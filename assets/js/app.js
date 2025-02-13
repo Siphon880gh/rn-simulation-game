@@ -28,10 +28,12 @@ const {start} = starter;
  *                               - 30 minutes → speedFactor = 24
  *                               - 15 minutes → speedFactor = 48
  *                               - 10 minutes → speedFactor = 72
+ *                               - 5 minutes → speedFactor = 144
+ *                               - 3 minutes → speedFactor = 360
  * @param {number} GAME_MINUTES_PER_SHIFT - How long the shift will be in game minutes?
  * @param {number} SHIFT_START - What time will the shift start? In thousand integers, eg 1900 for 19:00
  *
  * @example start("#clock", "#pause", 72, 4, 1900);
  * 
  */
-start("#clock", "#pause", 72, 60, 1900);
+start("#clock", "#pause", 360, 60*12, 1900);
