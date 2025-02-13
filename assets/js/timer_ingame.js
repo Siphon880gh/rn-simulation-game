@@ -1,24 +1,12 @@
 const TimerModule = (() => {
   // Configuration constants
   const TOTAL_DAYS = 1;
-  const REAL_MINUTES_PER_SHIFT = 10; // Set how long you want the shift to last in real minutes
-  const TIME_PER_DAY = REAL_MINUTES_PER_SHIFT * 60; // Convert to seconds
+  let GAME_MINUTES_PER_SHIFT = 10; // Set how long you want the shift to last in real minutes
+  let TIME_PER_DAY = GAME_MINUTES_PER_SHIFT * 60; // Convert to seconds
 
   // Shift time configuration (24-hour format)
   const SHIFT_START = 1900; // 19:00
-  const SHIFT_END = 730;   // 07:30
 
-  // Calculate total shift minutes
-  function calculateShiftMinutes() {
-    let endMinutes = Math.floor(SHIFT_END / 100) * 60 + (SHIFT_END % 100);
-    let startMinutes = Math.floor(SHIFT_START / 100) * 60 + (SHIFT_START % 100);
-    if (endMinutes < startMinutes) {
-      endMinutes += 24 * 60; // Add a full day if shift goes into next day
-    }
-    return endMinutes - startMinutes;
-  }
-
-  const TOTAL_SHIFT_MINUTES = calculateShiftMinutes();
   const GAME_MINUTES_PER_REAL_SECOND = 1; // Each real second corresponds to one game second
 
   let secondsLeft = TIME_PER_DAY;
@@ -77,7 +65,12 @@ const TimerModule = (() => {
   }
 
   // Public method to start the timer
-  function start(selector, pauseSelector, speedFactor = 1) {
+  function start(selector, pauseSelector, speedFactor = 1, GAME_MINUTES_PER_SHIFT = 10) {
+    GAME_MINUTES_PER_SHIFT = GAME_MINUTES_PER_SHIFT;
+    TIME_PER_DAY = GAME_MINUTES_PER_SHIFT * 60; // Convert to seconds
+    secondsLeft = TIME_PER_DAY;
+
+
     const clockElement = document.querySelector(selector);
     const pauseButton = document.querySelector(pauseSelector);
     
