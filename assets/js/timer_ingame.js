@@ -1,4 +1,4 @@
-const TimerModule = (() => {
+const GameTimerModule = (() => {
   // Configuration constants
   const TOTAL_DAYS = 1;
   let GAME_MINUTES_PER_SHIFT = 10; // Set how long you want the shift to last in real minutes
@@ -105,4 +105,4 @@ const TimerModule = (() => {
   };
 })();
 
-export default TimerModule;
+export default GameTimerModule;

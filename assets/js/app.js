@@ -1,21 +1,11 @@
 // app.js (Main Entry Point)
-import defaultFunction from './deps.js';
-import starter from './timer_ingame.js';
-import {greet, pi, Person} from './deps.js';
+import GameTimerModule from './timer_ingame.js';
 
-console.log(greet("Alice")); // Hello, Alice!
-console.log(`Value of π: ${pi}`);
-
-const user = new Person("Bob");
-console.log(user.sayHello()); // Hi, I'm Bob
-
-defaultFunction(); // Runs the default export function
-
-const {start} = starter;
+const {start:GameTimerModule_start} = GameTimerModule;
 
 /**
  * 
- * @function start
+ * @function GameTimerModule_start
  * @param {string} selector - The selector for the clock element
  * @param {string} pauseSelector - The selector for the pause button
  * @param {number} speedFactor - The speed factor for the clock. How long will your play be in real time?
@@ -33,7 +23,7 @@ const {start} = starter;
  * @param {number} GAME_MINUTES_PER_SHIFT - How long the shift will be in game minutes?
  * @param {number} SHIFT_START - What time will the shift start? In thousand integers, eg 1900 for 19:00
  *
- * @example start("#clock", "#pause", 72, 4, 1900);
+ * @example startGameTimer("#clock", "#pause", 72, 4, 1900);
  * 
  */
-start("#clock", "#pause", 360, 60*12, 1900);
+GameTimerModule_start("#clock", "#pause", 360, 60*12, 1900);
