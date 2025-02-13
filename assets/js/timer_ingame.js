@@ -5,7 +5,7 @@ const TimerModule = (() => {
   let TIME_PER_DAY = GAME_MINUTES_PER_SHIFT * 60; // Convert to seconds
 
   // Shift time configuration (24-hour format)
-  const SHIFT_START = 1900; // 19:00
+  let SHIFT_START = -1; // 19:00
 
   const GAME_MINUTES_PER_REAL_SECOND = 1; // Each real second corresponds to one game second
 
@@ -25,6 +25,7 @@ const TimerModule = (() => {
 
   // Function to calculate current shift time based on seconds remaining
   function calculateCurrentTime() {
+    if(SHIFT_START === -1) return;
     let elapsedGameSeconds = (TIME_PER_DAY - secondsLeft) * GAME_MINUTES_PER_REAL_SECOND;
     let startMinutes = Math.floor(SHIFT_START / 100) * 60 + (SHIFT_START % 100);
     let totalMinutes = startMinutes + Math.floor(elapsedGameSeconds / 60);
@@ -43,6 +44,7 @@ const TimerModule = (() => {
 
   // Function to update the clock and place it in a specified DOM element
   function updateClock(selector) {
+    if(SHIFT_START === -1) return;
     const clockElement = document.querySelector(selector);
     if (!clockElement) {
       console.error(`Element with selector "${selector}" not found.`);
@@ -65,11 +67,13 @@ const TimerModule = (() => {
   }
 
   // Public method to start the timer
-  function start(selector, pauseSelector, speedFactor = 1, GAME_MINUTES_PER_SHIFT = 10) {
-    GAME_MINUTES_PER_SHIFT = GAME_MINUTES_PER_SHIFT;
+  function start(selector, pauseSelector, speedFactor = 1, aGAME_MINUTES_PER_SHIFT = 10, aSHIFT_START = 1900) {
+    GAME_MINUTES_PER_SHIFT = aGAME_MINUTES_PER_SHIFT;
     TIME_PER_DAY = GAME_MINUTES_PER_SHIFT * 60; // Convert to seconds
     secondsLeft = TIME_PER_DAY;
 
+    SHIFT_START = aSHIFT_START;
+    currentShiftTime = aSHIFT_START;
 
     const clockElement = document.querySelector(selector);
     const pauseButton = document.querySelector(pauseSelector);
