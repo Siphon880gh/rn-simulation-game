@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind v3 CDN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: 'green', // affects bg-primary, text-primary, border-primary, etc.
+                }
+            }
+        }
+    }
+    </script>
+    <script type="module" src="assets/js/app.js"></script>
+
+</head>
+<body class="bg-gray-200 text-center p-10">
+    <div id="clock-wrapper">
+        <div id="clock"></div>
+        <button id="pause">Pause</button>
+    </div>
+    <div id="gameOver" style="display: none;">
+        <h1>Game Over!</h1>
+    </div>
+</body>
+</html>
