@@ -19,7 +19,7 @@ const TimerModule = (() => {
   }
 
   const TOTAL_SHIFT_MINUTES = calculateShiftMinutes();
-  const GAME_MINUTES_PER_REAL_SECOND = TOTAL_SHIFT_MINUTES / TIME_PER_DAY;
+  const GAME_MINUTES_PER_REAL_SECOND = 1; // Each real second corresponds to one game second
 
   let secondsLeft = TIME_PER_DAY;
   let currentShiftTime = SHIFT_START;
@@ -28,18 +28,19 @@ const TimerModule = (() => {
   let isPaused = false;
   let time = 0;
 
-  // Function to format military time to HH:MM
-  function formatMilitaryTime(time) {
+  // Function to format military time to HH:MM:SS
+  function formatMilitaryTime(time, seconds) {
     let hours = Math.floor(time / 100);
     let minutes = time % 100;
-    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   }
 
   // Function to calculate current shift time based on seconds remaining
   function calculateCurrentTime() {
-    let elapsedGameMinutes = (TIME_PER_DAY - secondsLeft) * GAME_MINUTES_PER_REAL_SECOND;
+    let elapsedGameSeconds = (TIME_PER_DAY - secondsLeft) * GAME_MINUTES_PER_REAL_SECOND;
     let startMinutes = Math.floor(SHIFT_START / 100) * 60 + (SHIFT_START % 100);
-    let totalMinutes = startMinutes + elapsedGameMinutes;
+    let totalMinutes = startMinutes + Math.floor(elapsedGameSeconds / 60);
+    let seconds = elapsedGameSeconds % 60;
     
     // Handle day rollover
     if (totalMinutes >= 24 * 60) {
@@ -47,9 +48,9 @@ const TimerModule = (() => {
     }
     
     let hours = Math.floor(totalMinutes / 60);
-    let minutes = Math.floor(totalMinutes % 60);
+    let minutes = totalMinutes % 60;
     
-    return hours * 100 + minutes;
+    return { hours: hours * 100 + minutes, seconds };
   }
 
   // Function to update the clock and place it in a specified DOM element
@@ -64,8 +65,9 @@ const TimerModule = (() => {
       secondsLeft--; // Decrease the time left
       
       // Calculate and display current shift time
-      currentShiftTime = calculateCurrentTime();
-      clockElement.textContent = "Shift Time: " + formatMilitaryTime(currentShiftTime);
+      const { hours, seconds } = calculateCurrentTime();
+      currentShiftTime = hours;
+      clockElement.textContent = "Shift Time: " + formatMilitaryTime(currentShiftTime, seconds);
     } else {
       // Shift is over
       clearInterval(intervalId);
@@ -75,7 +77,7 @@ const TimerModule = (() => {
   }
 
   // Public method to start the timer
-  function start(selector, pauseSelector) {
+  function start(selector, pauseSelector, speedFactor = 1) {
     const clockElement = document.querySelector(selector);
     const pauseButton = document.querySelector(pauseSelector);
     
@@ -93,12 +95,12 @@ const TimerModule = (() => {
     // Clear any existing interval
     if (intervalId) clearInterval(intervalId);
     
-    // Start the timer
+    // Start the timer with speed factor
     intervalId = setInterval(() => {
         if (!isPaused) {
             updateClock(selector);
         }
-    }, 1000);
+    }, 1000 / speedFactor);
   }
 
   return {
