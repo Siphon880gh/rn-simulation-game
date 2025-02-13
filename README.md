@@ -15,6 +15,8 @@ This engine is an in-game timer that starts at military time. The game concludes
 - **Game Duration**: The game ends after a set duration.
 - **Adjustable Speed**: Control how fast the game seconds progress.
 
+![Screenshot of countup timer](./docs/screenshot.png)
+
 ## Usage
 1. **Start the Timer**: Initialize the game timer at the desired military time.
 2. **Set Duration**: Define how long the game should last.
