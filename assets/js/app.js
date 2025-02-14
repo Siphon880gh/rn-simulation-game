@@ -4,6 +4,8 @@ import ModalModule from './modal.js';
 import PatientsModule from './patients.js';
 const {start:GameTimerModule_start} = GameTimerModule;
 
+// #region TIMER
+
 /**
  * 
  * @function GameTimerModule_start
@@ -29,7 +31,7 @@ const {start:GameTimerModule_start} = GameTimerModule;
  * 
  */
 
-// ?speed-factor=D&shift-starts=HHMM
+// ?speed-factor=NUMERIC&shift-starts=HHMM&shift-duration=MINS
 var searches = new URLSearchParams(window.location.search);
 var speedFactor = searches.get("speed-factor")
 if(speedFactor) speedFactor = parseInt(speedFactor);
@@ -43,11 +45,17 @@ if(shiftStarts) {
 }
 var defaultShiftStarts = 1900;
 
+var shiftDuration = searches.get("shift-duration")
+if(shiftDuration) {
+    shiftDuration = parseInt(shiftDuration);
+}
+var defaultShiftDuration = 60*12;
+
 GameTimerModule_start(
     "#clock", 
     "#pause", 
     speedFactor || defaultSpeedFactor, 
-    60*12, 
+    shiftDuration || defaultShiftDuration, 
     shiftStarts || defaultShiftStarts, 
     ()=>{
         modifyModal(
@@ -58,11 +66,21 @@ GameTimerModule_start(
         document.querySelector(".container").classList.add("opacity-40");
 });
 
+// #endregion TIMER
+
+// #region MODAL
+
 const { openModal, closeModal, modifyModal } = ModalModule;
 
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.modifyModal = modifyModal;
 
+// #endregion MODAL
+
+// #region PATIENTS
+
 const { init: PatientsModule_init } = PatientsModule;
 PatientsModule_init();
+
+// #endregion PATIENTS
