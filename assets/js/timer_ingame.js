@@ -16,6 +16,9 @@ const GameTimerModule = (() => {
   let isPaused = false;
   let time = 0;
 
+  // Gameover callback
+  let gameOverCallback = ()=>{};
+
   // Function to format military time to HH:MM:SS
   function formatMilitaryTime(time, seconds) {
     let hours = Math.floor(time / 100);
@@ -62,13 +65,13 @@ const GameTimerModule = (() => {
     } else {
       // Shift is over
       clearInterval(intervalId);
-      clockElement.style.display = "none";
-      document.getElementById("gameOver").style.display = "block";
+      // clockElement.style.display = "none"; // Decided to freeze on the last second
+      gameOverCallback();
     }
   }
 
   // Public method to start the timer
-  function start(selector, pauseSelector, speedFactor = 1, aGAME_MINUTES_PER_SHIFT = 10, aSHIFT_START = 1900) {
+  function start(selector, pauseSelector, speedFactor = 1, aGAME_MINUTES_PER_SHIFT = 10, aSHIFT_START = 1900, aGameOverCallback = ()=>{}) {
     GAME_MINUTES_PER_SHIFT = aGAME_MINUTES_PER_SHIFT;
     TIME_PER_DAY = GAME_MINUTES_PER_SHIFT * 60; // Convert to seconds
     secondsLeft = TIME_PER_DAY;
@@ -83,7 +86,9 @@ const GameTimerModule = (() => {
     secondsLeft = TIME_PER_DAY;
     currentShiftTime = SHIFT_START;
     isPaused = false;
-    
+
+    gameOverCallback = aGameOverCallback;
+
     // Add pause button listener
     pauseButton.addEventListener('click', () => {
         isPaused = !isPaused;

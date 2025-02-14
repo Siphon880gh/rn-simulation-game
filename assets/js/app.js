@@ -23,11 +23,19 @@ const {start:GameTimerModule_start} = GameTimerModule;
  *                               - 3 minutes → speedFactor = 360
  * @param {number} GAME_MINUTES_PER_SHIFT - How long the shift will be in game minutes?
  * @param {number} SHIFT_START - What time will the shift start? In thousand integers, eg 1900 for 19:00
+ * @param {function} gameOverCallback - The function to call when the game is over
  *
- * @example startGameTimer("#clock", "#pause", 72, 4, 1900);
+ * @example startGameTimer("#clock", "#pause", 72, 5, 1900, ()=>{ alert("Game over"); });
  * 
  */
-GameTimerModule_start("#clock", "#pause", 360, 60*12, 1900);
+GameTimerModule_start("#clock", "#pause", 360, 60*12, 1900, ()=>{
+    modifyModal(
+        "Game Over", 
+        "You have failed to save the patient", 
+        "<button class='px-4 py-2 rounded-lg font-medium bg-red-500 text-white hover:bg-red-600' onclick='closeModal()'>Close</button>");
+    openModal();
+    document.querySelector(".container").classList.add("opacity-40");
+});
 
 const { openModal, closeModal, modifyModal } = ModalModule;
 
