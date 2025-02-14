@@ -17,7 +17,6 @@
             }
         }
     </script>
-    <script type="module" src="assets/js/app.js"></script>
 
 </head>
 
@@ -26,21 +25,30 @@
     <div class="container mx-auto p-4">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-gray-800">Nursing Simulation</h1>
-            <div class="flex gap-4 items-center">
-                <div class="flex items-center gap-2 text-xl font-bold bg-white p-3 rounded-lg shadow"><svg
-                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+
+            <!-- #region Clock -->
+            <div class="flex flex-col gap-4 items-center">
+                <div class="flex items-center gap-2 text-xl font-bold bg-white p-3 rounded-lg shadow"
+                    style="width:150px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="lucide lucide-clock w-6 h-6 text-blue-600">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg><span>07:00</span></div><button
-                    class="px-4 py-2 rounded-lg font-medium bg-green-500 text-white hover:bg-green-600">Start
-                    Shift</button>
+                    </svg>
+                    <span id="clock">07:00</span>
+                </div>
+                <button id="pause" class="px-4 py-2 rounded-lg font-medium bg-green-500 text-white hover:bg-green-600"
+                    style="width:150px;">
+                    Pause
+                </button>
             </div>
+            <!-- #endregion Clock -->
+
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-white p-4 rounded-lg shadow-md">
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex justify-between items-top mb-4">
                     <h3 class="text-lg font-bold">Sarah Johnson</h3><span
                         class="text-sm bg-gray-100 px-2 py-1 rounded">Room 201-A</span>
                 </div>
@@ -49,9 +57,9 @@
                     <p class="text-sm text-gray-600">Diagnosis: Post-op Total Hip Replacement</p>
                 </div>
                 <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
-                    <div class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"
+                    <div class="flex justify-center items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg"
+                            width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-activity w-4 h-4 text-red-500">
                             <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
                         </svg><span>HR: 82</span></div>
@@ -60,12 +68,14 @@
                     <div>O2: 96%</div>
                 </div>
                 <div class="space-y-2">
-                    <h4 class="font-semibold flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24"
-                            height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard w-4 h-4">
+                    <h4 class="font-semibold flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-clipboard w-4 h-4">
                             <rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect>
                             <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                        </svg>Tasks</h4>
+                        </svg>Tasks
+                    </h4>
                     <div class="flex items-center gap-2 p-2 rounded bg-red-50"><input type="checkbox"
                             class="rounded text-blue-600">
                         <div class="flex-1">
@@ -89,24 +99,7 @@
     </div>
     <!-- #endregion Header -->
 
-    <!-- #region Clock -->
-    <div id="clock-wrapper">
-        <div id="clock"></div>
-        <button id="pause">Pause</button>
-    </div>
-    <!-- #endregion Clock -->
-
-    <!-- #region Game Over -->
-    <div id="gameOver" style="display: none;">
-        <h1>Game Over!</h1>
-    </div>
-    <!-- #endregion Game Over -->
+    <script type="module" src="assets/js/app.js"></script>
 </body>
-
-
-<div class=" bg-gray-100">
-
-</div>
-
 
 </html>

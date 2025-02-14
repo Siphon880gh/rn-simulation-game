@@ -57,7 +57,8 @@ const GameTimerModule = (() => {
       // Calculate and display current shift time
       const { hours, seconds } = calculateCurrentTime();
       currentShiftTime = hours;
-      clockElement.textContent = "Shift Time: " + formatMilitaryTime(currentShiftTime, seconds);
+      // clockElement.textContent = "Shift Time: " + formatMilitaryTime(currentShiftTime, seconds);
+      clockElement.textContent = formatMilitaryTime(currentShiftTime, seconds);
     } else {
       // Shift is over
       clearInterval(intervalId);
