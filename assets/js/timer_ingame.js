@@ -1,4 +1,5 @@
 import { roundDownTo15, timemarkPlusMinutes, divideBy15Mins, list15MinTimemarksFromHHMM } from './timer_utils.js';
+import ScheduledEvents from './events.js';
 
 const GameTimerModule = (() => {
   // Configuration constants
@@ -55,7 +56,8 @@ const GameTimerModule = (() => {
     // Check if the current time is a poll task time from 1900, 1930, 1945, 2000, etc, and run once when hit time
     if(pollTaskTimes.length && pollTaskTimes[0]<=elasedHHMM) {
       var hitTime = pollTaskTimes.shift();
-      console.log("Poll task time", hitTime);
+      // console.log("Poll task time", hitTime);
+      ScheduledEvents.getTasksAtHHMM.dispatch(hitTime);
     }
     
     // Handle day rollover
@@ -127,10 +129,10 @@ const GameTimerModule = (() => {
 
     // Game over callback
     gameOverCallback = aGameOverCallback;
+    
+    pollTaskTimes = list15MinTimemarksFromHHMM(SHIFT_START, divideBy15Mins(GAME_MINUTES_PER_SHIFT));
+    // console.log(pollTaskTimes);
 
-  
-  pollTaskTimes = list15MinTimemarksFromHHMM(SHIFT_START, divideBy15Mins(GAME_MINUTES_PER_SHIFT));
-  console.log(pollTaskTimes);
     // Add pause button listener
     pauseButton.addEventListener('click', () => {
         isPaused = !isPaused;
