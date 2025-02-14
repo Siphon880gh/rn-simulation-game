@@ -1,5 +1,6 @@
 // app.js (Main Entry Point)
 import GameTimerModule from './timer_ingame.js';
+import ModalModule from './modal.js';
 
 const {start:GameTimerModule_start} = GameTimerModule;
 
@@ -27,3 +28,9 @@ const {start:GameTimerModule_start} = GameTimerModule;
  * 
  */
 GameTimerModule_start("#clock", "#pause", 360, 60*12, 1900);
+
+const { openModal, closeModal, modifyModal } = ModalModule;
+
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.modifyModal = modifyModal;
