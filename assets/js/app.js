@@ -2,9 +2,10 @@
 import GameTimerModule from './timer_ingame.js';
 import ModalModule from './modal.js';
 import PatientsModule from './patients.js';
-const {start:GameTimerModule_start} = GameTimerModule;
 
 // #region TIMER
+const {start:GameTimerModule_start, pollTime} = GameTimerModule;
+window.pollTime = pollTime;
 
 /**
  * 
@@ -35,7 +36,7 @@ const {start:GameTimerModule_start} = GameTimerModule;
 var searches = new URLSearchParams(window.location.search);
 var speedFactor = searches.get("speed-factor")
 if(speedFactor) speedFactor = parseInt(speedFactor);
-var defaultSpeedFactor = 60*12;
+var defaultSpeedFactor = 1440; // 360 // 1440
 
 var shiftStarts = searches.get("shift-starts")
 if(shiftStarts) {
@@ -82,5 +83,10 @@ window.modifyModal = modifyModal;
 
 const { init: PatientsModule_init } = PatientsModule;
 PatientsModule_init();
+
+
+$(".patient").livequery( (i, card)=>{
+    console.log(card);
+});
 
 // #endregion PATIENTS
