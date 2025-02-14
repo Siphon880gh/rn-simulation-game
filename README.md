@@ -1,4 +1,4 @@
-# Game Timer
+# RN Simulation Game
 
 By Weng Fei Fung
 
@@ -7,48 +7,37 @@ By Weng Fei Fung
 <a target="_blank" href="https://www.linkedin.com/in/weng-fung/" rel="nofollow"><img src="https://img.shields.io/badge/LinkedIn-blue?style=flat&logo=linkedin&labelColor=blue" alt="Linked-In" data-canonical-src="https://img.shields.io/badge/LinkedIn-blue?style=flat&amp;logo=linkedin&amp;labelColor=blue" style="max-width:10ch;"></a>
 <a target="_blank" href="https://www.youtube.com/@WayneTeachesCode/" rel="nofollow"><img src="https://img.shields.io/badge/Youtube-red?style=flat&logo=youtube&labelColor=red" alt="Youtube" data-canonical-src="https://img.shields.io/badge/Youtube-red?style=flat&amp;logo=youtube&amp;labelColor=red" style="max-width:10ch;"></a>
 
-## Overview
-This engine is an in-game timer that starts at military time. The game concludes after a specified duration, and you have the ability to control the speed at which game seconds progress.
+## Description
 
-## Features
-- **Military Time Start**: The timer begins at military time format.
-- **Game Duration**: The game ends after a set duration.
-- **Adjustable Speed**: Control how fast the game seconds progress.
+Experience the intensity of a fast-paced 12-hour shift in this nursing simulation game. Manage multiple patients in ICU and Med-Surg units, facing real workloads and emergent situations. Your goal is to complete your shift without going into overtime, testing your clinical judgment, time management, and prioritization skills in a dynamic hospital environment.
 
-![Screenshot of countup timer](./docs/screenshot.png)
+### Future Features:
 
-## Usage
-1. **Start the Timer**: Initialize the game timer at the desired military time.
-2. **Set Duration**: Define how long the game should last.
-3. **Adjust Speed**: Modify the speed of the game seconds as needed.
+- Handle diverse patient populations in both ICU and Med-Surg settings
+- Respond to emergent situations like:
+  - Code Blues
+  - Rapid Responses
+  - Sudden Patient Deterioration
+  - New Admissions/Transfers
+- Balance competing priorities:
+  - Medication Administration
+  - Patient Assessments
+  - New Orders & Procedures
+  - Documentation
+  - Care Planning
+  - Family Communication
+- Real-time vital sign monitoring
+- Dynamic patient conditions that can change based on interventions
+- Realistic time pressure with an in-game 12-hour shift clock
+- Performance scoring based on patient outcomes and task completion
 
-```
-/**
- * 
- * @function GameTimerModule_start
- * @param {string} selector - The selector for the clock element
- * @param {string} pauseSelector - The selector for the pause button
- * @param {number} speedFactor - The speed factor for the clock. How long will your play be in real time?
- *                               - 12 hours → speedFactor = 1
- *                               - 6 hours → speedFactor = 2
- *                               - 3 hours → speedFactor = 4
- *                               - 2 hours → speedFactor = 6
- *                               - 1 hour → speedFactor = 12
- *                               - 45 minutes → speedFactor = 16
- *                               - 30 minutes → speedFactor = 24
- *                               - 15 minutes → speedFactor = 48
- *                               - 10 minutes → speedFactor = 72
- *                               - 5 minutes → speedFactor = 144
- *                               - 3 minutes → speedFactor = 360
- * @param {number} GAME_MINUTES_PER_SHIFT - How long the shift will be in game minutes?
- * @param {number} SHIFT_START - What time will the shift start? In thousand integers, eg 1900 for 19:00
- *
- * @example startGameTimer("#clock", "#pause", 72, 4, 1900);
- * 
- */
-GameTimerModule_start("#clock", "#pause", 360, 60*12, 1900);
-```
+### Learning Objectives:
 
+- Develop clinical prioritization skills
+- Practice safe medication administration
+- Improve time management in high-pressure situations
+- Learn to delegate appropriately
+- Master documentation requirements
+- Handle emergencies while maintaining care for other assigned patients
 
-## Author
-- **Weng Fei Fung**
+Perfect for nursing students and new graduates to practice clinical decision-making in a risk-free environment. Challenge yourself with increasing difficulty levels as you gain experience managing complex patient assignments.
