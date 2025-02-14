@@ -21,7 +21,7 @@
         <div>RR: 18</div>
     </div>
     <div class="space-y-2 mb-4">
-        <h4 class="font-semibold flex items-center gap-2">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="lucide lucide-clipboard w-4 h-4">
@@ -30,30 +30,32 @@
             </svg>
             Tasks
         </h4>
-        <div class="flex items-center gap-2 p-2 rounded bg-red-50"><input type="checkbox"
-                class="rounded text-blue-600">
-            <div class="flex-1">
-                <p class="text-sm ">Pain assessment and medication administration</p>
-            </div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" class="lucide lucide-pill w-4 h-4 text-blue-500">
-                <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
-                <path d="m8.5 8.5 7 7"></path>
-            </svg>
-        </div>
-        <div class="flex items-center gap-2 p-2 rounded bg-red-50"><input type="checkbox"
-                class="rounded text-blue-600">
-            <div class="flex-1">
-                <p class="text-sm ">Post-op assessment</p>
-            </div>
-        </div>
+        <ul class="tasks-list hidden" class="space-y-3">
+            <li class="flex items-center gap-2 p-2 rounded bg-red-50"><input type="checkbox"
+                    class="rounded text-blue-600">
+                <div class="flex-1">
+                    <p class="text-sm ">Pain assessment and medication administration</p>
+                </div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" class="lucide lucide-pill w-4 h-4 text-blue-500">
+                    <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
+                    <path d="m8.5 8.5 7 7"></path>
+                </svg>
+            </li>
+            <li class="flex items-center gap-2 p-2 rounded bg-red-50"><input type="checkbox"
+                    class="rounded text-blue-600">
+                <div class="flex-1">
+                    <p class="text-sm ">Post-op assessment</p>
+                </div>
+            </li>
+        </ul>
     </div>
     <div class="space-y-2 mb-4">
-        <h4 class="font-semibold flex items-center">
+        <h4 class="font-semibold flex items-center cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
             <i class="fas fa-pills text-xl mr-1"></i>
             Medications
         </h4>
-        <ul class="meds-list" class="space-y-3">
+        <ul class="meds-list hidden" class="space-y-3">
             <li data-scheduled="2200" class="bg-white p-4 rounded-lg shadow flex items-center">
                 <i class="fas fa-pills text-blue-500 text-xl mr-3"></i>
                 <span class="font-medium text-gray-900">Atorvastatin</span>
