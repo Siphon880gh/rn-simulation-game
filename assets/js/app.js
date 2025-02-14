@@ -1,7 +1,7 @@
 // app.js (Main Entry Point)
 import GameTimerModule from './timer_ingame.js';
 import ModalModule from './modal.js';
-
+import PatientsModule from './patients.js';
 const {start:GameTimerModule_start} = GameTimerModule;
 
 /**
@@ -63,3 +63,6 @@ const { openModal, closeModal, modifyModal } = ModalModule;
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.modifyModal = modifyModal;
+
+const { init: PatientsModule_init } = PatientsModule;
+PatientsModule_init();
