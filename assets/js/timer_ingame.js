@@ -1,36 +1,4 @@
-function timemarkPlusMinutes(hhmm, totalMinutes) {
-    
-  function roundDownTo15(hhmm) {
-      let hours = Math.floor(hhmm / 100);
-      let minutes = hhmm % 100;
-  
-      // Round down to the nearest 15-minute mark
-      minutes = Math.floor(minutes / 15) * 15;
-  
-      return hours * 100 + minutes;
-  }
-
-  let hours = Math.floor(hhmm / 100);
-  let minutes = hhmm % 100;
-
-  // Add totalMinutes
-  let newMinutes = minutes + totalMinutes;
-  let newHours = hours + Math.floor(newMinutes / 60);
-  newMinutes = newMinutes % 60;
-
-  // Handle overflow past midnight (optional behavior)
-  if (newHours >= 24) newHours = newHours % 24;
-
-  let newTime = newHours * 100 + newMinutes;
-
-  // Round down to the next 15-minute mark
-  return roundDownTo15(newTime).toString().padStart(4, '0');
-}
-
-
-// console.log(timemarkPlusMinutes(1900, 37)); // Output: '1930'
-// console.log(timemarkPlusMinutes(2330, 45)); // Output: '0015'
-// console.log(timemarkPlusMinutes(1007, 120)); // Output: '1200'
+import { roundDownTo15, timemarkPlusMinutes, divideBy15Mins, list15MinTimemarksFromHHMM } from './timer_utils.js';
 
 const GameTimerModule = (() => {
   // Configuration constants
@@ -160,41 +128,8 @@ const GameTimerModule = (() => {
     // Game over callback
     gameOverCallback = aGameOverCallback;
 
-    /**
-     * 
-     * Add to shift start hhmm with total minutes aka game shift duration
-     * Return an array of hhmm with 15 min intervals
-     * 
-     */
-    function generateTimeIntervals(hhmm, totalMinutes) {
-      function calculateIntervalsCount(totalMinutes) {
-          return Math.floor(totalMinutes / 15);
-      }
-      var count = calculateIntervalsCount(totalMinutes);
-      
-      let hours = Math.floor(hhmm / 100);
-      let minutes = hhmm % 100;
   
-      // Round down to the nearest 15-minute mark
-      minutes = Math.floor(minutes / 15) * 15;
-  
-      let intervals = [];
-      for (let i = 0; i < count; i++) {
-          let newMinutes = minutes + i * 15;
-          let newHours = hours + Math.floor(newMinutes / 60);
-          newMinutes = newMinutes % 60;
-  
-          if (newHours >= 24) break; // Stop if we pass midnight
-  
-          let formattedTime = (newHours * 100 + newMinutes).toString().padStart(4, '0');
-          formattedTime = parseInt(formattedTime);
-          intervals.push(formattedTime);
-      }
-  
-      return intervals;
-  }
-  
-  pollTaskTimes = generateTimeIntervals(SHIFT_START, GAME_MINUTES_PER_SHIFT);
+  pollTaskTimes = list15MinTimemarksFromHHMM(SHIFT_START, divideBy15Mins(GAME_MINUTES_PER_SHIFT));
   console.log(pollTaskTimes);
     // Add pause button listener
     pauseButton.addEventListener('click', () => {
