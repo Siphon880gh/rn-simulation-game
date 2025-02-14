@@ -14,6 +14,25 @@ Experience the intensity of a fast-paced 12-hour shift in this nursing simulatio
 ## STATUS
 This project is a work in progress and is currently in its early stages.
 
+## Hospital Shifts
+
+These are optional:
+- ?speed-factor=4&shift-starts=1700
+
+Speed factors to how long your simulation session will be:
+- 12 hours → speedFactor = 1
+- 6 hours → speedFactor = 2
+- 3 hours → speedFactor = 4
+- 2 hours → speedFactor = 6
+- 1 hour → speedFactor = 12
+- 45 minutes → speedFactor = 16
+- 30 minutes → speedFactor = 24
+- 15 minutes → speedFactor = 48
+- 10 minutes → speedFactor = 72
+- 5 minutes → speedFactor = 144
+- 3 minutes → speedFactor = 360
+
+
 ### Future Features:
 
 - Handle diverse patient populations in both ICU and Med-Surg settings

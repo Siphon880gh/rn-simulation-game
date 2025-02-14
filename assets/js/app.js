@@ -28,13 +28,34 @@ const {start:GameTimerModule_start} = GameTimerModule;
  * @example startGameTimer("#clock", "#pause", 72, 5, 1900, ()=>{ alert("Game over"); });
  * 
  */
-GameTimerModule_start("#clock", "#pause", 360, 60*12, 1900, ()=>{
-    modifyModal(
-        "Game Over", 
-        "You have failed to save the patient", 
-        "<button class='px-4 py-2 rounded-lg font-medium bg-red-500 text-white hover:bg-red-600' onclick='closeModal()'>Close</button>");
-    openModal();
-    document.querySelector(".container").classList.add("opacity-40");
+
+// ?speed-factor=D&shift-starts=HHMM
+var searches = new URLSearchParams(window.location.search);
+var speedFactor = searches.get("speed-factor")
+if(speedFactor) speedFactor = parseInt(speedFactor);
+var defaultSpeedFactor = 60*12;
+
+var shiftStarts = searches.get("shift-starts")
+if(shiftStarts) {
+    shiftStarts = "" + shiftStarts;
+    shiftStarts = shiftStarts.replaceAll(":", "");
+    shiftStarts = parseInt(shiftStarts);
+}
+var defaultShiftStarts = 1900;
+
+GameTimerModule_start(
+    "#clock", 
+    "#pause", 
+    speedFactor || defaultSpeedFactor, 
+    60*12, 
+    shiftStarts || defaultShiftStarts, 
+    ()=>{
+        modifyModal(
+            "Game Over", 
+            "You have failed to save the patient", 
+            "<button class='px-4 py-2 rounded-lg font-medium bg-red-500 text-white hover:bg-red-600' onclick='closeModal()'>Close</button>");
+        openModal();
+        document.querySelector(".container").classList.add("opacity-40");
 });
 
 const { openModal, closeModal, modifyModal } = ModalModule;
