@@ -4,7 +4,115 @@ import ModalModule from './modal.js';
 import PatientsModule from './patients.js';
 import { timemarkPlusMinutes } from './timer_utils.js';
 
-// #region TIMER
+
+// #region MODAL
+
+const { openModal, closeModal, modifyModal } = ModalModule;
+
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.modifyModal = modifyModal;
+
+// #endregion MODAL
+
+// #region PATIENTS
+
+const { init: PatientsModule_init } = PatientsModule;
+await PatientsModule_init();
+
+// #endregion PATIENTS
+
+// #region Standardize tasks
+
+$("[data-scheduled]").livequery( (i, task)=>{
+    let $task = $(task);
+    let scheduled = $task.data("scheduled");
+    let expire = $task.data("expire");
+    let durationMins = $task.data("duration-mins");
+
+    if(expire) {
+        expire = String(expire);
+        if(expire[0] == "+") {
+            expire = expire.slice(1);
+            expire = parseInt(expire);
+            expire = timemarkPlusMinutes(scheduled, expire);
+            $task.attr("data-expire", expire);
+        }
+    }
+});
+
+window.nextTaskId = -1;
+
+$("[data-scheduled]").livequery( (i, task)=>{
+    let $task = $(task);
+    let scheduled = $task.data("scheduled");
+    let expire = $task.data("expire");
+    let durationMins = $task.data("duration-mins");
+
+    if(expire) {
+        expire = String(expire);
+        if(expire[0] == "+") {
+            expire = expire.slice(1);
+            expire = parseInt(expire);
+            expire = timemarkPlusMinutes(scheduled, expire);
+            $task.attr("data-expire", expire);
+        }
+    }
+
+    if (!$task.attr('id')) {
+        nextTaskId++;
+        $task.attr('id', "task-"+nextTaskId);
+    }
+});
+
+
+$(`[data-task-type="med"]`).livequery( (i, task)=>{
+    let $task = $(task);
+
+    $.contextMenu({
+        selector: "#"+task.id,
+        trigger: 'left',
+        build: function ($triggerElement, e) {
+            var element = e.target;
+            if(!e.target.matches('[data-task-type]')) {
+                element = e.target.closest('[data-task-type]');
+            }
+            if ($(element).attr("data-status")!=="active") {
+                return false; // Prevent menu from opening if the flag is false
+            }
+            return {
+                callback: function (key, options) {
+                    // alert("Clicked: " + key);
+                    switch(key) {
+                        case "perform":
+                            alert("Coming soon!");
+                            break;
+                        case "details":
+                            const durationMins = $(element).data("duration-mins");
+                            const expire = $(element).data("expire");
+                            alert(`Task is ${durationMins} mins long. Expires at ${expire}.`);
+                            break;
+                            
+                    }
+                },
+                items: {
+                    perform: { name: "Perform", icon: "add" },
+                    // help: {type: 'html', html: '<div class="hover:bg-blue-500"><i class="fa fa-question absolute left-2.5 top-1.5" style="color:#2980b9"></i><span>Help</span></div>'}
+                    details: {name: 'Details', icon: 'question'}
+                }
+            };
+        }
+        // items: {
+        //     perform: { name: "Perform", icon: "add" },
+        //     details: {name: 'Details', icon: 'question'}
+        //   }
+      });
+});
+
+// #endregion Standardize
+
+
+// #region TIMER (Must at end)
 const {start:GameTimerModule_start, pollTime} = GameTimerModule;
 window.pollTime = pollTime;
 
@@ -69,45 +177,3 @@ GameTimerModule_start(
 });
 
 // #endregion TIMER
-
-// #region MODAL
-
-const { openModal, closeModal, modifyModal } = ModalModule;
-
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.modifyModal = modifyModal;
-
-// #endregion MODAL
-
-// #region PATIENTS
-
-const { init: PatientsModule_init } = PatientsModule;
-PatientsModule_init();
-
-// #endregion PATIENTS
-
-// #region Standardize
-
-$("[data-scheduled]").livequery( (i, task)=>{
-    let $task = $(task);
-    let scheduled = $task.data("scheduled");
-    let expire = $task.data("expire");
-    let durationMins = $task.data("duration-mins");
-
-    if(expire) {
-        expire = String(expire);
-        if(expire[0] == "+") {
-            expire = expire.slice(1);
-            expire = parseInt(expire);
-            expire = timemarkPlusMinutes(scheduled, expire);
-            $task.attr("data-expire", expire);
-        }
-    }
-
-
-    // $task.data("scheduled", scheduled);
-    // $task.data("expire", expire);
-});
-
-// #endregion Standardize
