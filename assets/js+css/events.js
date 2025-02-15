@@ -12,6 +12,8 @@ let ScheduledEvents = {
                 }
                 `
             })());
+
+            $(`[data-scheduled="${hhmm}"]`).attr("data-status", "active");
         });
 
         return that;

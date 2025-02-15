@@ -1,3 +1,9 @@
 #task-queue-bar img[src=""] {
     visibility: hidden;
 }
+
+.context-menu-icon-question::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: "\f128";
+}
