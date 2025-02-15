@@ -2,6 +2,7 @@
 import GameTimerModule from './timer_ingame.js';
 import ModalModule from './modal.js';
 import PatientsModule from './patients.js';
+import { timemarkPlusMinutes } from './timer_utils.js';
 
 // #region TIMER
 const {start:GameTimerModule_start, pollTime} = GameTimerModule;
@@ -84,9 +85,29 @@ window.modifyModal = modifyModal;
 const { init: PatientsModule_init } = PatientsModule;
 PatientsModule_init();
 
+// #endregion PATIENTS
 
-$(".patient").livequery( (i, card)=>{
-    console.log(card);
+// #region Standardize
+
+$("[data-scheduled]").livequery( (i, task)=>{
+    let $task = $(task);
+    let scheduled = $task.data("scheduled");
+    let expire = $task.data("expire");
+    let durationMins = $task.data("duration-mins");
+
+    if(expire) {
+        expire = String(expire);
+        if(expire[0] == "+") {
+            expire = expire.slice(1);
+            expire = parseInt(expire);
+            expire = timemarkPlusMinutes(scheduled, expire);
+            $task.attr("data-expire", expire);
+        }
+    }
+
+
+    // $task.data("scheduled", scheduled);
+    // $task.data("expire", expire);
 });
 
-// #endregion PATIENTS
+// #endregion Standardize

@@ -19,6 +19,27 @@ This project is a work in progress and is currently in its early stages.
 These are optional:
 - ?speed-factor=4&shift-starts=1700
 
+
+## Tasks
+
+For an element to be read as a task that is scheduled, the player can perfrom, and there's a deadline, there are three html attributes:
+- `data-scheduled="2100"`
+- `data-expire="+120"` or `data-expire="2300"` 
+- `data-duration-mins="10"`
+
+```
+    <li data-scheduled="2100" data-expire="+120" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+        <i class="fas fa-pills text-blue-500 text-xl mr-3"></i>
+        <span class="font-medium text-gray-900">Atorvastatin</span>
+        <span class="ml-auto text-sm text-gray-500">2200</span>
+    </li>
+    <li data-scheduled="2100" data-expire="2300" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+        <i class="fas fa-pills text-blue-500 text-xl mr-3"></i>
+        <span class="font-medium text-gray-900">Aspirin (Low-dose)</span>
+        <span class="ml-auto text-sm text-gray-500">2200</span>
+    </li>
+```
+
 Speed factors to how long your simulation session will be:
 - 12 hours → speedFactor = 1
 - 6 hours → speedFactor = 2
