@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hospital Shift Clock</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: black;
+      color: white;
+      margin: 0;
+    }
+    #gameOver {
+      display: none;
+      font-size: 2em;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div id="clock">Shift Time: 19:00</div>
+  <div id="gameOver">Shift Complete!</div>
+
+  <script>
+    // Configuration constants
+    const TOTAL_DAYS = 1;
+    const REAL_MINUTES_PER_SHIFT = 10; // Set how long you want the shift to last in real minutes
+    const TIME_PER_DAY = REAL_MINUTES_PER_SHIFT * 60; // Convert to seconds
+
+    // Shift time configuration (24-hour format)
+    const SHIFT_START = 1900; // 19:00
+    const SHIFT_END = 730;   // 07:30
+    
+    // Calculate total shift minutes
+    function calculateShiftMinutes() {
+      let endMinutes = Math.floor(SHIFT_END / 100) * 60 + (SHIFT_END % 100);
+      let startMinutes = Math.floor(SHIFT_START / 100) * 60 + (SHIFT_START % 100);
+      if (endMinutes < startMinutes) {
+        endMinutes += 24 * 60; // Add a full day if shift goes into next day
+      }
+      return endMinutes - startMinutes;
+    }
+
+    const TOTAL_SHIFT_MINUTES = calculateShiftMinutes();
+    const GAME_MINUTES_PER_REAL_SECOND = TOTAL_SHIFT_MINUTES / TIME_PER_DAY;
+
+    let secondsLeft = TIME_PER_DAY;
+    let currentShiftTime = SHIFT_START;
+
+    // Function to format military time to HH:MM
+    function formatMilitaryTime(time) {
+      let hours = Math.floor(time / 100);
+      let minutes = time % 100;
+      return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+    }
+
+    // Function to calculate current shift time based on seconds remaining
+    function calculateCurrentTime() {
+      let elapsedGameMinutes = (TIME_PER_DAY - secondsLeft) * GAME_MINUTES_PER_REAL_SECOND;
+      let startMinutes = Math.floor(SHIFT_START / 100) * 60 + (SHIFT_START % 100);
+      let totalMinutes = startMinutes + elapsedGameMinutes;
+      
+      // Handle day rollover
+      if (totalMinutes >= 24 * 60) {
+        totalMinutes -= 24 * 60;
+      }
+      
+      let hours = Math.floor(totalMinutes / 60);
+      let minutes = Math.floor(totalMinutes % 60);
+      
+      return hours * 100 + minutes;
+    }
+
+    // Function to update the clock
+    function updateClock() {
+      if (secondsLeft > 0) {
+        secondsLeft--; // Decrease the time left
+        
+        // Calculate and display current shift time
+        currentShiftTime = calculateCurrentTime();
+        document.getElementById("clock").textContent = 
+          "Shift Time: " + formatMilitaryTime(currentShiftTime);
+      } else {
+        // Shift is over
+        clearInterval(timer);
+        document.getElementById("clock").style.display = "none";
+        document.getElementById("gameOver").style.display = "block";
+      }
+    }
+
+    // Start the clock timer
+    const timer = setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
