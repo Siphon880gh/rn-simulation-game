@@ -1,18 +1,36 @@
-// Docs functionality for displaying markdown files from docs/ directory
+// Docs functionality for displaying markdown files from docs/ directory with nested categories
 (function() {
     'use strict';
 
-    // List of markdown files in docs/ directory
-    const markdownFiles = [
-        'MEDICATION_WINDOW_MECHANICS.md',
-        'README_UTILS.md',
-        'REFACTORING_SUMMARY.md'
-    ];
+    // Documentation structure with categories and files
+    const docsStructure = {
+        'devs': {
+            displayName: 'Developers',
+            icon: 'code',
+            color: 'text-purple-500',
+            files: [
+                'MEDICATION_WINDOW_MECHANICS.md',
+                'README_UTILS.md',
+                'REFACTORING_SUMMARY.md'
+            ]
+        },
+        'players': {
+            displayName: 'Players',
+            icon: 'users',
+            color: 'text-green-500',
+            files: [
+                'ABOUT.md'
+            ]
+        }
+    };
+
+    // Track expanded categories
+    let expandedCategories = new Set();
 
     // Initialize docs functionality when DOM is ready
     $(document).ready(function() {
         initializeDocsDropdown();
-        loadDocsList();
+        loadNestedDocsList();
         setupEventListeners();
     });
 
@@ -34,39 +52,157 @@
         });
     }
 
-    function loadDocsList() {
+    function loadNestedDocsList() {
         const docsList = $('#docs-list');
         docsList.empty();
 
-        markdownFiles.forEach(function(filename) {
-            const displayName = formatDisplayName(filename);
-            const listItem = $(`
-                <div class="docs-item px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer flex text-left gap-2"
-                     data-filename="${filename}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                         class="lucide lucide-file-text text-blue-500">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    ${displayName}
-                </div>
-            `);
-            docsList.append(listItem);
+        // Create categories
+        Object.keys(docsStructure).forEach(function(categoryKey) {
+            const category = docsStructure[categoryKey];
+            const isExpanded = expandedCategories.has(categoryKey);
+            
+            const categoryItem = createCategoryItem(categoryKey, category, isExpanded);
+            docsList.append(categoryItem);
+
+            // Add files for this category
+            if (isExpanded && category.files.length > 0) {
+                category.files.forEach(function(filename) {
+                    const fileItem = createFileItem(filename, categoryKey);
+                    docsList.append(fileItem);
+                });
+            }
         });
     }
 
+    function createCategoryItem(categoryKey, category, isExpanded) {
+        const expandIcon = isExpanded ? 'chevron-down' : 'chevron-right';
+        const categoryIcon = getCategoryIcon(category.icon);
+        
+        return $(`
+            <div class="category-item px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 cursor-pointer flex items-center gap-3 border-b border-gray-100"
+                 data-category="${categoryKey}">
+                <div class="flex items-center gap-2 flex-1">
+                    ${categoryIcon}
+                    <span class="${category.color}">${category.displayName}</span>
+                    <span class="text-xs text-gray-400">(${category.files.length})</span>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="lucide lucide-${expandIcon} text-gray-400 transition-transform duration-200">
+                    ${getChevronPath(expandIcon)}
+                </svg>
+            </div>
+        `);
+    }
+
+    function createFileItem(filename, categoryKey) {
+        const displayName = formatDisplayName(filename);
+        const fileIcon = getFileIcon(filename);
+        
+        return $(`
+            <div class="file-item pl-8 pr-4 py-2 text-sm text-gray-600 hover:bg-blue-50 cursor-pointer flex text-left gap-2 border-l-2 border-transparent hover:border-blue-300"
+                 data-filename="${filename}" data-category="${categoryKey}">
+                ${fileIcon}
+                <span>${displayName}</span>
+            </div>
+        `);
+    }
+
+    function getCategoryIcon(iconType) {
+        const icons = {
+            'code': `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="lucide lucide-code text-purple-500">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+            `,
+            'users': `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="lucide lucide-users text-green-500">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            `
+        };
+        return icons[iconType] || icons['code'];
+    }
+
+    function getFileIcon(filename) {
+        // Different icons based on file type/name
+        if (filename.toLowerCase().includes('about')) {
+            return `
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="lucide lucide-info text-blue-500">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 16v-4"></path>
+                    <path d="M12 8h.01"></path>
+                </svg>
+            `;
+        } else if (filename.toLowerCase().includes('readme')) {
+            return `
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="lucide lucide-book-open text-amber-500">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+            `;
+        } else {
+            return `
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="lucide lucide-file-text text-gray-500">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+            `;
+        }
+    }
+
+    function getChevronPath(iconType) {
+        if (iconType === 'chevron-down') {
+            return '<polyline points="6 9 12 15 18 9"></polyline>';
+        } else {
+            return '<polyline points="9 18 15 12 9 6"></polyline>';
+        }
+    }
+
     function setupEventListeners() {
-        // Handle clicking on doc items
-        $(document).on('click', '.docs-item', function(e) {
+        // Handle clicking on category items (expand/collapse)
+        $(document).on('click', '.category-item', function(e) {
             e.preventDefault();
+            e.stopPropagation(); // Prevent dropdown from closing
+            const categoryKey = $(this).data('category');
+            toggleCategory(categoryKey);
+        });
+
+        // Handle clicking on file items
+        $(document).on('click', '.file-item', function(e) {
+            e.preventDefault();
+            e.stopPropagation(); // Prevent any unwanted bubbling
             const filename = $(this).data('filename');
-            openMarkdownInNewWindow(filename);
+            const categoryKey = $(this).data('category');
+            openMarkdownInNewWindow(filename, categoryKey);
             $('#docs-dropdown').addClass('hidden');
         });
+    }
+
+    function toggleCategory(categoryKey) {
+        if (expandedCategories.has(categoryKey)) {
+            expandedCategories.delete(categoryKey);
+        } else {
+            expandedCategories.add(categoryKey);
+        }
+        loadNestedDocsList();
     }
 
     function formatDisplayName(filename) {
@@ -77,9 +213,9 @@
             .replace(/\b\w/g, l => l.toUpperCase());
     }
 
-    function openMarkdownInNewWindow(filename) {
-        // Fetch the markdown file and render it in a new window
-        fetch(`../docs/${filename}`)
+    function openMarkdownInNewWindow(filename, categoryKey) {
+        // Fetch the markdown file from the appropriate category folder
+        fetch(`../docs/${categoryKey}/${filename}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Failed to fetch ${filename}: ${response.statusText}`);
@@ -88,15 +224,16 @@
             })
             .then(markdownContent => {
                 const htmlContent = marked.parse(markdownContent);
-                createDocumentWindow(filename, htmlContent);
+                const categoryInfo = docsStructure[categoryKey];
+                createDocumentWindow(filename, htmlContent, categoryInfo);
             })
             .catch(error => {
                 console.error('Error loading markdown file:', error);
-                alert(`Error loading ${filename}. Please check if the file exists.`);
+                alert(`Error loading ${filename}. Please check if the file exists in the ${categoryKey} folder.`);
             });
     }
 
-    function createDocumentWindow(filename, htmlContent) {
+    function createDocumentWindow(filename, htmlContent, categoryInfo) {
         const displayName = formatDisplayName(filename);
         
         // Create a new window
@@ -114,8 +251,15 @@
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>${displayName} - Documentation</title>
-                
+                <title>${displayName} - ${categoryInfo.displayName} Documentation</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <script>
+                    tailwind.config = {
+                        corePlugins: {
+                            preflight: false, // Disable Tailwind's CSS reset
+                        }
+                    }
+                </script>
                 <style>
                     /* Custom styles for markdown content */
                     .markdown-content {
@@ -166,7 +310,12 @@
                 <div class="container mx-auto px-6 py-8 max-w-4xl">
                     <div class="bg-white rounded-lg shadow-lg p-8">
                         <div class="flex items-center justify-between mb-6 border-b border-gray-200 pb-4">
-                            <h1 class="text-2xl font-bold text-gray-900">${displayName}</h1>
+                            <div class="flex items-center gap-3">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 ${categoryInfo.color}">
+                                    ${categoryInfo.displayName}
+                                </span>
+                                <h1 class="text-2xl font-bold text-gray-900">${displayName}</h1>
+                            </div>
                             <button onclick="window.close()" 
                                     class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
                                 Close
