@@ -1,0 +1,151 @@
+/* Declarative Task Status Styles */
+
+/* Base task styling */
+[data-task-type] {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Task status-based styling */
+.task-status-not-yet {
+    opacity: 0.3;
+    background-color: #f3f4f6;
+    border-left: 4px solid #d1d5db;
+}
+
+.task-status-active {
+    opacity: 1;
+    background-color: #ffffff;
+    border-left: 4px solid #10b981;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.task-status-active:hover {
+    background-color: #f9fafb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.task-status-completed {
+    opacity: 0.6;
+    background-color: #ecfdf5;
+    border-left: 4px solid #059669;
+    text-decoration: line-through;
+}
+
+.task-status-overdue {
+    opacity: 1;
+    background-color: #fef2f2;
+    border-left: 4px solid #dc2626;
+    animation: pulse-danger 2s infinite;
+}
+
+@keyframes pulse-danger {
+    0%, 100% {
+        border-left-color: #dc2626;
+    }
+    50% {
+        border-left-color: #fca5a5;
+    }
+}
+
+/* Task type specific styling */
+[data-task-type="med"].task-status-active {
+    border-left-color: #3b82f6;
+}
+
+[data-task-type="assessment"].task-status-active {
+    border-left-color: #10b981;
+}
+
+[data-task-type="procedure"].task-status-active {
+    border-left-color: #8b5cf6;
+}
+
+/* Reveal scheduled tasks animation */
+li[data-status="active"] {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Context menu enhancements */
+[data-task-type].task-status-active {
+    position: relative;
+}
+
+[data-task-type].task-status-active::after {
+    content: '⋮';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+[data-task-type].task-status-active:hover::after {
+    opacity: 1;
+}
+
+/* Patient section styling */
+[data-patient-id] {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+[data-patient-id]:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Collapsible sections */
+.collapsible-header {
+    transition: background-color 0.2s ease;
+}
+
+.collapsible-header:hover {
+    background-color: #f3f4f6 !important;
+}
+
+/* Task queue styling */
+.task-queue-item {
+    transition: all 0.3s ease;
+}
+
+.task-queue-item.active {
+    background-color: #dbeafe;
+    border-color: #3b82f6;
+}
+
+.task-queue-item.completed {
+    background-color: #dcfce7;
+    border-color: #16a34a;
+    opacity: 0.7;
+}
+
+.task-queue-item.overdue {
+    background-color: #fee2e2;
+    border-color: #dc2626;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+} 
