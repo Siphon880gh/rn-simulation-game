@@ -126,10 +126,31 @@ export function hasAvailableSlot();
     <div class="slot-progress-bar">
       <div class="slot-progress-fill" style="width: 0%"></div>
     </div>
-    <span class="slot-time-remaining"></span>
+    <!-- Duration timemark: shows completion time in HHMM format -->
+    <span class="slot-duration-timemark"></span>
   </div>
   <!-- Repeat for slots 1 and 2 -->
 </div>
+```
+
+### Duration Timemark Display
+
+When a slot is occupied, display the **completion time** (not remaining time) as a timemark in HHMM format at the bottom center of the slot.
+
+```javascript
+/**
+ * Format end time for slot display
+ * @param {number} endTime - HHMM when task completes
+ * @returns {string} Formatted time "HH:MM"
+ */
+function formatSlotTimemark(endTime) {
+  const hours = Math.floor(endTime / 100);
+  const mins = endTime % 100;
+  return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+}
+
+// Example: Task starts at 19:00, duration 10 mins
+// Slot shows: "19:10" at bottom center
 ```
 
 ### Game State Actions
@@ -191,8 +212,19 @@ this.actions.set('RELEASE_SLOT', (payload) => {
   @apply h-full bg-blue-500 transition-all duration-100;
 }
 
-.slot-time-remaining {
-  @apply text-xs text-gray-500 absolute bottom-1;
+/* Duration timemark - shows completion time at bottom center */
+.slot-duration-timemark {
+  @apply absolute bottom-1 left-1/2 -translate-x-1/2;
+  @apply text-xs font-mono font-medium text-gray-600;
+  @apply bg-white/80 px-1 rounded;
+}
+
+.slot[data-status="empty"] .slot-duration-timemark {
+  @apply hidden;
+}
+
+.slot[data-status="occupied"] .slot-duration-timemark {
+  @apply block;
 }
 ```
 
@@ -219,6 +251,8 @@ this.actions.set('RELEASE_SLOT', (payload) => {
    - [ ] Occupied slots show task icon/name
    - [ ] Progress bar fills smoothly
    - [ ] Completion has brief animation
+   - [ ] **Duration timemark shows completion time (e.g., "19:10") at bottom center**
+   - [ ] Timemark hidden when slot is empty
 
 5. **State Persistence**
    - [ ] Pausing game pauses slot progress
@@ -245,9 +279,10 @@ Time: 19:00 - Heparin becomes available (scheduled 19:30, early start 60min)
 User: Clicks Heparin → Perform
 Slot 0: Occupied, taskId: 'joe-heparin-1', duration: 10min
        Progress bar starts at 0%
-Time: 19:05 - Progress: 50%
+       Timemark shows: "19:10" (completion time)
+Time: 19:05 - Progress: 50%, timemark still shows "19:10"
 Time: 19:10 - Progress: 100%, task completes
-Slot 0: Empty again
+Slot 0: Empty again, timemark hidden
 Heparin: Status = 'completed'
 ```
 

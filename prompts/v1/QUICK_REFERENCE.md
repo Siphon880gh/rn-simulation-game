@@ -114,10 +114,87 @@ NOT_YET ──► AVAILABLE ──► ACTIVE ──► COMPLETED
 | On-time shift finish | +300 bonus |
 | Per boost earned | +10 bonus |
 
+## Slot Display
+
+When a slot is occupied:
+- Progress bar fills from left to right
+- **Duration timemark** shows completion time at bottom center (e.g., "19:10")
+- Timemark hidden when slot is empty
+
+## Mini-Game System (Scalable)
+
+Plugin-based system for skill checks before task execution.
+
+### Architecture
+```
+MiniGameSystem (orchestrator)
+    │
+    ├── Pauses game (visible frozen clock ⏸)
+    ├── Opens modal popover
+    ├── Loads mini-game from registry
+    ├── Listens for pass/fail Signal
+    └── Resumes game
+         │
+MiniGameRegistry
+    │
+    ├── registerGame(id, GameClass)
+    └── mapTaskToGame(taskType, gameId)
+         │
+MiniGameBase (interface)
+    │
+    ├── render(container)
+    ├── destroy()
+    ├── onPass: Signal  ──► task assigned to slot
+    └── onFail: Signal  ──► task NOT assigned
+```
+
+### Built-in: Medication Name Game
+
+| Task Type | Challenge Type | Question Format |
+|-----------|---------------|-----------------|
+| `med`, `med-oral`, `med-iv`, `med-injection` | `medication-name` | Brand ↔ Generic name |
+
+### Adding a New Mini-Game (3 Steps)
+
+```javascript
+// 1. Create class extending MiniGameBase
+class MyGame extends MiniGameBase {
+  render(container) { /* UI */ }
+  // Call this.emitPass() or this.emitFail('reason')
+  static getDisplayName() { return 'My Game'; }
+  static getIcon() { return '🎯'; }
+}
+
+// 2. Register in minigame/index.js
+miniGameRegistry.registerGame('my-game', MyGame);
+
+// 3. Map task types
+miniGameRegistry.mapTaskToGame('task-type', 'my-game');
+```
+
+### Visible Pause Indicator
+- Clock shows "⏸" suffix when mini-game active
+- Clock time frozen (not advancing)
+- Background blurred/dimmed
+- Player clearly sees game is paused
+
+### Common Medication Names
+| Brand | Generic |
+|-------|---------|
+| Lipitor | atorvastatin |
+| Lasix | furosemide |
+| Lopressor | metoprolol |
+| Norvasc | amlodipine |
+| Zofran | ondansetron |
+| Ativan | lorazepam |
+| Neurontin | gabapentin |
+| Lovenox | enoxaparin |
+
 ## Milestone Checklist
 
 - [ ] **M2**: Task Schema - definitions, validation, parsing
-- [ ] **M3**: Slot System - blocking, progress, completion
+- [ ] **M3**: Slot System - blocking, progress, completion, duration timemark
+- [ ] **M3b**: Mini-Game Challenge - medication quiz, timer pause
 - [ ] **M4**: Availability Windows - early/late, modes
 - [ ] **M5**: Interactions - boosts, penalties, context
 - [ ] **M6**: Random/Urgent - spawning, alerts

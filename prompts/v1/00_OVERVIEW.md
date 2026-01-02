@@ -52,7 +52,8 @@ game/
 | 0 | Foundation (Timer, UI) | ✅ Complete |
 | 1 | Basic Task System | ✅ Complete |
 | 2 | Task Definition Schema | 🔜 Next |
-| 3 | Slot System (Task Queue) | Pending |
+| 3 | Slot System (Task Queue) + Duration Timemark | Pending |
+| 3b | Mini-Game Challenge (Medication Quiz) | Pending |
 | 4 | Availability Windows | Pending |
 | 5 | Task Class Interactions | Pending |
 | 6 | Random & Urgent Tasks | Pending |
@@ -66,6 +67,14 @@ game/
 - Task occupies a slot for its `duration` (in-game minutes)
 - Cannot start a task if all slots are occupied
 - Visual progress on slot during task execution
+- **Duration timemark**: Shows completion time (e.g., "19:10") at bottom center of occupied slot
+
+### Mini-Game Challenges
+- Certain tasks (medications) require passing a quiz before slot assignment
+- **Timer pauses** while mini-game modal is open
+- **Pass** → task assigned to slot
+- **Fail** → task NOT assigned, player can retry
+- Medication quiz: type generic name when given brand (or vice versa)
 
 ### Task Availability Windows
 | Type | Available From | Available Until |
