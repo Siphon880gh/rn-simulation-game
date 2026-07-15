@@ -1,0 +1,62 @@
+{
+  "current_epic_id": "E0",
+  "current_milestone_id": "E0.M3",
+  "status": "ready_to_implement",
+  "last_updated_iso": "2026-07-15T06:57:39Z",
+  "decisions": {
+    "platform": "web",
+    "app_name": "RN Simulation Game",
+    "one_liner": "12-hour nursing shift simulation for prioritization, time management, and clinical judgment under load",
+    "mvp_scope": "Multi-patient accelerated shift with slots, windows, thin urgents, one scenario pack, thin challenge gate, prioritization debrief, fiction disclaimer — no auth/chaos/class-interaction math",
+    "main_constraints": "Vanilla JS ES6 modules (+ jQuery/signals or light reactive layer); no React/Ink/Twine unless approved; military game clock; panels over floating windows; no auth/friends until Later epic",
+    "implementation_order": "E0.M3 → E0.M4 → E1 → E2 → E3.M1–M2 → E6.M0 → E4.M1 → (E4.M2 ∥ E5.M1) → E5.M2 → E3.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E4.M3, E7, E8",
+    "game_runtime": "pending_E0.M3",
+    "game_runtime_intent": "keep_modular_app",
+    "game_runtime_options": [
+      "keep_modular_app",
+      "thin_in_house_engine_layer",
+      "adopt_third_party_engine"
+    ],
+    "council_finalize": "Option A — Balanced Education MVP",
+    "council_option_confirmed_by_user": true,
+    "council_report": "council-report-epics-milestones.md",
+    "mvp_exclusions": ["E3.M4", "E4.M3", "E7", "E8.M2"]
+  },
+  "identified_epics": [
+    { "id": "E0", "name": "Planning & Decisions", "priority": "Mandatory" },
+    { "id": "E1", "name": "Shift Shell & Clock", "priority": "MVP" },
+    { "id": "E2", "name": "Patient Census & Clinical Panels", "priority": "MVP" },
+    { "id": "E3", "name": "Task Queue & Slot Execution", "priority": "MVP" },
+    { "id": "E4", "name": "Scenario & Event Pipeline", "priority": "MVP" },
+    { "id": "E5", "name": "Perform Challenges", "priority": "MVP" },
+    { "id": "E6", "name": "Scoring & Shift Debrief", "priority": "MVP" },
+    { "id": "E7", "name": "Chaos, Presentation & Content Scale", "priority": "Later" },
+    { "id": "E8", "name": "Portfolio Packaging & Optional Social", "priority": "Later" }
+  ],
+  "milestones": [
+    { "id": "E0.M1", "epic": "E0", "name": "Planning artifacts", "status": "done" },
+    { "id": "E0.M2", "epic": "E0", "name": "Epic map confirmed + council finalize", "status": "done" },
+    { "id": "E0.M3", "epic": "E0", "name": "Game engine / runtime decision (stamp keep_modular)", "status": "next" },
+    { "id": "E0.M4", "epic": "E0", "name": "Disclaimer + learning objectives", "status": "pending" },
+    { "id": "E1.M1", "epic": "E1", "name": "Audit/lock clock, speed, pause contracts", "status": "pending" },
+    { "id": "E1.M2", "epic": "E1", "name": "Lock panel chrome regions", "status": "pending" },
+    { "id": "E2.M1", "epic": "E2", "name": "Stabilize single-patient panels", "status": "pending" },
+    { "id": "E2.M2", "epic": "E2", "name": "Patient + global tabs", "status": "pending" },
+    { "id": "E2.M3", "epic": "E2", "name": "4–6 patient census layout", "status": "pending" },
+    { "id": "E3.M1", "epic": "E3", "name": "Task schema", "status": "pending" },
+    { "id": "E3.M2", "epic": "E3", "name": "Slot execution", "status": "pending" },
+    { "id": "E6.M0", "epic": "E6", "name": "Thin prioritization debrief", "status": "pending" },
+    { "id": "E4.M1", "epic": "E4", "name": "Scenario pack loader (thin)", "status": "pending" },
+    { "id": "E4.M2", "epic": "E4", "name": "Timed event drip (light)", "status": "pending" },
+    { "id": "E5.M1", "epic": "E5", "name": "Challenge gate + timer pause", "status": "pending" },
+    { "id": "E5.M2", "epic": "E5", "name": "Med identity quiz slice", "status": "pending" },
+    { "id": "E3.M3", "epic": "E3", "name": "Availability windows", "status": "pending" },
+    { "id": "E3.M5", "epic": "E3", "name": "Random/urgent tasks (thin)", "status": "pending" },
+    { "id": "E6.M1", "epic": "E6", "name": "Scoring hooks", "status": "pending" },
+    { "id": "E6.M2", "epic": "E6", "name": "Live feedback + teaching debrief", "status": "pending" },
+    { "id": "E3.M4", "epic": "E3", "name": "Task class interactions", "status": "later" },
+    { "id": "E4.M3", "epic": "E4", "name": "Hourly orders + acuity hooks", "status": "later" }
+  ],
+  "completed": ["E0.discovery", "E0.M1", "E0.M2"],
+  "notes": "User confirmed Option A. Next: E0.M3 stamp keep_modular_app, then E0.M4 disclaimer."
+}

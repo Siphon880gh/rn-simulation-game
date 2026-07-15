@@ -1,3 +1,11 @@
+# AGENTS-MILESTONES-INIT.md
+
+Goal:
+To initiate milestones tracking so that the app is planned first, then built, use this prompt.
+
+Prompt:
+
+```
 # Epic-Based Product Plan Generator
 
 ## Role
@@ -44,20 +52,6 @@ Do **not** confuse:
 - **Milestones** = how implementation is sequenced later
 
 Your first responsibility is to discover the right **epics**, not implementation chunks.
-
----
-
-## Repo Artifacts (This Project)
-
-| Artifact | Path | Purpose |
-|----------|------|---------|
-| Epic map | [`EPIC_MAP.md`](../EPIC_MAP.md) | Living epic list, outcomes, coverage |
-| Implementation stories | [`IMPLEMENTATION_STORIES.md`](../IMPLEMENTATION_STORIES.md) | Stories/tasks under approved epics |
-| Agent state | [`.agents/state.json`](../.agents/state.json) | Self-tracking resume point |
-| This prompt | [`prompts/GUIDELINES_MILESTONE_PROMPTS.md`](./GUIDELINES_MILESTONE_PROMPTS.md) | How to plan epics / milestones |
-| Milestone authoring | [`prompts/MILESTONE_AUTHORING.md`](./MILESTONE_AUTHORING.md) | 5-block prompts **after** epic approval |
-
-Always keep `EPIC_MAP.md`, `IMPLEMENTATION_STORIES.md`, and `.agents/state.json` in sync when planning or completing work.
 
 ---
 
@@ -228,7 +222,14 @@ If unknown, propose defaults and ask for confirmation.
 
 Based on the user needs, ICP profiles, flows, and scope, identify the product’s major epics.
 
-Return the following sections:
+### Persist planning artifacts (repository root)
+
+Milestone execution agents read **`EPIC_MAP.md`** and **`IMPLEMENTATION_STORIES.md`** together with **`AGENTS-MILESTONES-TURNS.md`**. During and after epic planning:
+
+- **`EPIC_MAP.md`** — Canonical epic map: epic IDs, names, goals, dependencies, coverage check, and verification checklist (mirror sections A–D below; add milestone/story hints only after user confirmation). Create or update this file so epics stay reviewable outside `.agents/state.json`.
+- **`IMPLEMENTATION_STORIES.md`** — Story-level breakdown: user stories, acceptance criteria, and links to epic IDs (and later milestone IDs). Populate when the user approves breaking epics into milestones and stories; keep it aligned with milestone folder READMEs and `EPIC_MAP.md` as work progresses.
+
+Return the following sections (and reflect approved content into those files when the user wants them persisted):
 
 ### A. Suggested Epic List
 
@@ -315,13 +316,6 @@ Return a proposed state update in this format:
 }
 ```
 
-After the user confirms the epic map:
-1. Write the approved plan into `EPIC_MAP.md`
-2. Update `.agents/state.json` (set `status`, `current_epic_id`, `completed`)
-3. Only then break epics into milestones / stories in `IMPLEMENTATION_STORIES.md`
-
-While implementing a milestone, update `.agents/state.json` at the start and end of the session so work is self-tracking and resumable.
-
 ---
 
 ## Final Instruction
@@ -333,5 +327,5 @@ Always:
 2. Show why each epic exists
 3. Check whether all mandatory features are covered
 4. Ask the user to confirm the epic map before converting any epic into milestones
-
-Create or refresh `EPIC_MAP.md` and `IMPLEMENTATION_STORIES.md` at the app root so planning stays manageable across sessions.
+5. Use **`EPIC_MAP.md`** for the approved epic map and **`IMPLEMENTATION_STORIES.md`** for stories once milestones are defined, so **`AGENTS-MILESTONES-TURNS.md`** and implementers have stable references
+```
