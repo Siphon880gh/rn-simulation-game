@@ -15,6 +15,25 @@ Use this file for ideas and tradeoffs. Do not switch stacks without user approva
 
 ---
 
+## Game types this architecture can do
+
+Derived from [`AGENTS_CODE_REFERENCE.md`](AGENTS_CODE_REFERENCE.md), [`EPIC_MAP.md`](EPIC_MAP.md), and [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md). Engines below should serve these formats — not the reverse.
+
+| Type | Fit | Epic hooks | Notes |
+|------|-----|------------|-------|
+| **Real-time shift / time-management sim** | Primary | E1, E3 | Accelerated military clock, availability windows, overtime pressure |
+| **Multi-entity resource / attention manager** | Primary | E2, E3 | 4–6 patient census + **3 concurrent slots** (workload under load) |
+| **Scenario / content-pack driven sim** | Primary (MVP thin) | E4 | HTML/JSON packs, timed drip; hourly/acuity Later (E4.M3) |
+| **Pass/fail perform challenges (DOM quiz)** | Primary thin MVP | E5 | Med identity quiz; pause shift clock during challenge |
+| **2D canvas skill-checks (arcade / spatial)** | Optional guest | E5, E7 | Only inside challenge modal or Later presentation — not the shell |
+| **Scoring + teaching debrief loop** | Primary | E6 | Prioritization feedback; not leaderboards/accounts |
+| **Chaos / incident replay packs** | Later | E7 | Emergent urgents beyond thin E3.M5 |
+| **Branching narrative / dialogue vignette** | Side slice only | approved Ink/Twine | Never owns clock or slots |
+| **Classic platformer / top-down action game** | Out of scope as product | — | Patterns only useful if borrowed for a sandboxed mini-game |
+| **3D ward / XR / inventory RPG chrome** | Out of scope for MVP | Later E7/E8 at most | Conflicts with panels-first clinical UX |
+
+---
+
 ## Fit tiers for *this* game
 
 | Tier | Meaning |
@@ -76,9 +95,23 @@ Use this file for ideas and tradeoffs. Do not switch stacks without user approva
 
 ---
 
+### Raw Canvas / WebGL (custom hybrid) — mini-games only
+
+**Description:** Browser hybrid path from common web-game skill trees: draw skill-checks with the platform Canvas 2D API or a thin WebGL context, without adopting Phaser/Pixi. Optional Later: WebGPU with WebGL fallback when a challenge needs heavier GPU work.
+
+**Integration:** Mount a `<canvas>` inside the challenge modal; tear down on complete; keep game loop local to the challenge (fixed timestep for any physics). Pause ownership stays with the shift shell.
+
+**Status panels:** Stay HTML/CSS outside the canvas.
+
+**Why it fits:** Matches E5 when a challenge needs drawing/spatial input but not a full 2D framework. Closest to the locked “vanilla / no-build” constraint among canvas options.
+
+**Fit note:** Prefer DOM quizzes for text/identity checks. Use Canvas/WebGL only when the interaction is visual/spatial.
+
+---
+
 ### Kaplay (formerly Kaboom) — mini-games only
 
-**Description:** Lightweight browser 2D toolkit; fast to prototype skill-check scenes.
+**Description:** Lightweight browser 2D toolkit; fast to prototype skill-check scenes (sprites, input, simple scenes).
 
 **Integration:** Mount a canvas/scene inside the challenge modal; destroy on complete; do not drive the shift shell.
 
@@ -88,11 +121,11 @@ Use this file for ideas and tradeoffs. Do not switch stacks without user approva
 
 ---
 
-### Phaser — mini-games / presentation polish only
+### Phaser (v4) — mini-games / presentation polish only
 
-**Description:** Mature HTML5 2D framework (scenes, input, tweening).
+**Description:** Mature HTML5 2D framework (scenes, input, tweening, physics). Web-game skill default when a **full** 2D feature set is needed inside a guest viewport.
 
-**Integration:** Same boundary as Kaplay — isolate to perform challenges or later art-heavy moments (E7). Avoid making Phaser the app shell.
+**Integration:** Same boundary as Kaplay — isolate to perform challenges or later art-heavy moments (E7). Avoid making Phaser the app shell. Often implies a bundler — weigh against no-build MVP.
 
 **Status panels:** Clinical panels stay HTML/CSS; Phaser is a guest viewport.
 
@@ -168,13 +201,23 @@ Use this file for ideas and tradeoffs. Do not switch stacks without user approva
 
 ---
 
-### PixiJS
+### PixiJS (v8)
 
-**Description:** 2D WebGL renderer; not a full gameplay framework alone.
+**Description:** 2D WebGL renderer focused on draw performance and scene graph; not a full gameplay framework alone (web-game skill default for “raw rendering power”).
 
-**Integration:** Overlay or challenge canvas; shell remains HTML panels.
+**Integration:** Overlay or challenge canvas; shell remains HTML panels. Pair with custom game logic (or a thin wrapper) for pass/fail challenges.
 
-**Fit for RN sim:** Later presentation (E7), not MVP shell.
+**Fit for RN sim:** Later presentation (E7) or GPU-heavy challenge art; not MVP shell.
+
+---
+
+### Three.js / Babylon.js — browser 3D guest only (Later)
+
+**Description:** Web skill defaults for browser **3D** (Three = rendering-focused; Babylon = fuller engine / XR). Listed here only as optional Later guests — not as 2D shell candidates.
+
+**Integration:** Isolated viewport for a Later presentation beat (E7); never owns census, clock, or slots.
+
+**Fit for RN sim:** Poor as product shell; fair as a sandboxed 3D moment if explicitly approved. Prefer Canvas/Phaser/Pixi for any 2D challenge work.
 
 ---
 
@@ -183,10 +226,10 @@ Use this file for ideas and tradeoffs. Do not switch stacks without user approva
 | Option | Why poor fit here |
 |--------|-------------------|
 | **Godot / Unity WebGL** | Heavy export, long iteration, wrong default UX for dense clinical HTML panels |
-| **Three.js / Babylon.js as shell** | 3D-first; only relevant if a Later epic mandates 3D wards |
+| **Three.js / Babylon.js as shell** | 3D-first; only relevant if a Later epic mandates 3D wards (guest OK — see Possible) |
 | **Ren’Py, Inform 7, classic parser IF** | Wrong platform or interaction model for timed multi-patient slots |
 | **Construct / GDevelop as shell** | Visual builders fight versioned clinical content packs and panel UX |
-| **Full Phaser/Kaplay app shell** | Canvas games bury “readable clinical panels”; overkill for DOM-first MVP |
+| **Full Phaser/Kaplay/Canvas app shell** | Canvas games bury “readable clinical panels”; overkill for DOM-first MVP |
 
 ---
 
@@ -200,17 +243,19 @@ Purposes scored against: **clock & concurrency**, **clinical panels**, **scenari
 | JSON/YAML scenario runtime | Most likely | Excellent (hooks) | N/A (feeds shell) | Excellent | N/A | Excellent | Non-dev friendly path | E4 direction |
 | Signals / light reactive | Likely partial | Good | Excellent | N/A | N/A | Excellent | Code | UI sync only |
 | Custom mini-game plugins | Likely partial | Good (pause) | Good | N/A | Excellent | Excellent | Code modules | E5 direction |
+| Raw Canvas / WebGL (guest) | Likely partial | Good (pause) | Poor if overused | Poor | Excellent | Excellent | Code | Closest canvas path to no-build |
 | Kaplay (challenges only) | Likely partial | Fair | Poor if overused | Poor | Excellent | Good | Code | Keep sandboxed |
-| Phaser (challenges only) | Likely partial | Fair | Poor if overused | Poor | Excellent | Fair (often bundled) | Code | Heavier than Kaplay |
+| Phaser 4 (challenges only) | Likely partial | Fair | Poor if overused | Poor | Excellent | Fair (often bundled) | Code | Full 2D features; heavier than Kaplay |
 | XState / state machines | Likely partial | Excellent | Good | Fair | Fair | Good | Code | Orchestration aid |
 | Ink + inkjs | Possible | Poor–Fair | Fair (vars → UI) | Fair (story = content) | Poor | Good | Excellent for prose branches | Approval required; narrative slice |
 | Twine + Twison/TweeJS | Possible | Poor | Fair | Fair | Poor | Fair | Excellent for branches | Approval required; not real-time sim |
 | Adventure Engine | Possible | Poor–Fair | Fair | Fair | Poor | Good | Simple text flows | Weak concurrency model |
 | React custom app | Possible | Excellent | Excellent | Excellent | Excellent | Poor (toolchain) | Code | Approval required; stack change |
 | Lit / Web Components | Possible | Good | Excellent | Good | Good | Good–Fair | Code | If components needed without React |
-| PixiJS | Possible / Later | Fair | Poor as shell | Poor | Good | Fair | Code | Render guest only |
+| PixiJS 8 | Possible / Later | Fair | Poor as shell | Poor | Good | Fair | Code | Render guest only |
+| Three.js / Babylon.js (guest) | Possible / Later | Fair | Poor as shell | Poor | Fair | Fair | Code | 3D guest only; not 2D challenges |
 | Godot / Unity WebGL | Poor fit | Fair | Poor | Fair | Good | Poor | Editor-centric | Wrong primary shell |
-| Three/Babylon shell | Poor fit | Fair | Poor | Poor | Fair | Poor | Code | Later 3D only |
+| Three/Babylon as shell | Poor fit | Fair | Poor | Poor | Fair | Poor | Code | Fights panels-first MVP |
 
 ### Pros / cons vs our gaming format
 
@@ -220,7 +265,9 @@ Purposes scored against: **clock & concurrency**, **clinical panels**, **scenari
 | **Scenario-as-data** | Replay, educator packs, drip events without rewriting UI | Need a clear schema and loader; not a “story editor” out of the box |
 | **Signals / light reactive** | Live panels without React; small surface area | Not a content or narrative solution |
 | **Mini-game plugins** | Scalable challenges; timer pause boundary is clear | Each new challenge is custom work |
-| **Kaplay / Phaser (partial)** | Richer skill checks / motion later | Easy to accidentally canvas-ify the whole product; bundling vs no-build |
+| **Raw Canvas / WebGL** | No framework tax; full control; stays ES-module friendly | You own sprites, input, pooling, teardown |
+| **Kaplay / Phaser 4 (partial)** | Richer skill checks / motion later | Easy to accidentally canvas-ify the whole product; bundling vs no-build |
+| **PixiJS 8 (partial)** | Strong 2D draw path when art gets heavy | Not a gameplay framework; still a guest |
 | **XState** | Clear shift/slot/challenge states under concurrency | Learning curve; still need custom game rules |
 | **Ink** | Best-in-class branching prose; variables for simple stats | Branch graph ≠ multi-patient workload; approval gate |
 | **Twine family** | Fast narrative prototyping; familiar to educators | Export/host glue; poor real-time concurrent sim |
@@ -236,8 +283,9 @@ Purposes scored against: **clock & concurrency**, **clinical panels**, **scenari
 1. **Default:** extend the **custom vanilla shell** + **scenario packs** + **plugin challenges**.
 2. **Narrative engines (Ink / Twine / Adventure Engine):** only for an approved slice (e.g. conversation or case vignette), never as the shift clock/slot authority.
 3. **React:** treat as a product decision, not a quiet dependency add.
-4. **2D engines (Kaplay / Phaser / Pixi):** guest inside perform challenges or Later presentation — not the census/task chrome.
-5. When proposing an engine, map it to epics in [`EPIC_MAP.md`](EPIC_MAP.md) (E1 clock, E2 panels, E3 slots, E4 scenarios, E5 challenges) and say which tier above it belongs to.
+4. **2D / browser renderers (Raw Canvas·WebGL → Kaplay → Phaser 4 → PixiJS 8):** guest inside perform challenges or Later presentation — not the census/task chrome. Prefer the lightest option that fits the challenge.
+5. **3D browser engines (Three.js / Babylon.js):** Later guest only; never the shift shell.
+6. When proposing an engine, map it to a **game type** in the table above and to epics in [`EPIC_MAP.md`](EPIC_MAP.md) (E1 clock, E2 panels, E3 slots, E4 scenarios, E5 challenges, E6 debrief) and say which tier it belongs to.
 
 ---
 
