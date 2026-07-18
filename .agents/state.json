@@ -2,14 +2,14 @@
   "current_epic_id": "E0",
   "current_milestone_id": "E0.M3",
   "status": "ready_to_implement",
-  "last_updated_iso": "2026-07-15T06:57:39Z",
+  "last_updated_iso": "2026-07-18T15:33:00Z",
   "decisions": {
     "platform": "web",
     "app_name": "RN Simulation Game",
     "one_liner": "12-hour nursing shift simulation for prioritization, time management, and clinical judgment under load",
-    "mvp_scope": "Multi-patient accelerated shift with slots, windows, thin urgents, one scenario pack, thin challenge gate, prioritization debrief, fiction disclaimer — no auth/chaos/class-interaction math",
+    "mvp_scope": "Multi-patient accelerated shift with slots, windows, chart history (past hx), hourly check-doctor-orders (expire end of hour), thin urgents, one scenario pack, thin challenge gate, prioritization debrief, fiction disclaimer — no auth/chaos/class-interaction math",
     "main_constraints": "Vanilla JS ES6 modules (+ jQuery/signals or light reactive layer); no React/Ink/Twine unless approved; military game clock; panels over floating windows; no auth/friends until Later epic",
-    "implementation_order": "E0.M3 → E0.M4 → E1 → E2 → E3.M1–M2 → E6.M0 → E4.M1 → (E4.M2 ∥ E5.M1) → E5.M2 → E3.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E4.M3, E7, E8",
+    "implementation_order": "E0.M3 → E0.M4 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5.M1) → E5.M2 → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E7, E8",
     "game_runtime": "pending_E0.M3",
     "game_runtime_intent": "keep_modular_app",
     "game_runtime_options": [
@@ -20,7 +20,7 @@
     "council_finalize": "Option A — Balanced Education MVP",
     "council_option_confirmed_by_user": true,
     "council_report": "council-report-epics-milestones.md",
-    "mvp_exclusions": ["E3.M4", "E4.M3", "E7", "E8.M2"]
+    "mvp_exclusions": ["E3.M4", "E7", "E8.M2"]
   },
   "identified_epics": [
     { "id": "E0", "name": "Planning & Decisions", "priority": "Mandatory" },
@@ -45,6 +45,7 @@
     { "id": "E2.M3", "epic": "E2", "name": "4–6 patient census layout", "status": "pending" },
     { "id": "E3.M1", "epic": "E3", "name": "Task schema", "status": "pending" },
     { "id": "E3.M2", "epic": "E3", "name": "Slot execution", "status": "pending" },
+    { "id": "E3.M6", "epic": "E3", "name": "Slot waiting queue (auto-assign)", "status": "pending" },
     { "id": "E6.M0", "epic": "E6", "name": "Thin prioritization debrief", "status": "pending" },
     { "id": "E4.M1", "epic": "E4", "name": "Scenario pack loader (thin)", "status": "pending" },
     { "id": "E4.M2", "epic": "E4", "name": "Timed event drip (light)", "status": "pending" },
@@ -55,8 +56,12 @@
     { "id": "E6.M1", "epic": "E6", "name": "Scoring hooks", "status": "pending" },
     { "id": "E6.M2", "epic": "E6", "name": "Live feedback + teaching debrief", "status": "pending" },
     { "id": "E3.M4", "epic": "E3", "name": "Task class interactions", "status": "later" },
-    { "id": "E4.M3", "epic": "E4", "name": "Hourly orders + acuity hooks", "status": "later" }
+    { "id": "E4.M3", "epic": "E4", "name": "Hourly check-doctor-orders (expire end of hour)", "status": "pending" },
+    { "id": "E5.M3", "epic": "E5", "name": "Bed-prep admission mini-game (win to complete; see AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md)", "status": "later" },
+    { "id": "E7.M1", "epic": "E7", "name": "Scene art: static floors + optional situation stills/motion", "status": "later" },
+    { "id": "E7.M2", "epic": "E7", "name": "Chaos / incident content packs", "status": "later" },
+    { "id": "E7.M3", "epic": "E7", "name": "More shifts + complications", "status": "later" }
   ],
   "completed": ["E0.discovery", "E0.M1", "E0.M2"],
-  "notes": "User confirmed Option A. Next: E0.M3 stamp keep_modular_app, then E0.M4 disclaimer."
+  "notes": "User confirmed Option A. Added E3.M6 waiting queue after E3.M2. E4.M3 pulled into MVP as hourly check-doctor-orders (expire end of hour); E2.M1 includes patient chart history (past hx). Later backlog: E5.M3 bed-prep flash sequence challenge; E7.M1 pre-gen Midjourney floor/situation art (+ optional motion). Next: E0.M3 stamp keep_modular_app, then E0.M4 disclaimer."
 }

@@ -24,7 +24,7 @@ Report: [`council-report-epics-milestones.md`](council-report-epics-milestones.m
 
 | Tier | Contents |
 |------|----------|
-| **MVP** | Accelerated shift clock; patient census + clinical panels; task schema with availability/expiry; 3 execution slots; at least one perform challenge; scoring + end-of-shift debrief; one playable scenario pack |
+| **MVP** | Accelerated shift clock; patient census + clinical panels (incl. chart history / past hx); task schema with availability/expiry; 3 execution slots + waiting queue (auto-assign); hourly check-doctor-orders task (expires end of hour); at least one perform challenge; scoring + end-of-shift debrief; one playable scenario pack |
 | **Mandatory** | Fictional names/scenarios disclaimer; military time; panels-first UI; vanilla/light stack (no React unless approved) |
 | **Later** | Chaos/incident packs, richer art, many shifts/complications, auth/friends, 3D/motion polish |
 
@@ -36,6 +36,7 @@ Report: [`council-report-epics-milestones.md`](council-report-epics-milestones.m
 - Run a full accelerated shift and see tasks appear/expire on game time
 - Manage multiple patients and know what is due for whom
 - Start work that occupies limited attention (slots) for a duration
+- Queue work when all slots are busy so it starts as soon as a slot frees
 - Face emergent / urgent work that disrupts the plan
 - Get a score/debrief that reflects prioritization quality
 
@@ -80,20 +81,20 @@ Report: [`council-report-epics-milestones.md`](council-report-epics-milestones.m
 
 ### User flows
 1. **First-run:** Open game → see shift clock + empty/seeded panels → start shift
-2. **Primary loop:** Watch game time → scan due tasks → Perform (optional challenge) → occupy slot → complete/miss → react to new orders/urgents → end shift → debrief
+2. **Primary loop:** Watch game time → scan due tasks → Perform (optional challenge) → occupy slot (or enqueue if full) → on slot free, next queued task starts → complete/miss → react to new orders/urgents → end shift → debrief
 3. **Secondary:** Adjust speed factor / shift start; open patient tabs; task details via context menu; docs/about
-4. **Errors / edges:** All slots full; task expired; challenge fail; missing patient content; timer pause during modal
+4. **Errors / edges:** All slots full (enqueue vs blocked); task expired while queued; challenge fail; missing patient content; timer pause during modal
 
 ### State & persistence
 | Kind | Plan |
 |------|------|
 | Business data | Patients, tasks, scenario events (content files / HTML data attrs; later YAML) |
 | Settings | Speed factor, shift start (URL/query or config) |
-| Temporary UI | Active tab, open modal, slot progress, context menu |
+| Temporary UI | Active tab, open modal, slot progress, waiting queue, context menu |
 | Offline | Fully client-side play for MVP; no server required |
 
 ### UI states
-Empty · Loading · Error · Success/confirm · First-run · Edge (slots full, overdue, challenge fail)
+Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / queued, overdue, challenge fail)
 
 ---
 
@@ -103,10 +104,10 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full, o
 |--------|-----------|----------------|----------|--------------|----------|
 | E0 | Planning & Decisions | Stable product/tech decisions + tracking | Epic map, state.json, story backlog, game-runtime/engine decision | Process | Mandatory |
 | E1 | Shift Shell & Clock | Player is inside a running shift with trustworthy time | Timer, speed factor, military display, panel chrome | MVP / usability | MVP |
-| E2 | Patient Census & Clinical Panels | Player can see who they have and clinical status surfaces | Patient load, tabs, vitals/meds/panels, multi-patient layout | Use needs / ICP | MVP |
-| E3 | Task Queue & Slot Execution | Player prioritizes timed work under concurrency limits | Schema, availability windows, slots, interactions, urgent spawn | MVP core loop | MVP |
-| E4 | Scenario & Event Pipeline | Shift content can drip and vary without code rewrites | Scenario packs, event unlocks, hourly orders, acuity hooks | Content / educator ICP | MVP |
-| E5 | Perform Challenges | High-stakes tasks require a focused pass/fail action | Mini-games (e.g. med quiz), timer pause, retry rules | MVP / learning | MVP |
+| E2 | Patient Census & Clinical Panels | Player can see who they have and clinical status surfaces | Patient load, tabs, vitals/meds/panels, chart history (past hx), multi-patient layout | Use needs / ICP | MVP |
+| E3 | Task Queue & Slot Execution | Player prioritizes timed work under concurrency limits | Schema, availability windows, slots, waiting queue, interactions, urgent spawn | MVP core loop | MVP |
+| E4 | Scenario & Event Pipeline | Shift content can drip and vary without code rewrites | Scenario packs, event unlocks, hourly check-doctor-orders task | Content / educator ICP | MVP |
+| E5 | Perform Challenges | High-stakes tasks require a focused pass/fail action | Mini-games (med quiz MVP; bed-prep sequence Later), timer pause, retry rules | MVP / learning | MVP |
 | E6 | Scoring & Shift Debrief | Player knows how the shift went | Points, grades, live feedback, end summary | Success signal | MVP |
 | E7 | Chaos, Presentation & Content Scale | Harder, richer, more replayable shifts | Art, chaos packs, incidents, more shifts/complications | Later wishlist | Later |
 | E8 | Portfolio Packaging & Optional Social | Ship/share beyond local demo | Polish, packaging; optional auth/friends | Later / social | Later |
@@ -136,7 +137,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full, o
 ### E2. Patient Census & Clinical Panels
 - **Goal / user outcome:** Player manages a census, not a single card demo forever.
 - **Why:** RN workload is multi-patient; panels carry clinical framing.
-- **Includes:** Patient loading, tabs (patient + global), vitals/meds/status panels, 4–6 patient layout path.
+- **Includes:** Patient loading, tabs (patient + global), vitals/meds/status panels, **patient chart history (past hx)**, 4–6 patient layout path.
 - **Dependencies:** E1 shell.
 - **Risks / unknowns:** How dense panels get before art epic.
 - **Out of scope:** Full scenario authoring DSL; social.
@@ -145,29 +146,29 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full, o
 ### E3. Task Queue & Slot Execution
 - **Goal / user outcome:** Player chooses what to do under time and concurrency pressure.
 - **Why:** Core skill of the product — prioritization under load.
-- **Includes:** Task class/type/duration schema; availability windows; 3 slots + progress; thin urgents; miss/overdue. **Class interactions (E3.M4) deferred to Later.**
+- **Includes:** Task class/type/duration schema; availability windows; 3 slots + progress; waiting queue that auto-assigns to the next free slot (**E3.M6**); thin urgents; miss/overdue. **Class interactions (E3.M4) deferred to Later.**
 - **Dependencies:** E1, E2.
-- **Risks / unknowns:** UX when all slots full.
+- **Risks / unknowns:** Expire/cancel while queued; how visible the waiting line should be.
 - **Out of scope:** Full mini-game suite; multiplayer; MVP class-interaction math.
-- **Suggested order:** 3 — primary MVP epic (through M3 + M5; not M4).
+- **Suggested order:** 3 — primary MVP epic (through M2 + M6 + M3 + M5; not M4).
 
 ### E4. Scenario & Event Pipeline
 - **Goal / user outcome:** Shifts feel authored and replayable via content, not hard-coded one-offs.
 - **Why:** Educators and replay need content packs and drip events.
-- **Includes:** One loadable pack (JSON/HTML) with objectives + fiction disclaimer; light timed drip. **Hourly/acuity (E4.M3) deferred to Later.**
-- **Dependencies:** E1–E3 for runtime hooks.
+- **Includes:** One loadable pack (JSON/HTML) with objectives + fiction disclaimer; light timed drip; **hourly check-doctor-orders task (E4.M3)** — spawn each game hour, expire end of that hour; complete may inject new orders (e.g. new med). Full acuity engine stays Later/E7.
+- **Dependencies:** E1–E3 for runtime hooks (esp. E3.M3 windows for hour-bound expiry).
 - **Risks / unknowns:** Authoring format choice; content volume.
-- **Out of scope:** AI-generated shifts; full library; YAML required for MVP.
-- **Suggested order:** After E3.M2 + thin E6.M0.
+- **Out of scope:** AI-generated shifts; full library; YAML required for MVP; chaos-scale order volume.
+- **Suggested order:** After E3.M6 + thin E6.M0; **E4.M3 after E3.M3**.
 
 ### E5. Perform Challenges
 - **Goal / user outcome:** Some tasks demand attention (pass to start; fail blocks slot assign).
 - **Why:** Reinforces safe practice moments (e.g. med identity) inside the time pressure.
-- **Includes:** Challenge modal, timer pause, med quiz vertical slice, retry behavior.
+- **Includes:** Challenge modal, timer pause, med quiz vertical slice (**E5.M2**), retry behavior; Later **E5.M3** bed-prep / admission mini-game (**win required to complete** that task) — spec [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md).
 - **Dependencies:** E3 perform path.
 - **Risks / unknowns:** Which task types require challenges first.
-- **Out of scope:** Full challenge suite for every task type.
-- **Suggested order:** After E3 perform wiring.
+- **Out of scope:** Full challenge suite for every task type (MVP = thin gate + one quiz).
+- **Suggested order:** After E3 perform wiring; E5.M3 after MVP.
 
 ### E6. Scoring & Shift Debrief
 - **Goal / user outcome:** Clear feedback on how the shift went.
@@ -181,7 +182,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full, o
 ### E7. Chaos, Presentation & Content Scale
 - **Goal / user outcome:** Harder emergent play and stronger presence.
 - **Why:** Replay and teaching depth beyond the first pack.
-- **Includes:** Background/art, chaos scenario pack, emergent incidents, more shifts/complications.
+- **Includes:** Pre-generated scene art (static ICU/unit floors; optional per-situation stills; selective image→3D/motion), chaos scenario pack, emergent incidents, more shifts/complications.
 - **Dependencies:** E4–E6 solid.
 - **Risks / unknowns:** Scope creep into “full hospital sim.”
 - **Out of scope:** Auth/friends (E8).
@@ -203,9 +204,9 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full, o
 | Requirement area | Covered by |
 |------------------|------------|
 | Accelerated 12h shift clock | E1 |
-| Multi-patient clinical panels | E2 |
-| Timed tasks, windows, slots, urgents | E3 |
-| Scenario / orders drip | E4 |
+| Multi-patient clinical panels + chart history (past hx) | E2 |
+| Timed tasks, windows, slots, waiting queue, urgents | E3 |
+| Scenario drip + hourly check-doctor-orders | E4 |
 | Med/perform challenges | E5 |
 | Scoring & debrief | E6 |
 | Chaos, art, content scale | E7 |
@@ -233,5 +234,5 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full, o
 2. Milestones: [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md)
 3. Resume: [`.agents/state.json`](.agents/state.json) → **E0.M3** (stamp `keep_modular_app`), then **E0.M4**
 
-**Order:** `E0.M3 → E0.M4 → E1 → E2 → E3.M1–M2 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E4.M3, E7, E8`
+**Order:** `E0.M3 → E0.M4 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E7, E8`
 

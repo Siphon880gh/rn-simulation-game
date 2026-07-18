@@ -13,6 +13,7 @@ const PatientsModule = (() => {
             name: 'Joe Johnson',
             room: 'Room 201-A',
             age: 68,
+            sex: 'Male',
             diagnosis: 'Post-op Total Hip Replacement',
             vitals: {
                 hr: 82,
