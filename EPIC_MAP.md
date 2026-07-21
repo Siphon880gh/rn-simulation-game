@@ -24,7 +24,7 @@ Report: [`council-report-epics-milestones.md`](council-report-epics-milestones.m
 
 | Tier | Contents |
 |------|----------|
-| **MVP** | Accelerated shift clock; patient census + clinical panels (incl. chart history / past hx); task schema with availability/expiry; 3 execution slots + waiting queue (auto-assign); hourly check-doctor-orders task (expires end of hour); at least one perform challenge; scoring + end-of-shift debrief; one playable scenario pack |
+| **MVP** | Accelerated shift clock; patient census + clinical panels (incl. chart history / past hx; panel swap + CSS transitions); task schema with availability/expiry; 3 execution slots + waiting queue (auto-assign); thin dynamic/urgent spawn; game-time emergency drip + thin deterioration; hourly check-doctor-orders task (expires end of hour); at least one perform challenge; scoring (tasks + satisfaction/status) + final outcome/debrief; one playable scenario pack; CSS motion first |
 | **Mandatory** | Fictional names/scenarios disclaimer; military time; panels-first UI; vanilla/light stack (no React unless approved); **declarative modular architecture** (`game-config` / `game-state` / `task-system` — see [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md) § Declarative architecture) |
 | **Later** | Chaos/incident packs, richer art, many shifts/complications, auth/friends, 3D/motion polish |
 
@@ -137,28 +137,28 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 ### E2. Patient Census & Clinical Panels
 - **Goal / user outcome:** Player manages a census, not a single card demo forever.
 - **Why:** RN workload is multi-patient; panels carry clinical framing.
-- **Includes:** Patient loading, tabs (patient + global), vitals/meds/status panels, **patient chart history (past hx)**, 4–6 patient layout path.
+- **Includes:** Patient loading, tabs (patient + global), vitals/meds/status panels, **patient chart history (past hx)**, 4–6 patient layout path; **efficient panel swap** on patient change with **dynamic per-patient content** and **graceful CSS transitions**.
 - **Dependencies:** E1 shell.
 - **Risks / unknowns:** How dense panels get before art epic.
-- **Out of scope:** Full scenario authoring DSL; social.
+- **Out of scope:** Full scenario authoring DSL; social; GSAP-required motion (CSS first; optional polish in E7).
 - **Suggested order:** 2 (partially exists).
 
 ### E3. Task Queue & Slot Execution
 - **Goal / user outcome:** Player chooses what to do under time and concurrency pressure.
 - **Why:** Core skill of the product — prioritization under load.
-- **Includes:** Task class/type/duration schema; availability windows; 3 slots + progress; waiting queue that auto-assigns to the next free slot (**E3.M6**); thin urgents; miss/overdue. **Class interactions (E3.M4) deferred to Later.**
+- **Includes:** Task class/type/duration schema; availability windows; 3 slots + progress (**CSS** progress/status motion); waiting queue that auto-assigns to the next free slot (**E3.M6**); **dynamic/urgent mid-shift spawn from templates (E3.M5)**; miss/overdue. **Class interactions (E3.M4) deferred to Later.**
 - **Dependencies:** E1, E2.
 - **Risks / unknowns:** Expire/cancel while queued; how visible the waiting line should be.
-- **Out of scope:** Full mini-game suite; multiplayer; MVP class-interaction math.
+- **Out of scope:** Full mini-game suite; multiplayer; MVP class-interaction math; wall-clock spawn that ignores pause/speed.
 - **Suggested order:** 3 — primary MVP epic (through M2 + M6 + M3 + M5; not M4).
 
 ### E4. Scenario & Event Pipeline
 - **Goal / user outcome:** Shifts feel authored and replayable via content, not hard-coded one-offs.
 - **Why:** Educators and replay need content packs and drip events.
-- **Includes:** One loadable pack (JSON/HTML) with objectives + fiction disclaimer; light timed drip; **hourly check-doctor-orders task (E4.M3)** — spawn each game hour, expire end of that hour; complete may inject new orders (e.g. new med). Full acuity engine stays Later/E7.
+- **Includes:** One loadable pack (JSON/HTML) with objectives + fiction disclaimer; light **game-time** drip + **emergency events** (e.g. critical new admit); **thin patient deterioration** when overdue/critical work ages; **hourly check-doctor-orders task (E4.M3)** — spawn each game hour, expire end of that hour; complete may inject new orders (e.g. new med). Full acuity engine stays Later/E7.
 - **Dependencies:** E1–E3 for runtime hooks (esp. E3.M3 windows for hour-bound expiry).
 - **Risks / unknowns:** Authoring format choice; content volume.
-- **Out of scope:** AI-generated shifts; full library; YAML required for MVP; chaos-scale order volume.
+- **Out of scope:** AI-generated shifts; full library; YAML required for MVP; chaos-scale order volume; continuous physiology sim.
 - **Suggested order:** After E3.M6 + thin E6.M0; **E4.M3 after E3.M3**.
 
 ### E5. Perform Challenges
@@ -173,16 +173,16 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 ### E6. Scoring & Shift Debrief
 - **Goal / user outcome:** Clear feedback on how the shift went.
 - **Why:** Success signal and learning loop closure.
-- **Includes:** Points/grades, real-time feedback hooks, end-of-shift summary.
-- **Dependencies:** E3 (and ideally E5 outcomes).
+- **Includes:** Points/grades from task handling + thin patient satisfaction/status; real-time feedback hooks; **final score + outcome** at shift end.
+- **Dependencies:** E3 (and ideally E5 outcomes); thin deterioration signals from E4.M2 when present.
 - **Risks / unknowns:** Scoring weights vs “feel fair.”
-- **Out of scope:** Leaderboards, accounts.
+- **Out of scope:** Leaderboards, accounts; deep satisfaction psychology model.
 - **Suggested order:** After core task loop is playable.
 
 ### E7. Chaos, Presentation & Content Scale
 - **Goal / user outcome:** Harder emergent play and stronger presence.
 - **Why:** Replay and teaching depth beyond the first pack.
-- **Includes:** Pre-generated scene art (static ICU/unit floors; optional per-situation stills; selective image→3D/motion), chaos scenario pack, emergent incidents, more shifts/complications.
+- **Includes:** Pre-generated scene art (static ICU/unit floors; optional per-situation stills; selective image→3D/motion); optional **GSAP**-level UI motion if CSS is not enough; chaos scenario pack; emergent incidents; richer acuity/deterioration; more shifts/complications.
 - **Dependencies:** E4–E6 solid.
 - **Risks / unknowns:** Scope creep into “full hospital sim.”
 - **Out of scope:** Auth/friends (E8).
@@ -205,11 +205,13 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 |------------------|------------|
 | Accelerated 12h shift clock | E1 |
 | Multi-patient clinical panels + chart history (past hx) | E2 |
-| Timed tasks, windows, slots, waiting queue, urgents | E3 |
-| Scenario drip + hourly check-doctor-orders | E4 |
+| Efficient panel swap + dynamic per-patient content + CSS transitions | E2.M2 |
+| Timed tasks, windows, slots, waiting queue, dynamic/urgent spawn | E3 |
+| Slot/progress CSS motion | E3.M2 (MVP); optional GSAP polish E7.M1 |
+| Scenario drip + emergency events + thin deterioration + hourly check-doctor-orders | E4 |
 | Med/perform challenges | E5 |
-| Scoring & debrief | E6 |
-| Chaos, art, content scale | E7 |
+| Scoring (tasks + satisfaction/status) + final outcome + debrief | E6 |
+| Chaos, art, richer acuity, content scale | E7 |
 | Auth/friends / packaging | E8 |
 | Fictional disclaimer + clinical tone | Decisions + all content epics |
 | Help / learning MD authoring + Mermaid + LaTeX math | E0.M5 (+ content epics author files) |
