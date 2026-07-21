@@ -74,12 +74,12 @@ When a decision milestone completes, stamp the outcome in `state.json` → `deci
 ### Step 5: Implement the Milestone
 
 **Implementation Rules:**
-1. Use the tech stack from `state.json` decisions
+1. Use the tech stack from `state.json` decisions (incl. `architecture_style` / declarative modular when stamped)
 2. Create files one at a time, allowing human review between files
-3. Follow existing code patterns if the codebase already has code
+3. Follow existing code patterns if the codebase already has code — extend `game-config` / `game-state` / `task-system`; do not reintroduce liveQuery task activation
 4. Do not skip ahead to future milestones
 5. Do not implement features from later milestones
-6. Reference `IMPLEMENTATION_STORIES.md` / milestone README for exact specifications
+6. Reference `IMPLEMENTATION_STORIES.md` / milestone README for exact specifications (incl. § Declarative architecture)
 7. Read `AGENTS_CODE_REFERENCE.md` (and linked maps) before opening source
 
 ### Step 6: Update State When Complete

@@ -25,7 +25,7 @@ Report: [`council-report-epics-milestones.md`](council-report-epics-milestones.m
 | Tier | Contents |
 |------|----------|
 | **MVP** | Accelerated shift clock; patient census + clinical panels (incl. chart history / past hx); task schema with availability/expiry; 3 execution slots + waiting queue (auto-assign); hourly check-doctor-orders task (expires end of hour); at least one perform challenge; scoring + end-of-shift debrief; one playable scenario pack |
-| **Mandatory** | Fictional names/scenarios disclaimer; military time; panels-first UI; vanilla/light stack (no React unless approved) |
+| **Mandatory** | Fictional names/scenarios disclaimer; military time; panels-first UI; vanilla/light stack (no React unless approved); **declarative modular architecture** (`game-config` / `game-state` / `task-system` — see [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md) § Declarative architecture) |
 | **Later** | Chaos/incident packs, richer art, many shifts/complications, auth/friends, 3D/motion polish |
 
 ---
@@ -119,10 +119,10 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 ### E0. Planning & Decisions
 - **Goal / user outcome:** Agents and humans share one epic map and resume state.
 - **Why:** Prevents full-app one-shots and architectural drift.
-- **Includes:** This file, `.agents/state.json`, `IMPLEMENTATION_STORIES.md`, prompt guidelines, **E0.M3 runtime stamp**, **E0.M4 disclaimer + learning objectives**.
+- **Includes:** This file, `.agents/state.json`, `IMPLEMENTATION_STORIES.md`, prompt guidelines, **E0.M3 runtime + architecture stamp** (`keep_modular_app` + `declarative_modular`), **E0.M4 disclaimer + learning objectives**.
 - **Dependencies:** None.
 - **Risks / unknowns:** Scope assumptions may need user edits; engine choice affects E3+ cost.
-- **Out of scope:** Implementing an engine or migrating frameworks inside E0 (decision only).
+- **Out of scope:** Implementing an engine or migrating frameworks inside E0 (decision only); greenfield re-architecture.
 - **Suggested order:** First — always; **E0.M3 → E0.M4** before heavy E3 work.
 
 ### E1. Shift Shell & Clock

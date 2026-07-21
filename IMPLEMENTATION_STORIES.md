@@ -9,6 +9,47 @@ Council finalize: [`council-report-epics-milestones.md`](council-report-epics-mi
 
 ---
 
+## Declarative architecture (locked — all milestones)
+
+Every milestone must **extend** the declarative shell already in `game/assets/js/` — not reintroduce imperative jQuery DOM-scraping loops. Reference: [`docs/devs/REFACTORING_SUMMARY.md`](docs/devs/REFACTORING_SUMMARY.md), [`AGENTS_CODE_REFERENCE.md`](AGENTS_CODE_REFERENCE.md).
+
+| Pattern | Home | Milestone rule |
+|---------|------|----------------|
+| **Configuration-driven** | `game-config.js` | New settings, selectors, task types, defaults → config objects; no scattered magic strings |
+| **Reactive-like state** | `game-state.js` | Mutations via named actions + subscribe (Redux-like); no silent globals |
+| **Declarative processes / types** | `task-system.js` (+ processors) | Create/process tasks from data (`createTask({…})`); rule-based activation, not liveQuery attr rewriting |
+| **Component / module APIs** | `app.js`, `modal.js`, `patients.js`, `timer_ingame.js` | Clear init/lifecycle; inject deps; orchestrate, don’t own every concern |
+| **Event-driven** | state subscribe + delegated handlers | Pub/sub or central delegation between modules; avoid one-off scattered `$().on` in unrelated files |
+| **Status-driven UI** | `declarative-tasks.css` | Prefer `task-status-*` / data-driven classes over imperative style patches |
+
+**Before (imperative — do not reintroduce):**
+
+```js
+$("[data-scheduled]").livequery((i, task) => {
+  let $task = $(task);
+  if (expire[0] == "+") {
+    expire = timemarkPlusMinutes(scheduled, expire);
+    $task.attr("data-expire", expire);
+  }
+});
+```
+
+**After (declarative — prefer):**
+
+```js
+taskSystem.createTask({
+  name: "Medication Administration",
+  type: "med",
+  scheduled: "1900",
+  expire: "+120",
+  duration: 10,
+});
+```
+
+**Agent checklist (every implement turn):** Prefer config + `dispatch`/`subscribe` + typed processors over DOM attribute mutation; put new task kinds in config/processors; wire UI from state subscriptions; keep milestone scope (do not rewrite the whole app “for architecture”).
+
+---
+
 ## Recommended order
 
 ```
@@ -44,7 +85,7 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 - Always-on shell line under the **ICU Simulation** header in `game/index.html` so players see it without opening Docs.
 - Suggested text: *Names and scenarios are fictional. Any resemblance to actual events are coincidental.*
 
-**E0.M3 implement notes:** Read [`AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md`](AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md) and [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](AGENTS_POSSIBLE_DECISIONS_INDEX.md). Timeboxed decision only: stamp `decisions.game_runtime = keep_modular_app` (default) and record brief rationale in `state.json`. Thin in-house layer only if later pain after slots; no third-party shell (Phaser/Pixi/Godot/React) unless user explicitly approves.
+**E0.M3 implement notes:** Read [`AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md`](AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md) and [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](AGENTS_POSSIBLE_DECISIONS_INDEX.md). Timeboxed decision only: stamp `decisions.game_runtime = keep_modular_app` (default) and record brief rationale in `state.json`. Also stamp `decisions.architecture_style = declarative_modular` (config + game-state actions/subscribe + task-system processors — see [Declarative architecture](#declarative-architecture-locked--all-milestones) above and [`docs/devs/REFACTORING_SUMMARY.md`](docs/devs/REFACTORING_SUMMARY.md)). Thin in-house layer only if later pain after slots; no third-party shell (Phaser/Pixi/Godot/React) unless user explicitly approves.
 
 ### Milestones
 
@@ -52,7 +93,7 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 |-----------|------|-----------|
 | **E0.M1** | Planning artifacts | — |
 | **E0.M2** | Epic map confirmed + backlog (+ council finalize) | — |
-| **E0.M3** | Stamp runtime: **`keep_modular_app`**. Timeboxed decision only. Thin in-house layer only if later pain after slots; no third-party shell. | No migration, no Phaser/Pixi/Godot/React rewrite |
+| **E0.M3** | Stamp runtime: **`keep_modular_app`** + architecture: **`declarative_modular`**. Timeboxed decision only. Thin in-house layer only if later pain after slots; no third-party shell. | No migration, no Phaser/Pixi/Godot/React rewrite; no greenfield re-architecture |
 | **E0.M4** | Fictional scenarios disclaimer + educational-use framing + learning objectives (shell + About; see notes above) | No legal productization, auth, LMS |
 
 ---
@@ -65,6 +106,7 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 | S1.2 | Military shift time + shift bounds | E1.M1 | [~] audit |
 | S1.3 | Speed-factor / shift-start via config or query | E1.M1 | [~] audit |
 | S1.4 | Pause ownership matrix (user / modal / challenge) | E1.M1 | [ ] |
+| S1.4b | Clock/pause changes go through `game-state` actions + `game-config` defaults (no new imperative globals) | E1.M1 | [ ] |
 | S1.5 | Primary panel chrome regions: left menu, right menu, top primary, top secondary, status bar at bottom | E1.M2 | [~] partial |
 | S1.6 | Hour tabs in shell chrome (browse shift by hour; content filled by E4.M2 drip) | E1.M2 | [ ] |
 | S1.7 | Bottom panel: player response / event history log (append-only during shift) | E1.M2 | [ ] |
@@ -75,6 +117,8 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 |-----------|------|-----------|
 | **E1.M1** | Audit clock/speed/military display; document pause ownership; fix trust gaps | No task logic, scoring, auth |
 | **E1.M2** | Lock panel chrome regions for patient + task UI (left/right menus, top primary/secondary, bottom status/history bar; hour-tab strip) | No multi-patient grid, no mini-games, no chaos incident packs |
+
+**E1.M1 implement notes:** Keep timer integrated with `game-state.js` / `game-config.js` (`timer.*`, pause actions). Prefer subscribe-driven UI updates over ad-hoc DOM writes. See [Declarative architecture](#declarative-architecture-locked--all-milestones).
 
 ---
 
@@ -104,8 +148,8 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 
 | ID | Story | Milestone | Status |
 |----|-------|-----------|--------|
-| S3.1 | Formal task schema (class/type/duration) | E3.M1 | [ ] |
-| S3.2 | Lifecycle not-yet → active → completed / overdue | E3.M1 | [~] partial |
+| S3.1 | Formal task schema (class/type/duration) via config + `taskSystem.createTask` | E3.M1 | [ ] |
+| S3.2 | Lifecycle not-yet → active → completed / overdue via `game-state` actions | E3.M1 | [~] partial |
 | S3.3 | Functional 3-slot execution + progress + timemark | E3.M2 | [ ] UI stub |
 | S3.4 | Availability windows (early/late/end modes); dynamic `<style id>` rules reveal start + expire duration (incl. relative `+N` before expire) | E3.M3 | [ ] |
 | S3.5 | Context-menu details + miss handling polish | E3.M2 | [~] partial |
@@ -118,16 +162,18 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 
 | Milestone | Goal | Non-goals | MVP? |
 |-----------|------|-----------|------|
-| **E3.M1** | Task schema + state wiring end-to-end | No slots blocking, no mini-games | Yes |
+| **E3.M1** | Task schema + declarative state wiring end-to-end (`task-system` + `game-state`) | No slots blocking, no mini-games; no liveQuery task activation | Yes |
 | **E3.M2** | Perform occupies a slot for `duration`; progress; full = blocked (no auto-start yet) | No interaction math; no waiting queue | Yes |
 | **E3.M6** | When slots full, player can enqueue; on slot free, next queued task auto-assigns and starts | No class-interaction math; no reordering UX beyond FIFO unless needed | Yes |
 | **E3.M3** | Availability windows gate Perform; style-block reveal of start/expire timing | No scenario YAML pipeline | Yes |
 | **E3.M5** | Thin mid-shift urgents + alerts; incident tabs omit event clock time | No chaos pack (E7) | Yes |
 | **E3.M4** | Class interaction rules adjust duration | — | **Later** |
 
-**E3.M2 implement notes:** Context menu for task details and med **Perform** — read [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md); if using jQuery-contextMenu (stamped default), also [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU_jQuery ContextMenu.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU_jQuery%20ContextMenu.md). Follow `decisions.context_menu_library` in `state.json`; do not swap libraries without user approval. Consolidate duplicate setup in `app.js` vs `patients.js` when touching perform UX (see [`AGENTS_CODE_REFERENCE-tasks.md`](AGENTS_CODE_REFERENCE-tasks.md)).
+**E3.M1 implement notes:** Formalize schema on top of existing `game-config.js` task types/statuses and `task-system.js` processors. Lifecycle transitions = `game-state` actions (`REGISTER_TASK`, `ACTIVATE_TASK`, `COMPLETE_TASK`, etc.). Do not reintroduce `$("[data-scheduled]").livequery` activation. Status visuals via `declarative-tasks.css`. See [Declarative architecture](#declarative-architecture-locked--all-milestones).
 
-**E3.M3 implement notes:** When gating **Perform** by availability windows, keep context-menu behavior aligned with [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md) (conditional menus / disabled items vs hiding Perform).
+**E3.M2 implement notes:** Context menu for task details and med **Perform** — read [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md); if using jQuery-contextMenu (stamped default), also [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU_jQuery ContextMenu.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU_jQuery%20ContextMenu.md). Follow `decisions.context_menu_library` in `state.json`; do not swap libraries without user approval. Consolidate duplicate setup in `app.js` vs `patients.js` when touching perform UX (see [`AGENTS_CODE_REFERENCE-tasks.md`](AGENTS_CODE_REFERENCE-tasks.md)). Slot assign/progress should dispatch through `game-state`, not only mutate DOM attributes.
+
+**E3.M3 implement notes:** When gating **Perform** by availability windows, keep context-menu behavior aligned with [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md) (conditional menus / disabled items vs hiding Perform). Window/expire rules stay in task processors + config (`+N` relative expire), not ad-hoc liveQuery attr rewrites.
 
 ---
 

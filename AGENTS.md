@@ -35,7 +35,7 @@ The agent is an execution-focused coding partner that:
 | [`.agents/state.json`](.agents/state.json) | Current epic/milestone + stamped decisions (`decisions.*`) |
 | [`prompts/`](prompts/) | Milestone authoring prompts |
 
-**Locked constraints** (from `.agents/state.json`): web ES6 modules; vanilla JS (+ jQuery/signals or light reactive); no React/Ink/Twine unless approved; military game clock; panels-first clinical UI; no auth until Later.
+**Locked constraints** (from `.agents/state.json`): web ES6 modules; vanilla JS (+ jQuery/signals or light reactive); no React/Ink/Twine unless approved; military game clock; panels-first clinical UI; no auth until Later; **declarative modular architecture** — extend `game-config.js` / `game-state.js` / `task-system.js` (config + named actions/subscribe + processors); do not reintroduce imperative liveQuery/DOM-scraping task loops. Detail: [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md) § Declarative architecture; [`docs/devs/REFACTORING_SUMMARY.md`](docs/devs/REFACTORING_SUMMARY.md).
 
 ---
 
@@ -204,8 +204,9 @@ When a feature or milestone requires picking a runtime, library, or mini-game pa
 1. **Read** the linked decision doc(s) for the current milestone or topic.
 2. **If already stamped** in `.agents/state.json` → `decisions.*` — follow it; do not re-debate. A one-line reminder in the report is enough.
 3. **If not stamped** — **choose the best fit**, implement, and **explain why** in the session report (see format below). Stamp the outcome in `state.json` when the decision is settled for that topic.
-4. **Prefer** options that match: locked `decisions.main_constraints`, libraries already in the shell/code maps, milestone **implement notes**, and the ⭐ recommendations in the decision doc.
+4. **Prefer** options that match: locked `decisions.main_constraints`, `decisions.architecture_style` (`declarative_modular` when stamped), libraries already in the shell/code maps, milestone **implement notes**, and the ⭐ recommendations in the decision doc.
 5. **Stop and ask the user** only when: the choice would violate locked constraints (e.g. React/Ink/Twine without approval), two options are genuinely tied on product grounds, or `status` is `blocked_waiting_user`.
+6. On every milestone implement turn: prefer configuration, `gameState.dispatch`/`subscribe`, and `taskSystem` processors over new imperative jQuery attribute loops; keep scope to the milestone (no whole-app rewrite “for architecture”).
 
 **Report format (when you made or applied a technology decision):**
 

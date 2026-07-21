@@ -2,13 +2,21 @@
   "current_epic_id": "E0",
   "current_milestone_id": "E0.M3",
   "status": "ready_to_implement",
-  "last_updated_iso": "2026-07-18T15:33:00Z",
+  "last_updated_iso": "2026-07-21T10:58:00Z",
   "decisions": {
     "platform": "web",
     "app_name": "RN Simulation Game",
     "one_liner": "12-hour nursing shift simulation for prioritization, time management, and clinical judgment under load",
     "mvp_scope": "Multi-patient accelerated shift with slots, windows, chart history (past hx), hourly check-doctor-orders (expire end of hour), thin urgents, one scenario pack, thin challenge gate, prioritization debrief, fiction disclaimer — no auth/chaos/class-interaction math",
-    "main_constraints": "Vanilla JS ES6 modules (+ jQuery/signals or light reactive layer); no React/Ink/Twine unless approved; military game clock; panels over floating windows; no auth/friends until Later epic",
+    "main_constraints": "Vanilla JS ES6 modules (+ jQuery/signals or light reactive layer); no React/Ink/Twine unless approved; military game clock; panels over floating windows; no auth/friends until Later epic; declarative modular architecture (game-config + game-state actions/subscribe + task-system processors; no liveQuery task activation)",
+    "architecture_style": "declarative_modular",
+    "architecture_style_doc": "IMPLEMENTATION_STORIES.md#declarative-architecture-locked--all-milestones",
+    "architecture_modules": [
+      "game/assets/js/game-config.js",
+      "game/assets/js/game-state.js",
+      "game/assets/js/task-system.js",
+      "game/assets/css/declarative-tasks.css"
+    ],
     "implementation_order": "E0.M3 → E0.M4 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5.M1) → E5.M2 → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E7, E8",
     "game_runtime": "pending_E0.M3",
     "game_runtime_intent": "keep_modular_app",
@@ -72,5 +80,5 @@
     { "id": "E7.M3", "epic": "E7", "name": "More shifts + complications", "status": "later" }
   ],
   "completed": ["E0.discovery", "E0.M1", "E0.M2"],
-  "notes": "User confirmed Option A. Added E3.M6 waiting queue after E3.M2. E4.M3 pulled into MVP as hourly check-doctor-orders (expire end of hour); E2.M1 includes patient chart history (past hx). Later backlog: E5.M3 bed-prep flash sequence challenge; E7.M1 pre-gen Midjourney floor/situation art (+ optional motion). Next: E0.M3 stamp keep_modular_app, then E0.M4 disclaimer."
+  "notes": "User confirmed Option A. Added E3.M6 waiting queue after E3.M2. E4.M3 pulled into MVP as hourly check-doctor-orders (expire end of hour); E2.M1 includes patient chart history (past hx). Architecture bar locked: decisions.architecture_style=declarative_modular (see IMPLEMENTATION_STORIES.md). Later backlog: E5.M3 bed-prep flash sequence challenge; E7.M1 pre-gen Midjourney floor/situation art (+ optional motion). Next: E0.M3 stamp keep_modular_app (+ confirm architecture_style), then E0.M4 disclaimer."
 }
