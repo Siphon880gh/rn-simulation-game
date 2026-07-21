@@ -25,7 +25,7 @@ The agent is an execution-focused coding partner that:
 | [`AGENTS_CODE_REFERENCE-tasks.md`](AGENTS_CODE_REFERENCE-tasks.md) | Task schema, statuses, med perform path, data attributes |
 | [`AGENTS_CODE_REFERENCE-patients.md`](AGENTS_CODE_REFERENCE-patients.md) | Patient census, HTML content packs, panel rendering |
 | [`AGENTS_CODE_REFERENCE-ui.md`](AGENTS_CODE_REFERENCE-ui.md) | Shell HTML, modals, docs dropdown, task CSS |
-| [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](AGENTS_POSSIBLE_DECISIONS_INDEX.md) | Route to decision docs (engine, context menu, mini-games) by milestone/topic |
+| [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](AGENTS_POSSIBLE_DECISIONS_INDEX.md) | Route to decision docs (engine, context menu, timeline, markdown, mini-games) by milestone/topic |
 | [`AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md`](AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md) | Runtime / engine options for **E0.M3** — do not switch stacks without approval |
 
 | Artifact | Role |

@@ -53,14 +53,14 @@ taskSystem.createTask({
 ## Recommended order
 
 ```
-E0.M3 → E0.M4 → E1.M1 → E1.M2 → E2.M1 → E2.M2 → E2.M3
+E0.M3 → E0.M4 → E0.M5 → E1.M1 → E1.M2 → E2.M1 → E2.M2 → E2.M3
   → E3.M1 → E3.M2 → E3.M6 → E6.M0
   → E4.M1 → (E4.M2 ∥ E5.M1) → E5.M2 → E3.M3 → E4.M3 → E3.M5
   → E6.M1 → E6.M2
   → Later: E3.M4, E5.M3, E7.*, E8.*
 ```
 
-Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + objectives).
+Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + objectives), then **E0.M5** (markdown-it Help/learning renderer).
 
 **MVP done when:** Multi-patient shift under slot pressure; hourly doctor-order checks; thin prioritization debrief; one loadable pack; fiction disclaimer visible — no auth, chaos packs, or class-interaction math.
 
@@ -79,13 +79,19 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 | S0.7 | Record `decisions.game_runtime` + rationale | E0.M3 | [ ] |
 | S0.8 | Player-facing fictional + educational-use disclaimer | E0.M4 | [ ] |
 | S0.9 | Learning objectives visible (About/docs/first-run) | E0.M4 | [ ] |
+| S0.10 | Shared MD renderer: markdown-it + live Mermaid + LaTeX math; Help/Docs opens authored `.md` | E0.M5 | [ ] |
+| S0.11 | Authoring path for learning/help MD (`docs/` roots + registry); wiki `[[links]]` | E0.M5 | [ ] |
+| S0.12 | Hover preview popover for internal MD links (Preview + Contents tabs) | E0.M5 | [ ] |
 
 **E0.M4 implement notes (locked):**
 - Canonical copy in `docs/players/ABOUT.md` (Docs FAB).
 - Always-on shell line under the **ICU Simulation** header in `game/index.html` so players see it without opening Docs.
 - Suggested text: *Names and scenarios are fictional. Any resemblance to actual events are coincidental.*
+- After **E0.M5**, About/objectives should open through the shared markdown renderer (not a second `marked` path).
 
 **E0.M3 implement notes:** Read [`AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md`](AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md) and [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](AGENTS_POSSIBLE_DECISIONS_INDEX.md). Timeboxed decision only: stamp `decisions.game_runtime = keep_modular_app` (default) and record brief rationale in `state.json`. Also stamp `decisions.architecture_style = declarative_modular` (config + game-state actions/subscribe + task-system processors — see [Declarative architecture](#declarative-architecture-locked--all-milestones) above and [`docs/devs/REFACTORING_SUMMARY.md`](docs/devs/REFACTORING_SUMMARY.md)). Thin in-house layer only if later pain after slots; no third-party shell (Phaser/Pixi/Godot/React) unless user explicitly approves.
+
+**E0.M5 implement notes:** Read [`AGENTS_POSSIBLE_DECISIONS__MARKDOWN.md`](AGENTS_POSSIBLE_DECISIONS__MARKDOWN.md), [`AGENTS_POSSIBLE_DECISIONS__MARKDOWN_markdown-it.md`](AGENTS_POSSIBLE_DECISIONS__MARKDOWN_markdown-it.md), [`AGENTS_POSSIBLE_DECISIONS__MARKDOWN_hover-preview.md`](AGENTS_POSSIBLE_DECISIONS__MARKDOWN_hover-preview.md), and [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](AGENTS_POSSIBLE_DECISIONS_INDEX.md). Port patterns from read-only [`context-devbrain/`](context-devbrain/) (`note-opener.js`, `link-popover.js`, CDN tags + `MarkdownItLatex` in `index.php`) — do not import DevBrain PHP/cache. Default stamp: `decisions.markdown_renderer = markdown-it`. Replace Help FAB `marked` usage in `docs.js` with a shared `markdown-renderer` module; live-render ` ```mermaid ` fences; render LaTeX math (`$…$` / `$$…$$`) for dosage/equations; support `[[Note Title]]` + catalogued relative `.md` links; add internal-link hover preview (Preview + Contents) without a new fetch API. Authoring = drop `.md` under `docs/{players,devs,learning}/` and register in docs structure / config.
 
 ### Milestones
 
@@ -95,6 +101,7 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 | **E0.M2** | Epic map confirmed + backlog (+ council finalize) | — |
 | **E0.M3** | Stamp runtime: **`keep_modular_app`** + architecture: **`declarative_modular`**. Timeboxed decision only. Thin in-house layer only if later pain after slots; no third-party shell. | No migration, no Phaser/Pixi/Godot/React rewrite; no greenfield re-architecture |
 | **E0.M4** | Fictional scenarios disclaimer + educational-use framing + learning objectives (shell + About; see notes above) | No legal productization, auth, LMS |
+| **E0.M5** | Shared **markdown-it + Mermaid + LaTeX math** renderer for Help/Docs + learning MD authoring; wiki links; internal-link hover preview | No DevBrain PHP/cache port; no external CORS link-preview markers required; no clinical HTML→MD migration; no auth/private notes |
 
 ---
 

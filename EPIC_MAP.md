@@ -119,11 +119,11 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 ### E0. Planning & Decisions
 - **Goal / user outcome:** Agents and humans share one epic map and resume state.
 - **Why:** Prevents full-app one-shots and architectural drift.
-- **Includes:** This file, `.agents/state.json`, `IMPLEMENTATION_STORIES.md`, prompt guidelines, **E0.M3 runtime + architecture stamp** (`keep_modular_app` + `declarative_modular`), **E0.M4 disclaimer + learning objectives**.
+- **Includes:** This file, `.agents/state.json`, `IMPLEMENTATION_STORIES.md`, prompt guidelines, **E0.M3 runtime + architecture stamp** (`keep_modular_app` + `declarative_modular`), **E0.M4 disclaimer + learning objectives**, **E0.M5 markdown-it Help/learning renderer** (authored `.md`, Mermaid, LaTeX math, internal-link hover — see [`AGENTS_POSSIBLE_DECISIONS__MARKDOWN.md`](AGENTS_POSSIBLE_DECISIONS__MARKDOWN.md)).
 - **Dependencies:** None.
 - **Risks / unknowns:** Scope assumptions may need user edits; engine choice affects E3+ cost.
-- **Out of scope:** Implementing an engine or migrating frameworks inside E0 (decision only); greenfield re-architecture.
-- **Suggested order:** First — always; **E0.M3 → E0.M4** before heavy E3 work.
+- **Out of scope:** Implementing an engine or migrating frameworks inside E0 (decision only); greenfield re-architecture; DevBrain PHP/cache port.
+- **Suggested order:** First — always; **E0.M3 → E0.M4 → E0.M5** before heavy E3 work.
 
 ### E1. Shift Shell & Clock
 - **Goal / user outcome:** Player trusts game time and has a place to work.
@@ -212,6 +212,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 | Chaos, art, content scale | E7 |
 | Auth/friends / packaging | E8 |
 | Fictional disclaimer + clinical tone | Decisions + all content epics |
+| Help / learning MD authoring + Mermaid + LaTeX math | E0.M5 (+ content epics author files) |
 | Vanilla/light stack | Decisions in state.json |
 
 ---
@@ -232,7 +233,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 
 1. Report: [`council-report-epics-milestones.md`](council-report-epics-milestones.md)
 2. Milestones: [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md)
-3. Resume: [`.agents/state.json`](.agents/state.json) → **E0.M3** (stamp `keep_modular_app`), then **E0.M4**
+3. Resume: [`.agents/state.json`](.agents/state.json) → **E0.M3** (stamp `keep_modular_app`), then **E0.M4**, then **E0.M5** (markdown renderer)
 
-**Order:** `E0.M3 → E0.M4 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E7, E8`
+**Order:** `E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E7, E8`
 
