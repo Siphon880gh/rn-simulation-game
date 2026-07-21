@@ -10,7 +10,7 @@ AI-oriented codebase map for safe modification, feature tracing, and implementat
 - [`AGENTS_CODE_REFERENCE-patients.md`](AGENTS_CODE_REFERENCE-patients.md) — census / HTML packs
 - [`AGENTS_CODE_REFERENCE-ui.md`](AGENTS_CODE_REFERENCE-ui.md) — shell / modal / docs / CSS
 
-Also: [`AGENTS.md`](AGENTS.md) (entry), [`AGENTS_POSSIBLE_GAME_ENGINES.md`](AGENTS_POSSIBLE_GAME_ENGINES.md) (engine unification options).
+Also: [`AGENTS.md`](AGENTS.md) (entry), [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](AGENTS_POSSIBLE_DECISIONS_INDEX.md) (decision routing), [`AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md`](AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md) (engine options for E0.M3).
 
 > Refer to this file for high-level context; details are in feature context files.
 
@@ -70,7 +70,8 @@ URL params (?speed-factor=&shift-starts=&shift-duration=)
 rngame/
 ├── AGENTS.md                          # AI entry + engine pointer
 ├── AGENTS_CODE_REFERENCE*.md          # this family
-├── AGENTS_POSSIBLE_GAME_ENGINES.md    # engine options if unifying DX
+├── AGENTS_POSSIBLE_DECISIONS_INDEX.md   # decision doc routing by milestone
+├── AGENTS_POSSIBLE_DECISIONS__*.md      # engine, context menu, mini-game specs
 ├── EPIC_MAP.md / IMPLEMENTATION_STORIES.md / .agents/state.json
 ├── index.html                         # repo root stub (game lives under game/)
 ├── game/

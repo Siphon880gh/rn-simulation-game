@@ -9,7 +9,7 @@ description: >-
 
 # Engine selection (RN shift sim)
 
-> Full comparison tables live in [`AGENTS_POSSIBLE_GAME_ENGINES.md`](../../../AGENTS_POSSIBLE_GAME_ENGINES.md). This skill is the decision procedure.
+> Full comparison tables live in [`AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md`](../../../AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md). This skill is the decision procedure.
 
 ---
 

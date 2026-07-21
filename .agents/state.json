@@ -17,6 +17,15 @@
       "thin_in_house_engine_layer",
       "adopt_third_party_engine"
     ],
+    "context_menu_library": "jquery-contextmenu",
+    "timeline_library": "timelinejs",
+    "decision_docs": {
+      "E0.M3": "AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md",
+      "E2.M1": "AGENTS_POSSIBLE_DECISIONS__TIMELINE.md",
+      "E3.M2": "AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md",
+      "E3.M3": "AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md",
+      "E5.M3": "AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md"
+    },
     "council_finalize": "Option A — Balanced Education MVP",
     "council_option_confirmed_by_user": true,
     "council_report": "council-report-epics-milestones.md",

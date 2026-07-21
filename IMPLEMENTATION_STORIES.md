@@ -44,6 +44,8 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 - Always-on shell line under the **ICU Simulation** header in `game/index.html` so players see it without opening Docs.
 - Suggested text: *Names and scenarios are fictional. Any resemblance to actual events are coincidental.*
 
+**E0.M3 implement notes:** Read [`AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md`](AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md) and [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](AGENTS_POSSIBLE_DECISIONS_INDEX.md). Timeboxed decision only: stamp `decisions.game_runtime = keep_modular_app` (default) and record brief rationale in `state.json`. Thin in-house layer only if later pain after slots; no third-party shell (Phaser/Pixi/Godot/React) unless user explicitly approves.
+
 ### Milestones
 
 | Milestone | Goal | Non-goals |
@@ -94,6 +96,8 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 | **E2.M2** | Patient tabs + global tab; active patient drives panels | No full acuity engine |
 | **E2.M3** | **4–6 patient census** usable in a shift | No friends/login |
 
+**E2.M1 implement notes:** Patient **past hx** tab — read [`AGENTS_POSSIBLE_DECISIONS__TIMELINE.md`](AGENTS_POSSIBLE_DECISIONS__TIMELINE.md); default library **TimelineJS** per [`AGENTS_POSSIBLE_DECISIONS__TIMELINE_TimelineJS.md`](AGENTS_POSSIBLE_DECISIONS__TIMELINE_TimelineJS.md). Follow `decisions.timeline_library` in `state.json`; lazy-init timeline when tab opens; pack JSON `pastHx[]` → adapter → TimelineJS `events`. Do not swap libraries without user approval. Context menu docs apply only if changing med perform UX on the same milestone.
+
 ---
 
 ## E3 — Task Queue & Slot Execution
@@ -120,6 +124,10 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 | **E3.M3** | Availability windows gate Perform; style-block reveal of start/expire timing | No scenario YAML pipeline | Yes |
 | **E3.M5** | Thin mid-shift urgents + alerts; incident tabs omit event clock time | No chaos pack (E7) | Yes |
 | **E3.M4** | Class interaction rules adjust duration | — | **Later** |
+
+**E3.M2 implement notes:** Context menu for task details and med **Perform** — read [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md); if using jQuery-contextMenu (stamped default), also [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU_jQuery ContextMenu.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU_jQuery%20ContextMenu.md). Follow `decisions.context_menu_library` in `state.json`; do not swap libraries without user approval. Consolidate duplicate setup in `app.js` vs `patients.js` when touching perform UX (see [`AGENTS_CODE_REFERENCE-tasks.md`](AGENTS_CODE_REFERENCE-tasks.md)).
+
+**E3.M3 implement notes:** When gating **Perform** by availability windows, keep context-menu behavior aligned with [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md) (conditional menus / disabled items vs hiding Perform).
 
 ---
 

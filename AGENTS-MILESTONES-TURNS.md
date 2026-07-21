@@ -51,6 +51,26 @@ Prefer `IMPLEMENTATION_STORIES.md` for milestone goals/non-goals/stories. If a f
 - **Files to Create** — Exact file paths and purposes
 - **Verification Checklist** — All items must pass before completion
 
+Also read any **implement notes** block for `current_milestone_id` in `IMPLEMENTATION_STORIES.md` (e.g. `**E0.M3 implement notes:**`).
+
+### Step 4b: Read decision docs for the current milestone
+
+Before implementing, read decision material linked from:
+
+1. `IMPLEMENTATION_STORIES.md` → **implement notes** for `current_milestone_id`
+2. [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](AGENTS_POSSIBLE_DECISIONS_INDEX.md) → row or milestone lookup for `current_milestone_id`
+3. `.agents/state.json` → `decisions.decision_docs` (if present) for the current milestone
+
+**Rules:**
+
+- If `decisions.*` already stamps a choice (e.g. `game_runtime`, `context_menu_library`), follow the stamp — do not re-debate libraries or engines unless the milestone or user explicitly reopens the decision.
+- If **no stamp exists** for the topic, read the decision doc, **pick the best fit**, implement, and **explain why** in the completion report (see [`AGENTS.md`](AGENTS.md) → Technology decisions). Stamp `decisions.<key>` in `state.json` when settled.
+- Read only docs relevant to the **current** milestone; do not load every `AGENTS_POSSIBLE_DECISIONS__*` file every session.
+- Do not violate locked constraints in `decisions.main_constraints` (e.g. no React/Ink/Twine unless user approved). Among allowed options, decide — do not stall for approval.
+- Do not **swap away** from an stamped library or runtime without user approval.
+
+When a decision milestone completes, stamp the outcome in `state.json` → `decisions` and add an entry to `decisions.decision_docs`.
+
 ### Step 5: Implement the Milestone
 
 **Implementation Rules:**
@@ -121,6 +141,12 @@ When you finish work on a milestone (or a work session), report to the user:
 ### What's Working Now
 - Feature 1 is functional
 - ...
+
+### Technology decision *(include when this work picked or applied an `AGENTS_POSSIBLE_DECISIONS__*` choice)*
+
+- **Topic:**
+- **Choice:**
+- **Why:**
 
 ### Verification Steps for Human
 
@@ -209,6 +235,8 @@ Copy and paste this to an AI agent to begin:
 ```
 Read .agents/state.json, then EPIC_MAP.md and IMPLEMENTATION_STORIES.md.
 Find the current milestone from current_milestone_id.
+Read implement notes for that milestone and AGENTS_POSSIBLE_DECISIONS_INDEX.md (linked decision docs only).
+Follow stamped decisions in state.json unless the milestone reopens them.
 Read AGENTS_CODE_REFERENCE.md as needed.
 Tell me the current status and either continue development or tell me what confirmation you need.
 ```

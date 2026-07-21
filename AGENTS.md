@@ -25,13 +25,14 @@ The agent is an execution-focused coding partner that:
 | [`AGENTS_CODE_REFERENCE-tasks.md`](AGENTS_CODE_REFERENCE-tasks.md) | Task schema, statuses, med perform path, data attributes |
 | [`AGENTS_CODE_REFERENCE-patients.md`](AGENTS_CODE_REFERENCE-patients.md) | Patient census, HTML content packs, panel rendering |
 | [`AGENTS_CODE_REFERENCE-ui.md`](AGENTS_CODE_REFERENCE-ui.md) | Shell HTML, modals, docs dropdown, task CSS |
-| [`AGENTS_POSSIBLE_GAME_ENGINES.md`](AGENTS_POSSIBLE_GAME_ENGINES.md) | Runtime / engine options for E0.M3 — do not switch stacks without approval |
+| [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](AGENTS_POSSIBLE_DECISIONS_INDEX.md) | Route to decision docs (engine, context menu, mini-games) by milestone/topic |
+| [`AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md`](AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md) | Runtime / engine options for **E0.M3** — do not switch stacks without approval |
 
 | Artifact | Role |
 |----------|------|
 | [`EPIC_MAP.md`](EPIC_MAP.md) | Product epics / MVP scope |
-| [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md) | Milestone backlog |
-| [`.agents/state.json`](.agents/state.json) | Current epic/milestone + stack decisions |
+| [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md) | Milestone backlog + **implement notes** linking decision docs |
+| [`.agents/state.json`](.agents/state.json) | Current epic/milestone + stamped decisions (`decisions.*`) |
 | [`prompts/`](prompts/) | Milestone authoring prompts |
 
 **Locked constraints** (from `.agents/state.json`): web ES6 modules; vanilla JS (+ jQuery/signals or light reactive); no React/Ink/Twine unless approved; military game clock; panels-first clinical UI; no auth until Later.
@@ -98,6 +99,7 @@ For every coding task, follow this loop:
 
 * Resume from the most logical next step. Prefer action over discussion.
 * Keep changes scoped, coherent, and easy to review.
+* When a topic needs an `AGENTS_POSSIBLE_DECISIONS__*` choice and none is stamped, pick the best fit, explain why, and stamp `decisions.*` (see **Technology decisions** under Decision-Making Principles).
 
 ### 3. Verify
 
@@ -176,11 +178,12 @@ Rules when using it:
 
 1. `AGENTS.md`
 2. `.agents/state.json` (initiate if missing)
-3. `EPIC_MAP.md` / `IMPLEMENTATION_STORIES.md` when present
-4. `TASKS.md` if present
-5. `AGENTS_CODE_REFERENCE.md` and `AGENTS_CODE_REFERENCE-*.md` (bootstrap if missing)
-6. Other `AGENTS-*.md` or implementation maps
-7. Directly relevant source → connected dependencies → broader files only if needed
+3. `EPIC_MAP.md` / `IMPLEMENTATION_STORIES.md` when present — including **implement notes** for `current_milestone_id`
+4. `AGENTS_POSSIBLE_DECISIONS_INDEX.md` and any linked `AGENTS_POSSIBLE_DECISIONS__*.md` for the current milestone (follow stamped `decisions.*` unless the milestone reopens the choice)
+5. `TASKS.md` if present
+6. `AGENTS_CODE_REFERENCE.md` and `AGENTS_CODE_REFERENCE-*.md` (bootstrap if missing)
+7. Other `AGENTS-*.md` or implementation maps
+8. Directly relevant source → connected dependencies → broader files only if needed
 
 Read only the files likely related to the task. Prefer targeted reads over scanning. Expand outward only when local context is insufficient.
 
@@ -193,6 +196,28 @@ Read only the files likely related to the task. Prefer targeted reads over scann
 * Prefer small, reviewable increments.
 * Prefer naming conventions already in the repo.
 * Update `EPIC_MAP.md` / `IMPLEMENTATION_STORIES.md`, `TASKS.md`, and `.agents/state.json` when progress changes meaningfully.
+
+### Technology decisions (`AGENTS_POSSIBLE_DECISIONS__*`)
+
+When a feature or milestone requires picking a runtime, library, or mini-game pattern covered by [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](AGENTS_POSSIBLE_DECISIONS_INDEX.md):
+
+1. **Read** the linked decision doc(s) for the current milestone or topic.
+2. **If already stamped** in `.agents/state.json` → `decisions.*` — follow it; do not re-debate. A one-line reminder in the report is enough.
+3. **If not stamped** — **choose the best fit**, implement, and **explain why** in the session report (see format below). Stamp the outcome in `state.json` when the decision is settled for that topic.
+4. **Prefer** options that match: locked `decisions.main_constraints`, libraries already in the shell/code maps, milestone **implement notes**, and the ⭐ recommendations in the decision doc.
+5. **Stop and ask the user** only when: the choice would violate locked constraints (e.g. React/Ink/Twine without approval), two options are genuinely tied on product grounds, or `status` is `blocked_waiting_user`.
+
+**Report format (when you made or applied a technology decision):**
+
+```markdown
+### Technology decision
+- **Topic:** [e.g. timeline / context menu / game runtime]
+- **Choice:** [library or pattern]
+- **Why:** [2–4 sentences: fit to milestone, existing stack, constraints, tradeoffs rejected]
+- **Stamped:** `decisions.<key>` in state.json [yes / already stamped]
+```
+
+Do not block implementation waiting for library approval when the decision doc and constraints already point to a clear winner.
 
 ---
 
@@ -210,14 +235,15 @@ When the user says **continue**, **keep going**, **proceed**, **next**, or **fin
 
 1. Read `.agents/state.json`; initiate if missing (use `AGENTS-MILESTONES-INIT.md` when epic/story files are absent).
 2. Follow `AGENTS-MILESTONES-TURNS.md` when milestone docs exist; otherwise read `TASKS.md`.
-3. Read `AGENTS_CODE_REFERENCE.md` and linked maps; bootstrap if missing.
-4. Sync epic/milestone/current step in `state.json`.
-5. Implement the next logical task.
-6. Verify.
-7. Update `EPIC_MAP.md` / `IMPLEMENTATION_STORIES.md`, `TASKS.md`, and `.agents/state.json` when progress changed.
-8. Report what changed, what was verified, what remains.
-9. Evaluate commit point.
-10. **If good commit point**: update LLM reference maps when warranted per `AGENTS-CODE_REFERENCE_INIT.md`, **then** suggest a commit message.
-11. **If not**: skip map update, commits, and pushes; say what remains.
-12. If the user has granted permission to commit without asking, make the commit.
-13. If the user has granted permission to push, push as well.
+3. Read milestone-linked decision docs: `AGENTS_POSSIBLE_DECISIONS_INDEX.md` + **implement notes** for `current_milestone_id` in `IMPLEMENTATION_STORIES.md`; honor stamped `decisions.*` unless the milestone reopens the choice.
+4. Read `AGENTS_CODE_REFERENCE.md` and linked maps; bootstrap if missing.
+5. Sync epic/milestone/current step in `state.json`.
+6. Implement the next logical task.
+7. Verify.
+8. Update `EPIC_MAP.md` / `IMPLEMENTATION_STORIES.md`, `TASKS.md`, and `.agents/state.json` when progress changed.
+9. Report what changed, what was verified, what remains.
+10. Evaluate commit point.
+11. **If good commit point**: update LLM reference maps when warranted per `AGENTS-CODE_REFERENCE_INIT.md`, **then** suggest a commit message.
+12. **If not**: skip map update, commits, and pushes; say what remains.
+13. If the user has granted permission to commit without asking, make the commit.
+14. If the user has granted permission to push, push as well.

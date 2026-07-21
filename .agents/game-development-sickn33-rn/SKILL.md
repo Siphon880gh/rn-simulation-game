@@ -11,7 +11,7 @@ description: >-
 # Game Development (RN shift sim — repo fork)
 
 > Project orchestrator for **this** nursing shift sim. **Engines serve game types — not the reverse.**  
-> Source of truth for runtime choices: [`AGENTS_POSSIBLE_GAME_ENGINES.md`](../../AGENTS_POSSIBLE_GAME_ENGINES.md)  
+> Source of truth for runtime choices: [`AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md`](../../AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md)  
 > **Upstream / contribute-back pack (no shift rules):** [`../sickn33-game-development/`](../sickn33-game-development/)
 
 ---
@@ -122,7 +122,7 @@ Skip ECS / behavior trees / spatial hashes unless a guest mini-game needs them.
 ## Agent workflow
 
 1. Name the **game type** (table above).
-2. Open [`AGENTS_POSSIBLE_GAME_ENGINES.md`](../../AGENTS_POSSIBLE_GAME_ENGINES.md) and assign a **fit tier**.
+2. Open [`AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md`](../../AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md) and assign a **fit tier**.
 3. Read the matching sub-skill (`engine-selection`, `shift-simulation`, `web-games`, …).
 4. Map work to epics: E1 clock · E2 panels · E3 slots · E4 scenarios · E5 challenges · E6 debrief.
 5. Implement the lightest approved approach; do not switch stacks without user approval.
@@ -149,7 +149,7 @@ Skip ECS / behavior trees / spatial hashes unless a guest mini-game needs them.
 
 | Artifact | Role |
 |----------|------|
-| [`AGENTS_POSSIBLE_GAME_ENGINES.md`](../../AGENTS_POSSIBLE_GAME_ENGINES.md) | Engine tiers & comparison |
+| [`AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md`](../../AGENTS_POSSIBLE_DECISIONS__GAME_ENGINES.md) | Engine tiers & comparison |
 | [`EPIC_MAP.md`](../../EPIC_MAP.md) / [`IMPLEMENTATION_STORIES.md`](../../IMPLEMENTATION_STORIES.md) | Capabilities & milestones |
 | [`AGENTS_CODE_REFERENCE.md`](../../AGENTS_CODE_REFERENCE.md) | Code map (timer/tasks/patients/ui companions) |
 | [`.agents/state.json`](../state.json) | Locked decisions + resume point |
