@@ -15,10 +15,16 @@ Report: [`council-report-epics-milestones.md`](council-report-epics-milestones.m
 | Field | Value |
 |-------|-------|
 | **App name** | RN Simulation Game |
-| **One-liner** | Experience a fast-paced 12-hour nursing shift: manage patients, timed tasks, and emergent load without slipping into overtime. |
+| **One-liner** | Compressed 12-hour RN shift: triage tasks, ace clinical mini-games, stay on schedule — or overtime / miss the critical moment. |
 | **Platform** | Web (browser, ES6 modules, no required build step) |
 | **Target users** | Nursing students, early-career RNs, educators exploring prioritization practice; also portfolio / demo viewers |
-| **Success signal** | Player completes (or fails) a shift with clear feedback on prioritization, timeliness, and task handling — feels like a real workload, not an RPG |
+| **Success signal** | Triage under load, pass clinical mini-games when gated, finish on schedule; failure = overtime and/or missing a critical moment that worsens patient status (practice framing, not competency claim) |
+
+### Product focus (locked — Clinical Training)
+
+**Clinical Training:** This RN simulator drops players into a compressed 12-hour nursing shift filled with real-world events, diverse patients, and escalating case studies. Success means triaging tasks, acing clinical mini-games, and staying on schedule; failure means clocking overtime—or worse, missing the critical moment that leads to patient injury.
+
+All epics and milestones serve this loop. Do **not** let art, chaos packs, social, or challenge catalogue expansion displace: **triage → perform (mini-games when required) → schedule pressure → patient-status consequences → debrief**.
 
 ### Scope (assumptions — edit if wrong)
 
@@ -33,12 +39,13 @@ Report: [`council-report-epics-milestones.md`](council-report-epics-milestones.m
 ## User Needs (Grounding)
 
 ### Use-based
-- Run a full accelerated shift and see tasks appear/expire on game time
-- Manage multiple patients and know what is due for whom
-- Start work that occupies limited attention (slots) for a duration
+- Run a compressed accelerated 12-hour shift with real-world-style events and escalating cases
+- Triage timed work across diverse patients and know what is due for whom
+- Ace clinical mini-games when Perform is gated (pass/fail under a frozen shift clock)
+- Start work that occupies limited attention (slots) for a duration; stay on schedule
 - Queue work when all slots are busy so it starts as soon as a slot frees
-- Face emergent / urgent work that disrupts the plan
-- Get a score/debrief that reflects prioritization quality
+- Face emergent / urgent / deteriorating work that can become a critical moment
+- Get a score/debrief that reflects triage quality, mini-game outcomes, overtime risk, and patient-status harm avoided or missed
 
 ### Usability-based
 - Runs in the browser with a local/static server
@@ -107,7 +114,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 | E2 | Patient Census & Clinical Panels | Player can see who they have and clinical status surfaces | Patient load, tabs, vitals/meds/panels, chart history (past hx), multi-patient layout | Use needs / ICP | MVP |
 | E3 | Task Queue & Slot Execution | Player prioritizes timed work under concurrency limits | Schema, availability windows, slots, waiting queue, interactions, urgent spawn | MVP core loop | MVP |
 | E4 | Scenario & Event Pipeline | Shift content can drip and vary without code rewrites | Scenario packs, event unlocks, hourly check-doctor-orders task | Content / educator ICP | MVP |
-| E5 | Perform Challenges | High-stakes tasks require a focused pass/fail action | Mini-games (med quiz MVP; bed-prep sequence Later), timer pause, retry rules | MVP / learning | MVP |
+| E5 | Perform Challenges | Ace clinical mini-games at critical Perform moments | Mini-games (med quiz MVP; bed-prep + Code Blue Later), timer pause, retry rules | MVP / learning | MVP |
 | E6 | Scoring & Shift Debrief | Player knows how the shift went | Points, grades, live feedback, end summary | Success signal | MVP |
 | E7 | Chaos, Presentation & Content Scale | Harder, richer, more replayable shifts | Art, chaos packs, incidents, more shifts/complications | Later wishlist | Later |
 | E8 | Portfolio Packaging & Optional Social | Ship/share beyond local demo | Polish, packaging; optional auth/friends | Later / social | Later |
@@ -162,13 +169,13 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 - **Suggested order:** After E3.M6 + thin E6.M0; **E4.M3 after E3.M3**.
 
 ### E5. Perform Challenges
-- **Goal / user outcome:** Some tasks demand attention (pass to start; fail blocks slot assign).
-- **Why:** Reinforces safe practice moments (e.g. med identity) inside the time pressure.
-- **Includes:** Challenge modal, timer pause, med quiz vertical slice (**E5.M2**), retry behavior; Later **E5.M3** bed-prep / admission mini-game (**win required to complete** that task) — spec [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md).
-- **Dependencies:** E3 perform path.
-- **Risks / unknowns:** Which task types require challenges first.
-- **Out of scope:** Full challenge suite for every task type (MVP = thin gate + one quiz).
-- **Suggested order:** After E3 perform wiring; E5.M3 after MVP.
+- **Goal / user outcome:** Players **ace clinical mini-games** at high-stakes Perform moments (pass to start; fail blocks slot assign); Later emergents (e.g. Code Blue) use the same focused gate.
+- **Why:** Clinical Training focus — safe practice under time pressure without live patient risk.
+- **Includes:** Challenge modal, timer pause, med quiz vertical slice (**E5.M2**), retry behavior; Later **E5.M3** bed-prep / admission mini-game (**win required to complete** that task) — spec [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md); Later **E5.M4** Code Blue mini-game for a random deteriorating patient (trigger from E4).
+- **Dependencies:** E3 perform path; Code Blue also needs E4 thin deterioration escalate.
+- **Risks / unknowns:** Which task types require challenges first; Code Blue frequency vs teachable pacing.
+- **Out of scope:** Full challenge suite for every task type (MVP = thin gate + one quiz). Extra mini-games must still serve triage/schedule pressure — not become the whole product.
+- **Suggested order:** After E3 perform wiring; E5.M3 / E5.M4 after MVP.
 
 ### E6. Scoring & Shift Debrief
 - **Goal / user outcome:** Clear feedback on how the shift went.
@@ -209,7 +216,8 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 | Timed tasks, windows, slots, waiting queue, dynamic/urgent spawn | E3 |
 | Slot/progress CSS motion | E3.M2 (MVP); optional GSAP polish E7.M1 |
 | Scenario drip + emergency events + thin deterioration + hourly check-doctor-orders | E4 |
-| Med/perform challenges | E5 |
+| Clinical Training focus (triage + mini-games + schedule / overtime / critical-moment harm) | Product focus (locked) + E1–E6 |
+| Med/perform challenges (MVP quiz; Later bed-prep + Code Blue) | E5 |
 | Scoring (tasks + satisfaction/status) + final outcome + debrief | E6 |
 | Chaos, art, richer acuity, content scale | E7 |
 | Auth/friends / packaging | E8 |
@@ -237,5 +245,5 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 2. Milestones: [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md)
 3. Resume: [`.agents/state.json`](.agents/state.json) → **E0.M3** (stamp `keep_modular_app`), then **E0.M4**, then **E0.M5** (markdown renderer)
 
-**Order:** `E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E7, E8`
+**Order:** `E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E5.M4, E7, E8`
 

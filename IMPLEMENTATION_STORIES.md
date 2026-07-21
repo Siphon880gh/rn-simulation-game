@@ -7,6 +7,12 @@ Council finalize: [`council-report-epics-milestones.md`](council-report-epics-mi
 
 **Status:** Epic map approved. Milestones **council-finalized** (Balanced Education MVP).
 
+### Product focus (locked — Clinical Training)
+
+**Clinical Training:** This RN simulator drops players into a compressed 12-hour nursing shift filled with real-world events, diverse patients, and escalating case studies. Success means triaging tasks, acing clinical mini-games, and staying on schedule; failure means clocking overtime—or worse, missing the critical moment that leads to patient injury.
+
+Every milestone must serve that loop (triage → perform/mini-games → schedule pressure → patient-status consequences → debrief). Later content (bed-prep, Code Blue, chaos packs, art) **extends** the loop; it does not replace it.
+
 ---
 
 ## Declarative architecture (locked — all milestones)
@@ -57,12 +63,12 @@ E0.M3 → E0.M4 → E0.M5 → E1.M1 → E1.M2 → E2.M1 → E2.M2 → E2.M3
   → E3.M1 → E3.M2 → E3.M6 → E6.M0
   → E4.M1 → (E4.M2 ∥ E5.M1) → E5.M2 → E3.M3 → E4.M3 → E3.M5
   → E6.M1 → E6.M2
-  → Later: E3.M4, E5.M3, E7.*, E8.*
+  → Later: E3.M4, E5.M3, E5.M4, E7.*, E8.*
 ```
 
 Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + objectives), then **E0.M5** (markdown-it Help/learning renderer).
 
-**MVP done when:** Multi-patient shift under slot pressure (with panel swap); thin dynamic/urgent spawn + game-time emergencies + thin deterioration; hourly doctor-order checks; score + final outcome (tasks + satisfaction/status); thin prioritization debrief; one loadable pack; fiction disclaimer visible — CSS motion first; no auth, chaos packs, full acuity engine, GSAP requirement, or class-interaction math.
+**MVP done when:** Player can run a compressed multi-patient shift under slot pressure (panel swap); triage timed work; face thin dynamic/urgent spawn + game-time emergencies + thin deterioration (critical-moment risk); ace at least one clinical mini-game gate; hourly doctor-order checks; score + final outcome covering schedule/overtime + patient status; thin prioritization debrief; one loadable pack; fiction disclaimer visible — CSS motion first; no auth, chaos packs, full acuity engine, GSAP requirement, or class-interaction math.
 
 ---
 
@@ -161,7 +167,7 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 |----|-------|-----------|--------|
 | S3.1 | Formal task schema (class/type/duration) via config + `taskSystem.createTask` | E3.M1 | [ ] |
 | S3.2 | Lifecycle not-yet → active → completed / overdue via `game-state` actions | E3.M1 | [~] partial |
-| S3.3 | Functional 3-slot execution + progress + timemark | E3.M2 | [ ] UI stub |
+| S3.3 | Functional 3-slot execution + progress + timemark; occupied slot shows task **duration as a timemark at bottom center** | E3.M2 | [ ] UI stub |
 | S3.3b | Slot / task **progress UI motion** via CSS (smooth fill, status color changes); keep clinical and readable | E3.M2 | [ ] |
 | S3.4 | Availability windows (early/late/end modes); dynamic `<style id>` rules reveal start + expire duration (incl. relative `+N` before expire) | E3.M3 | [ ] |
 | S3.5 | Context-menu details + miss handling polish | E3.M2 | [~] partial |
@@ -175,7 +181,7 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 | Milestone | Goal | Non-goals | MVP? |
 |-----------|------|-----------|------|
 | **E3.M1** | Task schema + declarative state wiring end-to-end (`task-system` + `game-state`) | No slots blocking, no mini-games; no liveQuery task activation | Yes |
-| **E3.M2** | Perform occupies a slot for `duration`; progress (+ **CSS** progress/status motion); full = blocked (no auto-start yet) | No interaction math; no waiting queue; no GSAP required | Yes |
+| **E3.M2** | Perform occupies a slot for `duration`; progress (+ **CSS** progress/status motion); occupied slot shows **duration timemark at bottom center**; full = blocked (no auto-start yet) | No interaction math; no waiting queue; no GSAP required | Yes |
 | **E3.M6** | When slots full, player can enqueue; on slot free, next queued task auto-assigns and starts | No class-interaction math; no reordering UX beyond FIFO unless needed | Yes |
 | **E3.M3** | Availability windows gate Perform; style-block reveal of start/expire timing | No scenario YAML pipeline | Yes |
 | **E3.M5** | Thin mid-shift **dynamic/urgent** task spawn from templates + alerts; incident tabs omit event clock time | No chaos pack (E7); no wall-clock-only spawn that ignores shift pause/speed | Yes |
@@ -183,7 +189,7 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 
 **E3.M1 implement notes:** Formalize schema on top of existing `game-config.js` task types/statuses and `task-system.js` processors. Lifecycle transitions = `game-state` actions (`REGISTER_TASK`, `ACTIVATE_TASK`, `COMPLETE_TASK`, etc.). Do not reintroduce `$("[data-scheduled]").livequery` activation. Status visuals via `declarative-tasks.css`. See [Declarative architecture](#declarative-architecture-locked--all-milestones).
 
-**E3.M2 implement notes:** Context menu for task details and med **Perform** — read [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md); if using jQuery-contextMenu (stamped default), also [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU_jQuery ContextMenu.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU_jQuery%20ContextMenu.md). Follow `decisions.context_menu_library` in `state.json`; do not swap libraries without user approval. Consolidate duplicate setup in `app.js` vs `patients.js` when touching perform UX (see [`AGENTS_CODE_REFERENCE-tasks.md`](AGENTS_CODE_REFERENCE-tasks.md)). Slot assign/progress should dispatch through `game-state`, not only mutate DOM attributes.
+**E3.M2 implement notes:** Context menu for task details and med **Perform** — read [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md); if using jQuery-contextMenu (stamped default), also [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU_jQuery ContextMenu.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU_jQuery%20ContextMenu.md). Follow `decisions.context_menu_library` in `state.json`; do not swap libraries without user approval. Consolidate duplicate setup in `app.js` vs `patients.js` when touching perform UX (see [`AGENTS_CODE_REFERENCE-tasks.md`](AGENTS_CODE_REFERENCE-tasks.md)). Slot assign/progress should dispatch through `game-state`, not only mutate DOM attributes. **Occupied slot UI:** when a slot contains a running task, show that task’s **duration as a timemark at the bottom center** of the slot (readable military/HHMM-style cue consistent with the shift clock language — not buried in a tooltip).
 
 **E3.M3 implement notes:** When gating **Perform** by availability windows, keep context-menu behavior aligned with [`AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md`](AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md) (conditional menus / disabled items vs hiding Perform). Window/expire rules stay in task processors + config (`+N` relative expire), not ad-hoc liveQuery attr rewrites.
 
@@ -200,6 +206,7 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 | S4.3 | Timed event unlocks / drip (authored + light random) | E4.M2 | [ ] |
 | S4.3b | **Emergency events (light):** separate **game-time** event drip (cadence / windows in config or pack) that can fire alerts such as critical new admit or unit emergency and inject follow-on tasks | E4.M2 | [ ] |
 | S4.3c | **Patient deterioration (thin):** if critical/overdue work for a patient lingers past config thresholds, worsen that patient’s status/acuity cue (and optionally spawn a follow-up task); feed scoring later | E4.M2 | [ ] |
+| S4.3d | **Code Blue escalate (hook):** from a deteriorating patient (weighted/random among eligible census), fire a Code Blue incident that opens the **E5.M4** mini-game — thin trigger only in E4; challenge UX is E5 | E4.M2 | [ ] Later gate |
 | S4.4 | Every game hour: spawn a **check doctor orders** task; expires when that hour ends (miss if not done) | E4.M3 | [ ] |
 | S4.4b | Completing the hourly check may inject new work (e.g. new med order) for that hour | E4.M3 | [ ] |
 | S4.5 | Hour-tab strip lists/filters work unlocked in that game hour (uses S1.6 chrome) | E4.M2 | [ ] |
@@ -212,6 +219,7 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 - Keep a **dedicated event drip** path (scenario unlocks + optional emergency templates) scheduled on **game time**, not a second wall-clock game loop. Cadence can be “every N game minutes” or authored timestamps; both must honor pause/speed.
 - Emergency examples for packs: “New patient arrived — critical,” rapid-response style alerts — inject census/task updates through `game-state` / `taskSystem`, surface in bottom history log (S1.7) and thin incident UI (E3.M5).
 - **Thin deterioration only:** discrete status steps or flags when overdue/critical tasks age out — not continuous vitals simulation, not a full acuity engine (that stays **E7**). Status changes should be visible on the patient panel after swap (E2.M2) and count toward E6 outcomes.
+- **Code Blue path (Later, with E5.M4):** when deterioration reaches a config threshold, optionally escalate a **random eligible patient** into a Code Blue incident (history log + urgent UI). Do **not** build the Code Blue mini-game here — only the game-time trigger / patient pick that hands off to **E5.M4**. Cap frequency so MVP thin drip stays teachable; richer chaos volume stays **E7**.
 
 **E4.M3 implement notes (locked):**
 - Recurring hourly task, not a free-floating order drip: at the start of each game hour, player gets a **check doctor orders** task.
@@ -233,20 +241,42 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 
 | ID | Story | Milestone | Status |
 |----|-------|-----------|--------|
-| S5.1 | Challenge gate on Perform; pause game timer | E5.M1 | [ ] |
-| S5.2 | Pass → assign slot; fail → no assign, retry | E5.M1 | [ ] |
-| S5.3 | Medication identity quiz vertical slice | E5.M2 | [ ] |
+| S5.1 | Challenge gate on Perform: open popover/modal mini-game; **freeze shift in-game timer** while modal stays open | E5.M1 | [ ] |
+| S5.2 | Pass → start task in a slot (duration progress, often short); fail → **not** added to a time slot; retry allowed | E5.M1 | [ ] |
+| S5.3 | Med identity quiz: type brand↔generic (random direction), **case-insensitive** | E5.M2 | [ ] |
 | S5.4 | Bed-prep / admission sequence mini-game — **must win to complete** that task. Spec: [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md) | E5.M3 | [ ] Later |
+| S5.5 | **Code Blue mini-game** for a **random deteriorating patient** (trigger from E4.M2 / S4.3d); uses E5.M1 modal + frozen shift timer; pass/fail feeds E6 | E5.M4 | [ ] Later |
 
-**E5.M3 implement notes:** Read [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md) before coding. Rules of thumb from that file: mnemonic **CSBBBCL**, flash loop until Ready, difficulty = hint views (3→1), submit highlights wrong + docks points (E6), fail/overtime does not complete the task and cites correct answers. Scene art defaults stay E7.
+**E5.M1 implement notes (challenge gate — locked intent):**
+- Some tasks open a **popover/modal mini-game** on Perform (reuse existing modal shell; do not invent a second overlay system).
+- While the mini-game is open, the **shift’s in-game timer freezes**. Preferred approach: **pause the game clock** and **keep the modal open** until the player finishes or dismisses per retry rules (pause ≠ close modal).
+- Outcome is **pass or fail**.
+  - **Pass:** task **starts** and is assigned to a free execution slot for its `duration` (often a short duration task).
+  - **Fail:** task is **not** added to a time slot; player may retry per rules (no silent auto-start).
+- Wire pause/resume through the existing timer / `game-state` pause path (same pause matrix as E1); destroy guest UI on close; resume clock when the challenge session ends.
+
+**E5.M2 implement notes (med identity quiz — locked intent):**
+- Vertical slice for **med** tasks: a question about that medication.
+- Prompt randomly asks for **generic given brand** or **brand given generic** (direction randomized per attempt).
+- Player must **type** the correct name; matching is **case-insensitive** (trim whitespace; practice framing, not a competency claim).
+- Uses the E5.M1 gate (modal + frozen shift timer + pass→slot / fail→no slot). Prefer a **DOM quiz** plugin, not a canvas engine.
+
+**E5.M3 implement notes:** Read [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md) before coding. Rules of thumb from that file: mnemonic **CSBBBCL**, flash loop until Ready, difficulty = hint views (3→1), submit highlights wrong + docks points (E6), fail/overtime does not complete the task and cites correct answers. Timer pause during the challenge follows the shared **E5.M1** contract. Scene art defaults stay E7.
+
+**E5.M4 implement notes (Code Blue — locked intent):**
+- Triggered when E4 thin deterioration escalates a **random eligible patient** into Code Blue (S4.3d) — not a always-on Perform gate on every med.
+- Opens via the shared **E5.M1** challenge modal; **shift in-game timer freezes** while the mini-game is open.
+- Pass/fail outcomes update that patient’s status / incident resolution and feed **E6** scoring (practice framing, not competency claim).
+- Plugin module under the challenge registry; keep shell declarative (`game-state` / `taskSystem`). Detailed step list / mnemonic can land in a decision doc later if needed; scene art defaults stay **E7**.
 
 ### Milestones
 
 | Milestone | Goal | Non-goals | MVP? |
 |-----------|------|-----------|------|
-| **E5.M1** | Challenge modal + timer pause; pass/fail gates slot | No stats dashboard; no challenge catalogue | Yes (thin) |
-| **E5.M2** | Med brand↔generic quiz (practice framing, not competency claim) | No full challenge suite | Yes if schedule allows |
+| **E5.M1** | Challenge popover/modal + shift-timer freeze; pass starts task in slot; fail does not occupy a slot | No stats dashboard; no challenge catalogue | Yes (thin) |
+| **E5.M2** | Med brand↔generic typed quiz (random direction, case-insensitive; practice framing) | No full challenge suite | Yes if schedule allows |
 | **E5.M3** | Bed-prep admission mini-game per [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md); **win required to complete** the task | No full challenge catalogue; not a replacement for E5.M2 unless product later chooses | Later |
+| **E5.M4** | Code Blue mini-game for a random deteriorating patient (E4 escalate → E5 challenge) | No full ACLS sim; no continuous physiology; not MVP | Later |
 
 ---
 
@@ -262,7 +292,7 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 | S6.3b | **Final score + outcome** screen at shift end (e.g. pass / needs practice / overtime risk framing — practice language, not competency claim) | E6.M2 | [ ] |
 | S6.4 | Debrief copy: practice feedback ≠ clinical assessment | E6.M2 | [ ] |
 | S6.5 | End debrief (and optional live cues) can reference bottom response/history log from S1.7 | E6.M0 | [ ] |
-| S6.6 | Challenge fail/overtime feedback can dock points and cite correct answers (supports E5.M2+; E5.M3 per [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md)) | E6.M1 | [ ] |
+| S6.6 | Challenge fail/overtime feedback can dock points and cite correct answers (supports E5.M2+; E5.M3 per [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md); E5.M4 Code Blue) | E6.M1 | [ ] |
 
 **E6.M1 / E6.M2 implement notes (scoring — locked intent):** Track score in `game-state` from declarative outcomes (complete / late / miss / challenge). Weight **task handling** and a thin **patient satisfaction/status** signal (from overdue/deterioration flags), not a deep psychology model. **E6.M2** shows a clear **final score + outcome** at shift end; live cues stay lightweight. No leaderboards/accounts in MVP.
 
