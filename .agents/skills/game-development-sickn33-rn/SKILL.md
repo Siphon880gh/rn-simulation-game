@@ -48,6 +48,7 @@ Default runtime intent: **`keep_modular_app`** (custom vanilla shell).
 | Multi-patient census / clinical panels | Primary | `shift-simulation` |
 | Task slots, windows, urgents | Primary | `shift-simulation` |
 | Scenario / event packs (JSON→YAML) | Primary | `shift-simulation` |
+| Add patients to day/night + unit census | Primary | [`../add-shift-patient-pack/`](../add-shift-patient-pack/) |
 | Engine / library choice | Decision | `engine-selection` + engines doc |
 | DOM pass/fail challenge (quiz) | Primary thin | `web-games` (plugin path) |
 | 2D canvas skill-check (guest only) | Optional guest | `web-games` → `2d-games` |

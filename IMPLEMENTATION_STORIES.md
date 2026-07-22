@@ -402,6 +402,55 @@ Next up: **Later** backlog (E3.M4, E5.M3, E5.M4, E7, E8) — MVP `implementation
 
 ---
 
+## E11 — Orders carryover + sudden procedures *(Post-MVP)*
+
+| ID | Story | Milestone | Status |
+|----|-------|-----------|--------|
+| S11.1 | Missed Check orders → undelivered pack injections carry to next check complete | E11.M1 | [x] |
+| S11.2 | Overdue unfinished injected orders re-queue and re-inject on next check | E11.M1 | [x] |
+| S11.3 | Engine may inject ≤1 condition-matched sudden procedure per game | E11.M2 | [x] |
+| S11.4 | sameDay procedure never within next 2h + Obtain consent task | E11.M3 | [x] |
+| S11.5 | tomorrow: consent + Inform NPO + whiteboard/CNA NPO; expire at next midnight | E11.M4 | [x] |
+| S11.6 | AUTO verify + code-map notes | E11.M5 | [x] |
+
+### Milestones
+
+| Milestone | Goal | Non-goals | MVP? |
+|-----------|------|-----------|------|
+| **E11.M1** | Carryover queues + re-inject; Check stays 5 min | No procedure engine | Post-MVP |
+| **E11.M2** | Diagnosis catalog + max-one inject | No multi-procedure | Post-MVP |
+| **E11.M3** | sameDay ≥2h + consent | No OR EHR | Post-MVP |
+| **E11.M4** | tomorrow NPO tasks expire midnight | No diet-order system | Post-MVP |
+| **E11.M5** | `verify-e11.mjs` + maps | — | Post-MVP |
+
+**E11 implement notes:** Carryover + procedure spawn live in `doctor-orders.js`. Catalog in `GameConfig.doctorOrders.procedures.byDiagnosis`. Force tomorrow if sameDay cannot fit ≥120 min before shift end. Mount patient tasks via `mountTaskDom`. Stamp `decisions.orders_carryover_procedures`.
+
+**AUTO verify:** `node scripts/verify-e11.mjs`.
+
+---
+
+## E12 — Care schedules (turning / skin) *(Post-MVP)*
+
+| ID | Story | Milestone | Status |
+|----|-------|-----------|--------|
+| S12.1 | `GameConfig.careSchedules.turnQ2h` (120 min, 10 min duration, +60 expire) | E12.M1 | [x] |
+| S12.2 | Opt-in via `careSchedules: ['turnQ2h']` and/or HTML `data-care-schedule="turn-q2h"` | E12.M1 | [x] |
+| S12.3 | Expand to assessment tasks across shift; mount “Turning / skin care” with reason | E12.M1 | [x] |
+| S12.4 | High-risk packs: Joe (obesity/post-op), Maria (bedbound), Derek (obesity + CVA weakness) | E12.M1 | [x] |
+| S12.5 | Perform uses existing assessment → slot path | E12.M1 | [x] |
+
+### Milestones
+
+| Milestone | Goal | Non-goals | MVP? |
+|-----------|------|-----------|------|
+| **E12.M1** | Q2H turn schedule for opted-in patients | Braden math; other ADLs | Post-MVP |
+
+**E12 implement notes:** Config in `game-config.js` → `careSchedules`. Expansion + mount in `patients.js` (`buildCareScheduleTasks` / `mountCareScheduleTasks`). Tasks are `assessment` (Perform already wired in `app.js`). Author reason via `careReason` or `data-care-reason`.
+
+**AUTO verify:** assert `careSchedules.turnQ2h` + shift times `[1900,2100,2300,0100,0300,0500]` + joe/maria/derek opt-in (source + HTML attrs).
+
+---
+
 ## Confirmation gate
 
 - [x] User approved `EPIC_MAP.md`

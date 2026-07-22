@@ -93,6 +93,7 @@ Plugin registry: challenge type → module. Prefer **DOM quiz** for med identity
 | Fiction | Disclaimer + fictional-only flag in pack metadata |
 | Drip | Events fire against **game time**, mutate tasks/patients |
 | Authoring | Educators edit data, not shell code |
+| New day/night unit census | Use [`../add-shift-patient-pack/`](../add-shift-patient-pack/) (interview → condition-aware tasks → pack) |
 
 ---
 

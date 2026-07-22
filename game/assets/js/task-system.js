@@ -77,6 +77,19 @@ class TaskSystem {
       render: (task) => this.renderGenericTask(task)
     });
 
+    // E11 sudden procedures / consent / NPO prep
+    this.taskProcessors.set('procedure', {
+      shouldActivate: (task, currentTime) => isAtOrAfterInShift(currentTime, task.scheduled),
+      shouldExpire: (task, currentTime) => (
+        task.expire != null && isAfterInShift(currentTime, task.expire)
+      ),
+      getContextMenu: () => ({
+        perform: { name: 'Perform', icon: 'add' },
+        details: { name: 'Details', icon: 'question' }
+      }),
+      render: (task) => this.renderGenericTask(task)
+    });
+
     // Bed prep / admission (E5.M3) — completion gated by mini-game win
     this.taskProcessors.set('bedprep', {
       shouldActivate: (task, currentTime) => isAtOrAfterInShift(currentTime, task.scheduled),

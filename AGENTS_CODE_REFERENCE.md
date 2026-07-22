@@ -99,7 +99,7 @@ rngame/
 │   │   ├── task-class-interactions.js # E3.M4 batch/context-switch duration
 │   │   ├── scene-backdrop.js          # E7.M1 unit theme + situation still hooks
 │   │   ├── availability-windows.js    # E3.M3 window phases + Perform gate
-│   │   ├── doctor-orders.js           # E4.M3 hourly check doctor orders
+│   │   ├── doctor-orders.js           # E4.M3 hourly check + E11 carryover / ≤1 procedure
 │   │   ├── right-menu.js              # E10 Orders + Tools right rail
 │   │   ├── dynamic-tasks.js           # E3.M5 weighted dynamic/urgent spawn + incident tabs
 │   │   ├── slot-system.js             # 3 slots + FIFO waiting queue
@@ -129,7 +129,7 @@ Line counts are approximate totals to help decide whether to load a whole file.
 3. **Patients** — `PatientsModule.init()` loads census from pack `patients[]` (fallback: all configs). With `?census=minus1|openAdmit`, holds last pack patient (`admitHold`) and boots N−1. Parses `[data-task-type]`, registers into state/DOM.
 4. **Subscriptions** — `currentTime` → `taskSystem.processTasks()`; also patients refresh DOM status classes.
 5. **Start** — URL params (or pack `shiftStart`) → `INITIALIZE_GAME` → pack log line → `admission.init` (schedules open-to-admit HHMM) → `GameTimerModule.start(...)`.
-6. **Tick** — timer interval (scaled by speed factor) updates `#clock`, `UPDATE_TIME`, reveals scheduled tasks at 15-min poll marks (CSS + `data-status="active"`). `event-drip` fires pack events; `doctor-orders` spawns a per-hour check; `admission-system` may spawn held patient + checklist; overdue work bumps `clinicalStatus` / `acuityScore` and may open Code Blue via `codeBlueHook` subscribe.
+6. **Tick** — timer interval (scaled by speed factor) updates `#clock`, `UPDATE_TIME`, reveals scheduled tasks at 15-min poll marks (CSS + `data-status="active"`). `event-drip` fires pack events; `doctor-orders` spawns a per-hour check (5 min; complete injects pack + carryover + ≤1 sudden procedure); `admission-system` may spawn held patient + checklist; overdue work bumps `clinicalStatus` / `acuityScore` and may open Code Blue via `codeBlueHook` subscribe.
 7. **Interact** — contextMenu Perform → `challenge-gate` (pause `challenge`; med quiz / bed-prep / admission quizzes / safety; bed-prep + admission steps must win to `completeTask`) → pass → slot (most types) or complete (bed-prep / admission). Find-nurse + admitting call/callback follow critical-lab-style recall.
 8. **End** — timer seconds exhausted → `GAME_OVER` → finalize score → practice **outcome** debrief (bands + by-patient notes + ethics framing) + dimmed shell.
 

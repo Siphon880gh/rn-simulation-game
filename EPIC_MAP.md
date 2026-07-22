@@ -120,6 +120,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 | E8 | Portfolio Packaging & Optional Social | Ship/share beyond local demo | Polish, packaging; optional auth/friends | Later / social | Later |
 | E9 | Open Admit & Admission Workflow | Choose lighter census / open bed; run a full admission checklist when an admit arrives | Census choice, mid-shift admit spawn, Admitting tab, quizzes, find-nurse retries, admitting MD callback | Post-MVP clinical loop | Post-MVP |
 | E10 | Right rail: Orders & Tools | Always-visible unit Orders + Tools glance without opening Global | Doctor-orders checks rail, injected-order cues, awaiting-MD / IV / admit tools, narrow-layout access | Post-MVP shell UX | Post-MVP |
+| E11 | Orders carryover + sudden procedures | Missed orders carry to next check; ≤1 condition-matched sudden procedure/shift with consent / NPO prep | Carryover queues, procedure catalog, sameDay ≥2h, tomorrow NPO until midnight | Post-MVP clinical orders | Post-MVP |
 
 ---
 
@@ -222,6 +223,22 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 - **Out of scope:** Moving sound/test/docs/slots into the rail; full order-entry EHR; scraping Global DOM as source of truth.
 - **Suggested order:** After E9 (post-MVP shell fill-in).
 
+### E11. Orders carryover + sudden procedures
+- **Goal / user outcome:** Missed check/injected orders reappear on the next Check doctor orders; at most one sudden procedure per shift that fits the patient’s condition, with consent and (if tomorrow) NPO prep until midnight.
+- **Why:** Teaches orders follow-through and procedure prep without an EHR order-entry sim.
+- **Includes:** Carryover queues in `doctor-orders.js`; diagnosis-matched procedure catalog in `GameConfig.doctorOrders.procedures`; sameDay ≥2h lead + consent; tomorrow consent + inform NPO + whiteboard/CNA NPO (expire next midnight); max one procedure/game.
+- **Dependencies:** E4.M3 doctor orders, E10 right rail (optional surface), patient diagnoses, task-system / mountTaskDom.
+- **Out of scope:** Multi-procedure games, consent mini-game beyond Perform/slot, full OR scheduling.
+- **Suggested order:** After E10.
+
+### E12. Care schedules (turning / skin)
+- **Goal / user outcome:** High-risk patients (obesity, bedbound, stroke/weakness) show Q2H turn/reposition tasks across the shift so players practice pressure-injury prevention amid other work.
+- **Why:** Routine nursing care load is part of real triage; not every patient needs turns.
+- **Includes:** `GameConfig.careSchedules.turnQ2h`; opt-in via `patientConfigs.careSchedules` and/or HTML `data-care-schedule="turn-q2h"`; assessment-type Perform/slot; panel “Turning / skin care” list with clinical reason.
+- **Dependencies:** E2 patient packs, E3 task/slot perform path.
+- **Out of scope:** Full Braden scoring, skin-breakdown physiology sim, other ADLs (feed/bath) unless added later.
+- **Suggested order:** After E11.
+
 ---
 
 ## C. Coverage Check
@@ -241,6 +258,8 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 | Auth/friends / packaging | E8 |
 | Open-to-admit census choice + admission checklist / MD callback | E9 |
 | Always-visible Orders + Tools right rail | E10 |
+| Orders carryover + ≤1 sudden procedure / consent / NPO | E11 |
+| Q2H turning / skin care for high-risk patients | E12 |
 | Fictional disclaimer + clinical tone | Decisions + all content epics |
 | Help / learning MD authoring + Mermaid + LaTeX math | E0.M5 (+ content epics author files) |
 | Vanilla/light stack | Decisions in state.json |
@@ -263,7 +282,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 
 1. Report: [`council-report-epics-milestones.md`](council-report-epics-milestones.md)
 2. Milestones: [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md)
-3. Resume: [`.agents/state.json`](.agents/state.json) → **E10 Right rail** after E9; prior MVP + Later slices shipped except skipped E8.M2
+3. Resume: [`.agents/state.json`](.agents/state.json) → **E12** after E11; prior MVP + Later slices shipped except skipped E8.M2
 
-**Order:** `E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E5.M4, E7, E8 → E9 → E10`
+**Order:** `E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E5.M4, E7, E8 → E9 → E10 → E11 → E12`
 

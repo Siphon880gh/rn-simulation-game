@@ -17,6 +17,9 @@ const PatientsModule = (() => {
             age: 68,
             sex: 'Male',
             diagnosis: 'Post-op Total Hip Replacement',
+            /** BMI 38 + post-op mobility limits → pressure-injury risk */
+            careSchedules: ['turnQ2h'],
+            careReason: 'BMI 38; limited mobility post THA — cannot self-reposition',
             vitals: {
                 hr: 82,
                 bp: '128/78',
@@ -35,6 +38,9 @@ const PatientsModule = (() => {
             age: 54,
             sex: 'Female',
             diagnosis: 'Community-acquired pneumonia',
+            /** Bedbound / too weak to turn independently */
+            careSchedules: ['turnQ2h'],
+            careReason: 'Bedbound; profound weakness on pressors — cannot self-turn',
             vitals: {
                 hr: 94,
                 bp: '118/72',
@@ -53,6 +59,9 @@ const PatientsModule = (() => {
             age: 71,
             sex: 'Male',
             diagnosis: 'COPD exacerbation',
+            /** Prior CVA residual weakness + obesity → Q2H turns */
+            careSchedules: ['turnQ2h'],
+            careReason: 'Class III obesity; prior CVA with residual weakness — bedbound',
             htmlFile: 'events/patients/derek.html',
             pastHxFile: 'events/patients/derek-past-hx.json'
         },
@@ -90,6 +99,139 @@ const PatientsModule = (() => {
 
     let panelMode = 'patient'; // 'patient' | 'global'
 
+    function addMinutesToHhmm(hhmm, minutes) {
+        const n = Number(hhmm);
+        const base = Number.isFinite(n) ? n : 0;
+        const total = Math.floor(base / 100) * 60 + (base % 100) + Number(minutes);
+        const day = ((total % 1440) + 1440) % 1440;
+        return Math.floor(day / 60) * 100 + (day % 60);
+    }
+
+    function resolveCareScheduleKeys(patientConfig, html) {
+        const keys = new Set(
+            Array.isArray(patientConfig.careSchedules) ? patientConfig.careSchedules : []
+        );
+        let careReason = patientConfig.careReason || null;
+        try {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const root = doc.querySelector('.patient[data-care-schedule], [data-care-schedule]');
+            const raw = root?.getAttribute('data-care-schedule') || '';
+            const schedules = GameConfig.careSchedules || {};
+            raw.split(/[,\s]+/).filter(Boolean).forEach((token) => {
+                const match = Object.entries(schedules).find(
+                    ([, cfg]) => cfg.htmlAttr === token || cfg.id === token
+                );
+                if (match) keys.add(match[0]);
+                else if (schedules[token]) keys.add(token);
+            });
+            const reason = root?.getAttribute('data-care-reason');
+            if (reason) careReason = reason;
+        } catch {
+            /* ignore parse errors — config keys still apply */
+        }
+        return { keys: [...keys], careReason };
+    }
+
+    function buildCareScheduleTasks(patientId, scheduleKey, careReason) {
+        const cfg = GameConfig.careSchedules?.[scheduleKey];
+        if (!cfg) return [];
+        const shiftStart = GameConfig.timer.defaultShiftStart;
+        const shiftMins = GameConfig.timer.defaultShiftDuration;
+        const interval = Number(cfg.intervalMins) || 120;
+        const tasks = [];
+        for (let elapsed = 0; elapsed < shiftMins; elapsed += interval) {
+            const scheduled = addMinutesToHhmm(shiftStart, elapsed);
+            tasks.push({
+                id: `${patientId}-${scheduleKey}-${String(scheduled).padStart(4, '0')}`,
+                name: cfg.taskName || 'Care task',
+                type: cfg.taskType || 'assessment',
+                taskClass: cfg.taskClass || GameConfig.tasks.classes.ROUTINE,
+                scheduled,
+                expire: `+${Number(cfg.expireMins) || 60}`,
+                durationMins: Number(cfg.durationMins) || 10,
+                status: GameConfig.tasks.statuses.NOT_YET,
+                metadata: {
+                    careSchedule: scheduleKey,
+                    reason: careReason || null
+                }
+            });
+        }
+        return tasks;
+    }
+
+    function mountCareScheduleTasks(patientId, careTasks, careReason) {
+        if (!careTasks.length) return;
+        const panel = document.querySelector(`.patient-panel-host[data-patient-id="${patientId}"]`);
+        if (!panel) return;
+
+        let list = panel.querySelector('.care-tasks-list');
+        if (!list) {
+            const block = document.createElement('div');
+            block.className = 'space-y-2 mb-4 care-tasks-block';
+            const heading = document.createElement('h4');
+            heading.className = 'font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100';
+            heading.innerHTML = '<i class="fas fa-bed text-xl mr-1 text-emerald-700"></i> Turning / skin care';
+            list = document.createElement('ul');
+            list.className = 'care-tasks-list space-y-3';
+            heading.addEventListener('click', () => {
+                list.classList.toggle('hidden');
+            });
+            block.appendChild(heading);
+            if (careReason) {
+                const note = document.createElement('p');
+                note.className = 'text-xs text-gray-600 mb-2 care-schedule-reason';
+                note.textContent = careReason;
+                block.appendChild(note);
+            }
+            block.appendChild(list);
+            const patientRoot = panel.querySelector('.patient') || panel;
+            const vitalsGrid = patientRoot.querySelector('.grid.grid-cols-2');
+            if (vitalsGrid?.nextSibling) {
+                patientRoot.insertBefore(block, vitalsGrid.nextSibling);
+            } else {
+                const medsBlock = patientRoot.querySelector('.meds-list')?.closest('.space-y-2.mb-4, .space-y-2');
+                if (medsBlock) patientRoot.insertBefore(block, medsBlock);
+                else patientRoot.appendChild(block);
+            }
+        } else if (careReason && !panel.querySelector('.care-schedule-reason')) {
+            const note = document.createElement('p');
+            note.className = 'text-xs text-gray-600 mb-2 care-schedule-reason';
+            note.textContent = careReason;
+            list.parentElement?.insertBefore(note, list);
+        }
+
+        careTasks.forEach((task) => {
+            if (document.getElementById(task.id)) return;
+            const live = gameState.getStateSlice('tasks').get(task.id) || task;
+            const li = document.createElement('li');
+            li.id = live.id;
+            li.setAttribute('data-task-type', live.type);
+            li.setAttribute('data-task-class', live.taskClass || 'routine');
+            li.setAttribute('data-status', live.status);
+            li.setAttribute('data-scheduled', String(live.scheduled).padStart(4, '0'));
+            if (live.expire != null) {
+                li.setAttribute(
+                    'data-expire',
+                    typeof live.expire === 'number'
+                        ? String(live.expire).padStart(4, '0')
+                        : String(live.expire)
+                );
+            }
+            li.setAttribute('data-duration-mins', String(live.duration || 10));
+            li.setAttribute('title', 'Click for Perform / Details menu');
+            li.className = `bg-emerald-50 p-4 rounded-lg shadow flex items-center task-status-${live.status} border border-emerald-200`;
+            const timeLabel = String(live.scheduled).padStart(4, '0');
+            li.innerHTML = `
+              <data class="slot-label" value="1"></data>
+              <i class="fas fa-bed text-emerald-700 text-xl mr-3"></i>
+              <span class="font-medium text-gray-900">${live.name}</span>
+              <span class="ml-auto text-sm text-gray-500">${timeLabel.slice(0, 2)}:${timeLabel.slice(2)}</span>
+            `;
+            list.appendChild(li);
+            taskSystem.syncTaskWindowDomAttrs?.(li, live);
+        });
+    }
+
     // Declarative patient initialization
     // options.skipPackTasks — admit spawn: panel only; checklist comes from admission-system
     // options.admissionPhase — 'admitting' | 'admitted' | null
@@ -121,11 +263,16 @@ const PatientsModule = (() => {
 
             const skipPackTasks = Boolean(options.skipPackTasks);
             const packTasks = extractTasksFromHTML(html, patientConfig.id);
+            const { keys: careKeys, careReason } = resolveCareScheduleKeys(patientConfig, html);
+            const careTasks = skipPackTasks
+                ? []
+                : careKeys.flatMap((key) => buildCareScheduleTasks(patientConfig.id, key, careReason));
 
             // Create patient data model
             const patient = {
                 ...patientConfig,
-                tasks: skipPackTasks ? [] : packTasks,
+                careReason,
+                tasks: skipPackTasks ? [] : [...packTasks, ...careTasks],
                 pastHx: pastHxPack.pastHx || [],
                 pastHxPack,
                 status: 'active',
@@ -158,6 +305,8 @@ const PatientsModule = (() => {
                     `.patient-panel-host[data-patient-id="${patient.id}"]`
                 );
                 panelHost?.querySelectorAll('[data-task-type]').forEach((el) => el.remove());
+            } else if (careTasks.length) {
+                mountCareScheduleTasks(patient.id, careTasks, careReason);
             }
 
             // E3.M3: write absolute expire (+ resolved) onto DOM for reveal rules / window phase
@@ -416,8 +565,8 @@ const PatientsModule = (() => {
             header.removeAttribute('onclick');
         });
 
-        // Learning UX: medications + IV start open so timed work is visible without an extra click
-        patientElement.querySelectorAll('.meds-list, .iv-list').forEach((list) => {
+        // Learning UX: medications + IV + turning schedule start open so timed work is visible
+        patientElement.querySelectorAll('.meds-list, .iv-list, .care-tasks-list').forEach((list) => {
             list.classList.remove('hidden');
         });
 

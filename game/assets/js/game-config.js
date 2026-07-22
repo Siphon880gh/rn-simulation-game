@@ -59,7 +59,11 @@ export const GameConfig = {
       PROCEDURE: {
         name: 'Procedure',
         icon: 'fas fa-medical',
-        color: 'purple'
+        color: 'purple',
+        contextMenu: {
+          perform: { name: 'Perform', icon: 'add' },
+          details: { name: 'Details', icon: 'question' }
+        }
       },
       ORDERS: {
         name: 'Doctor Orders',
@@ -132,6 +136,27 @@ export const GameConfig = {
   slots: {
     count: 3,
     queueSelector: '#slot-waiting-queue'
+  },
+
+  /**
+   * Recurring bedside care schedules (pressure-injury prevention).
+   * Patient packs opt in via patientConfigs.careSchedules and/or
+   * HTML `data-care-schedule="turn-q2h"` on `.patient` (reason in data-care-reason).
+   * Typical for obesity, bedbound, or stroke/weakness that prevents self-turning.
+   */
+  careSchedules: {
+    turnQ2h: {
+      id: 'turnQ2h',
+      htmlAttr: 'turn-q2h',
+      intervalMins: 120,
+      durationMins: 10,
+      expireMins: 60,
+      taskType: 'assessment',
+      taskClass: 'routine',
+      taskName: 'Turn / reposition (Q2H)',
+      /** Align first due to shift start; then every intervalMins through the shift. */
+      alignToShiftStart: true
+    }
   },
 
   // Scene presence (E7.M1 Later) — CSS themes; optional authored image URLs
@@ -540,10 +565,48 @@ export const GameConfig = {
     }
   },
 
-  // Hourly check-doctor-orders (E4.M3)
+  // Hourly check-doctor-orders (E4.M3) + E11 carryover / sudden procedures
   doctorOrders: {
     durationMins: 5,
-    taskType: 'orders'
+    taskType: 'orders',
+    defaultInjectExpire: '+60',
+    procedures: {
+      enabled: true,
+      maxPerGame: 1,
+      chancePerCheck: 0.35,
+      minLeadMinsSameDay: 120,
+      consentDurationMins: 10,
+      npoTaskDurationMins: 5,
+      procedureDurationMins: 20,
+      procedureExpireMins: 60,
+      /** Diagnosis substring/regex → procedure candidates (not every patient). */
+      byDiagnosis: [
+        {
+          match: 'NSTEMI',
+          name: 'Cardiac catheterization',
+          defaultTiming: 'sameDay',
+          timings: ['sameDay', 'tomorrow']
+        },
+        {
+          match: 'COPD',
+          name: 'Bronchoscopy',
+          defaultTiming: 'tomorrow',
+          timings: ['tomorrow', 'sameDay']
+        },
+        {
+          match: 'pneumonia',
+          name: 'Bronchoscopy',
+          defaultTiming: 'tomorrow',
+          timings: ['tomorrow', 'sameDay']
+        },
+        {
+          match: 'cholecystectomy',
+          name: 'ERCP',
+          defaultTiming: 'sameDay',
+          timings: ['sameDay', 'tomorrow']
+        }
+      ]
+    }
   },
 
   /**

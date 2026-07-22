@@ -86,6 +86,24 @@ CSS classes: `task-status-*` in `declarative-tasks.css`.
 
 ---
 
+## Care schedules (E12)
+
+`GameConfig.careSchedules.turnQ2h` — every 120 game-min from shift start; `assessment` tasks (duration 10, expire +60). Built in `patients.js` (`buildCareScheduleTasks` / `mountCareScheduleTasks`). Perform = existing assessment → slot path in `app.js`.
+
+## Doctor orders + E11
+
+`doctor-orders.js` — hourly `doctor-orders-check` (duration 5). On **complete**: inject pack `orderInjections` + **carryover** (missed-check undelivered specs + overdue `fromOrdersCheck` tasks) + maybe **one** sudden procedure (`GameConfig.doctorOrders.procedures`).
+
+| Procedure rule | Behavior |
+|----------------|----------|
+| Eligibility | Diagnosis match in `procedures.byDiagnosis`; max 1/game |
+| sameDay | Schedule ≥ `minLeadMinsSameDay` (120); always spawn Obtain consent |
+| tomorrow | Consent + Inform NPO + whiteboard/CNA NPO; `expire` = next midnight (`nextMidnightExpire`) |
+
+AUTO: `node scripts/verify-e11.mjs`.
+
+---
+
 ## Safe-edit notes
 
 - Prefer new task types via `GameConfig.tasks.types` + `taskProcessors.set(...)`.

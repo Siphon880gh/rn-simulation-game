@@ -1,8 +1,8 @@
 {
-  "current_epic_id": "E10",
-  "current_milestone_id": "E10.M6",
+  "current_epic_id": "E12",
+  "current_milestone_id": "E12.M1",
   "status": "backlog_complete",
-  "last_updated_iso": "2026-07-22T14:08:52.407Z",
+  "last_updated_iso": "2026-07-22T14:45:00.000Z",
   "decisions": {
     "platform": "web",
     "app_name": "RN Simulation Game",
@@ -17,7 +17,7 @@
       "game/assets/js/task-system.js",
       "game/assets/css/declarative-tasks.css"
     ],
-    "implementation_order": "E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5.M1) → E5.M2 → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E5.M4, E7, E8 → E10",
+    "implementation_order": "E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5.M1) → E5.M2 → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E5.M4, E7, E8 → E10 → E11",
     "game_runtime": "keep_modular_app",
     "game_runtime_rationale": "Core loop is concurrent clock + clinical panels + slots; custom vanilla ES6 shell already matches locked constraints. Decision doc default (Most likely). Thin in-house layer only if later pain after slots; no Phaser/Pixi/Godot/React shell without explicit approval.",
     "game_runtime_options": [
@@ -57,7 +57,11 @@
     "admission_census_mode": "hold_last_pack_patient",
     "admission_census_mode_rationale": "E9: census=minus1|openAdmit holds last pack patients[] id off boot census; openAdmit spawns that patient mid-shift with admission checklist. Reuse bed-prep + critical-lab Dr callback/recall.",
     "right_rail": "orders_tools_declarative",
-    "right_rail_rationale": "E10: always-visible Orders (doctor-orders-check + injected) + Tools (awaiting MD, IV, admit) via right-menu.js subscribe; Global stays detail; no DOM scrape."
+    "right_rail_rationale": "E10: always-visible Orders (doctor-orders-check + injected) + Tools (awaiting MD, IV, admit) via right-menu.js subscribe; Global stays detail; no DOM scrape.",
+    "orders_carryover_procedures": "carryover_both_plus_max_one_procedure",
+    "orders_carryover_procedures_rationale": "E11: carry undelivered pack injections + overdue injected orders; engine injects ≤1 diagnosis-matched sudden procedure with consent; sameDay ≥2h or tomorrow NPO until midnight.",
+    "care_schedules": "turn_q2h_opt_in",
+    "care_schedules_rationale": "E12: Q2H turn/reposition via GameConfig.careSchedules + patient opt-in (config and/or data-care-schedule); assessment Perform/slot; for obesity, bedbound, stroke/weakness risk."
   },
   "identified_epics": [
     {
@@ -113,6 +117,16 @@
     {
       "id": "E10",
       "name": "Right rail: Orders & Tools",
+      "priority": "Post-MVP"
+    },
+    {
+      "id": "E11",
+      "name": "Orders carryover + sudden procedures",
+      "priority": "Post-MVP"
+    },
+    {
+      "id": "E12",
+      "name": "Care schedules (turning / skin)",
       "priority": "Post-MVP"
     }
   ],
@@ -380,6 +394,42 @@
       "epic": "E10",
       "name": "Narrow layout keeps Orders/Tools reachable",
       "status": "done"
+    },
+    {
+      "id": "E11.M1",
+      "epic": "E11",
+      "name": "Carryover queues + re-inject on next check",
+      "status": "done"
+    },
+    {
+      "id": "E11.M2",
+      "epic": "E11",
+      "name": "Procedure catalog + max-one engine inject",
+      "status": "done"
+    },
+    {
+      "id": "E11.M3",
+      "epic": "E11",
+      "name": "sameDay ≥2h + consent task",
+      "status": "done"
+    },
+    {
+      "id": "E11.M4",
+      "epic": "E11",
+      "name": "tomorrow NPO tasks expire at midnight",
+      "status": "done"
+    },
+    {
+      "id": "E11.M5",
+      "epic": "E11",
+      "name": "AUTO verify + maps",
+      "status": "done"
+    },
+    {
+      "id": "E12.M1",
+      "epic": "E12",
+      "name": "Q2H turn schedule for high-risk patients",
+      "status": "done"
     }
   ],
   "completed": [
@@ -426,9 +476,15 @@
     "E10.M3",
     "E10.M4",
     "E10.M5",
-    "E10.M6"
+    "E10.M6",
+    "E11.M1",
+    "E11.M2",
+    "E11.M3",
+    "E11.M4",
+    "E11.M5",
+    "E12.M1"
   ],
-  "notes": "E10 Right rail shipped: Orders (doctor-orders-check + injected) + Tools (awaiting MD, IV, admitHold); narrow stacked access. AUTO: node scripts/verify-e10.mjs. decisions.right_rail=orders_tools_declarative.",
+  "notes": "E12.M1 shipped: Q2H turn/reposition care schedule (GameConfig.careSchedules.turnQ2h) for joe/maria/derek (obesity, bedbound, CVA weakness). Assessment → slot Perform. E11 still: node scripts/verify-e11.mjs.",
   "skipped": [
     {
       "id": "E8.M2",

@@ -31,10 +31,12 @@ Near top of `patients.js`, `patientConfigs`:
 
 ```js
 // Six census packs (E2.M3): joe, maria, derek, aisha, robert, lin
-joe: { id, name, room, htmlFile, pastHxFile }
+joe: { id, name, room, htmlFile, pastHxFile, careSchedules?, careReason? }
 ```
 
 Adding a patient = new config entry + HTML under `game/events/patients/` (+ optional `*-past-hx.json`). MVP census size is **4–6** (currently 6).
+
+**E12 care schedules:** Opt in with `careSchedules: ['turnQ2h']` and/or HTML `data-care-schedule="turn-q2h"` (+ optional `data-care-reason`). `patients.js` expands Q2H turn tasks from `GameConfig.careSchedules` and mounts a **Turning / skin care** list. High-risk examples: joe (obesity/post-op), maria (bedbound), derek (obesity + CVA weakness).
 
 **E4.M1 packs:** `game/events/scenarios/*.json` lists patient ids + optional `disclaimer` / `learningObjectives`. `ScenarioPackModule` loads before `patients.init()`; census order follows pack `patients[]`. Shell `#fiction-disclaimer` is not replaced by pack text.
 
