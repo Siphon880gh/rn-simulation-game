@@ -1,9 +1,9 @@
 {
   "suite": "QA_User_Flows",
   "seed_default": "http://localhost:8765/game/index.html?speed-factor=48",
-  "current_flow_id": "UF-11",
-  "status": "in_progress",
-  "last_updated_iso": "2026-07-22T05:52:00Z",
+  "current_flow_id": null,
+  "status": "suite_pass",
+  "last_updated_iso": "2026-07-22T05:55:00Z",
   "results": {
     "UF-01": {
       "status": "pass",
@@ -45,8 +45,11 @@
       "status": "pass",
       "notes": "speed-factor=720 to GAME_OVER; modal 'Shift debrief — practice outcome' auto-opens; practice framing + score/counts/By patient/Teaching notes/shift log; Close dismisses. Completed orders-check-1900 so Completed count non-zero."
     },
-    "UF-11": { "status": "pending", "notes": "" }
+    "UF-11": {
+      "status": "pass",
+      "notes": "Demo quick day → URL has speed-factor=48 + day-shift-medsurg.json; title Day Shift — Medical-Surgical Floor; day objectives; #fiction-disclaimer kept; 6 patient tabs + Global; H1 07:00. quick night↔quick day link navigation works."
+    }
   },
   "error_fix_round": 0,
-  "notes": "UF-01..UF-10 PASS. Next UF-11 day pack swap."
+  "notes": "STOP_SUITE_PASS — UF-01..UF-11 all pass."
 }
