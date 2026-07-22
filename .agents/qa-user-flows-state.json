@@ -1,9 +1,9 @@
 {
   "suite": "QA_User_Flows",
   "seed_default": "http://localhost:8765/game/index.html?speed-factor=48",
-  "current_flow_id": "UF-10",
+  "current_flow_id": "UF-11",
   "status": "in_progress",
-  "last_updated_iso": "2026-07-22T05:48:00Z",
+  "last_updated_iso": "2026-07-22T05:52:00Z",
   "results": {
     "UF-01": {
       "status": "pass",
@@ -41,9 +41,12 @@
       "status": "pass",
       "notes": "Docs FAB → ABOUT in-page (disclaimer + objectives). PRIORITIZATION BASICS: h1/h2, Mermaid SVG, KaTeX. Hover About md-internal-link → .md-link-popover Preview/Contents. Close returns to shell (#clock running)."
     },
-    "UF-10": { "status": "pending", "notes": "" },
+    "UF-10": {
+      "status": "pass",
+      "notes": "speed-factor=720 to GAME_OVER; modal 'Shift debrief — practice outcome' auto-opens; practice framing + score/counts/By patient/Teaching notes/shift log; Close dismisses. Completed orders-check-1900 so Completed count non-zero."
+    },
     "UF-11": { "status": "pending", "notes": "" }
   },
   "error_fix_round": 0,
-  "notes": "UF-01..UF-09 PASS. Next UF-10 debrief."
+  "notes": "UF-01..UF-10 PASS. Next UF-11 day pack swap."
 }
