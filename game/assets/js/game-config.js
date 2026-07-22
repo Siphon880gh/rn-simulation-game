@@ -270,6 +270,8 @@ export const GameConfig = {
     awaitingCallbackToast: '#shell-awaiting-callback-toast',
     hourTabs: '#shell-hour-tabs',
     shiftHistoryLog: '#shift-history-log',
+    clockCluster: '#shell-clock-cluster',
+    topCollapse: '#shell-top-collapse',
     clock: '#clock',
     pauseButton: '#pause',
     testMode: '#shell-test-mode',

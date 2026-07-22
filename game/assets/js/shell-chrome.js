@@ -11,6 +11,8 @@ const BOTTOM_HEIGHT_STORAGE_KEY = 'rngame.shellBottomHeightPx';
 const BOTTOM_HEIGHT_MIN_PX = 120;
 const BOTTOM_HEIGHT_MAX_VH = 0.55;
 const BOTTOM_HEIGHT_DEFAULT_PX = 176;
+const TOP_COLLAPSED_STORAGE_KEY = 'rngame.shellTopCollapsed';
+const CLOCK_FLOAT_POS_STORAGE_KEY = 'rngame.shellClockFloatPos';
 const HOUR_PEEK_TRUNCATE = 3;
 const HOUR_PEEK_SHOW_MS = 220;
 const HOUR_PEEK_HIDE_MS = 180;
@@ -445,6 +447,208 @@ function initBottomResize() {
     });
 }
 
+function readStoredTopCollapsed() {
+    try {
+        return localStorage.getItem(TOP_COLLAPSED_STORAGE_KEY) === '1';
+    } catch {
+        return false;
+    }
+}
+
+function storeTopCollapsed(collapsed) {
+    try {
+        localStorage.setItem(TOP_COLLAPSED_STORAGE_KEY, collapsed ? '1' : '0');
+    } catch {
+        /* ignore quota / private mode */
+    }
+}
+
+function readStoredClockFloatPos() {
+    try {
+        const raw = localStorage.getItem(CLOCK_FLOAT_POS_STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        const left = Number(parsed?.left);
+        const top = Number(parsed?.top);
+        if (!Number.isFinite(left) || !Number.isFinite(top)) return null;
+        return { left, top };
+    } catch {
+        return null;
+    }
+}
+
+function storeClockFloatPos(left, top) {
+    try {
+        localStorage.setItem(CLOCK_FLOAT_POS_STORAGE_KEY, JSON.stringify({ left, top }));
+    } catch {
+        /* ignore quota / private mode */
+    }
+}
+
+function clampClockFloatPos(left, top, cluster) {
+    const margin = 8;
+    const width = cluster.offsetWidth || 170;
+    const height = cluster.offsetHeight || 220;
+    const maxLeft = Math.max(margin, window.innerWidth - width - margin);
+    const maxTop = Math.max(margin, window.innerHeight - height - margin);
+    return {
+        left: Math.min(Math.max(margin, left), maxLeft),
+        top: Math.min(Math.max(margin, top), maxTop)
+    };
+}
+
+function applyClockFloatPos(left, top) {
+    const cluster = document.getElementById('shell-clock-cluster');
+    if (!cluster) return null;
+    const next = clampClockFloatPos(left, top, cluster);
+    cluster.style.left = `${next.left}px`;
+    cluster.style.top = `${next.top}px`;
+    cluster.style.right = 'auto';
+    return next;
+}
+
+function clearClockFloatPosStyles() {
+    const cluster = document.getElementById('shell-clock-cluster');
+    if (!cluster) return;
+    cluster.style.left = '';
+    cluster.style.top = '';
+    cluster.style.right = '';
+}
+
+function syncTopCollapseChrome(collapsed) {
+    const header = document.querySelector(GameConfig.selectors.topPrimary);
+    const toggle = document.getElementById('shell-top-collapse');
+    if (!header || !toggle) return;
+
+    header.classList.toggle('is-collapsed', collapsed);
+    toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    toggle.title = collapsed ? 'Expand top bar' : 'Collapse top bar';
+
+    const label = toggle.querySelector('[data-collapse-label]');
+    if (label) label.textContent = collapsed ? 'Expand' : 'Collapse';
+
+    const collapseIcon = toggle.querySelector('[data-collapse-icon="collapse"]');
+    const expandIcon = toggle.querySelector('[data-collapse-icon="expand"]');
+    if (collapseIcon) collapseIcon.classList.toggle('hidden', collapsed);
+    if (expandIcon) expandIcon.classList.toggle('hidden', !collapsed);
+}
+
+function placeFloatingClockCluster() {
+    const cluster = document.getElementById('shell-clock-cluster');
+    if (!cluster) return;
+
+    const stored = readStoredClockFloatPos();
+    if (stored) {
+        applyClockFloatPos(stored.left, stored.top);
+        return;
+    }
+
+    const rect = cluster.getBoundingClientRect();
+    const next = applyClockFloatPos(rect.left, rect.top);
+    if (next) storeClockFloatPos(next.left, next.top);
+}
+
+function setTopCollapsed(collapsed) {
+    const header = document.querySelector(GameConfig.selectors.topPrimary);
+    if (!header) return;
+
+    if (collapsed) {
+        // Capture on-screen position before fixed positioning takes over.
+        placeFloatingClockCluster();
+        syncTopCollapseChrome(true);
+        // Re-clamp after layout settles (padding/border change size).
+        requestAnimationFrame(() => {
+            const cluster = document.getElementById('shell-clock-cluster');
+            if (!cluster) return;
+            const left = Number.parseFloat(cluster.style.left);
+            const top = Number.parseFloat(cluster.style.top);
+            if (Number.isFinite(left) && Number.isFinite(top)) {
+                const next = applyClockFloatPos(left, top);
+                if (next) storeClockFloatPos(next.left, next.top);
+            } else {
+                placeFloatingClockCluster();
+            }
+        });
+    } else {
+        syncTopCollapseChrome(false);
+        clearClockFloatPosStyles();
+    }
+
+    storeTopCollapsed(collapsed);
+}
+
+function initTopCollapse() {
+    const header = document.querySelector(GameConfig.selectors.topPrimary);
+    const toggle = document.getElementById('shell-top-collapse');
+    const dragHandle = document.getElementById('shell-clock-drag');
+    const cluster = document.getElementById('shell-clock-cluster');
+    if (!header || !toggle || !cluster || toggle.dataset.bound === '1') return;
+    toggle.dataset.bound = '1';
+
+    toggle.addEventListener('click', () => {
+        setTopCollapsed(!header.classList.contains('is-collapsed'));
+    });
+
+    if (dragHandle && dragHandle.dataset.bound !== '1') {
+        dragHandle.dataset.bound = '1';
+
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let originLeft = 0;
+        let originTop = 0;
+
+        const onPointerMove = (event) => {
+            applyClockFloatPos(
+                originLeft + (event.clientX - dragStartX),
+                originTop + (event.clientY - dragStartY)
+            );
+        };
+
+        const onPointerUp = (event) => {
+            dragHandle.releasePointerCapture?.(event.pointerId);
+            document.body.classList.remove('shell-clock-dragging');
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', onPointerUp);
+            const left = Number.parseFloat(cluster.style.left);
+            const top = Number.parseFloat(cluster.style.top);
+            if (Number.isFinite(left) && Number.isFinite(top)) {
+                storeClockFloatPos(left, top);
+            }
+        };
+
+        dragHandle.addEventListener('pointerdown', (event) => {
+            if (!header.classList.contains('is-collapsed')) return;
+            if (event.button != null && event.button !== 0) return;
+            event.preventDefault();
+            const rect = cluster.getBoundingClientRect();
+            dragStartX = event.clientX;
+            dragStartY = event.clientY;
+            originLeft = rect.left;
+            originTop = rect.top;
+            document.body.classList.add('shell-clock-dragging');
+            dragHandle.setPointerCapture?.(event.pointerId);
+            window.addEventListener('pointermove', onPointerMove);
+            window.addEventListener('pointerup', onPointerUp);
+        });
+    }
+
+    window.addEventListener('resize', () => {
+        if (!header.classList.contains('is-collapsed')) return;
+        const left = Number.parseFloat(cluster.style.left);
+        const top = Number.parseFloat(cluster.style.top);
+        if (Number.isFinite(left) && Number.isFinite(top)) {
+            const next = applyClockFloatPos(left, top);
+            if (next) storeClockFloatPos(next.left, next.top);
+        }
+    });
+
+    if (readStoredTopCollapsed()) {
+        setTopCollapsed(true);
+    } else {
+        syncTopCollapseChrome(false);
+    }
+}
+
 function hourCount(shiftDurationMinutes) {
     return Math.max(1, Math.ceil(Number(shiftDurationMinutes || 60) / 60));
 }
@@ -549,6 +753,7 @@ const ShellChromeModule = {
         const activeHour = gameState.getStateSlice('activeHourIndex') || 0;
 
         initBottomResize();
+        initTopCollapse();
         wireBrandMenu();
         renderHourTabs(shiftStart, shiftDuration, activeHour);
         renderShiftLog(gameState.getStateSlice('shiftLog') || []);

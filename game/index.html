@@ -30,7 +30,7 @@
 
 <body class="shell-body min-h-screen bg-gray-200">
     <div id="shell">
-        <!-- Top primary: brand + clock/pause -->
+        <!-- Top primary: brand + clock/pause (collapsible; clock cluster floats when collapsed) -->
         <header id="shell-top-primary">
             <div class="shell-brand text-left">
                 <div class="shell-brand-heading">
@@ -58,7 +58,24 @@
                     <ul id="scenario-pack-objectives" class="text-xs text-gray-500 list-disc pl-4"></ul>
                 </div>
             </div>
-            <div class="shell-clock-cluster">
+            <div id="shell-clock-cluster" class="shell-clock-cluster">
+                <div class="shell-clock-cluster__chrome">
+                    <button type="button" id="shell-clock-drag"
+                            class="shell-clock-cluster__drag"
+                            aria-label="Drag shift controls"
+                            title="Drag">
+                        <i class="fas fa-grip-lines" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" id="shell-top-collapse"
+                            class="shell-top-collapse"
+                            aria-expanded="true"
+                            aria-controls="shell-top-primary"
+                            title="Collapse top bar">
+                        <i class="fas fa-chevron-up" data-collapse-icon="collapse" aria-hidden="true"></i>
+                        <i class="fas fa-chevron-down hidden" data-collapse-icon="expand" aria-hidden="true"></i>
+                        <span data-collapse-label>Collapse</span>
+                    </button>
+                </div>
                 <div class="flex flex-col items-center gap-2 text-xl font-bold bg-white p-3 rounded-lg shadow"
                     style="width:150px; cursor:s-resize;"
                     onclick="document.getElementById('shift-ends').classList.toggle('hidden')">
