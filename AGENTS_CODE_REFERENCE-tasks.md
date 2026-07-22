@@ -97,7 +97,7 @@ CSS classes: `task-status-*` in `declarative-tasks.css`.
 | Mode | When | Effect |
 |------|------|--------|
 | **Team · ½ time** | Turns / reposition | Slot duration ×0.5 |
-| **They do this · instant** | `data-delegate-mode="solo"` (e.g. linen/hygiene) | `COMPLETE_TASK` immediately |
+| **They do this · instant** | `GameConfig.delegation.soloRequestCatalog` (bathroom, water, bed position, pillow, linen) | `COMPLETE_TASK` immediately |
 
 Invalid click while aide selected → soft `#shell-delegate-hint`. AUTO: `node scripts/verify-e13.mjs`.
 

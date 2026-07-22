@@ -136,11 +136,18 @@ if (!appJs.includes('handleDelegateTaskClick')) fail('missing handleDelegateTask
 if (!appJs.includes('performDelegatedSolo')) fail('missing performDelegatedSolo');
 const rightMenu = fs.readFileSync(path.join(root, 'game/assets/js/right-menu.js'), 'utf8');
 if (!rightMenu.includes('selectAide')) fail('right-menu missing selectAide');
-const joeHtml = fs.readFileSync(path.join(root, 'game/events/patients/joe.html'), 'utf8');
-if (!joeHtml.includes('data-delegate-mode="solo"')) fail('joe missing solo task');
+const catalog = cfg.soloRequestCatalog || [];
+const needed = ['bathroom', 'water', 'bed-position', 'pillow', 'linen'];
+for (const id of needed) {
+    if (!catalog.some((s) => s.id === id)) fail(`soloRequestCatalog missing ${id}`);
+}
+const patientsJs = fs.readFileSync(path.join(root, 'game/assets/js/patients.js'), 'utf8');
+if (!patientsJs.includes('buildSoloRequestTasks')) fail('missing buildSoloRequestTasks');
+if (!patientsJs.includes('mountSoloRequestTasks')) fail('missing mountSoloRequestTasks');
 
 console.log('PASS E13 delegation', {
     thirds: floor.aides.map((a) => a.thirdIndex),
     teamDuration: resolved.duration,
+    soloCatalog: catalog.map((s) => s.id),
     modes: Object.keys(cfg.modes)
 });

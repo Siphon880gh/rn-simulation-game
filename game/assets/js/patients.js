@@ -132,11 +132,20 @@ const PatientsModule = (() => {
         return { keys: [...keys], careReason };
     }
 
+    function shiftStartHhmm() {
+        const pack = gameState.getStateSlice('scenarioPack');
+        const start = Number(pack?.shiftStart ?? GameConfig.timer.defaultShiftStart);
+        return Number.isFinite(start) ? start : GameConfig.timer.defaultShiftStart;
+    }
+
     function buildCareScheduleTasks(patientId, scheduleKey, careReason) {
         const cfg = GameConfig.careSchedules?.[scheduleKey];
         if (!cfg) return [];
-        const shiftStart = GameConfig.timer.defaultShiftStart;
-        const shiftMins = GameConfig.timer.defaultShiftDuration;
+        const shiftStart = shiftStartHhmm();
+        const hours = Number(gameState.getStateSlice('scenarioPack')?.shiftDurationHours);
+        const shiftMins = Number.isFinite(hours) && hours > 0
+            ? hours * 60
+            : Number(GameConfig.timer.defaultShiftDuration) || 720;
         const interval = Number(cfg.intervalMins) || 120;
         const tasks = [];
         for (let elapsed = 0; elapsed < shiftMins; elapsed += interval) {
@@ -158,6 +167,106 @@ const PatientsModule = (() => {
             });
         }
         return tasks;
+    }
+
+    /** CNA/CCT solo requests — bathroom, water, bed position, pillow, linen (instant delegate). */
+    function buildSoloRequestTasks(patientId, patientIndex = 0) {
+        const catalog = GameConfig.delegation?.soloRequestCatalog || [];
+        if (!catalog.length) return [];
+        const shiftStart = shiftStartHhmm();
+        return catalog.map((spec, i) => {
+            const scheduled = addMinutesToHhmm(
+                shiftStart,
+                45 + (Number(patientIndex) || 0) * 20 + i * 55
+            );
+            return {
+                id: `${patientId}-cna-${spec.id}`,
+                name: spec.name || 'Patient request',
+                type: 'assessment',
+                taskClass: GameConfig.tasks.classes.ROUTINE,
+                scheduled,
+                expire: `+${Number(spec.expireMins) || 60}`,
+                durationMins: Number(spec.durationMins) || 5,
+                status: GameConfig.tasks.statuses.NOT_YET,
+                metadata: {
+                    delegateMode: 'solo',
+                    cnaRequest: spec.id,
+                    icon: spec.icon || 'fas fa-hands-helping'
+                }
+            };
+        });
+    }
+
+    function mountSoloRequestTasks(patientId, soloTasks) {
+        if (!soloTasks.length) return;
+        const panel = document.querySelector(`.patient-panel-host[data-patient-id="${patientId}"]`);
+        if (!panel) return;
+
+        let list = panel.querySelector('.care-solo-list');
+        if (!list) {
+            const block = document.createElement('div');
+            block.className = 'space-y-2 mb-4 care-solo-block';
+            const heading = document.createElement('h4');
+            heading.className = 'font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100';
+            heading.innerHTML = '<i class="fas fa-hands-helping text-xl mr-1 text-violet-600"></i> Patient requests (CNA)';
+            list = document.createElement('ul');
+            list.className = 'care-solo-list space-y-3';
+            heading.addEventListener('click', () => list.classList.toggle('hidden'));
+            block.appendChild(heading);
+            const note = document.createElement('p');
+            note.className = 'text-xs text-gray-600 mb-2';
+            note.textContent = 'Delegate: they do this · instant (bathroom, water, bed position, pillow, linen)';
+            block.appendChild(note);
+            block.appendChild(list);
+            const patientRoot = panel.querySelector('.patient') || panel;
+            const vitalsGrid = patientRoot.querySelector('.grid.grid-cols-2');
+            if (vitalsGrid?.nextSibling) {
+                patientRoot.insertBefore(block, vitalsGrid.nextSibling);
+            } else {
+                const medsBlock = patientRoot.querySelector('.meds-list')?.closest('.space-y-2.mb-4, .space-y-2');
+                if (medsBlock) patientRoot.insertBefore(block, medsBlock);
+                else patientRoot.appendChild(block);
+            }
+        } else {
+            list.replaceChildren();
+            const heading = list.previousElementSibling;
+            if (heading && !panel.querySelector('.care-solo-block .text-xs')) {
+                /* keep authored heading */
+            }
+        }
+
+        soloTasks.forEach((task) => {
+            if (document.getElementById(task.id)) return;
+            const live = gameState.getStateSlice('tasks').get(task.id) || task;
+            const li = document.createElement('li');
+            li.id = live.id;
+            li.setAttribute('data-task-type', live.type);
+            li.setAttribute('data-task-class', live.taskClass || 'routine');
+            li.setAttribute('data-status', live.status);
+            li.setAttribute('data-scheduled', String(live.scheduled).padStart(4, '0'));
+            li.setAttribute('data-delegate-mode', 'solo');
+            if (live.expire != null) {
+                li.setAttribute(
+                    'data-expire',
+                    typeof live.expire === 'number'
+                        ? String(live.expire).padStart(4, '0')
+                        : String(live.expire)
+                );
+            }
+            li.setAttribute('data-duration-mins', String(live.duration || 5));
+            li.setAttribute('title', 'Select a CNA then click — they do this · instant');
+            li.className = `bg-violet-50 p-4 rounded-lg shadow flex items-center task-status-${live.status} border border-violet-200`;
+            const timeLabel = String(live.scheduled).padStart(4, '0');
+            const icon = live.metadata?.icon || 'fas fa-hands-helping';
+            li.innerHTML = `
+              <data class="slot-label" value="1"></data>
+              <i class="${icon} text-violet-600 text-xl mr-3"></i>
+              <span class="font-medium text-gray-900">${live.name}</span>
+              <span class="ml-auto text-sm text-gray-500">${timeLabel.slice(0, 2)}:${timeLabel.slice(2)}</span>
+            `;
+            list.appendChild(li);
+            taskSystem.syncTaskWindowDomAttrs?.(li, live);
+        });
     }
 
     function mountCareScheduleTasks(patientId, careTasks, careReason) {
@@ -264,17 +373,23 @@ const PatientsModule = (() => {
                 : 0;
 
             const skipPackTasks = Boolean(options.skipPackTasks);
-            const packTasks = extractTasksFromHTML(html, patientConfig.id);
+            const packTasks = extractTasksFromHTML(html, patientConfig.id)
+                // Catalog-driven solo requests replace authored CNA linen rows
+                .filter((t) => t.metadata?.delegateMode !== 'solo' && !String(t.id).includes('-linen-solo'));
             const { keys: careKeys, careReason } = resolveCareScheduleKeys(patientConfig, html);
             const careTasks = skipPackTasks
                 ? []
                 : careKeys.flatMap((key) => buildCareScheduleTasks(patientConfig.id, key, careReason));
+            const patientIndex = gameState.getStateSlice('patients')?.size || 0;
+            const soloTasks = skipPackTasks
+                ? []
+                : buildSoloRequestTasks(patientConfig.id, patientIndex);
 
             // Create patient data model
             const patient = {
                 ...patientConfig,
                 careReason,
-                tasks: skipPackTasks ? [] : [...packTasks, ...careTasks],
+                tasks: skipPackTasks ? [] : [...packTasks, ...careTasks, ...soloTasks],
                 pastHx: pastHxPack.pastHx || [],
                 pastHxPack,
                 status: 'active',
@@ -307,8 +422,18 @@ const PatientsModule = (() => {
                     `.patient-panel-host[data-patient-id="${patient.id}"]`
                 );
                 panelHost?.querySelectorAll('[data-task-type]').forEach((el) => el.remove());
-            } else if (careTasks.length) {
-                mountCareScheduleTasks(patient.id, careTasks, careReason);
+            } else {
+                if (careTasks.length) {
+                    mountCareScheduleTasks(patient.id, careTasks, careReason);
+                }
+                if (soloTasks.length) {
+                    // Drop authored single-linen CNA blocks; remount full catalog
+                    const host = document.querySelector(
+                        `.patient-panel-host[data-patient-id="${patient.id}"]`
+                    );
+                    host?.querySelectorAll('.care-solo-list [data-delegate-mode="solo"]').forEach((el) => el.remove());
+                    mountSoloRequestTasks(patient.id, soloTasks);
+                }
             }
 
             // E3.M3: write absolute expire (+ resolved) onto DOM for reveal rules / window phase

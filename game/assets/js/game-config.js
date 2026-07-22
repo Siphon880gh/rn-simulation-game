@@ -181,7 +181,18 @@ export const GameConfig = {
       availabilityFraction: 1 / 3,
       staggerThirds: true,
       names: ['Wendy', 'Luis', 'Pat', 'Sam', 'Nina', 'Omar']
-    }
+    },
+    /**
+     * Patient requests CNAs (or CCT) can complete alone — instant “they do this”.
+     * Expanded per patient in patients.js (staggered times across the shift).
+     */
+    soloRequestCatalog: [
+      { id: 'linen', name: 'Linen change / hygiene assist', icon: 'fas fa-tshirt', durationMins: 10, expireMins: 90 },
+      { id: 'bathroom', name: 'Bathroom assist', icon: 'fas fa-door-open', durationMins: 10, expireMins: 60 },
+      { id: 'water', name: 'Get water', icon: 'fas fa-tint', durationMins: 5, expireMins: 45 },
+      { id: 'bed-position', name: 'Bed position request', icon: 'fas fa-bed', durationMins: 5, expireMins: 45 },
+      { id: 'pillow', name: 'Pillow request', icon: 'fas fa-moon', durationMins: 5, expireMins: 45 }
+    ]
   },
 
   /**
