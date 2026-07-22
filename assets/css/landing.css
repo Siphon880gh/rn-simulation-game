@@ -1,0 +1,217 @@
+/* Front-door assignment picker — clinical, not dashboard */
+
+:root {
+    --ink: #14212b;
+    --muted: #3d5160;
+    --paper: #e8eef2;
+    --accent: #0d6e6e;
+    --accent-deep: #0a5555;
+    --tele: #1f6b5c;
+    --medsurg: #2c5a7a;
+    --icu: #6b3a3a;
+    --glow: rgba(13, 110, 110, 0.14);
+    --font-display: "Fraunces", Georgia, serif;
+    --font-body: "DM Sans", system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body.landing {
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--paper);
+    overflow-x: hidden;
+}
+
+.landing-atmosphere {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+        radial-gradient(ellipse 80% 55% at 15% 20%, rgba(45, 120, 110, 0.22), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 85% 75%, rgba(60, 90, 120, 0.18), transparent 50%),
+        linear-gradient(160deg, #d5e2e8 0%, #c5d4dc 42%, #b8c8d0 100%);
+    animation: atmosphere-drift 18s ease-in-out infinite alternate;
+}
+
+@keyframes atmosphere-drift {
+    from { transform: scale(1) translate(0, 0); }
+    to { transform: scale(1.04) translate(-1.5%, 1%); }
+}
+
+.landing-main {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 6vw, 4.5rem) clamp(1.25rem, 4vw, 2.5rem) 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+.landing-brand {
+    max-width: 36rem;
+    animation: rise-in 0.7s ease-out both;
+}
+
+.landing-kicker {
+    margin: 0 0 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+}
+
+.landing-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 7vw, 4.25rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+}
+
+.landing-lede {
+    margin: 0.85rem 0 0;
+    font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+    color: var(--muted);
+    max-width: 28rem;
+    line-height: 1.45;
+}
+
+.landing-disclaimer {
+    margin: 1rem 0 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--muted);
+    max-width: 32rem;
+    opacity: 0.9;
+}
+
+.landing-choices {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    animation: rise-in 0.85s ease-out 0.12s both;
+}
+
+@keyframes rise-in {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.unit-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+    min-height: 11.5rem;
+    padding: 1.25rem 1.2rem 1.15rem;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid rgba(20, 33, 43, 0.12);
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.unit-tile::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--tile-accent, var(--accent));
+}
+
+.unit-tile:hover,
+.unit-tile:focus-visible {
+    transform: translateY(-4px);
+    border-color: rgba(20, 33, 43, 0.22);
+    box-shadow: 0 14px 28px var(--glow);
+    outline: none;
+}
+
+.unit-tile--tele { --tile-accent: var(--tele); --glow: rgba(31, 107, 92, 0.2); }
+.unit-tile--medsurg { --tile-accent: var(--medsurg); --glow: rgba(44, 90, 122, 0.2); }
+.unit-tile--icu { --tile-accent: var(--icu); --glow: rgba(107, 58, 58, 0.22); }
+
+.unit-tile__dept {
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    font-weight: 600;
+    line-height: 1.15;
+}
+
+.unit-tile__census {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--tile-accent, var(--accent));
+}
+
+.unit-tile__blurb {
+    font-size: 0.92rem;
+    line-height: 1.4;
+    color: var(--muted);
+    flex: 1;
+}
+
+.unit-tile__cta {
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.unit-tile:hover .unit-tile__cta,
+.unit-tile:focus-visible .unit-tile__cta {
+    color: var(--tile-accent, var(--accent));
+}
+
+.landing-foot {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--muted);
+    animation: rise-in 1s ease-out 0.2s both;
+}
+
+.landing-foot a {
+    color: var(--accent-deep);
+}
+
+@media (max-width: 820px) {
+    .landing-choices {
+        grid-template-columns: 1fr;
+    }
+
+    .unit-tile {
+        min-height: 0;
+    }
+}

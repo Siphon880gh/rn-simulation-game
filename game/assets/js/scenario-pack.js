@@ -18,16 +18,21 @@ export function normalizePack(raw, sourceUrl) {
     if (!patients.length) {
         throw new Error('Scenario pack requires a non-empty patients array');
     }
+    const patientOverrides = raw.patientOverrides && typeof raw.patientOverrides === 'object'
+        ? raw.patientOverrides
+        : {};
     return {
         id: String(raw.id || 'unnamed-pack'),
         title: String(raw.title || 'Scenario pack'),
         version: Number(raw.version) || 1,
+        department: typeof raw.department === 'string' ? raw.department : null,
         fictionalOnly: raw.fictionalOnly !== false,
         disclaimer: typeof raw.disclaimer === 'string' ? raw.disclaimer : '',
         learningObjectives: Array.isArray(raw.learningObjectives)
             ? raw.learningObjectives.map(String).filter(Boolean)
             : [],
         patients,
+        patientOverrides,
         events: Array.isArray(raw.events) ? raw.events : [],
         orderInjections: raw.orderInjections && typeof raw.orderInjections === 'object'
             ? raw.orderInjections

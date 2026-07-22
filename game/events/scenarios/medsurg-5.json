@@ -1,0 +1,58 @@
+{
+  "id": "medsurg-5",
+  "title": "Med-Surg — 5 patients",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Prioritize a five-patient med-surg assignment under slot pressure",
+    "Use panels and chart history to sequence meds and assessments",
+    "Recognize when work falls late across a full floor census"
+  ],
+  "patients": ["joe", "maria", "derek", "aisha", "lin"],
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/chaos-night-medsurg.json",
+  "orderInjections": {
+    "1900": [
+      {
+        "id": "order-joe-new-ondansetron",
+        "type": "med",
+        "name": "Ondansetron (new order)",
+        "patientId": "joe",
+        "scheduled": 1900,
+        "expire": "+60",
+        "durationMins": 10,
+        "taskClass": "routine"
+      }
+    ],
+    "default": []
+  },
+  "events": [
+    {
+      "id": "rr-admit-2000",
+      "at": 2000,
+      "type": "emergency",
+      "message": "Rapid response: critical new admit pending — triage assessment needed",
+      "injectTasks": [
+        {
+          "id": "evt-maria-rr-assess",
+          "type": "assessment",
+          "name": "Rapid-response triage assessment",
+          "patientId": "maria",
+          "scheduled": 2000,
+          "expire": "+45",
+          "durationMins": 15,
+          "taskClass": "urgent"
+        }
+      ]
+    }
+  ]
+}

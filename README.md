@@ -17,23 +17,36 @@ Playable clinical-training MVP + Later backlog slices (challenges, chaos packs, 
 
 ## Run locally
 
-Serve the repo root (or `game/`) over HTTP — ES modules need a static server, not `file://`.
+Serve the repo root over HTTP — ES modules need a static server, not `file://`.
 
 ```bash
 # from repo root
 python3 -m http.server 8765
-# open http://localhost:8765/game/index.html
+# open http://localhost:8765/  → choose Tele / Med-Surg / ICU
+# (opening /game/ without ?scenario= redirects back to the picker)
 ```
+
+
+## Choose your assignment (front page)
+
+| Unit | Census | Start URL |
+|------|--------|-----------|
+| Telemetry | 4 patients | `http://localhost:8765/` → **Start Tele** |
+| Med-Surg | 5 patients | `http://localhost:8765/` → **Start Med-Surg** |
+| ICU | 2 patients (higher acuity) | `http://localhost:8765/` → **Start ICU** |
+
+Packs: `game/events/scenarios/tele-4.json`, `medsurg-5.json`, `icu-2.json`.
 
 ## Demo presets (portfolio)
 
 | Preset | URL (after local server is up) |
 |--------|--------------------------------|
+| Assignment picker | `http://localhost:8765/` |
 | Quick night (~15 min wall) | `http://localhost:8765/game/index.html?speed-factor=48` |
 | Quick day shift | `http://localhost:8765/game/index.html?speed-factor=48&scenario=events/scenarios/day-shift-medsurg.json` |
 | Slower teaching pace | `http://localhost:8765/game/index.html?speed-factor=12` |
 
-Scenario packs: `events/scenarios/night-shift-default.json` (default), `events/scenarios/day-shift-medsurg.json`. Chaos incidents merge from `events/incidents/chaos-night-medsurg.json`.
+Legacy packs: `night-shift-default.json` (default six-patient), `day-shift-medsurg.json`. Chaos incidents merge from `events/incidents/chaos-night-medsurg.json`.
 
 ## Hospital Shifts
 

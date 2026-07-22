@@ -1,9 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta http-equiv="refresh" content="0; url=game/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RN Simulation — Choose your assignment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/landing.css">
 </head>
-<body>
-    Redirecting to game...
+<body class="landing">
+    <div class="landing-atmosphere" aria-hidden="true"></div>
+
+    <main class="landing-main">
+        <header class="landing-brand">
+            <p class="landing-kicker">Clinical training practice</p>
+            <h1 class="landing-title">RN Simulation</h1>
+            <p class="landing-lede">Choose your unit assignment, then run a compressed shift.</p>
+            <p class="landing-disclaimer">
+                Names and scenarios are fictional. Educational training use only —
+                not a substitute for supervised clinical practice.
+            </p>
+        </header>
+
+        <section class="landing-choices" aria-label="Department assignments">
+            <a class="unit-tile unit-tile--tele"
+               href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/tele-4.json">
+                <span class="unit-tile__dept">Telemetry</span>
+                <span class="unit-tile__census">4 patients</span>
+                <span class="unit-tile__blurb">Rhythm watch and bedside alarms with a mid-size census.</span>
+                <span class="unit-tile__cta">Start Tele</span>
+            </a>
+
+            <a class="unit-tile unit-tile--medsurg"
+               href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/medsurg-5.json">
+                <span class="unit-tile__dept">Med-Surg</span>
+                <span class="unit-tile__census">5 patients</span>
+                <span class="unit-tile__blurb">Floor workload — meds, assessments, and slot pressure.</span>
+                <span class="unit-tile__cta">Start Med-Surg</span>
+            </a>
+
+            <a class="unit-tile unit-tile--icu"
+               href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/icu-2.json">
+                <span class="unit-tile__dept">ICU</span>
+                <span class="unit-tile__census">2 patients · higher acuity</span>
+                <span class="unit-tile__blurb">Smaller census, sicker starts — protect critical windows.</span>
+                <span class="unit-tile__cta">Start ICU</span>
+            </a>
+        </section>
+
+        <p class="landing-foot">
+            Legacy six-patient night pack:
+            <a href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/night-shift-default.json">open demo</a>.
+        </p>
+    </main>
 </body>
 </html>

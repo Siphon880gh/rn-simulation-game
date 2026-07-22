@@ -1,0 +1,47 @@
+{
+  "id": "tele-4",
+  "title": "Telemetry — 4 patients",
+  "version": 1,
+  "department": "tele",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Monitor a telemetry census of four under slot pressure",
+    "Respond to rhythm / bedside alarms without losing routine meds",
+    "Sequence work when multiple patients share similar urgency cues"
+  ],
+  "patients": ["derek", "maria", "robert", "aisha"],
+  "scene": {
+    "theme": "tele",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/chaos-night-medsurg.json",
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": [
+    {
+      "id": "tele-alarm-1930",
+      "at": 1930,
+      "type": "emergency",
+      "message": "Telemetry: frequent PVCs — bedside check needed",
+      "injectTasks": [
+        {
+          "id": "evt-tele-pvc-check",
+          "type": "assessment",
+          "name": "Telemetry PVC / rhythm bedside check",
+          "patientId": "derek",
+          "scheduled": 1930,
+          "expire": "+45",
+          "durationMins": 10,
+          "taskClass": "urgent"
+        }
+      ]
+    }
+  ]
+}

@@ -5,6 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ICU Simulation</title>
+    <!-- No unit chosen → assignment picker (repo root). Unit tiles always pass ?scenario=. -->
+    <script>
+        (function () {
+            try {
+                var params = new URLSearchParams(window.location.search);
+                if (!params.get('scenario')) {
+                    window.location.replace('../index.html');
+                }
+            } catch (e) { /* keep loading if redirect fails */ }
+        })();
+    </script>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markdown-it-texmath/css/texmath.min.css">
@@ -30,8 +41,11 @@
                 <p id="scenario-pack-title" class="text-xs text-gray-500 mt-1"></p>
                 <p id="scenario-pack-note" class="text-xs text-gray-400 mt-0.5 max-w-xl" hidden></p>
                 <p id="demo-preset-links" class="text-xs text-gray-500 mt-1 max-w-xl">
+                    <a class="underline text-blue-700 hover:text-blue-900" href="../index.html">Change unit</a>
+                    ·
                     Demo:
-                    <a class="underline text-blue-700 hover:text-blue-900" href="?speed-factor=48">quick night</a>
+                    <a class="underline text-blue-700 hover:text-blue-900"
+                       href="?speed-factor=48&amp;scenario=events/scenarios/night-shift-default.json">quick night</a>
                     ·
                     <a class="underline text-blue-700 hover:text-blue-900"
                        href="?speed-factor=48&amp;scenario=events/scenarios/day-shift-medsurg.json">quick day</a>
@@ -74,7 +88,7 @@
 
         <div id="shell-body">
             <aside id="shell-left-menu" aria-label="Left menu">
-                <p class="shell-menu-label">Census <span class="font-normal normal-case tracking-normal text-gray-400">(4–6)</span></p>
+                <p class="shell-menu-label">Census</p>
                 <div id="patient-tabs" class="patient-tabs" role="tablist" aria-label="Patient and global tabs"></div>
                 <div class="incident-tabs-wrap mt-3">
                     <p class="shell-menu-label">Incidents</p>

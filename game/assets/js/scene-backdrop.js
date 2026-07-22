@@ -26,7 +26,7 @@ export function applyUnitScene() {
     if (!main) return;
     const { url, theme } = resolveUnitBackground();
     main.classList.add('shell-scene-main');
-    main.classList.remove('scene-theme-medsurg', 'scene-theme-icu', 'scene-theme-ed');
+    main.classList.remove('scene-theme-medsurg', 'scene-theme-icu', 'scene-theme-ed', 'scene-theme-tele');
     main.classList.add(`scene-theme-${theme || 'medsurg'}`);
     if (url) {
         main.style.setProperty('--scene-unit-image', `url("${url}")`);

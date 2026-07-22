@@ -210,6 +210,8 @@ Next up: **Later** backlog (E3.M4, E5.M3, E5.M4, E7, E8) — MVP `implementation
 | S4.4 | Every game hour: spawn a **check doctor orders** task; expires when that hour ends (miss if not done) | E4.M3 | [x] |
 | S4.4b | Completing the hourly check may inject new work (e.g. new med order) for that hour | E4.M3 | [x] |
 | S4.5 | Hour-tab strip lists/filters work unlocked in that game hour (uses S1.6 chrome) | E4.M2 | [x] |
+| S4.6 | **Department picker** on repo root: Tele (4), Med-Surg (5), ICU (2 + higher starting acuity) → load matching scenario pack | E4.M4 | [x] |
+| S4.6b | Pack fields `department` + optional `patientOverrides` (clinicalStatus / acuityScore) applied at patient init | E4.M4 | [x] |
 
 **E4.M1 implement notes (locked):**
 - Pack metadata includes an optional disclaimer field (fictional-only flag + text).
@@ -234,6 +236,9 @@ Next up: **Later** backlog (E3.M4, E5.M3, E5.M4, E7, E8) — MVP `implementation
 | **E4.M1** | One loadable pack (JSON first or HTML packs); fictional-only + pack disclaimer field (shell/About stay default) | No AI generation, no YAML required | Yes |
 | **E4.M2** | Game-time event drip + **light emergencies** + **thin overdue→status deterioration**; inject work into the task system | No chaos incidents pack; no continuous physiology sim | Yes (light) |
 | **E4.M3** | Hourly **check doctor orders** task (spawn each hour; expire end of hour; may inject new orders on complete) | No full acuity engine; no chaos packs | Yes |
+| **E4.M4** | Front-page unit assignment: Tele / Med-Surg / ICU packs with census size + ICU starting acuity | No auth; no full acuity physiology | Post-MVP (shipped) |
+
+**E4.M4 implement notes:** Root `index.html` is the player entry (not a silent redirect). Each tile starts `game/index.html` with `?scenario=` + speed factor. ICU pack sets `patientOverrides` so panels show elevated status at boot. In-game **Change unit** returns to the picker.
 
 ---
 

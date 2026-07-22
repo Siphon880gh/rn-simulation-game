@@ -108,6 +108,14 @@ const PatientsModule = (() => {
                 }
             }
 
+            // Pack may raise starting acuity (e.g. ICU assignment)
+            const pack = gameState.getStateSlice('scenarioPack');
+            const overrides = pack?.patientOverrides?.[patientConfig.id] || {};
+            const clinicalStatus = overrides.clinicalStatus || 'stable';
+            const acuityScore = Number.isFinite(Number(overrides.acuityScore))
+                ? Number(overrides.acuityScore)
+                : 0;
+
             // Create patient data model
             const patient = {
                 ...patientConfig,
@@ -115,7 +123,9 @@ const PatientsModule = (() => {
                 pastHx: pastHxPack.pastHx || [],
                 pastHxPack,
                 status: 'active',
-                clinicalStatus: 'stable',
+                clinicalStatus,
+                clinicalStatusReason: overrides.clinicalStatusReason || null,
+                acuityScore,
                 loadedAt: new Date().toISOString()
             };
 
@@ -134,7 +144,8 @@ const PatientsModule = (() => {
             renderPatient(patient, html);
             // E3.M3: write absolute expire (+ resolved) onto DOM for reveal rules / window phase
             syncMountedTaskWindows(patient);
-            
+            paintInitialClinicalStatus(patient);
+
             console.log(`Patient ${patient.name} initialized with ${patient.tasks.length} tasks`);
             return patient;
             
@@ -179,6 +190,27 @@ const PatientsModule = (() => {
 
         patientsContainer.appendChild(host);
         setupPatientInteractions(patient, host);
+    };
+
+    /** Show pack-driven starting acuity on the panel header (ICU etc.). */
+    const paintInitialClinicalStatus = (patient) => {
+        const status = patient?.clinicalStatus || 'stable';
+        if (status === 'stable') return;
+        const host = document.querySelector(`.patient-panel-host[data-patient-id="${patient.id}"]`);
+        if (!host) return;
+        let badge = host.querySelector('[data-clinical-status]');
+        if (!badge) {
+            const header = host.querySelector('.patient .flex, .patient > div');
+            badge = document.createElement('span');
+            badge.className = 'text-xs font-semibold px-2 py-0.5 rounded ml-2 clinical-status-badge';
+            if (header) header.appendChild(badge);
+            else host.prepend(badge);
+        }
+        badge.setAttribute('data-clinical-status', status);
+        badge.textContent = status;
+        badge.classList.toggle('is-watch', status === 'watch');
+        badge.classList.toggle('is-worsening', status === 'worsening');
+        badge.classList.toggle('is-critical', status === 'critical');
     };
 
     const syncMountedTaskWindows = (patient) => {

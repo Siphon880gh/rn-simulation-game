@@ -1,0 +1,75 @@
+{
+  "id": "icu-2",
+  "title": "ICU — 2 patients (higher acuity)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Manage a two-patient ICU assignment with elevated starting acuity",
+    "Protect high-risk windows when both patients can deteriorate",
+    "Practice Code Blue / escalate cues under compressed census"
+  ],
+  "patients": ["maria", "robert"],
+  "patientOverrides": {
+    "maria": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2
+    },
+    "robert": {
+      "clinicalStatus": "worsening",
+      "acuityScore": 3
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/chaos-night-medsurg.json",
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": [
+    {
+      "id": "icu-lab-critical-1930",
+      "at": 1930,
+      "type": "emergency",
+      "message": "Lab called: critical potassium result — notify provider",
+      "injectTasks": [
+        {
+          "id": "evt-icu-robert-k",
+          "type": "assessment",
+          "name": "Critical K+ — recheck / notify provider",
+          "patientId": "robert",
+          "scheduled": 1930,
+          "expire": "+30",
+          "durationMins": 15,
+          "taskClass": "stat"
+        }
+      ]
+    },
+    {
+      "id": "icu-resp-2000",
+      "at": 2000,
+      "type": "emergency",
+      "message": "Increasing work of breathing — escalate assessment",
+      "injectTasks": [
+        {
+          "id": "evt-icu-maria-resp",
+          "type": "assessment",
+          "name": "Respiratory escalate assessment",
+          "patientId": "maria",
+          "scheduled": 2000,
+          "expire": "+30",
+          "durationMins": 15,
+          "taskClass": "stat"
+        }
+      ]
+    }
+  ]
+}
