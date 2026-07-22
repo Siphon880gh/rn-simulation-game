@@ -599,6 +599,19 @@ function onTime(currentTime) {
     processPendingCallbacks(currentTime);
 }
 
+/** E10 Tools rail — pending MD callbacks (read-only snapshot). */
+export function listPendingCriticalLabCallbacks() {
+    return Array.from(pendingCallbacks.values()).map((p) => ({
+        callTaskId: p.callTaskId,
+        patientId: p.patientId,
+        labId: p.labId || p.lab?.id || null,
+        labShortName: p.lab?.shortName || null,
+        callbackAt: p.callbackAt,
+        windowEnd: p.windowEnd,
+        recallCount: p.recallCount || 0
+    }));
+}
+
 export function resetCriticalLabs() {
     spawnedLabKeys.clear();
     pendingCallbacks.clear();
@@ -635,6 +648,7 @@ const CriticalLabsModule = {
     showAwaitingCallbackToast,
     spawnCriticalLabNow,
     pickCallbackAt,
+    listPendingCriticalLabCallbacks,
     _addMinutesToHhmm: addMinutesToHhmm
 };
 

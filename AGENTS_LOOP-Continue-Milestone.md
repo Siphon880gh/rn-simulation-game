@@ -75,7 +75,8 @@ Advance the RN Simulation Game through the milestone backlog until every impleme
 milestone in `decisions.implementation_order` (excluding Later / `mvp_exclusions`) is
 complete — or until a STOP condition fires.
 
-**Done (outer loop):** no remaining implementable milestones in `.agents/state.json`.
+**Done (outer loop):** no remaining implementable milestones in `.agents/state.json`
+(including post-MVP **E10** Right rail when present).
 **Done (single tick):** one continue cycle finished with AUTO verification; advanced or STOP.
 
 # CONTEXT

@@ -119,6 +119,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 | E7 | Chaos, Presentation & Content Scale | Harder, richer, more replayable shifts | Art, chaos packs, incidents, more shifts/complications | Later wishlist | Later |
 | E8 | Portfolio Packaging & Optional Social | Ship/share beyond local demo | Polish, packaging; optional auth/friends | Later / social | Later |
 | E9 | Open Admit & Admission Workflow | Choose lighter census / open bed; run a full admission checklist when an admit arrives | Census choice, mid-shift admit spawn, Admitting tab, quizzes, find-nurse retries, admitting MD callback | Post-MVP clinical loop | Post-MVP |
+| E10 | Right rail: Orders & Tools | Always-visible unit Orders + Tools glance without opening Global | Doctor-orders checks rail, injected-order cues, awaiting-MD / IV / admit tools, narrow-layout access | Post-MVP shell UX | Post-MVP |
 
 ---
 
@@ -213,6 +214,14 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 - **Out of scope:** New patient art packs; empty-bed inventory UI; multiplayer nurse availability.
 - **Suggested order:** After E4.M4 / E5.M3 (shipped post-MVP).
 
+### E10. Right rail: Orders & Tools
+- **Goal / user outcome:** Player sees hourly doctor-orders checks and unit tools (awaiting MD, IV attention, admit pipeline) in the right shell rail without hunting Global.
+- **Why:** E1.M2 reserved `#shell-right-menu` as “Tools / orders (later)”; Global buries orders; unit glances belong off the left census nav.
+- **Includes:** `right-menu.js` declarative rail; Orders list from `doctor-orders-check` + injected orders; click → open Global / patient; Tools: awaiting MD, IV attention, admitHold; narrow viewport keeps access (no hard hide).
+- **Dependencies:** E1.M2 chrome, E4.M3 doctor orders, E2 tabs/Global, critical-labs + admission callback patterns, IV system.
+- **Out of scope:** Moving sound/test/docs/slots into the rail; full order-entry EHR; scraping Global DOM as source of truth.
+- **Suggested order:** After E9 (post-MVP shell fill-in).
+
 ---
 
 ## C. Coverage Check
@@ -231,6 +240,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 | Chaos, art, richer acuity, content scale | E7 |
 | Auth/friends / packaging | E8 |
 | Open-to-admit census choice + admission checklist / MD callback | E9 |
+| Always-visible Orders + Tools right rail | E10 |
 | Fictional disclaimer + clinical tone | Decisions + all content epics |
 | Help / learning MD authoring + Mermaid + LaTeX math | E0.M5 (+ content epics author files) |
 | Vanilla/light stack | Decisions in state.json |
@@ -253,7 +263,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 
 1. Report: [`council-report-epics-milestones.md`](council-report-epics-milestones.md)
 2. Milestones: [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md)
-3. Resume: [`.agents/state.json`](.agents/state.json) → **MVP order complete**; Later: E3.M4, E5.M3, E5.M4, E7, E8
+3. Resume: [`.agents/state.json`](.agents/state.json) → **E10 Right rail** after E9; prior MVP + Later slices shipped except skipped E8.M2
 
-**Order:** `E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E5.M4, E7, E8`
+**Order:** `E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E5.M4, E7, E8 → E9 → E10`
 

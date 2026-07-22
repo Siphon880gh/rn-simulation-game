@@ -22,6 +22,7 @@ import TestModeModule from './test-mode.js';
 import SoundModule from './sound.js';
 import NurseAlertsModule from './nurse-alerts.js';
 import AdmissionSystemModule from './admission-system.js';
+import RightMenuModule from './right-menu.js';
 import { setShiftAnchor } from './availability-windows.js';
 
 // Declarative Application Configuration
@@ -46,7 +47,8 @@ const AppConfig = {
         testMode: TestModeModule,
         sound: SoundModule,
         nurseAlerts: NurseAlertsModule,
-        admission: AdmissionSystemModule
+        admission: AdmissionSystemModule,
+        rightMenu: RightMenuModule
     },
     
     urlParams: GameConfig.urlParams,
@@ -112,7 +114,7 @@ class GameApplication {
 
     // Initialize modules with dependency management
     async initializeModules() {
-        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs, testMode, sound, nurseAlerts, admission } = this.config.modules;
+        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs, testMode, sound, nurseAlerts, admission, rightMenu } = this.config.modules;
         
         // Register modules
         this.modules.set('modal', modal);
@@ -135,6 +137,7 @@ class GameApplication {
         this.modules.set('sound', sound);
         this.modules.set('nurseAlerts', nurseAlerts);
         this.modules.set('admission', admission);
+        this.modules.set('rightMenu', rightMenu);
 
         if (slots && slots.init) {
             slots.init();
@@ -661,6 +664,14 @@ class GameApplication {
             admission.init({
                 patients: this.modules.get('patients'),
                 shiftConfig: gameConfig
+            });
+        }
+
+        // E10: Orders & Tools right rail
+        const rightMenu = this.modules.get('rightMenu');
+        if (rightMenu && rightMenu.init) {
+            rightMenu.init({
+                patients: this.modules.get('patients')
             });
         }
 

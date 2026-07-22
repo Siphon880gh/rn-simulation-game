@@ -16,6 +16,7 @@ Browser chrome around the sim: locked shell regions (E1.M2), patient main mount,
 |------|--------|------|
 | `game/index.html` | ~170 | DOM shell + CDN scripts + module entry |
 | `game/assets/js/shell-chrome.js` | ~120 | Hour tabs + shift history log wiring |
+| `game/assets/js/right-menu.js` | ~ESM | E10 Orders + Tools right rail (subscribe-driven) |
 | `game/assets/js/modal.js` | ~210 | Modal configs + open/close/promise helpers |
 | `game/assets/js/debrief.js` | ~160 | E6.M0 thin prioritization debrief (completed/late/missed + shift log) |
 | `game/assets/js/docs.js` | ~ESM | Help FAB + markdown viewer |
@@ -37,7 +38,7 @@ Browser chrome around the sim: locked shell regions (E1.M2), patient main mount,
 | Top secondary | `#shell-top-secondary` / `#shell-hour-tabs` | Hour strip (E4.M2 fills content) |
 | Left menu | `#shell-left-menu` | Placeholder for patient nav (E2) |
 | Main | `#shell-main` / `#patients` | Clinical panels mount |
-| Right menu | `#shell-right-menu` | Placeholder for tools/orders |
+| Right menu | `#shell-right-menu` | E10 Orders (`#orders-rail`) + Tools (`#tools-rail`); `right-menu.js` |
 | Bottom | `#shell-bottom` | History + slots + status |
 | History log | `#shift-history-log` | Append-only via `APPEND_SHIFT_LOG` |
 | Task queue | `#task-queue-bar` / `#slot-waiting-queue` | 3 slots + FIFO wait (slot-system.js) |

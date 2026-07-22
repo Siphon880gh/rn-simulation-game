@@ -263,6 +263,8 @@ export const GameConfig = {
     topSecondary: '#shell-top-secondary',
     leftMenu: '#shell-left-menu',
     rightMenu: '#shell-right-menu',
+    ordersRail: '#orders-rail',
+    toolsRail: '#tools-rail',
     main: '#shell-main',
     bottom: '#shell-bottom',
     statusBar: '#shell-status-bar',

@@ -370,6 +370,38 @@ Next up: **Later** backlog (E3.M4, E5.M3, E5.M4, E7, E8) — MVP `implementation
 
 ---
 
+## E10 — Right rail: Orders & Tools *(Post-MVP)*
+
+| ID | Story | Milestone | Status |
+|----|-------|-----------|--------|
+| S10.1 | `#shell-right-menu` hosts Orders + Tools labels/lists; selectors + `right-menu.js` stub wired in `app.js` | E10.M1 | [x] |
+| S10.2 | Orders rail mirrors `doctor-orders-check` tasks (status + window); Global list stays detail view | E10.M2 | [x] |
+| S10.3 | Orders click opens Global (`PatientsModule.showGlobalPanel`) and focuses check row; injected-order rows jump patient | E10.M3 | [x] |
+| S10.4 | Tools: Awaiting MD list from critical-lab (+ admission) pending callbacks | E10.M4 | [x] |
+| S10.5 | Tools: IV attention + admitHold glance rows | E10.M5 | [x] |
+| S10.6 | Narrow layout keeps Orders/Tools reachable (no hard `display: none`) | E10.M6 | [x] |
+
+### Milestones
+
+| Milestone | Goal | Non-goals | MVP? |
+|-----------|------|-----------|------|
+| **E10.M1** | DOM skeleton + module init + GameConfig selectors | No orders/tools behavior | Post-MVP |
+| **E10.M2** | Orders rail from `tasks` subscribe (declarative) | No click navigation | Post-MVP |
+| **E10.M3** | Click → Global / patient focus | No EHR order entry | Post-MVP |
+| **E10.M4** | Awaiting MD tools list | No toast replacement | Post-MVP |
+| **E10.M5** | IV + admitHold tools glance | No full IV chart in rail | Post-MVP |
+| **E10.M6** | Responsive rail access | No mobile redesign of whole shell | Post-MVP |
+
+**E10.M1 implement notes:** Extend `#shell-right-menu` with `#orders-rail` / `#tools-rail`. Keep `declarative_modular` — selectors in `game-config.js`, `gameState.subscribe`, thin `right-menu.js`. Do not scrape `#doctor-orders-list` as source of truth.
+
+**E10.M2–M3 implement notes:** Filter `metadata.kind === 'doctor-orders-check'` and `metadata.fromOrdersCheck`. Export `PatientsModule.showGlobalPanel()`. Dual-render OK; Global list remains.
+
+**E10.M4–M5 implement notes:** Export read helpers from `critical-labs.js` / `admission-system.js` for pending callbacks; IV from `patients.*.ivLines` (drip / nextPttAt due); admit from `admitHold` + `admissionPhase === 'admitting'`.
+
+**AUTO verify:** `node scripts/verify-e10.mjs` (shell hosts, module wire, selectors, list helpers).
+
+---
+
 ## Confirmation gate
 
 - [x] User approved `EPIC_MAP.md`

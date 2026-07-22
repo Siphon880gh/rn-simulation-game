@@ -561,6 +561,19 @@ const PatientsModule = (() => {
         renderPatientTabs();
     });
 
+    /** E10: open Global from Orders/Tools rail (or other chrome). */
+    const showGlobalPanel = (opts = {}) => {
+        panelMode = 'global';
+        applyPanelVisibility();
+        renderPatientTabs();
+        if (opts.logMessage !== false) {
+            gameState.dispatch('APPEND_SHIFT_LOG', {
+                message: opts.logMessage || 'Opened global shift panel',
+                timeLabel: 'nav'
+            });
+        }
+    };
+
     // Public API
     return {
         init,
@@ -568,6 +581,7 @@ const PatientsModule = (() => {
         extractTasksFromHTML,
         renderPatient,
         handleTaskAction,
+        showGlobalPanel,
         
         // Getters
         getPatientConfigs: () => ({ ...patientConfigs }),

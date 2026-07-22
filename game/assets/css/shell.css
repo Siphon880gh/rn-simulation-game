@@ -671,9 +671,106 @@ body.shell-bottom-resizing {
     margin: 0 0 0.5rem;
 }
 
+.shell-menu-label--spaced {
+    margin-top: 1rem;
+}
+
 .shell-menu-placeholder {
     margin: 0;
     color: #9ca3af;
+    font-size: 0.75rem;
+}
+
+/* E10 — Orders / Tools right rail */
+#shell-right-menu {
+    overflow: auto;
+    min-height: 0;
+}
+
+.orders-rail,
+.tools-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.rail-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+    width: 100%;
+    text-align: left;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #374151;
+    border-radius: 0.375rem;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    line-height: 1.25;
+}
+
+.rail-item__title {
+    display: block;
+    width: 100%;
+}
+
+.rail-item__meta {
+    display: block;
+    width: 100%;
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.rail-item.is-current-hour {
+    border-color: #6366f1;
+    background: #eef2ff;
+}
+
+.rail-item.is-injected {
+    border-color: #a5b4fc;
+    background: #f5f3ff;
+}
+
+.rail-item.is-awaiting-md {
+    border-color: #fbbf24;
+    background: #fffbeb;
+    color: #92400e;
+}
+
+.rail-item.is-iv {
+    border-color: #5eead4;
+    background: #f0fdfa;
+    color: #115e59;
+}
+
+.rail-item.is-admit {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1e40af;
+}
+
+.rail-item.status-active {
+    border-color: #34d399;
+}
+
+.rail-item.status-overdue,
+.rail-item.status-missed {
+    border-color: #f87171;
+    background: #fef2f2;
+}
+
+.rail-item.status-completed {
+    opacity: 0.55;
+}
+
+.rail-focus-pulse {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+    transition: outline-color 200ms ease;
 }
 
 /* Tall content (e.g. shift debrief): keep panel in viewport; scroll body; pin footer */
@@ -701,12 +798,23 @@ body.shell-bottom-resizing {
     }
 
     #shell-left-menu {
+        order: 1;
         border-right: 0;
         border-bottom: 1px solid #d1d5db;
     }
 
+    #shell-main {
+        order: 2;
+    }
+
+    /* E10.M6: keep Orders/Tools reachable (stacked under main) */
     #shell-right-menu {
-        display: none;
+        order: 3;
+        display: block;
+        border-left: 0;
+        border-top: 1px solid #d1d5db;
+        max-height: 14rem;
+        overflow: auto;
     }
 
     #shell-bottom {

@@ -1,13 +1,13 @@
 {
-  "current_epic_id": "E9",
-  "current_milestone_id": "E9.M6",
+  "current_epic_id": "E10",
+  "current_milestone_id": "E10.M6",
   "status": "backlog_complete",
-  "last_updated_iso": "2026-07-22T08:00:00Z",
+  "last_updated_iso": "2026-07-22T14:08:52.407Z",
   "decisions": {
     "platform": "web",
     "app_name": "RN Simulation Game",
-    "one_liner": "Compressed 12-hour RN shift: triage tasks, ace clinical mini-games, stay on schedule \u2014 or overtime / miss the critical moment.",
-    "mvp_scope": "Multi-patient accelerated shift with slots, windows, chart history (past hx), panel swap on patient change, hourly check-doctor-orders (expire end of hour), thin dynamic/urgent spawn + game-time emergencies + thin deterioration, score + final outcome (tasks + satisfaction/status), one scenario pack, thin challenge gate, prioritization debrief, fiction disclaimer \u2014 CSS motion first; no auth/chaos/full acuity/class-interaction math",
+    "one_liner": "Compressed 12-hour RN shift: triage tasks, ace clinical mini-games, stay on schedule — or overtime / miss the critical moment.",
+    "mvp_scope": "Multi-patient accelerated shift with slots, windows, chart history (past hx), panel swap on patient change, hourly check-doctor-orders (expire end of hour), thin dynamic/urgent spawn + game-time emergencies + thin deterioration, score + final outcome (tasks + satisfaction/status), one scenario pack, thin challenge gate, prioritization debrief, fiction disclaimer — CSS motion first; no auth/chaos/full acuity/class-interaction math",
     "main_constraints": "Vanilla JS ES6 modules (+ jQuery/signals or light reactive layer); no React/Ink/Twine unless approved; military game clock; panels over floating windows; no auth/friends until Later epic; declarative modular architecture (game-config + game-state actions/subscribe + task-system processors; no liveQuery task activation)",
     "architecture_style": "declarative_modular",
     "architecture_style_doc": "IMPLEMENTATION_STORIES.md#declarative-architecture-locked--all-milestones",
@@ -17,7 +17,7 @@
       "game/assets/js/task-system.js",
       "game/assets/css/declarative-tasks.css"
     ],
-    "implementation_order": "E0.M3 \u2192 E0.M4 \u2192 E0.M5 \u2192 E1 \u2192 E2 \u2192 E3.M1\u2013M2 \u2192 E3.M6 \u2192 E6.M0 \u2192 E4.M1 \u2192 (E4.M2 \u2225 E5.M1) \u2192 E5.M2 \u2192 E3.M3 \u2192 E4.M3 \u2192 E3.M5 \u2192 E6.M1\u2013M2 \u2192 Later: E3.M4, E5.M3, E5.M4, E7, E8",
+    "implementation_order": "E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5.M1) → E5.M2 → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E5.M4, E7, E8 → E10",
     "game_runtime": "keep_modular_app",
     "game_runtime_rationale": "Core loop is concurrent clock + clinical panels + slots; custom vanilla ES6 shell already matches locked constraints. Decision doc default (Most likely). Thin in-house layer only if later pain after slots; no Phaser/Pixi/Godot/React shell without explicit approval.",
     "game_runtime_options": [
@@ -40,7 +40,7 @@
       "E3.M3": "AGENTS_POSSIBLE_DECISIONS__CONTEXT_MENU.md",
       "E5.M3": "AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md"
     },
-    "council_finalize": "Option A \u2014 Balanced Education MVP",
+    "council_finalize": "Option A — Balanced Education MVP",
     "council_option_confirmed_by_user": true,
     "council_report": "council-report-epics-milestones.md",
     "mvp_exclusions": [
@@ -49,13 +49,15 @@
       "E8.M2"
     ],
     "product_focus": "Clinical Training",
-    "product_focus_text": "This RN simulator drops players into a compressed 12-hour nursing shift filled with real-world events, diverse patients, and escalating case studies. Success means triaging tasks, acing clinical mini-games, and staying on schedule; failure means clocking overtime\u2014or worse, missing the critical moment that leads to patient injury.",
+    "product_focus_text": "This RN simulator drops players into a compressed 12-hour nursing shift filled with real-world events, diverse patients, and escalating case studies. Success means triaging tasks, acing clinical mini-games, and staying on schedule; failure means clocking overtime—or worse, missing the critical moment that leads to patient injury.",
     "markdown_renderer_rationale": "Default for Help/learning MD: plugin surface for wiki links, Mermaid fences, and KaTeX math; matches locked vanilla CDN shell. marked kept only as rejected thin fallback.",
     "ui_motion": "css_first",
     "ui_motion_rationale": "E7.M1: CSS panel-swap + status pulse; no GSAP until CSS ceiling proven.",
     "skipped_doc": "SKIPPED_MILESTONES.md",
     "admission_census_mode": "hold_last_pack_patient",
-    "admission_census_mode_rationale": "E9: census=minus1|openAdmit holds last pack patients[] id off boot census; openAdmit spawns that patient mid-shift with admission checklist. Reuse bed-prep + critical-lab Dr callback/recall."
+    "admission_census_mode_rationale": "E9: census=minus1|openAdmit holds last pack patients[] id off boot census; openAdmit spawns that patient mid-shift with admission checklist. Reuse bed-prep + critical-lab Dr callback/recall.",
+    "right_rail": "orders_tools_declarative",
+    "right_rail_rationale": "E10: always-visible Orders (doctor-orders-check + injected) + Tools (awaiting MD, IV, admit) via right-menu.js subscribe; Global stays detail; no DOM scrape."
   },
   "identified_epics": [
     {
@@ -106,6 +108,11 @@
     {
       "id": "E9",
       "name": "Open Admit & Admission Workflow",
+      "priority": "Post-MVP"
+    },
+    {
+      "id": "E10",
+      "name": "Right rail: Orders & Tools",
       "priority": "Post-MVP"
     }
   ],
@@ -167,7 +174,7 @@
     {
       "id": "E2.M3",
       "epic": "E2",
-      "name": "4\u20136 patient census layout",
+      "name": "4–6 patient census layout",
       "status": "done"
     },
     {
@@ -269,7 +276,7 @@
     {
       "id": "E5.M4",
       "epic": "E5",
-      "name": "Code Blue mini-game (random deteriorating patient; E4 escalate \u2192 E5 challenge)",
+      "name": "Code Blue mini-game (random deteriorating patient; E4 escalate → E5 challenge)",
       "status": "done"
     },
     {
@@ -337,6 +344,42 @@
       "epic": "E9",
       "name": "Call admitting quiz + MD callback + consult + clear Admitting",
       "status": "done"
+    },
+    {
+      "id": "E10.M1",
+      "epic": "E10",
+      "name": "DOM skeleton + right-menu.js wire",
+      "status": "done"
+    },
+    {
+      "id": "E10.M2",
+      "epic": "E10",
+      "name": "Orders rail mirrors doctor-orders checks",
+      "status": "done"
+    },
+    {
+      "id": "E10.M3",
+      "epic": "E10",
+      "name": "Orders click → Global / patient focus",
+      "status": "done"
+    },
+    {
+      "id": "E10.M4",
+      "epic": "E10",
+      "name": "Tools: Awaiting MD pending callbacks",
+      "status": "done"
+    },
+    {
+      "id": "E10.M5",
+      "epic": "E10",
+      "name": "Tools: IV attention + admitHold glance",
+      "status": "done"
+    },
+    {
+      "id": "E10.M6",
+      "epic": "E10",
+      "name": "Narrow layout keeps Orders/Tools reachable",
+      "status": "done"
     }
   ],
   "completed": [
@@ -377,9 +420,15 @@
     "E9.M3",
     "E9.M4",
     "E9.M5",
-    "E9.M6"
+    "E9.M6",
+    "E10.M1",
+    "E10.M2",
+    "E10.M3",
+    "E10.M4",
+    "E10.M5",
+    "E10.M6"
   ],
-  "notes": "E9 open-to-admit shipped: landing census modal (minus1 / openAdmit), hold last pack patient, mid-shift admit spawn, Admitting tab, admission checklist + quizzes, find-nurse retries, call admitting + MD callback/consult. decisions.admission_census_mode=hold_last_pack_patient. Prior backlog (E0-E8 except skipped E8.M2) remains complete.",
+  "notes": "E10 Right rail shipped: Orders (doctor-orders-check + injected) + Tools (awaiting MD, IV, admitHold); narrow stacked access. AUTO: node scripts/verify-e10.mjs. decisions.right_rail=orders_tools_declarative.",
   "skipped": [
     {
       "id": "E8.M2",

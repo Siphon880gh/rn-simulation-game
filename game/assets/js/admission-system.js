@@ -42,7 +42,7 @@ function statusMessage(text) {
     if (el) el.textContent = text;
 }
 
-function isOpenAdmitMode(mode) {
+export function isOpenAdmitMode(mode) {
     return mode === 'openAdmit'
         || mode === 'admitStart'
         || mode === 'admitMiddle';
@@ -635,6 +635,18 @@ export function initAdmissionSystem(deps = {}) {
     unsubTasks = gameState.subscribe('tasks', onTasks);
 }
 
+/** E10 Tools rail — pending admitting MD callbacks (read-only snapshot). */
+export function listPendingAdmissionCallbacks() {
+    return Array.from(pendingCallbacks.values()).map((p) => ({
+        callTaskId: p.callTaskId,
+        patientId: p.patientId,
+        consult: p.consult || null,
+        callbackAt: p.callbackAt,
+        windowEnd: p.windowEnd,
+        recallCount: p.recallCount || 0
+    }));
+}
+
 const AdmissionSystemModule = {
     init(deps) {
         initAdmissionSystem(deps || {});
@@ -645,7 +657,8 @@ const AdmissionSystemModule = {
     handleAdmissionCallComplete,
     handleAdmissionRecallComplete,
     handleAdmissionCallbackComplete,
-    spawnAdmitPatient
+    spawnAdmitPatient,
+    listPendingAdmissionCallbacks
 };
 
 export default AdmissionSystemModule;

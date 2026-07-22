@@ -100,6 +100,7 @@ rngame/
 │   │   ├── scene-backdrop.js          # E7.M1 unit theme + situation still hooks
 │   │   ├── availability-windows.js    # E3.M3 window phases + Perform gate
 │   │   ├── doctor-orders.js           # E4.M3 hourly check doctor orders
+│   │   ├── right-menu.js              # E10 Orders + Tools right rail
 │   │   ├── dynamic-tasks.js           # E3.M5 weighted dynamic/urgent spawn + incident tabs
 │   │   ├── slot-system.js             # 3 slots + FIFO waiting queue
 │   │   ├── docs.js                    # Help FAB + in-page docs viewer (ES module)
