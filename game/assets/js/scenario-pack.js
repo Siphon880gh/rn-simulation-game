@@ -106,7 +106,33 @@ export async function loadScenarioPack(url = DEFAULT_PACK_URL) {
     return pack;
 }
 
+/** Map pack department / scene theme → top-left brand unit label. */
+const DEPARTMENT_BRAND_LABELS = {
+    icu: 'ICU',
+    medsurg: 'Med-Surge',
+    tele: 'Tele',
+    ed: 'ED'
+};
+
+function resolveDepartmentLabel(pack) {
+    const key = String(pack?.department || pack?.scene?.theme || '').toLowerCase();
+    return DEPARTMENT_BRAND_LABELS[key] || null;
+}
+
+function applyShellBrand(pack) {
+    const unit = resolveDepartmentLabel(pack);
+    const brand = unit ? `RN Shift Simulator: ${unit}` : 'RN Shift Simulator';
+    const brandEl = document.querySelector('#shell-brand-title');
+    if (brandEl) {
+        brandEl.textContent = brand;
+        if (unit) brandEl.dataset.department = String(pack.department || pack.scene?.theme || '');
+        else delete brandEl.dataset.department;
+    }
+    document.title = brand;
+}
+
 function applyPackChrome(pack) {
+    applyShellBrand(pack);
     const titleEl = document.querySelector('#scenario-pack-title');
     if (titleEl) {
         titleEl.textContent = pack.title;
