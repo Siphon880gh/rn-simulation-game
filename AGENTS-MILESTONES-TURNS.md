@@ -40,8 +40,24 @@ Also read `EPIC_MAP.md` and `IMPLEMENTATION_STORIES.md` for the epic/milestone b
 |--------|--------|
 | `blocked_waiting_user` | **STOP.** Tell user what confirmation is needed. Do not proceed without explicit approval. |
 | `in_progress` / `ready_to_implement` | Continue implementing the current milestone. Check `IMPLEMENTATION_STORIES.md` (and any milestone README) for remaining work. |
-| `verification_ready` | Present the verification checklist to the user. Wait for confirmation before marking complete. |
+| `verification_ready` | Run **automatic verification** (Step 6). If all required items are **AUTO** and pass, advance to the next milestone without waiting. **STOP** only for items that are truly **HUMAN_REQUIRED**, or if AUTO verification fails after the fix budget. |
 | `complete` | Move to the next milestone. Update `current_milestone_id` and set status to `in_progress`. |
+
+### Step 3b: Autonomous continue / loop (default)
+
+When the user says **continue**, **next**, **proceed**, **keep going**, or is running a **milestone loop**, prefer uninterrupted progress:
+
+1. Implement the next slice for `current_milestone_id`.
+2. Classify each verification checklist item as **AUTO** or **HUMAN_REQUIRED** (see Step 6).
+3. Run all AUTO checks. On PASS, mark the milestone complete and start the next one in the same turn when work remains.
+4. **Do not** idle on `verification_ready` for checklist items that can be proven automatically.
+5. **STOP** only when:
+   - status is `blocked_waiting_user`, or
+   - a checklist item is truly **HUMAN_REQUIRED** (subjective UX, clinical judgment, or no auto path), or
+   - AUTO verification fails and cannot be fixed within **10** fix rounds (including new errors introduced while fixing), or
+   - a change would violate locked `decisions.main_constraints` / require an unapproved stack swap.
+
+Do **not** stop between ordinary file edits for human review during continue/loop. Batch coherent edits; report what changed at the end of the tick.
 
 ### Step 4: Locate Milestone Documentation
 
@@ -75,18 +91,25 @@ When a decision milestone completes, stamp the outcome in `state.json` → `deci
 
 **Implementation Rules:**
 1. Use the tech stack from `state.json` decisions (incl. `architecture_style` / declarative modular when stamped)
-2. Create files one at a time, allowing human review between files
+2. Prefer coherent batches of edits in one continue/loop tick. Pause for per-file human review only when the user asked for that cadence, or when a file touches an irreversible/external concern
 3. Follow existing code patterns if the codebase already has code — extend `game-config` / `game-state` / `task-system`; do not reintroduce liveQuery task activation
 4. Do not skip ahead to future milestones
 5. Do not implement features from later milestones
 6. Reference `IMPLEMENTATION_STORIES.md` / milestone README for exact specifications (incl. § Declarative architecture)
 7. Read `AGENTS_CODE_REFERENCE.md` (and linked maps) before opening source
 
-### Step 6: Update State When Complete
+### Step 6: Verify and Update State
 
-After all verification checklist items pass, update `.agents/state.json`:
+Classify every verification checklist item before gating progress:
 
-**When code is ready for verification:**
+| Class | Meaning | Action |
+|-------|---------|--------|
+| **AUTO** | Can be proven without a human (scripts, lint/type/build, deterministic checks, contracts) | Run it. Required to pass before advancing. |
+| **HUMAN_REQUIRED** | Needs eyes/judgment; no reliable auto path | **STOP** and hand the checklist to the user. Do not mark complete. |
+
+Prefer classifying items as **AUTO** whenever a reliable check exists. Use **HUMAN_REQUIRED** sparingly.
+
+**When implementation is done but AUTO checks are not finished yet** (optional intermediate state):
 
 ```json
 {
@@ -96,19 +119,14 @@ After all verification checklist items pass, update `.agents/state.json`:
 }
 ```
 
-**Ask user to verify the work:**
-- Output a **verification checklist** the user can follow.
-- Each verification item should include:
-  - the exact page or route to visit
-  - the exact button, link, tab, or control to click
-  - the exact value or text to enter
-  - the exact expected result
-  - what to compare against
-  - what the user should report back
-- Where useful, include optional **DevTools Console** commands.
-- Remind user they can ask for help with a specific verification step.
+On `verification_ready` during continue/loop: run AUTO checks immediately; do not wait for a human reply first.
 
-**When user confirms verification passed:**
+**AUTO verification failure / fix budget:**
+- Keep an `error_fix_round` counter (0–10) for the current failure cluster.
+- Each round: read errors → minimal patch → re-run failing checks. New errors from a fix still count toward the same 10 rounds.
+- After 10 failed rounds, **STOP** with a handoff: failing commands, stderr highlights, files touched, hypotheses tried, best next human action.
+
+**When all required AUTO items pass and none are HUMAN_REQUIRED** — advance without waiting:
 
 ```json
 {
@@ -119,7 +137,13 @@ After all verification checklist items pass, update `.agents/state.json`:
 }
 ```
 
-And recommend a git commit message for these updates, but do not commit unless the user asks (or has granted commit permission).
+**Only when HUMAN_REQUIRED items remain:**
+- Stay on `verification_ready` (or equivalent).
+- Output a verification checklist the user can follow (page/route, control, input, expected result, what to report back).
+- Optional DevTools Console commands where useful.
+- Advance only after the user confirms those HUMAN_REQUIRED items (e.g. reply `verified`).
+
+Recommend a git commit message at good commit points; do not commit unless the user asks (or has granted commit permission).
 
 ---
 
@@ -148,19 +172,22 @@ When you finish work on a milestone (or a work session), report to the user:
 - **Choice:**
 - **Why:**
 
-### Verification Steps for Human
+### Automatic Verification
+- Commands run and results (PASS/FAIL)
+- Checklist items classified AUTO vs HUMAN_REQUIRED
+
+### Verification Steps for Human *(only if HUMAN_REQUIRED items remain)*
 
 Please test the following:
 
-1. [ ] [First verification item]
-2. [ ] [Second verification item]
+1. [ ] [First HUMAN_REQUIRED item]
+2. [ ] [Second HUMAN_REQUIRED item]
 ...
 
 ### Next Steps
 
-Once you confirm the verification checklist passes:
-- Reply "verified" to proceed to [next milestone]
-- Or report any issues that need fixing
+- If AUTO passed and nothing is HUMAN_REQUIRED: already advancing / ready for next continue tick
+- If HUMAN_REQUIRED remains: reply "verified" to proceed to [next milestone], or report issues
 ```
 
 ---
@@ -217,11 +244,21 @@ Proceeding with: [Next file or feature to implement]
 
 ### If `verification_ready`:
 
+**Prefer (continue/loop — AUTO path):**
+
 ```
-**[Milestone ID] - [Name]** is ready for verification.
+**[Milestone ID] - [Name]** — running automatic verification.
+AUTO: [commands + PASS/FAIL]
+HUMAN_REQUIRED: none → advancing to [next milestone]
+```
+
+**Only when HUMAN_REQUIRED remains:**
+
+```
+**[Milestone ID] - [Name]** needs human verification for items that cannot be checked automatically.
 
 Please test:
-[Verification checklist]
+[HUMAN_REQUIRED checklist only]
 
 Reply "verified" to proceed or describe any issues found.
 ```
@@ -238,7 +275,8 @@ Find the current milestone from current_milestone_id.
 Read implement notes for that milestone and AGENTS_POSSIBLE_DECISIONS_INDEX.md (linked decision docs only).
 Follow stamped decisions in state.json unless the milestone reopens them.
 Read AGENTS_CODE_REFERENCE.md as needed.
-Tell me the current status and either continue development or tell me what confirmation you need.
+Continue development: prefer automatic verification and advance when AUTO checks pass.
+Stop only for blocked_waiting_user, true HUMAN_REQUIRED verification, or AUTO failures after 10 fix rounds.
 ```
 
 ---
@@ -298,6 +336,7 @@ Each milestone README (when used) should contain:
 |-----------|--------|
 | `state.json` missing | Create via `AGENTS-MILESTONES-INIT.md` or seed from `EPIC_MAP.md` / `IMPLEMENTATION_STORIES.md` |
 | Milestone docs not found | Use `IMPLEMENTATION_STORIES.md`; ask user if still unclear |
-| Verification checklist item fails | Report the failure, suggest fix, do not mark complete |
+| AUTO verification item fails | Fix within 10 rounds (same failure cluster); if still failing, STOP with debugging handoff; do not mark complete |
+| HUMAN_REQUIRED item only | Present that checklist; wait for user; do not block on AUTO-capable items |
 | Unclear requirements | Ask user for clarification before implementing |
 | Conflicting instructions | Prioritize `IMPLEMENTATION_STORIES.md` / milestone README over general assumptions |

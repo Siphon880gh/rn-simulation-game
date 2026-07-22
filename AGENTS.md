@@ -33,7 +33,7 @@ The agent is an execution-focused coding partner that:
 | [`EPIC_MAP.md`](EPIC_MAP.md) | Product epics / MVP scope |
 | [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md) | Milestone backlog + **implement notes** linking decision docs |
 | [`.agents/state.json`](.agents/state.json) | Current epic/milestone + stamped decisions (`decisions.*`) |
-| [`prompts/`](prompts/) | Milestone authoring prompts |
+| [`prompts/`](prompts/) | Milestone authoring prompts + [`prompts/MILESTONE_LOOP.md`](prompts/MILESTONE_LOOP.md) continue loop |
 
 **Locked constraints** (from `.agents/state.json`): web ES6 modules; vanilla JS (+ jQuery/signals or light reactive); no React/Ink/Twine unless approved; military game clock; panels-first clinical UI; no auth until Later; **declarative modular architecture** — extend `game-config.js` / `game-state.js` / `task-system.js` (config + named actions/subscribe + processors); do not reintroduce imperative liveQuery/DOM-scraping task loops. Detail: [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md) § Declarative architecture; [`docs/devs/REFACTORING_SUMMARY.md`](docs/devs/REFACTORING_SUMMARY.md).
 
@@ -105,7 +105,10 @@ For every coding task, follow this loop:
 
 * Run the smallest check that gives confidence, then broaden if needed.
 * Preference order: targeted test → lint → type check → build → browser/UI → manual steps.
-* If you cannot verify, say what could not be verified and give exact steps.
+* Prefer **automatic** checks. Treat checklist items as **AUTO** when a reliable check exists; use **HUMAN_REQUIRED** only when judgment/eyes are unavoidable (see [`AGENTS-MILESTONES-TURNS.md`](AGENTS-MILESTONES-TURNS.md) Step 6).
+* On continue/loop: if AUTO checks pass and nothing is HUMAN_REQUIRED, advance the milestone without waiting for a human reply.
+* If AUTO checks fail, patch and re-run up to **10** fix rounds for that failure cluster (new errors from fixes count); then stop with a debugging handoff.
+* If you cannot auto-verify and the item is HUMAN_REQUIRED, give exact manual steps and stop only for those items.
 
 ### 4. Report
 
@@ -232,19 +235,20 @@ Do not block implementation waiting for library approval when the decision doc a
 
 ## Session Continuation Rule
 
-When the user says **continue**, **keep going**, **proceed**, **next**, or **finish this**:
+When the user says **continue**, **keep going**, **proceed**, **next**, or **finish this** (including milestone **loop** ticks):
 
 1. Read `.agents/state.json`; initiate if missing (use `AGENTS-MILESTONES-INIT.md` when epic/story files are absent).
-2. Follow `AGENTS-MILESTONES-TURNS.md` when milestone docs exist; otherwise read `TASKS.md`.
+2. Follow `AGENTS-MILESTONES-TURNS.md` when milestone docs exist (incl. Step 3b autonomous continue); otherwise read `TASKS.md`.
 3. Read milestone-linked decision docs: `AGENTS_POSSIBLE_DECISIONS_INDEX.md` + **implement notes** for `current_milestone_id` in `IMPLEMENTATION_STORIES.md`; honor stamped `decisions.*` unless the milestone reopens the choice.
 4. Read `AGENTS_CODE_REFERENCE.md` and linked maps; bootstrap if missing.
 5. Sync epic/milestone/current step in `state.json`.
-6. Implement the next logical task.
-7. Verify.
+6. Implement the next logical task (batch coherent edits; do not pause for per-file approval unless the user asked).
+7. Verify with AUTO checks; advance when they pass and nothing is HUMAN_REQUIRED. Stop only for `blocked_waiting_user`, true HUMAN_REQUIRED items, or AUTO failure after 10 fix rounds.
 8. Update `EPIC_MAP.md` / `IMPLEMENTATION_STORIES.md`, `TASKS.md`, and `.agents/state.json` when progress changed.
-9. Report what changed, what was verified, what remains.
+9. Report what changed, what was verified, what remains (or the STOP handoff).
 10. Evaluate commit point.
 11. **If good commit point**: update LLM reference maps when warranted per `AGENTS-CODE_REFERENCE_INIT.md`, **then** suggest a commit message.
 12. **If not**: skip map update, commits, and pushes; say what remains.
 13. If the user has granted permission to commit without asking, make the commit.
 14. If the user has granted permission to push, push as well.
+15. If work remains and no STOP condition fired, keep going to the next milestone slice in the same session/loop tick chain.

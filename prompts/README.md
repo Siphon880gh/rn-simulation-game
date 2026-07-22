@@ -6,6 +6,7 @@ This folder holds prompts for planning and implementing the product in **epics**
 |------|-------------|
 | [`GUIDELINES_MILESTONE_PROMPTS.md`](./GUIDELINES_MILESTONE_PROMPTS.md) | Discover/confirm epics (Epic 0 first). Always update state. |
 | [`MILESTONE_AUTHORING.md`](./MILESTONE_AUTHORING.md) | After epic approval: write 5-block milestone prompts and keep state in sync. |
+| [`MILESTONE_LOOP.md`](./MILESTONE_LOOP.md) | Autonomous continue loop: AUTO verify + advance; stop only for HUMAN_REQUIRED / fix budget / blocked. |
 
 ## Living artifacts (repo root)
 
