@@ -12,12 +12,34 @@ By Weng Fei Fung
 Experience the intensity of a fast-paced 12-hour shift in this nursing simulation game. Manage multiple patients in ICU and Med-Surg units, facing real workloads and emergent situations. Your goal is to complete your shift without going into overtime, testing your clinical judgment, time management, and prioritization skills in a dynamic hospital environment.
 
 ## STATUS
-This project is a work in progress and is currently in its early stages.
+
+Playable clinical-training MVP + Later backlog slices (challenges, chaos packs, alternate shifts). Optional auth/friends (**E8.M2**) stays off until explicitly re-approved.
+
+## Run locally
+
+Serve the repo root (or `game/`) over HTTP — ES modules need a static server, not `file://`.
+
+```bash
+# from repo root
+python3 -m http.server 8765
+# open http://localhost:8765/game/index.html
+```
+
+## Demo presets (portfolio)
+
+| Preset | URL (after local server is up) |
+|--------|--------------------------------|
+| Quick night (~15 min wall) | `http://localhost:8765/game/index.html?speed-factor=48` |
+| Quick day shift | `http://localhost:8765/game/index.html?speed-factor=48&scenario=events/scenarios/day-shift-medsurg.json` |
+| Slower teaching pace | `http://localhost:8765/game/index.html?speed-factor=12` |
+
+Scenario packs: `events/scenarios/night-shift-default.json` (default), `events/scenarios/day-shift-medsurg.json`. Chaos incidents merge from `events/incidents/chaos-night-medsurg.json`.
 
 ## Hospital Shifts
 
-These are optional:
-- ?speed-factor=4&shift-starts=1700
+Optional query params:
+- `?speed-factor=4&shift-starts=1700`
+- `?scenario=events/scenarios/day-shift-medsurg.json`
 
 
 ## Tasks
@@ -54,25 +76,11 @@ Speed factors to how long your simulation session will be:
 - 3 minutes → speedFactor = 360
 
 
-### Future Features:
+### Shipped vs later
 
-- Handle diverse patient populations in both ICU and Med-Surg settings
-- Respond to emergent situations like:
-  - Code Blues
-  - Rapid Responses
-  - Sudden Patient Deterioration
-  - New Admissions/Transfers
-- Balance competing priorities:
-  - Medication Administration
-  - Patient Assessments
-  - New Orders & Procedures
-  - Documentation
-  - Care Planning
-  - Family Communication
-- Real-time vital sign monitoring
-- Dynamic patient conditions that can change based on interventions
-- Realistic time pressure with an in-game 12-hour shift clock
-- Performance scoring based on patient outcomes and task completion
+**In the build:** multi-patient census, slots + queue, availability windows, scenario/incident packs, med identity + bed-prep + Code Blue challenges, thin→richer deterioration, scoring/debrief, military shift clock with speed factor.
+
+**Still later / optional:** authored Midjourney unit stills, full acuity physiology, auth/friends (E8.M2 — re-approve only).
 
 ### Learning Objectives:
 

@@ -1,0 +1,78 @@
+/**
+ * E7.M1 scene presence — CSS-first unit themes + optional image hooks.
+ * Soft clinical atmospheres (not purple glow / cream-serif defaults).
+ */
+
+#shell-main.shell-scene-main {
+    position: relative;
+    background-color: #d7dde6;
+    background-image:
+        linear-gradient(165deg, rgba(232, 238, 244, 0.92) 0%, rgba(198, 210, 222, 0.88) 45%, rgba(180, 196, 208, 0.9) 100%),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 47px,
+            rgba(255, 255, 255, 0.04) 47px,
+            rgba(255, 255, 255, 0.04) 48px
+        );
+    background-size: cover, auto;
+    background-attachment: local;
+}
+
+#shell-main.shell-scene-main.scene-theme-icu {
+    background-image:
+        linear-gradient(165deg, rgba(220, 232, 236, 0.94) 0%, rgba(176, 200, 208, 0.9) 50%, rgba(156, 180, 188, 0.92) 100%),
+        repeating-linear-gradient(90deg, transparent, transparent 47px, rgba(255, 255, 255, 0.05) 47px, rgba(255, 255, 255, 0.05) 48px);
+}
+
+#shell-main.shell-scene-main.scene-theme-ed {
+    background-image:
+        linear-gradient(165deg, rgba(236, 230, 224, 0.94) 0%, rgba(214, 198, 182, 0.88) 55%, rgba(196, 180, 164, 0.9) 100%),
+        repeating-linear-gradient(90deg, transparent, transparent 47px, rgba(255, 255, 255, 0.04) 47px, rgba(255, 255, 255, 0.04) 48px);
+}
+
+#shell-main.shell-scene-main.has-scene-image {
+    background-image:
+        linear-gradient(180deg, rgba(243, 244, 246, 0.82) 0%, rgba(229, 231, 235, 0.72) 100%),
+        var(--scene-unit-image);
+    background-size: cover, cover;
+    background-position: center, center;
+}
+
+/* Optional situation still behind modal content */
+#modal.has-situation-still::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--scene-situation-image);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 0;
+}
+
+#modal.has-situation-still > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Light CSS motion polish (no GSAP) */
+html.scene-motion-panels .patient-panel-swap {
+    animation: scene-panel-fade 220ms ease-out;
+}
+
+@keyframes scene-panel-fade {
+    from { opacity: 0.55; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+html.scene-motion-status [data-clinical-status='worsening'],
+html.scene-motion-status [data-clinical-status='critical'] {
+    animation: scene-status-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes scene-status-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0); }
+    50% { box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.18); }
+}

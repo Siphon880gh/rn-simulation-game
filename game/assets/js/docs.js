@@ -1,337 +1,338 @@
-// Docs functionality for displaying markdown files from docs/ directory with nested categories
-(function() {
-    'use strict';
+/**
+ * Docs / Help FAB — opens authored .md via shared markdown-it renderer.
+ */
+import {
+    renderMarkdown,
+    enhanceMarkdownDom
+} from './markdown-renderer.js';
+import { createLinkPopover } from './link-popover.js';
 
-    // Documentation structure with categories and files
-    const docsStructure = {
-        'devs': {
-            displayName: 'Developers',
-            icon: 'code',
-            color: 'text-purple-500',
-            files: [
-                'MEDICATION_WINDOW_MECHANICS.md',
-                'README_UTILS.md',
-                'REFACTORING_SUMMARY.md'
-            ]
-        },
-        'players': {
-            displayName: 'Players',
-            icon: 'users',
-            color: 'text-green-500',
-            files: [
-                'ABOUT.md'
-            ]
-        }
-    };
+const docsStructure = {
+    devs: {
+        displayName: 'Developers',
+        icon: 'code',
+        color: 'text-purple-500',
+        files: [
+            'MEDICATION_WINDOW_MECHANICS.md',
+            'README_UTILS.md',
+            'REFACTORING_SUMMARY.md'
+        ]
+    },
+    players: {
+        displayName: 'Players',
+        icon: 'users',
+        color: 'text-green-500',
+        files: [
+            'ABOUT.md'
+        ]
+    },
+    learning: {
+        displayName: 'Learning',
+        icon: 'book',
+        color: 'text-amber-500',
+        files: [
+            'PRIORITIZATION_BASICS.md'
+        ]
+    }
+};
 
-    // Track expanded categories
-    let expandedCategories = new Set();
+const noteCatalog = buildNoteCatalog(docsStructure);
+let expandedCategories = new Set(['players', 'learning']);
+let linkPopover = null;
 
-    // Initialize docs functionality when DOM is ready
-    $(document).ready(function() {
-        initializeDocsDropdown();
-        loadNestedDocsList();
-        setupEventListeners();
+function buildNoteCatalog(structure) {
+    const byKey = new Map();
+
+    function add(entry) {
+        const keys = [
+            entry.filename,
+            entry.filename.replace(/\.md$/i, ''),
+            entry.title,
+            entry.title.toLowerCase(),
+            entry.filename.replace(/\.md$/i, '').replace(/_/g, ' '),
+            entry.filename.replace(/\.md$/i, '').replace(/_/g, ' ').toLowerCase()
+        ];
+        keys.forEach((key) => {
+            if (key) byKey.set(String(key), entry);
+        });
+    }
+
+    Object.keys(structure).forEach((category) => {
+        structure[category].files.forEach((filename) => {
+            const title = formatDisplayName(filename);
+            add({
+                category,
+                filename,
+                title,
+                path: `../docs/${category}/${filename}`
+            });
+        });
     });
 
-    function initializeDocsDropdown() {
-        const docsButton = $('#docs-button');
-        const docsDropdown = $('#docs-dropdown');
+    return byKey;
+}
 
-        // Toggle dropdown on button click
-        docsButton.on('click', function(e) {
-            e.stopPropagation();
-            docsDropdown.toggleClass('hidden');
-        });
+function resolveNote(titleOrPath) {
+    if (!titleOrPath) return null;
+    const raw = String(titleOrPath).trim();
+    const decoded = decodeURIComponent(raw);
+    const noHash = decoded.split('#')[0];
 
-        // Close dropdown when clicking outside
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('#docs-button, #docs-dropdown').length) {
-                docsDropdown.addClass('hidden');
-            }
-        });
+    if (noteCatalog.has(noHash)) return toResolved(noteCatalog.get(noHash));
+    if (noteCatalog.has(noHash.toLowerCase())) return toResolved(noteCatalog.get(noHash.toLowerCase()));
+
+    const basename = noHash.split('/').pop();
+    if (basename && noteCatalog.has(basename)) return toResolved(noteCatalog.get(basename));
+    if (basename && noteCatalog.has(basename.replace(/\.md$/i, ''))) {
+        return toResolved(noteCatalog.get(basename.replace(/\.md$/i, '')));
     }
 
-    function loadNestedDocsList() {
-        const docsList = $('#docs-list');
-        docsList.empty();
+    return null;
+}
 
-        // Create categories
-        Object.keys(docsStructure).forEach(function(categoryKey) {
-            const category = docsStructure[categoryKey];
-            const isExpanded = expandedCategories.has(categoryKey);
-            
-            const categoryItem = createCategoryItem(categoryKey, category, isExpanded);
-            docsList.append(categoryItem);
+function toResolved(entry) {
+    return {
+        href: `#doc=${encodeURIComponent(entry.category + '/' + entry.filename)}`,
+        category: entry.category,
+        filename: entry.filename,
+        title: entry.title,
+        path: entry.path
+    };
+}
 
-            // Add files for this category
-            if (isExpanded && category.files.length > 0) {
-                category.files.forEach(function(filename) {
-                    const fileItem = createFileItem(filename, categoryKey);
-                    docsList.append(fileItem);
-                });
-            }
-        });
-    }
+function resolveFromHref(href) {
+    if (!href) return null;
+    const clean = href.replace(/^\.\.\//, '').replace(/^docs\//, '');
+    return resolveNote(clean) || resolveNote(href);
+}
 
-    function createCategoryItem(categoryKey, category, isExpanded) {
-        const expandIcon = isExpanded ? 'chevron-down' : 'chevron-right';
-        const categoryIcon = getCategoryIcon(category.icon);
-        
-        return $(`
-            <div class="category-item px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 cursor-pointer flex items-center gap-3 border-b border-gray-100"
-                 data-category="${categoryKey}">
-                <div class="flex items-center gap-2 flex-1">
-                    ${categoryIcon}
-                    <span class="${category.color}">${category.displayName}</span>
-                    <span class="text-xs text-gray-400">(${category.files.length})</span>
+function formatDisplayName(filename) {
+    return filename
+        .replace(/\.md$/i, '')
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+}
+
+function ensureViewer() {
+    let viewer = document.getElementById('docs-viewer');
+    if (viewer) return viewer;
+
+    viewer = document.createElement('div');
+    viewer.id = 'docs-viewer';
+    viewer.className = 'hidden';
+    viewer.innerHTML = `
+        <div class="docs-viewer__panel" role="dialog" aria-modal="true" aria-labelledby="docs-viewer-title">
+            <div class="docs-viewer__header">
+                <div class="flex items-center gap-3 min-w-0">
+                    <span id="docs-viewer-category" class="px-3 py-1 rounded-full text-xs font-medium bg-gray-100"></span>
+                    <h2 id="docs-viewer-title" class="text-xl font-bold text-gray-900 truncate"></h2>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="lucide lucide-${expandIcon} text-gray-400 transition-transform duration-200">
-                    ${getChevronPath(expandIcon)}
-                </svg>
+                <button type="button" id="docs-viewer-close"
+                        class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                    Close
+                </button>
             </div>
-        `);
+            <div id="docs-viewer-body" class="docs-viewer__body markdown-content"></div>
+        </div>
+    `;
+    document.body.appendChild(viewer);
+
+    viewer.querySelector('#docs-viewer-close').addEventListener('click', closeViewer);
+    viewer.addEventListener('click', (event) => {
+        if (event.target === viewer) closeViewer();
+    });
+
+    return viewer;
+}
+
+function closeViewer() {
+    const viewer = document.getElementById('docs-viewer');
+    if (viewer) viewer.classList.add('hidden');
+    if (linkPopover) linkPopover.hide();
+}
+
+async function fetchNoteMarkdown({ category, filename, note }) {
+    let entry = null;
+    if (category && filename) {
+        entry = noteCatalog.get(filename) || { category, filename, path: `../docs/${category}/${filename}` };
+    } else {
+        entry = resolveNote(note);
+    }
+    if (!entry || !entry.path && !(entry.category && entry.filename)) {
+        throw new Error('Note not found');
+    }
+    const path = entry.path || `../docs/${entry.category}/${entry.filename}`;
+    const response = await fetch(path);
+    if (!response.ok) throw new Error(`Failed to fetch ${path}`);
+    return response.text();
+}
+
+async function openMarkdownDocument(categoryKey, filename, options = {}) {
+    const categoryInfo = docsStructure[categoryKey];
+    if (!categoryInfo) {
+        alert(`Unknown docs category: ${categoryKey}`);
+        return;
     }
 
-    function createFileItem(filename, categoryKey) {
-        const displayName = formatDisplayName(filename);
-        const fileIcon = getFileIcon(filename);
-        
-        return $(`
-            <div class="file-item pl-8 pr-4 py-2 text-sm text-gray-600 hover:bg-blue-50 cursor-pointer flex text-left gap-2 border-l-2 border-transparent hover:border-blue-300"
-                 data-filename="${filename}" data-category="${categoryKey}">
-                ${fileIcon}
-                <span>${displayName}</span>
-            </div>
-        `);
-    }
+    try {
+        const markdownContent = await fetchNoteMarkdown({ category: categoryKey, filename });
+        const htmlContent = renderMarkdown(markdownContent, { resolveNote });
+        const viewer = ensureViewer();
+        const body = viewer.querySelector('#docs-viewer-body');
+        const titleEl = viewer.querySelector('#docs-viewer-title');
+        const categoryEl = viewer.querySelector('#docs-viewer-category');
 
-    function getCategoryIcon(iconType) {
-        const icons = {
-            'code': `
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="lucide lucide-code text-purple-500">
-                    <polyline points="16 18 22 12 16 6"></polyline>
-                    <polyline points="8 6 2 12 8 18"></polyline>
-                </svg>
-            `,
-            'users': `
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="lucide lucide-users text-green-500">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-            `
-        };
-        return icons[iconType] || icons['code'];
-    }
+        titleEl.textContent = formatDisplayName(filename);
+        categoryEl.textContent = categoryInfo.displayName;
+        categoryEl.className = `px-3 py-1 rounded-full text-xs font-medium bg-gray-100 ${categoryInfo.color}`;
+        body.innerHTML = htmlContent;
+        viewer.classList.remove('hidden');
 
-    function getFileIcon(filename) {
-        // Different icons based on file type/name
-        if (filename.toLowerCase().includes('about')) {
-            return `
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="lucide lucide-info text-blue-500">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M12 16v-4"></path>
-                    <path d="M12 8h.01"></path>
-                </svg>
-            `;
-        } else if (filename.toLowerCase().includes('readme')) {
-            return `
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="lucide lucide-book-open text-amber-500">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                </svg>
-            `;
-        } else {
-            return `
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="lucide lucide-file-text text-gray-500">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-            `;
-        }
-    }
-
-    function getChevronPath(iconType) {
-        if (iconType === 'chevron-down') {
-            return '<polyline points="6 9 12 15 18 9"></polyline>';
-        } else {
-            return '<polyline points="9 18 15 12 9 6"></polyline>';
-        }
-    }
-
-    function setupEventListeners() {
-        // Handle clicking on category items (expand/collapse)
-        $(document).on('click', '.category-item', function(e) {
-            e.preventDefault();
-            e.stopPropagation(); // Prevent dropdown from closing
-            const categoryKey = $(this).data('category');
-            toggleCategory(categoryKey);
-        });
-
-        // Handle clicking on file items
-        $(document).on('click', '.file-item', function(e) {
-            e.preventDefault();
-            e.stopPropagation(); // Prevent any unwanted bubbling
-            const filename = $(this).data('filename');
-            const categoryKey = $(this).data('category');
-            openMarkdownInNewWindow(filename, categoryKey);
-            $('#docs-dropdown').addClass('hidden');
-        });
-    }
-
-    function toggleCategory(categoryKey) {
-        if (expandedCategories.has(categoryKey)) {
-            expandedCategories.delete(categoryKey);
-        } else {
-            expandedCategories.add(categoryKey);
-        }
-        loadNestedDocsList();
-    }
-
-    function formatDisplayName(filename) {
-        // Convert filename to a more readable format
-        return filename
-            .replace('.md', '')
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, l => l.toUpperCase());
-    }
-
-    function openMarkdownInNewWindow(filename, categoryKey) {
-        // Fetch the markdown file from the appropriate category folder
-        fetch(`../docs/${categoryKey}/${filename}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch ${filename}: ${response.statusText}`);
+        if (!linkPopover) {
+            linkPopover = createLinkPopover({
+                fetchNote: fetchNoteMarkdown,
+                openNote: (anchor, opts = {}) => {
+                    const cat = anchor.getAttribute('data-md-category');
+                    const file = anchor.getAttribute('data-md-filename');
+                    if (cat && file) {
+                        openMarkdownDocument(cat, file, opts);
+                    }
                 }
-                return response.text();
-            })
-            .then(markdownContent => {
-                const htmlContent = marked.parse(markdownContent);
-                const categoryInfo = docsStructure[categoryKey];
-                createDocumentWindow(filename, htmlContent, categoryInfo);
-            })
-            .catch(error => {
-                console.error('Error loading markdown file:', error);
-                alert(`Error loading ${filename}. Please check if the file exists in the ${categoryKey} folder.`);
             });
-    }
-
-    function createDocumentWindow(filename, htmlContent, categoryInfo) {
-        const displayName = formatDisplayName(filename);
-        
-        // Create a new window
-        const newWindow = window.open('', '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes');
-        
-        if (!newWindow) {
-            alert('Pop-up blocked! Please allow pop-ups for this site to view documentation.');
-            return;
         }
 
-        // Write the HTML content to the new window
-        newWindow.document.write(`
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>${displayName} - ${categoryInfo.displayName} Documentation</title>
-                <script src="https://cdn.tailwindcss.com"></script>
-                <script>
-                    tailwind.config = {
-                        corePlugins: {
-                            preflight: false, // Disable Tailwind's CSS reset
-                        }
-                    }
-                </script>
-                <style>
-                    /* Custom styles for markdown content */
-                    .markdown-content {
-                        line-height: 1.6;
-                    }
-                    .markdown-content h1 {
-                        @apply text-3xl font-bold mb-4 text-gray-900 border-b border-gray-200 pb-2;
-                    }
-                    .markdown-content h2 {
-                        @apply text-2xl font-semibold mb-3 text-gray-800 mt-6;
-                    }
-                    .markdown-content h3 {
-                        @apply text-xl font-semibold mb-2 text-gray-700 mt-4;
-                    }
-                    .markdown-content p {
-                        @apply mb-4 text-gray-600;
-                    }
-                    .markdown-content ul, .markdown-content ol {
-                        @apply mb-4 pl-6;
-                    }
-                    .markdown-content li {
-                        @apply mb-1 text-gray-600;
-                    }
-                    .markdown-content code {
-                        @apply bg-gray-100 px-1 py-0.5 rounded text-sm font-mono text-red-600;
-                    }
-                    .markdown-content pre {
-                        @apply bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4;
-                    }
-                    .markdown-content pre code {
-                        @apply bg-transparent px-0 py-0 text-gray-800;
-                    }
-                    .markdown-content blockquote {
-                        @apply border-l-4 border-blue-500 pl-4 py-2 mb-4 bg-blue-50 text-gray-700;
-                    }
-                    .markdown-content table {
-                        @apply w-full border-collapse border border-gray-300 mb-4;
-                    }
-                    .markdown-content th, .markdown-content td {
-                        @apply border border-gray-300 px-4 py-2 text-left;
-                    }
-                    .markdown-content th {
-                        @apply bg-gray-100 font-semibold;
-                    }
-                </style>
-            </head>
-            <body class="bg-gray-50 min-h-screen">
-                <div class="container mx-auto px-6 py-8 max-w-4xl">
-                    <div class="bg-white rounded-lg shadow-lg p-8">
-                        <div class="flex items-center justify-between mb-6 border-b border-gray-200 pb-4">
-                            <div class="flex items-center gap-3">
-                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 ${categoryInfo.color}">
-                                    ${categoryInfo.displayName}
-                                </span>
-                                <h1 class="text-2xl font-bold text-gray-900">${displayName}</h1>
-                            </div>
-                            <button onclick="window.close()" 
-                                    class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
-                                Close
-                            </button>
-                        </div>
-                        <div class="markdown-content">
-                            ${htmlContent}
-                        </div>
-                    </div>
-                </div>
-            </body>
-            </html>
-        `);
-        
-        newWindow.document.close();
-        newWindow.focus();
-    }
+        await enhanceMarkdownDom(body, {
+            resolveFromHref,
+            linkPopover,
+            onInternalLinkClick: (anchor) => {
+                const cat = anchor.getAttribute('data-md-category');
+                const file = anchor.getAttribute('data-md-filename');
+                if (cat && file) {
+                    openMarkdownDocument(cat, file);
+                }
+            }
+        });
 
-})(); 
+        if (options.hash) {
+            const target = body.querySelector(`#${CSS.escape(options.hash)}`);
+            if (target) target.scrollIntoView({ block: 'start' });
+        }
+    } catch (error) {
+        console.error('Error loading markdown file:', error);
+        alert(`Error loading ${filename}. Please check if the file exists in the ${categoryKey} folder.`);
+    }
+}
+
+function getCategoryIcon(iconType) {
+    const icons = {
+        code: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lucide text-purple-500"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
+        users: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lucide text-green-500"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
+        book: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lucide text-amber-500"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`
+    };
+    return icons[iconType] || icons.code;
+}
+
+function getFileIcon(filename) {
+    if (filename.toLowerCase().includes('about')) {
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lucide text-blue-500"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>`;
+    }
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lucide text-gray-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`;
+}
+
+function getChevronPath(iconType) {
+    return iconType === 'chevron-down'
+        ? '<polyline points="6 9 12 15 18 9"></polyline>'
+        : '<polyline points="9 18 15 12 9 6"></polyline>';
+}
+
+function createCategoryItem(categoryKey, category, isExpanded) {
+    const expandIcon = isExpanded ? 'chevron-down' : 'chevron-right';
+    return $(`
+        <div class="category-item px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 cursor-pointer flex items-center gap-3 border-b border-gray-100"
+             data-category="${categoryKey}">
+            <div class="flex items-center gap-2 flex-1">
+                ${getCategoryIcon(category.icon)}
+                <span class="${category.color}">${category.displayName}</span>
+                <span class="text-xs text-gray-400">(${category.files.length})</span>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" class="lucide text-gray-400">
+                ${getChevronPath(expandIcon)}
+            </svg>
+        </div>
+    `);
+}
+
+function createFileItem(filename, categoryKey) {
+    return $(`
+        <div class="file-item pl-8 pr-4 py-2 text-sm text-gray-600 hover:bg-blue-50 cursor-pointer flex text-left gap-2 border-l-2 border-transparent hover:border-blue-300"
+             data-filename="${filename}" data-category="${categoryKey}">
+            ${getFileIcon(filename)}
+            <span>${formatDisplayName(filename)}</span>
+        </div>
+    `);
+}
+
+function loadNestedDocsList() {
+    const docsList = $('#docs-list');
+    docsList.empty();
+    Object.keys(docsStructure).forEach((categoryKey) => {
+        const category = docsStructure[categoryKey];
+        const isExpanded = expandedCategories.has(categoryKey);
+        docsList.append(createCategoryItem(categoryKey, category, isExpanded));
+        if (isExpanded) {
+            category.files.forEach((filename) => {
+                docsList.append(createFileItem(filename, categoryKey));
+            });
+        }
+    });
+}
+
+function toggleCategory(categoryKey) {
+    if (expandedCategories.has(categoryKey)) {
+        expandedCategories.delete(categoryKey);
+    } else {
+        expandedCategories.add(categoryKey);
+    }
+    loadNestedDocsList();
+}
+
+function initializeDocsDropdown() {
+    const docsButton = $('#docs-button');
+    const docsDropdown = $('#docs-dropdown');
+
+    docsButton.on('click', function (e) {
+        e.stopPropagation();
+        docsDropdown.toggleClass('hidden');
+    });
+
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('#docs-button, #docs-dropdown').length) {
+            docsDropdown.addClass('hidden');
+        }
+    });
+}
+
+function setupEventListeners() {
+    $(document).on('click', '.category-item', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleCategory($(this).data('category'));
+    });
+
+    $(document).on('click', '.file-item', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const filename = $(this).data('filename');
+        const categoryKey = $(this).data('category');
+        openMarkdownDocument(categoryKey, filename);
+        $('#docs-dropdown').addClass('hidden');
+    });
+}
+
+$(document).ready(function () {
+    initializeDocsDropdown();
+    loadNestedDocsList();
+    setupEventListeners();
+    ensureViewer();
+});

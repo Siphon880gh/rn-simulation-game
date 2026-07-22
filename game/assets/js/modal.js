@@ -48,7 +48,7 @@ const ModalModule = (() => {
             
             // Add overlay effects if configured
             if (config.overlay) {
-                document.querySelector(".container")?.classList.add("opacity-40");
+                document.querySelector(GameConfig.selectors.shell)?.classList.add("opacity-40");
             }
             
             return true;
@@ -61,7 +61,7 @@ const ModalModule = (() => {
             modal.classList.add('hidden');
             
             // Remove overlay effects
-            document.querySelector(".container")?.classList.remove("opacity-40");
+            document.querySelector(GameConfig.selectors.shell)?.classList.remove("opacity-40");
             currentModal = null;
             
             return true;
@@ -186,12 +186,7 @@ const ModalModule = (() => {
         closeModal();
     };
 
-    // Subscribe to game state changes
-    gameState.subscribe('gameStatus', (status) => {
-        if (status === GameConfig.gameStates.GAME_OVER) {
-            showGameOver();
-        }
-    });
+    // GAME_OVER UI is owned by app + debrief (E6.M0); do not auto-open bare gameOver here.
 
     // Public API
     return {

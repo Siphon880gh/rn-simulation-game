@@ -1,0 +1,48 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Maria Santos</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Room 204-B</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 54</p>
+        <p class="text-sm text-gray-600">Sex: Female</p>
+        <p class="text-sm text-gray-600">Diagnosis: Community-acquired pneumonia</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 94</div>
+        <div>BP: 118/72</div>
+        <div>Temp: 100.8°F</div>
+        <div>O<sub>2</sub>: 93% on 2L NC</div>
+        <div>Pain: 0/10</div>
+        <div>RR: 22</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-pills text-xl mr-1"></i>
+            Medications
+        </h4>
+        <ul class="meds-list space-y-3 hidden">
+            <li data-task-type="med" data-status="not-yet" data-scheduled="2000" data-expire="2130" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-pills text-blue-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Ceftriaxone</span>
+                <span class="ml-auto text-sm text-gray-500">2000</span>
+            </li>
+            <li data-task-type="med" data-status="not-yet" data-scheduled="2100" data-expire="2230" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-pills text-blue-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Acetaminophen</span>
+                <span class="ml-auto text-sm text-gray-500">2100</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-maria" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

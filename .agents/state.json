@@ -1,8 +1,8 @@
 {
-  "current_epic_id": "E0",
-  "current_milestone_id": "E0.M3",
-  "status": "ready_to_implement",
-  "last_updated_iso": "2026-07-21T12:15:00Z",
+  "current_epic_id": "E8",
+  "current_milestone_id": "E8.M1",
+  "status": "backlog_complete",
+  "last_updated_iso": "2026-07-22T03:41:55Z",
   "decisions": {
     "platform": "web",
     "app_name": "RN Simulation Game",
@@ -18,8 +18,8 @@
       "game/assets/css/declarative-tasks.css"
     ],
     "implementation_order": "E0.M3 \u2192 E0.M4 \u2192 E0.M5 \u2192 E1 \u2192 E2 \u2192 E3.M1\u2013M2 \u2192 E3.M6 \u2192 E6.M0 \u2192 E4.M1 \u2192 (E4.M2 \u2225 E5.M1) \u2192 E5.M2 \u2192 E3.M3 \u2192 E4.M3 \u2192 E3.M5 \u2192 E6.M1\u2013M2 \u2192 Later: E3.M4, E5.M3, E5.M4, E7, E8",
-    "game_runtime": "pending_E0.M3",
-    "game_runtime_intent": "keep_modular_app",
+    "game_runtime": "keep_modular_app",
+    "game_runtime_rationale": "Core loop is concurrent clock + clinical panels + slots; custom vanilla ES6 shell already matches locked constraints. Decision doc default (Most likely). Thin in-house layer only if later pain after slots; no Phaser/Pixi/Godot/React shell without explicit approval.",
     "game_runtime_options": [
       "keep_modular_app",
       "thin_in_house_engine_layer",
@@ -27,8 +27,7 @@
     ],
     "context_menu_library": "jquery-contextmenu",
     "timeline_library": "timelinejs",
-    "markdown_renderer": "pending_E0.M5",
-    "markdown_renderer_intent": "markdown-it",
+    "markdown_renderer": "markdown-it",
     "markdown_renderer_options": [
       "markdown-it",
       "marked"
@@ -50,7 +49,11 @@
       "E8.M2"
     ],
     "product_focus": "Clinical Training",
-    "product_focus_text": "This RN simulator drops players into a compressed 12-hour nursing shift filled with real-world events, diverse patients, and escalating case studies. Success means triaging tasks, acing clinical mini-games, and staying on schedule; failure means clocking overtime\u2014or worse, missing the critical moment that leads to patient injury."
+    "product_focus_text": "This RN simulator drops players into a compressed 12-hour nursing shift filled with real-world events, diverse patients, and escalating case studies. Success means triaging tasks, acing clinical mini-games, and staying on schedule; failure means clocking overtime\u2014or worse, missing the critical moment that leads to patient injury.",
+    "markdown_renderer_rationale": "Default for Help/learning MD: plugin surface for wiki links, Mermaid fences, and KaTeX math; matches locked vanilla CDN shell. marked kept only as rejected thin fallback.",
+    "ui_motion": "css_first",
+    "ui_motion_rationale": "E7.M1: CSS panel-swap + status pulse; no GSAP until CSS ceiling proven.",
+    "skipped_doc": "SKIPPED_MILESTONES.md"
   },
   "identified_epics": [
     {
@@ -116,169 +119,219 @@
       "id": "E0.M3",
       "epic": "E0",
       "name": "Game engine / runtime decision (stamp keep_modular)",
-      "status": "next"
+      "status": "done"
     },
     {
       "id": "E0.M4",
       "epic": "E0",
       "name": "Disclaimer + learning objectives",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E0.M5",
       "epic": "E0",
       "name": "Markdown renderer (markdown-it + Mermaid + LaTeX; Help/learning MD; hover preview)",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E1.M1",
       "epic": "E1",
       "name": "Audit/lock clock, speed, pause contracts",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E1.M2",
       "epic": "E1",
       "name": "Lock panel chrome regions",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E2.M1",
       "epic": "E2",
       "name": "Stabilize single-patient panels",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E2.M2",
       "epic": "E2",
       "name": "Patient + global tabs",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E2.M3",
       "epic": "E2",
       "name": "4\u20136 patient census layout",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E3.M1",
       "epic": "E3",
       "name": "Task schema",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E3.M2",
       "epic": "E3",
       "name": "Slot execution",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E3.M6",
       "epic": "E3",
       "name": "Slot waiting queue (auto-assign)",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E6.M0",
       "epic": "E6",
       "name": "Thin prioritization debrief",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E4.M1",
       "epic": "E4",
       "name": "Scenario pack loader (thin)",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E4.M2",
       "epic": "E4",
       "name": "Timed event drip (light)",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E5.M1",
       "epic": "E5",
       "name": "Challenge gate + timer pause",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E5.M2",
       "epic": "E5",
       "name": "Med identity quiz slice",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E3.M3",
       "epic": "E3",
       "name": "Availability windows",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E3.M5",
       "epic": "E3",
       "name": "Random/urgent tasks (thin)",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E6.M1",
       "epic": "E6",
       "name": "Scoring hooks",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E6.M2",
       "epic": "E6",
       "name": "Live feedback + teaching debrief",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E3.M4",
       "epic": "E3",
       "name": "Task class interactions",
-      "status": "later"
+      "status": "done"
     },
     {
       "id": "E4.M3",
       "epic": "E4",
       "name": "Hourly check-doctor-orders (expire end of hour)",
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "E5.M3",
       "epic": "E5",
       "name": "Bed-prep admission mini-game (win to complete; see AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md)",
-      "status": "later"
+      "status": "done"
     },
     {
       "id": "E5.M4",
       "epic": "E5",
       "name": "Code Blue mini-game (random deteriorating patient; E4 escalate \u2192 E5 challenge)",
-      "status": "later"
+      "status": "done"
     },
     {
       "id": "E7.M1",
       "epic": "E7",
       "name": "Scene art: static floors + optional situation stills/motion",
-      "status": "later"
+      "status": "done"
     },
     {
       "id": "E7.M2",
       "epic": "E7",
       "name": "Chaos / incident content packs",
-      "status": "later"
+      "status": "done"
     },
     {
       "id": "E7.M3",
       "epic": "E7",
       "name": "More shifts + complications",
-      "status": "later"
+      "status": "done"
+    },
+    {
+      "id": "E8.M1",
+      "epic": "E8",
+      "name": "Demo/portfolio packaging polish",
+      "status": "done"
+    },
+    {
+      "id": "E8.M2",
+      "epic": "E8",
+      "name": "Optional auth/friends",
+      "status": "skipped"
     }
   ],
   "completed": [
     "E0.discovery",
     "E0.M1",
-    "E0.M2"
+    "E0.M2",
+    "E0.M3",
+    "E0.M4",
+    "E0.M5",
+    "E1.M1",
+    "E1.M2",
+    "E2.M1",
+    "E2.M2",
+    "E2.M3",
+    "E3.M1",
+    "E3.M2",
+    "E3.M6",
+    "E6.M0",
+    "E4.M1",
+    "E4.M2",
+    "E5.M1",
+    "E5.M2",
+    "E3.M3",
+    "E4.M3",
+    "E3.M5",
+    "E6.M1",
+    "E6.M2",
+    "E3.M4",
+    "E5.M3",
+    "E5.M4",
+    "E7.M1",
+    "E7.M2",
+    "E7.M3",
+    "E8.M1"
   ],
-  "notes": "User confirmed Option A. Added E3.M6 waiting queue after E3.M2. E4.M3 pulled into MVP as hourly check-doctor-orders (expire end of hour); E2.M1 includes patient chart history (past hx). Architecture bar locked: decisions.architecture_style=declarative_modular (see IMPLEMENTATION_STORIES.md). E0.M5 added: markdown-it + Mermaid Help/learning MD authoring + internal-link hover preview (decision docs AGENTS_POSSIBLE_DECISIONS__MARKDOWN*.md; port from context-devbrain/). Framework expansion folded into milestones (text/web GUI RN sim): E2.M2 panel swap + dynamic content + CSS transitions; E3.M5 dynamic template spawn; E4.M2 game-time emergency drip + thin deterioration; E6.M1\u2013M2 satisfaction/status score + final outcome; CSS motion in E3.M2/E2.M2, optional GSAP in E7.M1. Later backlog: E5.M3 bed-prep; E7 richer acuity/art. Next: E0.M3 stamp keep_modular_app (+ confirm architecture_style), then E0.M4 disclaimer, then E0.M5 markdown renderer. Product focus locked: Clinical Training (EPIC_MAP + IMPLEMENTATION_STORIES)."
+  "notes": "User confirmed Option A. Added E3.M6 waiting queue after E3.M2. E4.M3 pulled into MVP as hourly check-doctor-orders (expire end of hour); E2.M1 includes patient chart history (past hx). Architecture bar locked: decisions.architecture_style=declarative_modular (see IMPLEMENTATION_STORIES.md). E0.M3 stamped decisions.game_runtime=keep_modular_app (custom vanilla shell; no third-party engine). E0.M5 added: markdown-it + Mermaid Help/learning MD authoring + internal-link hover preview (decision docs AGENTS_POSSIBLE_DECISIONS__MARKDOWN*.md; port from context-devbrain/). Framework expansion folded into milestones (text/web GUI RN sim): E2.M2 panel swap + dynamic content + CSS transitions; E3.M5 dynamic template spawn; E4.M2 game-time emergency drip + thin deterioration; E6.M1\u2013M2 satisfaction/status score + final outcome; CSS motion in E3.M2/E2.M2, optional GSAP in E7.M1. Later backlog: E5.M3 bed-prep; E7 richer acuity/art. E0.M4 done (shell #fiction-disclaimer + ABOUT.md learning objectives). E0.M5 done (markdown-it + Mermaid + KaTeX + hover preview). E1.M1 done (SET_PAUSE ownership + GameConfig.timer defaults). E1.M2 done (shell chrome regions + hour tabs + shift log). Next: E2.M1 single-patient panels + past hx. Product focus locked: Clinical Training (EPIC_MAP + IMPLEMENTATION_STORIES). E2.M1 done (TimelineJS past hx). Next: E2.M2 panel swap. E2.M2 done (patient/global tabs + CSS panel swap + maria pack). Next: E2.M3 4-6 census. E2.M3 done (6-patient census). Next: E3.M1 task schema. E3.M1 done (task schema + MARK_OVERDUE lifecycle). Next: E3.M2 slot execution. E3.M2 done (3-slot execution + progress timemark). Next: E3.M6 waiting queue. E3.M6 done (FIFO waiting queue + auto-assign). E6.M0 done (thin prioritization debrief + shift log). Next: E4.M1 scenario pack loader. E4.M1 done (JSON scenario pack + loader; shell disclaimer kept). Next: E4.M2 timed event drip (\u2225 E5.M1). E4.M2 done (game-time event drip + thin deterioration + Code Blue hook log). Next: E5.M1 challenge gate. E5.M1 done (challenge modal + challenge pause source; pass\u2192slot / fail\u2192no slot). Next: E5.M2 med identity quiz. E5.M2 done (med brand\u2194generic typed quiz on Perform). Next: E3.M3 availability windows. E3.M3 done (availability windows gate Perform; early/late/end phases; style reveal with expire). Next: E4.M3 hourly check-doctor-orders. E4.M3 done (hourly check doctor orders + pack injections). Next: E3.M5 dynamic/urgent spawn. E3.M5 done (dynamic/urgent spawn + incident tabs without clock time). Next: E6.M1 scoring hooks. E6.M1 done (score state + challenge dock/cite + satisfaction). Next: E6.M2 final outcome debrief. E6.M2 done (practice outcome bands + live score cues + teaching debrief). MVP implementation_order complete; Later: E3.M4, E5.M3, E5.M4, E7, E8. E3.M4 done (batch/context-switch duration). Next: E5.M3 bed-prep admission mini-game. E5.M3 done (bed-prep CSBBBCL win-to-complete). E5.M4 done (Code Blue BLS order from E4 escalate). Next: E7.M1 scene art. E7.M1 done (CSS unit themes + situation still hooks; no GSAP). Next: E7.M2 chaos/incident packs. E7.M2 done (chaos incident pack merge). Next: E7.M3 richer acuity/complications. E7.M3 done (critical acuity + day shift pack). Next: E8.M1 portfolio packaging. E8.M1 done (README demo presets + shell links). Later order complete except E8.M2 auth/friends \u2014 STOP pending explicit re-approve. E8.M2 skipped by user (2026-07-22); see SKIPPED_MILESTONES.md. Backlog complete.",
+  "skipped": [
+    {
+      "id": "E8.M2",
+      "epic": "E8",
+      "name": "Optional auth/friends",
+      "skipped_iso": "2026-07-22T03:41:55Z",
+      "reason": "User skip after Later backlog; auth/friends out of clinical loop until explicit reopen",
+      "doc": "SKIPPED_MILESTONES.md"
+    }
+  ]
 }

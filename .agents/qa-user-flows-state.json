@@ -1,0 +1,22 @@
+{
+  "suite": "QA_User_Flows",
+  "seed_default": "http://localhost:8765/game/index.html?speed-factor=48",
+  "current_flow_id": "UF-01",
+  "status": "ready",
+  "last_updated_iso": "2026-07-22T05:10:00Z",
+  "results": {
+    "UF-01": { "status": "pending", "notes": "" },
+    "UF-02": { "status": "pending", "notes": "" },
+    "UF-03": { "status": "pending", "notes": "" },
+    "UF-04": { "status": "pending", "notes": "" },
+    "UF-05": { "status": "pending", "notes": "" },
+    "UF-06": { "status": "pending", "notes": "" },
+    "UF-07": { "status": "pending", "notes": "" },
+    "UF-08": { "status": "pending", "notes": "" },
+    "UF-09": { "status": "pending", "notes": "" },
+    "UF-10": { "status": "pending", "notes": "" },
+    "UF-11": { "status": "pending", "notes": "" }
+  },
+  "error_fix_round": 0,
+  "notes": "Suite authored; not yet executed by QA loop."
+}

@@ -40,6 +40,24 @@
     animation: pulse-danger 2s infinite;
 }
 
+/* E3.M3 — availability window phase cues (within active window) */
+[data-window-phase="early"].task-status-active {
+    border-left-color: #10b981;
+}
+
+[data-window-phase="late"].task-status-active {
+    border-left-color: #f59e0b;
+}
+
+[data-window-phase="end"].task-status-active {
+    border-left-color: #ef4444;
+}
+
+[data-window-phase="before"],
+[data-window-phase="after"] {
+    cursor: not-allowed;
+}
+
 @keyframes pulse-danger {
     0%, 100% {
         border-left-color: #dc2626;
@@ -78,26 +96,33 @@ li[data-status="active"] {
     }
 }
 
-/* Context menu enhancements */
+/* Context menu affordance — left-click opens Perform / Details */
 [data-task-type].task-status-active {
     position: relative;
+    padding-right: 5.5rem;
 }
 
-[data-task-type].task-status-active::after {
-    content: '⋮';
+[data-task-type="med"].task-status-active::after,
+[data-task-type="orders"].task-status-active::after,
+[data-task-type="assessment"].task-status-active::after,
+[data-task-type="bedprep"].task-status-active::after {
+    content: "Click · Perform";
     position: absolute;
-    right: 10px;
+    right: 0.5rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
-    font-weight: bold;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    pointer-events: none;
-}
-
-[data-task-type].task-status-active:hover::after {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #1d4ed8;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 0.25rem;
+    padding: 0.15rem 0.4rem;
     opacity: 1;
+    pointer-events: none;
+    white-space: nowrap;
 }
 
 /* Patient section styling */
@@ -148,4 +173,139 @@ li[data-status="active"] {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-2px); }
     75% { transform: translateX(2px); }
-} 
+}
+
+/* E3.M2 — concurrent slots */
+.task-queue-bar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+    background: #fff;
+    padding: 0.45rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.task-slot {
+    width: 5.5rem;
+    min-height: 4.25rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.4rem;
+    background: #f9fafb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.35rem 0.3rem 0.25rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.task-slot--empty .task-slot-label {
+    margin: auto;
+    font-size: 0.7rem;
+    color: #9ca3af;
+    font-weight: 600;
+}
+
+.task-slot--busy {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+
+.task-slot-name {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #1e3a8a;
+    text-align: center;
+    line-height: 1.15;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.task-slot-progress {
+    width: 100%;
+    height: 0.35rem;
+    background: #dbeafe;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 0.25rem 0;
+}
+
+.task-slot-progress-fill {
+    height: 100%;
+    background: #2563eb;
+    transition: width 200ms ease;
+}
+
+.task-slot-timemark {
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #1d4ed8;
+    text-align: center;
+}
+
+/* E3.M6 — waiting queue */
+.slot-cluster {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+}
+
+.slot-waiting-queue {
+    min-width: 11rem;
+    max-width: 14rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.45rem;
+    padding: 0.35rem 0.45rem;
+    font-size: 0.72rem;
+    text-align: left;
+}
+
+.slot-queue-empty {
+    margin: 0;
+    color: #9ca3af;
+}
+
+.slot-queue-heading {
+    margin: 0 0 0.25rem;
+    font-weight: 700;
+    color: #4b5563;
+}
+
+.slot-queue-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.slot-queue-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.15rem 0.2rem;
+    border-radius: 0.25rem;
+    background: #f3f4f6;
+}
+
+.slot-queue-pos {
+    font-weight: 700;
+    color: #6b7280;
+    min-width: 1rem;
+}
+
+.slot-queue-name {
+    color: #1f2937;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

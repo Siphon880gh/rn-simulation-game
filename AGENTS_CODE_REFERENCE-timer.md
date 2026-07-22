@@ -10,25 +10,52 @@ Parent: [`AGENTS_CODE_REFERENCE.md`](AGENTS_CODE_REFERENCE.md)
 
 ## Role
 
-Accelerated military clock for one shift: tick display, pause/resume, scheduled 15-minute poll marks that reveal tasks, and game-over when real-time shift budget runs out.
+Accelerated military clock for one shift: tick display, pause/resume with **owned pause sources**, scheduled 15-minute poll marks that reveal tasks, and game-over when real-time shift budget runs out.
 
 | File | ~Lines | Role |
 |------|--------|------|
-| `game/assets/js/timer_ingame.js` | ~276 | IIFE module: start/pause/resume/stop, tick, reveal |
+| `game/assets/js/timer_ingame.js` | ~280 | IIFE module: start/pause/resume/stop, tick, reveal |
 | `game/assets/js/timer_utils.js` | ~69 | HHMM math: round to 15, add minutes, list poll marks |
-| `game/assets/js/game-config.js` | ~69 | `timer.*` defaults, `#clock` / `#pause` selectors |
+| `game/assets/js/game-config.js` | ~90 | `timer.*` defaults, pause source ids, `#clock` / `#pause` selectors |
+| `game/assets/js/game-state.js` | ~200 | `SET_PAUSE` / `UPDATE_TIME` / `INITIALIZE_GAME` / `GAME_OVER` |
+| `game/assets/js/event-drip.js` | ~220 | E4.M2: pack events on `currentTime` (pause-safe); thin deterioration |
 | `game/assets/js/events.js` | ~23 | Legacy `signals.Signal` reveal (largely superseded) |
-| `game/app.config.js` | ~53 | Presets / `CALCULATED_SPEED_FACTOR` — **not imported by app.js** |
+| `game/app.config.js` | ~53 | Presets / `CALCULATED_SPEED_FACTOR` — **not imported by app.js** (legacy) |
+
+---
+
+## Contracts (E1.M1 locked)
+
+### Speed / shift bounds
+
+- **Canonical defaults:** `GameConfig.timer` (`defaultSpeedFactor`, `defaultShiftStart`, `defaultShiftDuration`).
+- **URL overrides** (`GameConfig.urlParams`): `speed-factor`, `shift-starts`, `shift-duration` — parsed in `app.js` `parseURLParameters()`.
+- **Display / schedule keys:** military HHMM integer (`1900` = 19:00).
+- **Speed:** interval = `1000 / speedFactor` ms; larger factor → shorter real session.
+- Do **not** reintroduce parallel defaults in `AppConfig` — they read from `GameConfig.timer`.
+
+### Pause ownership matrix
+
+| Source id | Who | Behavior |
+|-----------|-----|----------|
+| `user` | `#pause` button | Toggle adds/removes only this source |
+| `modal` | Blocking modals (opt-in) | Hold while modal should freeze the shift |
+| `challenge` | Perform mini-games (E5) | Hold while `challenge-gate` modal is open; cleared on pass/fail/cancel |
+| `system` | Bootstrap / teardown | Reserved |
+
+- State: `pauseSources: string[]`, `isPaused = pauseSources.length > 0`.
+- Action: `gameState.dispatch('SET_PAUSE', { paused: boolean, source })`.
+- `TOGGLE_PAUSE` only flips the `user` source (convenience).
+- Timer interval skips ticks when `isPaused`; button label syncs via `subscribe('isPaused')`.
+- `GAME_OVER` status is not overwritten by later `SET_PAUSE`.
 
 ---
 
 ## Public API (`timer_ingame.js`)
 
-Exported default object near end of file:
-
 - `start(clockSelector, pauseSelector, speedFactor, gameMinutesPerShift, shiftStart, gameOverCallback)`
 - `pollTime()` → `{ currentTime, secondsLeft, isPaused, progress }`
-- `pause` / `resume` / `stop` / `getState`
+- `pause(source?)` / `resume(source?)` / `stop` / `getState` — pause/resume dispatch `SET_PAUSE`
 
 Called from `app.js` `startGame()` with `GameConfig.selectors` and URL-parsed config.
 
@@ -36,36 +63,16 @@ Called from `app.js` `startGame()` with `GameConfig.selectors` and URL-parsed co
 
 ## Flow
 
-1. **`initialize` (inside module)** — stores shift start, `secondsLeft = gameMinutesPerShift * 60`, `timePerDay = gameMinutesPerShift * 60`, builds `pollTaskTimes` via `list15MinTimemarksFromHHMM`.
+1. **`initialize`** — shift start, `secondsLeft = gameMinutesPerShift * 60`, poll marks via `list15MinTimemarksFromHHMM`.
 2. **`start`** — `setInterval` every `1000 / speedFactor` ms; skips tick when paused.
-3. **`tickTimer`** — decrement `secondsLeft`; `calculateCurrentTime()` → HHMM + seconds; update `#clock`; `gameState.dispatch('UPDATE_TIME', { time: hours })`; `checkScheduledEvents`.
-4. **Poll hit** — when elapsed HHMM reaches next poll mark, `dispatchScheduledTaskEvent`: append CSS rule into `#reveal-scheduled-tasks`, set matching `li[data-scheduled]` to `active`, dispatch `ACTIVATE_SCHEDULED_TASKS`.
-5. **Exhaustion** — stop interval, `GAME_OVER`, invoke callback (app opens game-over modal).
-
-Pause button: near middle of file (`setupPauseButton`) — clones node to clear listeners; toggles label Pause/Resume; dispatches `TOGGLE_PAUSE`.
-
----
-
-## Time model
-
-- **Display / schedule keys:** military HHMM integer (`1900` = 19:00).
-- **Speed:** larger `speed-factor` → shorter real session (interval fires faster). App defaults currently use a large factor (e.g. 1440) unless URL overrides.
-- **URL params** (parsed in `app.js`): `speed-factor`, `shift-starts`, `shift-duration`.
-- **Utils** (`timer_utils.js`): `roundDownTo15`, `timemarkPlusMinutes`, `divideBy15Mins`, `list15MinTimemarksFromHHMM` — all HHMM-oriented; midnight wrap handled in add/list helpers.
-
-### Snippet — poll reveal (around middle of `timer_ingame.js`)
-
-```js
-// On poll hit: inject CSS li[data-scheduled="${hhmm}"] { opacity: 1 !important; }
-// Set DOM data-status to GameConfig.tasks.statuses.ACTIVE
-// gameState.dispatch('ACTIVATE_SCHEDULED_TASKS', { time: hhmm })
-```
+3. **`tickTimer`** — decrement `secondsLeft`; HHMM display; `UPDATE_TIME`; poll reveal.
+4. **Exhaustion** — stop interval, `GAME_OVER`, callback (app opens game-over modal; avoids double-dispatch if already over).
 
 ---
 
 ## Safe-edit notes
 
-- Keep HHMM integer math consistent with `task-system` comparisons (`currentTime >= task.scheduled`).
-- `#reveal-scheduled-tasks` is an empty `<style>` in `game/index.html` — required for CSS reveal path.
-- Prefer fixing/extending `timer_ingame.js` over reactivating `events.js` unless syncing both on purpose.
-- Product next step (E1.M1): audit/lock clock & speed contracts — `app.config.js` vs `GameConfig` vs URL defaults may need consolidation.
+- Keep HHMM integer math consistent with `task-system` comparisons.
+- `#reveal-scheduled-tasks` empty `<style>` in `game/index.html` is required for CSS reveal.
+- Prefer `SET_PAUSE` with an explicit source over mutating `timerState.isPaused` directly.
+- Leave `game/app.config.js` unwired unless a milestone deliberately migrates presets.

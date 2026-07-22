@@ -1,0 +1,78 @@
+{
+  "id": "day-shift-medsurg",
+  "title": "Day Shift — Medical-Surgical Floor",
+  "version": 1,
+  "shiftStart": 700,
+  "shiftDurationHours": 12,
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Sequence morning meds and assessments under slot pressure",
+    "Respond to mid-shift complications without losing the census thread",
+    "Close the shift with fewer open overdue tasks"
+  ],
+  "patients": ["joe", "maria", "derek", "aisha", "robert", "lin"],
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/chaos-night-medsurg.json",
+  "orderInjections": {
+    "0700": [],
+    "0800": [
+      {
+        "id": "order-day-aisha-abx",
+        "type": "med",
+        "name": "Antibiotics (new day order)",
+        "patientId": "aisha",
+        "scheduled": 800,
+        "expire": "+60",
+        "durationMins": 10,
+        "taskClass": "routine"
+      }
+    ],
+    "default": []
+  },
+  "events": [
+    {
+      "id": "day-transport-0900",
+      "at": 900,
+      "type": "unlock",
+      "message": "Transport delayed — bedside hold for imaging",
+      "injectTasks": [
+        {
+          "id": "evt-day-transport-hold",
+          "type": "assessment",
+          "name": "Transport hold / reassess readiness",
+          "patientId": "derek",
+          "scheduled": 900,
+          "expire": "+45",
+          "durationMins": 10,
+          "taskClass": "routine"
+        }
+      ]
+    },
+    {
+      "id": "day-glucose-1030",
+      "at": 1030,
+      "type": "emergency",
+      "message": "Low glucose alert — treat and recheck",
+      "injectTasks": [
+        {
+          "id": "evt-day-glucose",
+          "type": "assessment",
+          "name": "Hypoglycemia treatment / recheck",
+          "patientId": "robert",
+          "scheduled": 1030,
+          "expire": "+30",
+          "durationMins": 15,
+          "taskClass": "stat"
+        }
+      ]
+    }
+  ]
+}

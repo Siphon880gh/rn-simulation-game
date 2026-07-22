@@ -1,0 +1,120 @@
+/* Help / learning markdown host + prose */
+
+#docs-viewer {
+    position: fixed;
+    inset: 1.5rem;
+    z-index: 60;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    pointer-events: none;
+}
+
+#docs-viewer.hidden {
+    display: none;
+}
+
+#docs-viewer .docs-viewer__panel {
+    pointer-events: auto;
+    width: min(56rem, 100%);
+    max-height: calc(100vh - 3rem);
+    overflow: auto;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
+    text-align: left;
+}
+
+#docs-viewer .docs-viewer__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 1;
+}
+
+#docs-viewer .docs-viewer__body {
+    padding: 1.25rem 1.5rem 2rem;
+}
+
+.markdown-content {
+    line-height: 1.65;
+    color: #374151;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+    color: #111827;
+    font-weight: 700;
+    margin: 1.25rem 0 0.6rem;
+}
+
+.markdown-content h1 { font-size: 1.75rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.35rem; }
+.markdown-content h2 { font-size: 1.35rem; }
+.markdown-content h3 { font-size: 1.15rem; }
+
+.markdown-content p { margin: 0 0 0.9rem; }
+.markdown-content ul,
+.markdown-content ol { margin: 0 0 0.9rem; padding-left: 1.4rem; }
+.markdown-content li { margin: 0.25rem 0; }
+
+.markdown-content code {
+    background: #f3f4f6;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+    color: #b91c1c;
+}
+
+.markdown-content pre {
+    background: #f3f4f6;
+    padding: 0.9rem 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 0 0 1rem;
+}
+
+.markdown-content pre code {
+    background: transparent;
+    color: #1f2937;
+    padding: 0;
+}
+
+.markdown-content .mermaid {
+    margin: 0 0 1rem;
+    text-align: center;
+    overflow-x: auto;
+}
+
+.markdown-content a.md-internal-link {
+    color: #1d4ed8;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.markdown-content a.md-missing-link {
+    color: #b45309;
+}
+
+.markdown-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 1rem;
+}
+
+.markdown-content th,
+.markdown-content td {
+    border: 1px solid #d1d5db;
+    padding: 0.45rem 0.7rem;
+    text-align: left;
+}
+
+.markdown-content th { background: #f9fafb; }

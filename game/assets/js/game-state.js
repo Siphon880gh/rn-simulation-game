@@ -7,10 +7,34 @@ class GameState {
       gameStatus: GameConfig.gameStates.INITIALIZING,
       currentTime: null,
       isPaused: false,
+      pauseSources: [],
+      activeHourIndex: 0,
+      activeHourHhmm: null,
+      shiftLog: [],
+      activePatientId: null,
       tasks: new Map(),
       patients: new Map(),
       scheduledEvents: new Map(),
-      activeTasks: new Set()
+      activeTasks: new Set(),
+      slots: Array.from({ length: GameConfig.slots.count }, (_, index) => ({
+        id: index,
+        taskId: null,
+        taskName: null,
+        startedAt: null,
+        endsAt: null,
+        progress: 0
+      })),
+      slotQueue: [],
+      scenarioPack: null,
+      firedEvents: [],
+      codeBlueHook: null,
+      score: {
+        total: 100,
+        taskPoints: 0,
+        challengePoints: 0,
+        satisfactionPoints: 0,
+        events: []
+      }
     };
     
     this.subscribers = new Map();
@@ -24,7 +48,28 @@ class GameState {
     this.actions.set('INITIALIZE_GAME', (payload) => ({
       ...this.state,
       gameStatus: GameConfig.gameStates.RUNNING,
-      currentTime: payload.startTime
+      currentTime: payload.startTime,
+      isPaused: false,
+      pauseSources: [],
+      activeHourIndex: 0,
+      activeHourHhmm: payload.startTime ?? null,
+      shiftLog: [],
+      slots: Array.from({ length: GameConfig.slots.count }, (_, index) => ({
+        id: index,
+        taskId: null,
+        taskName: null,
+        startedAt: null,
+        endsAt: null,
+        progress: 0
+      })),
+      slotQueue: [],
+      score: {
+        total: Number(GameConfig.scoring?.startingTotal) || 100,
+        taskPoints: 0,
+        challengePoints: 0,
+        satisfactionPoints: 0,
+        events: []
+      }
     }));
 
     this.actions.set('UPDATE_TIME', (payload) => ({
@@ -32,11 +77,40 @@ class GameState {
       currentTime: payload.time
     }));
 
-    this.actions.set('TOGGLE_PAUSE', () => ({
-      ...this.state,
-      isPaused: !this.state.isPaused,
-      gameStatus: this.state.isPaused ? GameConfig.gameStates.RUNNING : GameConfig.gameStates.PAUSED
-    }));
+    // Explicit pause ownership — prefer SET_PAUSE over TOGGLE_PAUSE.
+    this.actions.set('SET_PAUSE', (payload) => {
+      const source = payload.source || GameConfig.timer.pauseSources.SYSTEM;
+      const wantPaused = !!payload.paused;
+      let sources = Array.isArray(this.state.pauseSources) ? [...this.state.pauseSources] : [];
+
+      if (wantPaused) {
+        if (!sources.includes(source)) sources.push(source);
+      } else {
+        sources = sources.filter((s) => s !== source);
+      }
+
+      const isPaused = sources.length > 0;
+      const gameStatus =
+        this.state.gameStatus === GameConfig.gameStates.GAME_OVER
+          ? GameConfig.gameStates.GAME_OVER
+          : isPaused
+            ? GameConfig.gameStates.PAUSED
+            : GameConfig.gameStates.RUNNING;
+
+      return {
+        ...this.state,
+        pauseSources: sources,
+        isPaused,
+        gameStatus
+      };
+    });
+
+    // User-button convenience: flips only the `user` pause source.
+    this.actions.set('TOGGLE_PAUSE', () => {
+      const user = GameConfig.timer.pauseSources.USER;
+      const hasUser = this.state.pauseSources.includes(user);
+      return this.actions.get('SET_PAUSE')({ paused: !hasUser, source: user });
+    });
 
     this.actions.set('ACTIVATE_TASK', (payload) => {
       const newActiveTasks = new Set(this.state.activeTasks);
@@ -76,6 +150,20 @@ class GameState {
       };
     });
 
+    this.actions.set('MARK_OVERDUE', (payload) => {
+      const newTasks = new Map(this.state.tasks);
+      if (newTasks.has(payload.taskId)) {
+        newTasks.set(payload.taskId, {
+          ...newTasks.get(payload.taskId),
+          status: GameConfig.tasks.statuses.OVERDUE
+        });
+      }
+      return {
+        ...this.state,
+        tasks: newTasks
+      };
+    });
+
     this.actions.set('REGISTER_TASK', (payload) => {
       const newTasks = new Map(this.state.tasks);
       newTasks.set(payload.task.id, payload.task);
@@ -106,6 +194,183 @@ class GameState {
       ...this.state,
       gameStatus: GameConfig.gameStates.GAME_OVER
     }));
+
+    this.actions.set('SET_ACTIVE_HOUR', (payload) => ({
+      ...this.state,
+      activeHourIndex: Number(payload.hourIndex) || 0,
+      activeHourHhmm: payload.hourHhmm ?? null
+    }));
+
+    this.actions.set('APPEND_SHIFT_LOG', (payload) => {
+      const entry = {
+        id: `log-${Date.now()}-${this.state.shiftLog.length}`,
+        message: payload.message || '',
+        timeLabel: payload.timeLabel || '—',
+        at: Date.now()
+      };
+      return {
+        ...this.state,
+        shiftLog: [...this.state.shiftLog, entry]
+      };
+    });
+
+    this.actions.set('SET_ACTIVE_PATIENT', (payload) => ({
+      ...this.state,
+      activePatientId: payload.patientId || null
+    }));
+
+    this.actions.set('SET_SCENARIO_PACK', (payload) => ({
+      ...this.state,
+      scenarioPack: payload.pack || null
+    }));
+
+    this.actions.set('UPDATE_PATIENT', (payload) => {
+      const patients = new Map(this.state.patients);
+      const existing = patients.get(payload.patientId);
+      if (!existing) return this.state;
+      patients.set(payload.patientId, { ...existing, ...(payload.patch || {}) });
+      return { ...this.state, patients };
+    });
+
+    this.actions.set('MARK_EVENT_FIRED', (payload) => ({
+      ...this.state,
+      firedEvents: [
+        ...this.state.firedEvents,
+        {
+          eventId: payload.eventId,
+          at: payload.at,
+          type: payload.type || 'unlock',
+          message: payload.message || ''
+        }
+      ]
+    }));
+
+    this.actions.set('MARK_CODE_BLUE_HOOK', (payload) => ({
+      ...this.state,
+      codeBlueHook: {
+        patientId: payload.patientId || null,
+        at: this.state.currentTime,
+        resolved: false,
+        passed: null
+      }
+    }));
+
+    this.actions.set('RESOLVE_CODE_BLUE', (payload) => {
+      const prev = this.state.codeBlueHook || {};
+      return {
+        ...this.state,
+        codeBlueHook: {
+          ...prev,
+          patientId: payload.patientId || prev.patientId || null,
+          resolved: true,
+          passed: Boolean(payload.passed),
+          at: prev.at ?? this.state.currentTime
+        }
+      };
+    });
+
+    this.actions.set('RESET_SCORE', () => ({
+      ...this.state,
+      score: {
+        total: Number(GameConfig.scoring?.startingTotal) || 100,
+        taskPoints: 0,
+        challengePoints: 0,
+        satisfactionPoints: 0,
+        events: []
+      }
+    }));
+
+    this.actions.set('ADJUST_SCORE', (payload) => {
+      const delta = Number(payload.delta) || 0;
+      const dimension = payload.dimension || 'task';
+      const prev = this.state.score || {
+        total: Number(GameConfig.scoring?.startingTotal) || 100,
+        taskPoints: 0,
+        challengePoints: 0,
+        satisfactionPoints: 0,
+        events: []
+      };
+      const next = {
+        ...prev,
+        total: prev.total + delta,
+        taskPoints: prev.taskPoints + (dimension === 'task' ? delta : 0),
+        challengePoints: prev.challengePoints + (dimension === 'challenge' ? delta : 0),
+        satisfactionPoints: prev.satisfactionPoints + (dimension === 'satisfaction' ? delta : 0),
+        events: [
+          ...prev.events,
+          {
+            delta,
+            dimension,
+            reason: payload.reason || '',
+            at: this.state.currentTime,
+            ts: Date.now()
+          }
+        ].slice(-40)
+      };
+      return { ...this.state, score: next };
+    });
+
+    this.actions.set('ASSIGN_SLOT', (payload) => {
+      const slots = this.state.slots.map((slot) => ({ ...slot }));
+      const free = slots.find((s) => !s.taskId);
+      if (!free) return this.state;
+      free.taskId = payload.taskId;
+      free.taskName = payload.taskName || null;
+      free.startedAt = payload.startedAt;
+      free.endsAt = payload.endsAt;
+      free.progress = 0;
+      return { ...this.state, slots };
+    });
+
+    this.actions.set('UPDATE_SLOT_PROGRESS', (payload) => {
+      const slots = this.state.slots.map((slot) => {
+        if (slot.id !== payload.slotId) return slot;
+        return { ...slot, progress: Math.max(0, Math.min(100, payload.progress || 0)) };
+      });
+      return { ...this.state, slots };
+    });
+
+    this.actions.set('RELEASE_SLOT', (payload) => {
+      const slots = this.state.slots.map((slot) => {
+        if (slot.id !== payload.slotId && slot.taskId !== payload.taskId) return slot;
+        return {
+          id: slot.id,
+          taskId: null,
+          taskName: null,
+          startedAt: null,
+          endsAt: null,
+          progress: 0
+        };
+      });
+      return { ...this.state, slots };
+    });
+
+    this.actions.set('ENQUEUE_SLOT_TASK', (payload) => {
+      const queue = Array.isArray(this.state.slotQueue) ? [...this.state.slotQueue] : [];
+      if (queue.some((item) => item.taskId === payload.taskId)) {
+        return this.state;
+      }
+      queue.push({
+        taskId: payload.taskId,
+        taskName: payload.taskName || null,
+        patientId: payload.patientId || null,
+        enqueuedAt: payload.enqueuedAt ?? Date.now()
+      });
+      return { ...this.state, slotQueue: queue };
+    });
+
+    this.actions.set('DEQUEUE_SLOT_TASK', (payload = {}) => {
+      const queue = Array.isArray(this.state.slotQueue) ? [...this.state.slotQueue] : [];
+      if (!queue.length) return this.state;
+      if (payload.taskId) {
+        return {
+          ...this.state,
+          slotQueue: queue.filter((item) => item.taskId !== payload.taskId)
+        };
+      }
+      queue.shift();
+      return { ...this.state, slotQueue: queue };
+    });
   }
 
   // Subscribe to state changes

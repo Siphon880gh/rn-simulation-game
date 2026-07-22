@@ -243,7 +243,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 
 1. Report: [`council-report-epics-milestones.md`](council-report-epics-milestones.md)
 2. Milestones: [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md)
-3. Resume: [`.agents/state.json`](.agents/state.json) → **E0.M3** (stamp `keep_modular_app`), then **E0.M4**, then **E0.M5** (markdown renderer)
+3. Resume: [`.agents/state.json`](.agents/state.json) → **MVP order complete**; Later: E3.M4, E5.M3, E5.M4, E7, E8
 
 **Order:** `E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E5.M4, E7, E8`
 

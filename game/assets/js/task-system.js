@@ -1,6 +1,13 @@
 // task-system.js - Declarative task management system
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
+import {
+  getWindowPhase,
+  isPerformAllowed,
+  buildRevealRule,
+  syncTaskWindowDomAttrs,
+  applyWindowPhaseClass
+} from './availability-windows.js';
 
 class TaskSystem {
   constructor() {
@@ -54,26 +61,109 @@ class TaskSystem {
 
       render: (task) => this.renderMedicationTask(task)
     });
+
+    // Hourly doctor-orders check (E4.M3) — expire at hour boundary (>=)
+    this.taskProcessors.set('orders', {
+      shouldActivate: (task, currentTime) => currentTime >= task.scheduled,
+      shouldExpire: (task, currentTime) => (
+        task.expire != null && currentTime >= task.expire
+      ),
+      getContextMenu: () => ({
+        perform: { name: 'Check orders', icon: 'add' },
+        details: { name: 'Details', icon: 'question' }
+      }),
+      render: (task) => this.renderGenericTask(task)
+    });
+
+    // Bed prep / admission (E5.M3) — completion gated by mini-game win
+    this.taskProcessors.set('bedprep', {
+      shouldActivate: (task, currentTime) => currentTime >= task.scheduled,
+      shouldExpire: (task, currentTime) => (
+        task.expire && currentTime > task.expire
+      ),
+      getContextMenu: () => ({
+        perform: { name: 'Prepare bed', icon: 'add' },
+        details: { name: 'Details', icon: 'question' }
+      }),
+      render: (task) => this.renderGenericTask(task)
+    });
+  }
+
+  /**
+   * Normalize authoring / HTML attrs into the locked task schema (E3.M1).
+   */
+  normalizeTaskData(taskData = {}) {
+    const type = String(taskData.type || 'default').toLowerCase();
+    const taskClass = String(
+      taskData.taskClass ||
+      taskData.class ||
+      GameConfig.tasks.classes.ROUTINE
+    ).toLowerCase();
+    const scheduledRaw = taskData.scheduled;
+    const scheduled = this.parseTime(scheduledRaw);
+    const expire = taskData.expire != null && taskData.expire !== ''
+      ? this.parseTime(taskData.expire, scheduledRaw ?? scheduled)
+      : null;
+    const duration = Number(taskData.durationMins ?? taskData.duration ?? 0) || 0;
+
+    return {
+      id: taskData.id || this.generateTaskId(),
+      type,
+      taskClass,
+      name: taskData.name || 'Untitled task',
+      scheduled,
+      expire,
+      duration,
+      status: taskData.status || GameConfig.tasks.statuses.NOT_YET,
+      patientId: taskData.patientId || null,
+      metadata: { ...(taskData.metadata || {}) },
+      schemaVersion: GameConfig.tasks.schemaVersion
+    };
   }
 
   // Declarative task factory
   createTask(taskData) {
-    const task = {
-      id: taskData.id || this.generateTaskId(),
-      type: taskData.type || 'default',
-      name: taskData.name,
-      scheduled: this.parseTime(taskData.scheduled),
-      expire: taskData.expire ? this.parseTime(taskData.expire, taskData.scheduled) : null,
-      duration: taskData.durationMins || 0,
-      status: GameConfig.tasks.statuses.NOT_YET,
-      patientId: taskData.patientId,
-      metadata: taskData.metadata || {}
-    };
+    const task = this.normalizeTaskData(taskData);
+    // Keep raw relative expire for CSS reveal rules that still match authored +N attrs
+    if (typeof taskData.expire === 'string' && taskData.expire.startsWith('+')) {
+      task.metadata = { ...task.metadata, expireRaw: taskData.expire };
+    }
 
     this.taskRegistry.set(task.id, task);
     gameState.dispatch('REGISTER_TASK', { task });
     
     return task;
+  }
+
+  getWindowPhase(task, currentTime) {
+    return getWindowPhase(task, currentTime);
+  }
+
+  isPerformAllowed(task, currentTime = gameState.getStateSlice('currentTime')) {
+    if (GameConfig.tasks.availability?.gatePerform === false) {
+      return task?.status === GameConfig.tasks.statuses.ACTIVE;
+    }
+    return isPerformAllowed(task, currentTime);
+  }
+
+  buildRevealRule(scheduled, expire, expireRaw) {
+    return buildRevealRule(scheduled, expire, expireRaw);
+  }
+
+  syncTaskWindowDomAttrs(element, task) {
+    syncTaskWindowDomAttrs(element, task);
+  }
+
+  /** Refresh data-window-phase on mounted task elements from game time */
+  syncWindowPhases(currentTime) {
+    const tasks = gameState.getStateSlice('tasks');
+    if (!tasks) return;
+    tasks.forEach((task) => {
+      const el = document.getElementById(task.id);
+      if (!el) return;
+      syncTaskWindowDomAttrs(el, task);
+      applyWindowPhaseClass(el, getWindowPhase(task, currentTime));
+    });
   }
 
   // Parse time declarations (handles "+120" format)
@@ -92,36 +182,33 @@ class TaskSystem {
     return parseInt(str);
   }
 
-  // Declarative task processing pipeline
+  // Declarative task processing pipeline — lifecycle only via game-state actions
   processTasks(currentTime) {
     const tasks = gameState.getStateSlice('tasks');
     const changes = [];
 
     for (const [taskId, task] of tasks) {
-      const processor = this.getTaskProcessor(task.type);
-      const currentStatus = task.status;
-      let newStatus = currentStatus;
+      if (task.status === GameConfig.tasks.statuses.COMPLETED) continue;
 
-      // Determine new status based on rules
-      if (currentStatus === GameConfig.tasks.statuses.NOT_YET) {
+      const processor = this.getTaskProcessor(task.type);
+
+      if (task.status === GameConfig.tasks.statuses.NOT_YET) {
         if (processor.shouldActivate(task, currentTime)) {
-          newStatus = GameConfig.tasks.statuses.ACTIVE;
           changes.push({ type: 'ACTIVATE_TASK', payload: { taskId } });
         }
-      } else if (currentStatus === GameConfig.tasks.statuses.ACTIVE) {
+      } else if (task.status === GameConfig.tasks.statuses.ACTIVE) {
         if (processor.shouldExpire(task, currentTime)) {
-          newStatus = GameConfig.tasks.statuses.OVERDUE;
+          changes.push({ type: 'MARK_OVERDUE', payload: { taskId } });
         }
-      }
-
-      if (newStatus !== currentStatus) {
-        task.status = newStatus;
       }
     }
 
-    // Apply changes to state
-    changes.forEach(change => {
+    changes.forEach((change) => {
       gameState.dispatch(change.type, change.payload);
+      const updated = gameState.getStateSlice('tasks').get(change.payload.taskId);
+      if (updated) {
+        this.taskRegistry.set(change.payload.taskId, updated);
+      }
     });
   }
 
@@ -163,7 +250,12 @@ class TaskSystem {
   }
 
   completeTask(task) {
-    gameState.dispatch('COMPLETE_TASK', { taskId: task.id });
+    const taskId = typeof task === 'string' ? task : task.id;
+    gameState.dispatch('COMPLETE_TASK', { taskId });
+    const updated = gameState.getStateSlice('tasks').get(taskId);
+    if (updated) {
+      this.taskRegistry.set(taskId, updated);
+    }
   }
 
   // Declarative rendering system

@@ -2,6 +2,7 @@
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
+import { loadPastHxPack, ensurePastHxTimeline } from './past-hx-timeline.js';
 
 const PatientsModule = (() => {
     console.log("Patients module initialized");
@@ -23,9 +24,70 @@ const PatientsModule = (() => {
                 pain: '1/10 R hip',
                 rr: 18
             },
-            htmlFile: 'events/patients/joe.html'
+            htmlFile: 'events/patients/joe.html',
+            pastHxFile: 'events/patients/joe-past-hx.json'
+        },
+        maria: {
+            id: 'maria',
+            name: 'Maria Santos',
+            room: 'Room 204-B',
+            age: 54,
+            sex: 'Female',
+            diagnosis: 'Community-acquired pneumonia',
+            vitals: {
+                hr: 94,
+                bp: '118/72',
+                temp: '100.8°F',
+                o2: '93% on 2L NC',
+                pain: '0/10',
+                rr: 22
+            },
+            htmlFile: 'events/patients/maria.html',
+            pastHxFile: 'events/patients/maria-past-hx.json'
+        },
+        derek: {
+            id: 'derek',
+            name: 'Derek Nguyen',
+            room: 'Room 203-A',
+            age: 71,
+            sex: 'Male',
+            diagnosis: 'COPD exacerbation',
+            htmlFile: 'events/patients/derek.html',
+            pastHxFile: 'events/patients/derek-past-hx.json'
+        },
+        aisha: {
+            id: 'aisha',
+            name: 'Aisha Rahman',
+            room: 'Room 205-C',
+            age: 29,
+            sex: 'Female',
+            diagnosis: 'DKA resolving',
+            htmlFile: 'events/patients/aisha.html',
+            pastHxFile: 'events/patients/aisha-past-hx.json'
+        },
+        robert: {
+            id: 'robert',
+            name: 'Robert Hale',
+            room: 'Room 202-B',
+            age: 62,
+            sex: 'Male',
+            diagnosis: 'NSTEMI rule-out',
+            htmlFile: 'events/patients/robert.html',
+            pastHxFile: 'events/patients/robert-past-hx.json'
+        },
+        lin: {
+            id: 'lin',
+            name: 'Lin Chen',
+            room: 'Room 206-A',
+            age: 45,
+            sex: 'Female',
+            diagnosis: 'Post-op lap cholecystectomy',
+            htmlFile: 'events/patients/lin.html',
+            pastHxFile: 'events/patients/lin-past-hx.json'
         }
     };
+
+    let panelMode = 'patient'; // 'patient' | 'global'
 
     // Declarative patient initialization
     const initializePatient = async (patientConfig) => {
@@ -34,11 +96,26 @@ const PatientsModule = (() => {
             const response = await fetch(patientConfig.htmlFile);
             const html = await response.text();
             
+            let pastHxPack = { displayName: patientConfig.name, pastHx: [] };
+            if (patientConfig.pastHxFile) {
+                try {
+                    pastHxPack = await loadPastHxPack(patientConfig.pastHxFile);
+                    if (!pastHxPack.displayName) {
+                        pastHxPack.displayName = patientConfig.name;
+                    }
+                } catch (pastHxError) {
+                    console.warn(`Past hx unavailable for ${patientConfig.id}:`, pastHxError);
+                }
+            }
+
             // Create patient data model
             const patient = {
                 ...patientConfig,
                 tasks: extractTasksFromHTML(html, patientConfig.id),
+                pastHx: pastHxPack.pastHx || [],
+                pastHxPack,
                 status: 'active',
+                clinicalStatus: 'stable',
                 loadedAt: new Date().toISOString()
             };
 
@@ -46,15 +123,17 @@ const PatientsModule = (() => {
             gameState.dispatch('REGISTER_PATIENT', { patient });
             
             // Register patient tasks in task system
-            patient.tasks.forEach(taskData => {
+            patient.tasks.forEach((taskData) => {
                 taskSystem.createTask({
                     ...taskData,
                     patientId: patient.id
                 });
             });
 
-            // Render patient in UI
+            // Render patient in UI (all packs stay mounted; swap via activePatientId)
             renderPatient(patient, html);
+            // E3.M3: write absolute expire (+ resolved) onto DOM for reveal rules / window phase
+            syncMountedTaskWindows(patient);
             
             console.log(`Patient ${patient.name} initialized with ${patient.tasks.length} tasks`);
             return patient;
@@ -75,6 +154,7 @@ const PatientsModule = (() => {
             id: element.id || `${patientId}-task-${index}`,
             name: element.querySelector('.font-medium')?.textContent || 'Unknown Task',
             type: element.getAttribute('data-task-type'),
+            taskClass: element.getAttribute('data-task-class') || GameConfig.tasks.classes.ROUTINE,
             scheduled: element.getAttribute('data-scheduled'),
             expire: element.getAttribute('data-expire'),
             durationMins: parseInt(element.getAttribute('data-duration-mins')) || 0,
@@ -83,7 +163,7 @@ const PatientsModule = (() => {
         }));
     };
 
-    // Declarative patient rendering
+    // Declarative patient rendering — keep hosts mounted for efficient swap
     const renderPatient = (patient, html) => {
         const patientsContainer = document.querySelector(GameConfig.selectors.patients);
         if (!patientsContainer) {
@@ -91,22 +171,147 @@ const PatientsModule = (() => {
             return;
         }
 
-        // Create patient element
-        const patientElement = document.createElement('div');
-        patientElement.innerHTML = html;
-        patientElement.setAttribute('data-patient-id', patient.id);
-        
-        // Add patient to container
-        patientsContainer.appendChild(patientElement);
+        const host = document.createElement('div');
+        host.className = 'patient-panel-host';
+        host.setAttribute('data-patient-id', patient.id);
+        host.setAttribute('role', 'tabpanel');
+        host.innerHTML = html;
 
-        // Setup patient interactions
-        setupPatientInteractions(patient, patientElement);
+        patientsContainer.appendChild(host);
+        setupPatientInteractions(patient, host);
+    };
+
+    const syncMountedTaskWindows = (patient) => {
+        const host = document.querySelector(`[data-patient-id="${patient.id}"]`);
+        if (!host) return;
+        const elements = host.querySelectorAll('[data-task-type]');
+        elements.forEach((el, index) => {
+            const taskId = el.id || patient.tasks[index]?.id;
+            if (!el.id && taskId) el.id = taskId;
+            const task = gameState.getStateSlice('tasks')?.get(taskId);
+            if (task) {
+                taskSystem.syncTaskWindowDomAttrs(el, task);
+            }
+        });
+    };
+
+    const updateCensusMeta = () => {
+        const patients = gameState.getStateSlice('patients');
+        const count = patients ? patients.size : 0;
+        const meta = document.querySelector('#shell-status-meta');
+        if (meta) {
+            meta.textContent = `Census: ${count} · Slots: 3`;
+        }
+        const badge = document.querySelector('#census-count-badge');
+        if (badge) {
+            badge.textContent = String(count);
+        }
+    };
+
+    const renderPatientTabs = () => {
+        const tabsHost = document.querySelector(GameConfig.selectors.patientTabs);
+        if (!tabsHost) return;
+
+        const patients = gameState.getStateSlice('patients');
+        const activeId = gameState.getStateSlice('activePatientId');
+        tabsHost.innerHTML = '';
+
+        const heading = document.createElement('div');
+        heading.className = 'census-tabs-heading';
+        heading.innerHTML = `<span>Patients</span><span id="census-count-badge" class="census-count-badge">${patients.size}</span>`;
+        tabsHost.appendChild(heading);
+
+        patients.forEach((patient) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'patient-tab';
+            btn.setAttribute('role', 'tab');
+            btn.dataset.tab = 'patient';
+            btn.dataset.patientId = patient.id;
+            const room = (patient.room || '').replace(/^Room\s+/i, '');
+            btn.innerHTML = `<span class="patient-tab-room">${room}</span><span class="patient-tab-name">${patient.name}</span>`;
+            if (panelMode === 'patient' && patient.id === activeId) {
+                btn.classList.add('is-active');
+                btn.setAttribute('aria-selected', 'true');
+            } else {
+                btn.setAttribute('aria-selected', 'false');
+            }
+            btn.addEventListener('click', () => {
+                panelMode = 'patient';
+                gameState.dispatch('SET_ACTIVE_PATIENT', { patientId: patient.id });
+                gameState.dispatch('APPEND_SHIFT_LOG', {
+                    message: `Switched to ${patient.name}`,
+                    timeLabel: 'nav'
+                });
+            });
+            tabsHost.appendChild(btn);
+        });
+
+        const globalBtn = document.createElement('button');
+        globalBtn.type = 'button';
+        globalBtn.className = 'patient-tab';
+        globalBtn.dataset.tab = 'global';
+        globalBtn.setAttribute('role', 'tab');
+        globalBtn.textContent = 'Global';
+        if (panelMode === 'global') {
+            globalBtn.classList.add('is-active');
+            globalBtn.setAttribute('aria-selected', 'true');
+        } else {
+            globalBtn.setAttribute('aria-selected', 'false');
+        }
+        globalBtn.addEventListener('click', () => {
+            panelMode = 'global';
+            applyPanelVisibility();
+            renderPatientTabs();
+            gameState.dispatch('APPEND_SHIFT_LOG', {
+                message: 'Opened global shift panel',
+                timeLabel: 'nav'
+            });
+        });
+        tabsHost.appendChild(globalBtn);
+        updateCensusMeta();
+    };
+
+    const applyPanelVisibility = () => {
+        const activeId = gameState.getStateSlice('activePatientId');
+        const patientsContainer = document.querySelector(GameConfig.selectors.patients);
+        const globalPanel = document.querySelector(GameConfig.selectors.globalPanel);
+
+        if (panelMode === 'global') {
+            if (patientsContainer) patientsContainer.classList.add('hidden');
+            if (globalPanel) {
+                globalPanel.classList.remove('hidden');
+                // force reflow for transition
+                void globalPanel.offsetWidth;
+                globalPanel.classList.add('is-active');
+            }
+            document.querySelectorAll('.patient-panel-host').forEach((host) => {
+                host.classList.remove('is-active');
+            });
+            return;
+        }
+
+        if (globalPanel) {
+            globalPanel.classList.remove('is-active');
+            globalPanel.classList.add('hidden');
+        }
+        if (patientsContainer) patientsContainer.classList.remove('hidden');
+
+        document.querySelectorAll('.patient-panel-host').forEach((host) => {
+            const isActive = host.getAttribute('data-patient-id') === activeId;
+            host.classList.toggle('is-active', isActive);
+            if (isActive) {
+                host.classList.remove('patient-panel-swap');
+                void host.offsetWidth;
+                host.classList.add('patient-panel-swap');
+            }
+        });
     };
 
     // Setup declarative patient interactions
     const setupPatientInteractions = (patient, patientElement) => {
-        // Collapsible sections
-        const collapsibleHeaders = patientElement.querySelectorAll('[onclick*="toggleClass"]');
+        // Collapsible sections (legacy inline onclick + declarative toggles)
+        const collapsibleHeaders = patientElement.querySelectorAll('[onclick*="toggleClass"], .past-hx-toggle');
         collapsibleHeaders.forEach(header => {
             header.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -114,10 +319,24 @@ const PatientsModule = (() => {
                 if (targetElement) {
                     targetElement.classList.toggle('hidden');
                 }
+
+                // Lazy-init TimelineJS when past hx opens
+                if (header.classList.contains('past-hx-toggle') && targetElement && !targetElement.classList.contains('hidden')) {
+                    const mount = targetElement.querySelector('[data-past-hx-mount]');
+                    ensurePastHxTimeline(patient.id, mount, patient.pastHxPack || {
+                        displayName: patient.name,
+                        pastHx: patient.pastHx || []
+                    });
+                }
             });
             
             // Remove inline onclick
             header.removeAttribute('onclick');
+        });
+
+        // Learning UX: medications start open so timed work is visible without an extra click
+        patientElement.querySelectorAll('.meds-list').forEach((list) => {
+            list.classList.remove('hidden');
         });
 
         // Task interactions - ensure all task elements have proper IDs
@@ -127,6 +346,7 @@ const PatientsModule = (() => {
             if (!taskElement.id) {
                 taskElement.id = `${patient.id}-task-${index}-${Date.now()}`;
             }
+            taskElement.setAttribute('title', 'Click for Perform / Details menu');
             setupTaskInteractions(taskElement, patient);
         });
     };
@@ -141,76 +361,41 @@ const PatientsModule = (() => {
         }
     };
 
-    // Setup medication task interactions
-    const setupMedicationTaskInteractions = (taskElement, patient) => {
-        // Remove existing context menu setup and use declarative approach
-        const taskData = {
-            id: taskElement.id,
-            name: taskElement.querySelector('.font-medium')?.textContent || 'Unknown Medication',
-            type: 'med',
-            patientId: patient.id
-        };
+    // Med interactions: context menu owned by app.js (jquery-contextmenu, census-wide selector)
+    const setupMedicationTaskInteractions = () => {};
 
-        // Setup context menu declaratively
-        const contextMenuConfig = {
-            selector: `#${taskElement.id}`,
-            trigger: 'left',
-            build: function(triggerElement, e) {
-                const element = e.target.closest('[data-task-type]');
-                if (!element || element.getAttribute('data-status') !== 'active') {
-                    return false;
-                }
+    const handleTaskAction = () => {};
 
-                return {
-                    callback: function(key, options) {
-                        handleTaskAction(key, taskData);
-                    },
-                    items: {
-                        perform: { name: "Perform", icon: "add" },
-                        details: { name: 'Details', icon: 'question' }
-                    }
-                };
-            }
-        };
-
-        // Apply context menu
-        $.contextMenu(contextMenuConfig);
-    };
-
-    // Declarative task action handler
-    const handleTaskAction = (action, taskData) => {
-        const actionHandlers = {
-            perform: () => {
-                console.log(`Performing task: ${taskData.name}`);
-                // This would integrate with the task system
-                taskSystem.completeTask(taskData);
-            },
-            details: () => {
-                console.log(`Showing details for: ${taskData.name}`);
-                // This would show task details modal
-                if (window.ModalModule) {
-                    window.ModalModule.showTaskDetails(taskData);
-                }
-            }
-        };
-
-        const handler = actionHandlers[action];
-        if (handler) {
-            handler();
-        } else {
-            console.warn(`Unknown task action: ${action}`);
-        }
-    };
-
-    // Main initialization function
+    // Main initialization function — census order from active scenario pack (E4.M1) when present
     const init = async () => {
         try {
-            // Initialize all configured patients
+            const pack = gameState.getStateSlice('scenarioPack');
+            const packIds = Array.isArray(pack?.patients) ? pack.patients : null;
+            const configs = packIds
+                ? packIds.map((id) => {
+                    const cfg = patientConfigs[id];
+                    if (!cfg) {
+                        throw new Error(`Scenario pack references unknown patient id: ${id}`);
+                    }
+                    return cfg;
+                })
+                : Object.values(patientConfigs);
+
             const patients = await Promise.all(
-                Object.values(patientConfigs).map(config => initializePatient(config))
+                configs.map((config) => initializePatient(config))
             );
 
-            console.log(`Initialized ${patients.length} patients`);
+            const firstId = patients[0]?.id || null;
+            if (firstId) {
+                gameState.dispatch('SET_ACTIVE_PATIENT', { patientId: firstId });
+            }
+
+            panelMode = 'patient';
+            renderPatientTabs();
+            applyPanelVisibility();
+            updateCensusMeta();
+
+            console.log(`Initialized ${patients.length} patients (census)`);
             return patients;
         } catch (error) {
             console.error('Failed to initialize patients:', error);
@@ -220,8 +405,16 @@ const PatientsModule = (() => {
 
     // Subscribe to game state changes
     gameState.subscribe('currentTime', (currentTime) => {
-        // Update patient task statuses based on time
+        // Update patient task statuses based on time (all mounted packs — census-aware)
         updatePatientTaskStatuses(currentTime);
+    });
+
+    gameState.subscribe('activePatientId', () => {
+        if (panelMode !== 'patient') {
+            panelMode = 'patient';
+        }
+        applyPanelVisibility();
+        renderPatientTabs();
     });
 
     // Update patient task statuses declaratively
@@ -258,7 +451,9 @@ const PatientsModule = (() => {
         
         // Getters
         getPatientConfigs: () => ({ ...patientConfigs }),
-        getPatient: (id) => gameState.getStateSlice('patients').get(id)
+        getPatient: (id) => gameState.getStateSlice('patients').get(id),
+        applyPanelVisibility,
+        renderPatientTabs
     };
 })();
 

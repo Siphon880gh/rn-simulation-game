@@ -1,0 +1,25 @@
+{
+  "displayName": "Joe Johnson",
+  "pastHx": [
+    {
+      "start": "2024-03-12",
+      "headline": "Primary care visit — hip pain",
+      "text": "Progressive right hip osteoarthritis; scheduled for elective THA. Fictional teaching record."
+    },
+    {
+      "start": "2025-11-02",
+      "headline": "Pre-op labs & clearance",
+      "text": "CBC, BMP, ECG within acceptable limits for elective orthopedic surgery."
+    },
+    {
+      "start": "2026-07-20",
+      "headline": "Total hip arthroplasty (R)",
+      "text": "Uncomplicated OR course. Transferred to floor with PCA and VTE prophylaxis orders."
+    },
+    {
+      "start": "2026-07-21",
+      "headline": "POD1 — transfer to simulated ICU census",
+      "text": "Stable vitals; pain controlled; ready for nursing prioritization practice shift."
+    }
+  ]
+}

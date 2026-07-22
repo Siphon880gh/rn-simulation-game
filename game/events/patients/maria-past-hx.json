@@ -1,0 +1,20 @@
+{
+  "displayName": "Maria Santos",
+  "pastHx": [
+    {
+      "start": "2025-09-14",
+      "headline": "Clinic visit — cough",
+      "text": "Treated for viral URI; symptoms resolved. Fictional teaching record."
+    },
+    {
+      "start": "2026-07-20",
+      "headline": "ED presentation — dyspnea",
+      "text": "Fever, productive cough, SpO2 91% on room air; admitted for CAP."
+    },
+    {
+      "start": "2026-07-21",
+      "headline": "Floor transfer to simulated census",
+      "text": "Stable on 2L NC; antibiotics started; prioritization practice case."
+    }
+  ]
+}

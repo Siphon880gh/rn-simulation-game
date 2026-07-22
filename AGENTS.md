@@ -32,8 +32,10 @@ The agent is an execution-focused coding partner that:
 |----------|------|
 | [`EPIC_MAP.md`](EPIC_MAP.md) | Product epics / MVP scope |
 | [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md) | Milestone backlog + **implement notes** linking decision docs |
+| [`SKIPPED_MILESTONES.md`](SKIPPED_MILESTONES.md) | Intentionally skipped milestones/epics (do not resume without reopen) |
 | [`.agents/state.json`](.agents/state.json) | Current epic/milestone + stamped decisions (`decisions.*`) |
-| [`prompts/`](prompts/) | Milestone authoring prompts + [`prompts/MILESTONE_LOOP.md`](prompts/MILESTONE_LOOP.md) continue loop |
+| [`AGENTS_LOOP-Continue-Milestone.md`](AGENTS_LOOP-Continue-Milestone.md) | Autonomous continue `/loop` prompt + how to run |
+| [`prompts/`](prompts/) | Milestone authoring prompts |
 
 **Locked constraints** (from `.agents/state.json`): web ES6 modules; vanilla JS (+ jQuery/signals or light reactive); no React/Ink/Twine unless approved; military game clock; panels-first clinical UI; no auth until Later; **declarative modular architecture** — extend `game-config.js` / `game-state.js` / `task-system.js` (config + named actions/subscribe + processors); do not reintroduce imperative liveQuery/DOM-scraping task loops. Detail: [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md) § Declarative architecture; [`docs/devs/REFACTORING_SUMMARY.md`](docs/devs/REFACTORING_SUMMARY.md).
 

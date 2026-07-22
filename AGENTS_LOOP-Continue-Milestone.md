@@ -1,8 +1,71 @@
-# Milestone continue loop
+# AGENTS_LOOP — Continue Milestone
 
-Use with Cursor `/loop` (dynamic pacing — no interval). Each tick runs one continue cycle. Outer iterations are infinite; the human stops the process.
+Autonomous continue loop for the RN Simulation Game milestone backlog.
 
-Canonical autonomy rules live in [`AGENTS-MILESTONES-TURNS.md`](../AGENTS-MILESTONES-TURNS.md) (Step 3b + Step 6) and [`AGENTS.md`](../AGENTS.md) Session Continuation Rule. This file is the pasteable loop body.
+Each tick = one **continue** cycle (implement → AUTO verify → advance). Outer iterations are infinite; you stop the agent/process when you want. Inner fix budget is 10 rounds per failure cluster.
+
+Canonical autonomy rules: [`AGENTS-MILESTONES-TURNS.md`](AGENTS-MILESTONES-TURNS.md) (Step 3b + Step 6), [`AGENTS.md`](AGENTS.md) Session Continuation Rule. This file is the pasteable loop body plus how to run it.
+
+---
+
+## How to run
+
+### Recommended (Cursor `/loop`, dynamic)
+
+1. Open this repo in Cursor Agent.
+2. In chat, start a loop with **no interval** (dynamic self-pacing) and point at this file:
+
+```text
+/loop Read AGENTS_LOOP-Continue-Milestone.md and execute one continue tick from the Loop prompt section. After PASS, schedule the next tick immediately (dynamic). Stop only on STOP_* labels in that file.
+```
+
+3. On the first tick the agent should:
+   - read `.agents/state.json`
+   - continue `current_milestone_id`
+   - AUTO-verify and advance when possible
+   - emit a short tick report
+4. Leave the session running. Stop the loop when you want (ask the agent to stop, or stop the chat/process).
+5. If you see `STOP_HUMAN`, `STOP_FIX_BUDGET`, or `STOP_BLOCKED`, read the handoff and take over; restart `/loop` after you unblock.
+
+**Why dynamic (no `5m`):** milestone work is bursty. Fixed intervals waste idle wakes or cut off long implement/fix ticks. Dynamic mode re-arms after each tick finishes.
+
+### Alternative: fixed interval
+
+Use only if you want a heartbeat while something else is waiting (e.g. long install):
+
+```text
+/loop 10m Read AGENTS_LOOP-Continue-Milestone.md and execute one continue tick from the Loop prompt section.
+```
+
+Prefer dynamic for normal milestone grinding.
+
+### Alternative: manual continue (no `/loop`)
+
+Paste once per turn (or say **continue**):
+
+```text
+Follow AGENTS_LOOP-Continue-Milestone.md. Run one continue tick now.
+```
+
+Without `/loop`, you must send the next message yourself each time.
+
+### Before you start
+
+- Working tree should be clean enough that the agent will not mix unrelated WIP (or tell it which files are off-limits).
+- Commit permission: by default the loop **suggests** commits only; say explicitly if it may `git commit` / `git push`.
+- Optional: allow creating/updating skills under `.agents/skills/*` when the same fix/verify pattern repeats.
+
+### When it should stop (expected)
+
+| Label | Meaning |
+|-------|---------|
+| `STOP_HUMAN` | True HUMAN_REQUIRED checks, or `blocked_waiting_user` |
+| `STOP_FIX_BUDGET` | Same failure cluster failed 10 fix rounds |
+| `STOP_BLOCKED` | Locked constraint / unapproved stack swap / missing critical info |
+
+It should **not** stop merely because status is `verification_ready` if AUTO checks can pass.
+
+---
 
 ## Loop prompt
 
@@ -59,11 +122,4 @@ Tick labels: `PASS` | `FAIL` | `STOP_HUMAN` | `STOP_FIX_BUDGET` | `STOP_BLOCKED`
 - Skills used/updated: … (or none)
 - State change: …
 - Next: continue <id> | STOP_<REASON>
-```
-
-## Invoke
-
-```text
-/loop
-<paste the Loop prompt fenced block above>
 ```

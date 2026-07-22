@@ -1,0 +1,87 @@
+{
+  "id": "chaos-night-medsurg",
+  "title": "Night Med-Surg Chaos Incidents",
+  "version": 1,
+  "fictionalOnly": true,
+  "disclaimer": "Incident pack content is fictional practice chaos — not a competency assessment.",
+  "dynamicTemplates": [
+    {
+      "id": "iv-infiltrate",
+      "weight": 2,
+      "type": "assessment",
+      "taskClass": "urgent",
+      "name": "IV site infiltrate check",
+      "durationMins": 10,
+      "expire": "+40",
+      "patientScope": "random"
+    },
+    {
+      "id": "fall-assist",
+      "weight": 2,
+      "type": "assessment",
+      "taskClass": "stat",
+      "name": "Assist after near-fall",
+      "durationMins": 15,
+      "expire": "+30",
+      "patientScope": "random"
+    },
+    {
+      "id": "telemetry-alarm",
+      "weight": 3,
+      "type": "assessment",
+      "taskClass": "urgent",
+      "name": "Telemetry alarm — bedside check",
+      "durationMins": 10,
+      "expire": "+35",
+      "patientScope": "random"
+    },
+    {
+      "id": "oxygen-desat",
+      "weight": 2,
+      "type": "assessment",
+      "taskClass": "stat",
+      "name": "Desaturation — oxygen / reposition",
+      "durationMins": 12,
+      "expire": "+25",
+      "patientScope": "random"
+    }
+  ],
+  "events": [
+    {
+      "id": "chaos-power-glitch-2045",
+      "at": 2045,
+      "type": "emergency",
+      "message": "Unit power flicker — check vents / pumps on your assignment",
+      "injectTasks": [
+        {
+          "id": "evt-chaos-equipment-sweep",
+          "type": "assessment",
+          "name": "Equipment sweep after power flicker",
+          "patientId": "derek",
+          "scheduled": 2045,
+          "expire": "+30",
+          "durationMins": 10,
+          "taskClass": "urgent"
+        }
+      ]
+    },
+    {
+      "id": "chaos-visitor-escalation-2115",
+      "at": 2115,
+      "type": "unlock",
+      "message": "Visitor escalation at bedside — de-escalate and update charge",
+      "injectTasks": [
+        {
+          "id": "evt-chaos-visitor",
+          "type": "assessment",
+          "name": "Visitor de-escalation / charge notify",
+          "patientId": "aisha",
+          "scheduled": 2115,
+          "expire": "+45",
+          "durationMins": 15,
+          "taskClass": "urgent"
+        }
+      ]
+    }
+  ]
+}

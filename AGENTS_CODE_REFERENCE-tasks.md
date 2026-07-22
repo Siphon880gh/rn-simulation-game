@@ -15,11 +15,46 @@ Declarative tasks with availability windows: create from patient HTML attrs, act
 
 | File | ~Lines | Role |
 |------|--------|------|
-| `game/assets/js/task-system.js` | ~261 | Processors, create/process/complete, render helpers |
-| `game/assets/js/game-config.js` | ~69 | `tasks.types`, `tasks.statuses` |
-| `game/assets/js/game-state.js` | ~173 | `REGISTER_TASK`, `ACTIVATE_TASK`, `COMPLETE_TASK` |
-| `game/assets/js/app.js` | ~355 | Context menu + `performMedicationTask` |
+| `game/assets/js/task-system.js` | ~280 | Schema normalize, processors, create/process/complete |
+| `game/assets/js/availability-windows.js` | ~100 | E3.M3 phases + Perform gate + reveal CSS helpers |
+| `game/assets/js/game-config.js` | — | `tasks.schemaVersion`, `classes`, `types`, `statuses`, `availability` |
+| `game/assets/js/game-state.js` | — | `REGISTER_TASK`, `ACTIVATE_TASK`, `MARK_OVERDUE`, `COMPLETE_TASK` |
+| `game/assets/js/app.js` | — | Context menu + med perform path |
 | `game/assets/css/declarative-tasks.css` | ~150 | Status visuals + scheduled reveal opacity |
+
+---
+
+## Schema (E3.M1)
+
+`taskSystem.createTask` → `normalizeTaskData`:
+
+| Field | Notes |
+|-------|--------|
+| `id` | Stable string |
+| `type` | Processor key: `med` / `assessment` / `procedure` / `orders` / `bedprep` / `default` |
+| `taskClass` | `routine` / `urgent` / `stat` (E3.M4 batch/context-switch duration) |
+| `name` | Display |
+| `scheduled` | HHMM int |
+| `expire` | HHMM int or null (`+N` relative from scheduled at create) |
+| `duration` | Minutes (slot occupancy E3.M2) |
+| `status` | `not-yet` → `active` → `completed` / `overdue` |
+| `patientId` | Census link |
+| `schemaVersion` | From `GameConfig.tasks.schemaVersion` |
+
+HTML attrs: `data-task-type`, `data-task-class` (optional), `data-scheduled`, `data-expire`, `data-duration-mins`, `data-status`.
+
+---
+
+## Lifecycle actions
+
+| Transition | Action |
+|------------|--------|
+| create | `REGISTER_TASK` |
+| not-yet → active | `ACTIVATE_TASK` |
+| active → overdue | `MARK_OVERDUE` |
+| → completed | `COMPLETE_TASK` |
+
+`processTasks(currentTime)` only queues those dispatches (no liveQuery). Registry mirrors state after each change.
 
 ---
 
@@ -32,59 +67,28 @@ Declarative tasks with availability windows: create from patient HTML attrs, act
 | `completed` | Done |
 | `overdue` | Past expire while still active |
 
-CSS classes: `task-status-*` in `declarative-tasks.css` (near top of file).
-
----
-
-## Content contract (HTML)
-
-Required on task `<li>` (see `game/events/patients/joe.html`, medications list):
-
-| Attribute | Example | Notes |
-|-----------|---------|--------|
-| `data-task-type` | `med` | Processor key (`med` / default) |
-| `data-status` | `not-yet` | Initial |
-| `data-scheduled` | `2100` | HHMM activate time |
-| `data-expire` | `+120` or `2300` | Relative (+mins from scheduled) or absolute |
-| `data-duration-mins` | `10` | Intended work duration (slots later) |
-| `id` | optional | Assigned if missing when patient renders |
-
-Types declared in config: `MED`, `ASSESSMENT`, `PROCEDURE` — only `med` has rich context menu today.
+CSS classes: `task-status-*` in `declarative-tasks.css`.
 
 ---
 
 ## Flow
 
-1. **Create** — `taskSystem.createTask` (called from patients): parse times, status `not-yet`, `REGISTER_TASK`.
-2. **Process** — on each `currentTime` (subscribed in `app.js`): for `not-yet`, if `shouldActivate` → `ACTIVATE_TASK`; for `active`, if `shouldExpire` → set `overdue` on task object (overdue path is lighter than activate dispatch).
-3. **Reveal (DOM)** — timer poll also forces opacity/active on matching `data-scheduled` (see timer doc). Two paths can touch activation; keep them aligned when changing rules.
-4. **Perform** — left-click contextMenu on `[data-task-type="med"][data-status="active"]` in `app.js` (~ middle): Perform → `ModalModule.showMedicationConfirmation` → `taskSystem.completeTask` → `COMPLETE_TASK`.
-
-### Snippet — relative expire parse (around middle of `task-system.js`)
-
-```js
-// parseTime('+120', scheduled) → addMinutesToTime(base, 120)
-// Absolute: parseInt('2300')
-```
-
-### Snippet — process pipeline (around middle of `task-system.js`)
-
-```js
-// NOT_YET + shouldActivate → ACTIVATE_TASK
-// ACTIVE + shouldExpire → status OVERDUE
-```
+1. **Create** — patients extract HTML → `createTask` → `REGISTER_TASK`.
+2. **Process** — `currentTime` subscribe → `processTasks`.
+3. **Reveal (DOM)** — timer poll may also force opacity/active on `data-scheduled` (keep aligned).
+4. **Perform** — contextMenu on active meds; **disabled outside availability window** (early/late/end phases on `data-window-phase`); pass → challenge gate → slot. Reveal CSS in `#reveal-scheduled-tasks` includes scheduled + absolute/`+N` expire selectors.
 
 ---
 
-## Slot bar (incomplete)
+## Slots (E3.M2)
 
-`#task-queue-bar` in `game/index.html` (~ bottom of body) shows three fixed slots. Med HTML includes `<data class="slot-label" value="1">`. **Full concurrent slot execution is not implemented** (epic E3.M2). Do not invent slot occupancy logic without matching product stories.
+`slot-system.js` + `GameConfig.slots.count` (3). Perform → `requestSlot`: free slot → `ASSIGN_SLOT`; full → `ENQUEUE_SLOT_TASK` (FIFO `#slot-waiting-queue`). On release, `drainQueue` auto-assigns. Progress CSS + end timemark at bottom center; then `COMPLETE_TASK`. Context menu: `app.js` only (`jquery-contextmenu`).
 
 ---
 
 ## Safe-edit notes
 
 - Prefer new task types via `GameConfig.tasks.types` + `taskProcessors.set(...)`.
-- Keep expire math in one place (`parseTime` / `addMinutesToTime`).
-- Context menu setup appears in both `app.js` and `patients.js` — changing perform UX may need both or consolidating to one owner.
-- Scoring / overdue penalties not wired yet (E6).
+- Lifecycle status changes must go through `game-state` actions.
+- Do not reintroduce `$("[data-scheduled]").livequery` activation.
+- Context menu setup appears in both `app.js` and `patients.js` — consolidate when touching perform UX (E3.M2).

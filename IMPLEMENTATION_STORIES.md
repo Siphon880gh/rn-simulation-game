@@ -66,7 +66,7 @@ E0.M3 → E0.M4 → E0.M5 → E1.M1 → E1.M2 → E2.M1 → E2.M2 → E2.M3
   → Later: E3.M4, E5.M3, E5.M4, E7.*, E8.*
 ```
 
-Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + objectives), then **E0.M5** (markdown-it Help/learning renderer).
+Next up: **Later** backlog (E3.M4, E5.M3, E5.M4, E7, E8) — MVP `implementation_order` complete.
 
 **MVP done when:** Player can run a compressed multi-patient shift under slot pressure (panel swap); triage timed work; face thin dynamic/urgent spawn + game-time emergencies + thin deterioration (critical-moment risk); ace at least one clinical mini-game gate; hourly doctor-order checks; score + final outcome covering schedule/overtime + patient status; thin prioritization debrief; one loadable pack; fiction disclaimer visible — CSS motion first; no auth, chaos packs, full acuity engine, GSAP requirement, or class-interaction math.
 
@@ -81,13 +81,13 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 | S0.3 | User confirms epic map | E0.M2 | [x] |
 | S0.4 | Milestone backlog written | E0.M2 | [x] |
 | S0.5 | Council finalize epics/milestones | E0.M2 | [x] |
-| S0.6 | Decide runtime: keep modular (default) | E0.M3 | [ ] |
-| S0.7 | Record `decisions.game_runtime` + rationale | E0.M3 | [ ] |
-| S0.8 | Player-facing fictional + educational-use disclaimer | E0.M4 | [ ] |
-| S0.9 | Learning objectives visible (About/docs/first-run) | E0.M4 | [ ] |
-| S0.10 | Shared MD renderer: markdown-it + live Mermaid + LaTeX math; Help/Docs opens authored `.md` | E0.M5 | [ ] |
-| S0.11 | Authoring path for learning/help MD (`docs/` roots + registry); wiki `[[links]]` | E0.M5 | [ ] |
-| S0.12 | Hover preview popover for internal MD links (Preview + Contents tabs) | E0.M5 | [ ] |
+| S0.6 | Decide runtime: keep modular (default) | E0.M3 | [x] |
+| S0.7 | Record `decisions.game_runtime` + rationale | E0.M3 | [x] |
+| S0.8 | Player-facing fictional + educational-use disclaimer | E0.M4 | [x] |
+| S0.9 | Learning objectives visible (About/docs/first-run) | E0.M4 | [x] |
+| S0.10 | Shared MD renderer: markdown-it + live Mermaid + LaTeX math; Help/Docs opens authored `.md` | E0.M5 | [x] |
+| S0.11 | Authoring path for learning/help MD (`docs/` roots + registry); wiki `[[links]]` | E0.M5 | [x] |
+| S0.12 | Hover preview popover for internal MD links (Preview + Contents tabs) | E0.M5 | [x] |
 
 **E0.M4 implement notes (locked):**
 - Canonical copy in `docs/players/ABOUT.md` (Docs FAB).
@@ -115,14 +115,14 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 
 | ID | Story | Milestone | Status |
 |----|-------|-----------|--------|
-| S1.1 | In-game timer with speed acceleration | E1.M1 | [~] audit |
-| S1.2 | Military shift time + shift bounds | E1.M1 | [~] audit |
-| S1.3 | Speed-factor / shift-start via config or query | E1.M1 | [~] audit |
-| S1.4 | Pause ownership matrix (user / modal / challenge) | E1.M1 | [ ] |
-| S1.4b | Clock/pause changes go through `game-state` actions + `game-config` defaults (no new imperative globals) | E1.M1 | [ ] |
-| S1.5 | Primary panel chrome regions: left menu, right menu, top primary, top secondary, status bar at bottom | E1.M2 | [~] partial |
-| S1.6 | Hour tabs in shell chrome (browse shift by hour; content filled by E4.M2 drip) | E1.M2 | [ ] |
-| S1.7 | Bottom panel: player response / event history log (append-only during shift) | E1.M2 | [ ] |
+| S1.1 | In-game timer with speed acceleration | E1.M1 | [x] |
+| S1.2 | Military shift time + shift bounds | E1.M1 | [x] |
+| S1.3 | Speed-factor / shift-start via config or query | E1.M1 | [x] |
+| S1.4 | Pause ownership matrix (user / modal / challenge) | E1.M1 | [x] |
+| S1.4b | Clock/pause changes go through `game-state` actions + `game-config` defaults (no new imperative globals) | E1.M1 | [x] |
+| S1.5 | Primary panel chrome regions: left menu, right menu, top primary, top secondary, status bar at bottom | E1.M2 | [x] |
+| S1.6 | Hour tabs in shell chrome (browse shift by hour; content filled by E4.M2 drip) | E1.M2 | [x] |
+| S1.7 | Bottom panel: player response / event history log (append-only during shift) | E1.M2 | [x] |
 
 ### Milestones
 
@@ -139,13 +139,13 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 
 | ID | Story | Milestone | Status |
 |----|-------|-----------|--------|
-| S2.1 | Load/render one patient’s clinical surfaces | E2.M1 | [~] partial |
-| S2.1b | Patient chart history (past hx) surface for the active patient | E2.M1 | [ ] |
-| S2.2 | Patient tabs + global tab shell | E2.M2 | [ ] |
-| S2.3 | **Efficient panel swap** on patient change: active patient id drives which text/clinical panels show; task list stays bound to census (no orphan DOM tasks) | E2.M2 | [ ] |
-| S2.3b | **Dynamic content load** per patient: vitals/meds/notes/hx (and any graphics) resolve from that patient’s pack/content id when selected | E2.M2 | [ ] |
-| S2.3c | **Graceful panel transitions** on switch (CSS opacity/slide or short cross-fade); keep motion subtle and clinical — no game-HUD flash | E2.M2 | [ ] |
-| S2.4 | Multi-patient census layout (**4–6**, MVP non-negotiable) | E2.M3 | [ ] |
+| S2.1 | Load/render one patient’s clinical surfaces | E2.M1 | [x] |
+| S2.1b | Patient chart history (past hx) surface for the active patient | E2.M1 | [x] |
+| S2.2 | Patient tabs + global tab shell | E2.M2 | [x] |
+| S2.3 | **Efficient panel swap** on patient change: active patient id drives which text/clinical panels show; task list stays bound to census (no orphan DOM tasks) | E2.M2 | [x] |
+| S2.3b | **Dynamic content load** per patient: vitals/meds/notes/hx (and any graphics) resolve from that patient’s pack/content id when selected | E2.M2 | [x] |
+| S2.3c | **Graceful panel transitions** on switch (CSS opacity/slide or short cross-fade); keep motion subtle and clinical — no game-HUD flash | E2.M2 | [x] |
+| S2.4 | Multi-patient census layout (**4–6**, MVP non-negotiable) | E2.M3 | [x] |
 
 ### Milestones
 
@@ -165,16 +165,16 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 
 | ID | Story | Milestone | Status |
 |----|-------|-----------|--------|
-| S3.1 | Formal task schema (class/type/duration) via config + `taskSystem.createTask` | E3.M1 | [ ] |
-| S3.2 | Lifecycle not-yet → active → completed / overdue via `game-state` actions | E3.M1 | [~] partial |
-| S3.3 | Functional 3-slot execution + progress + timemark; occupied slot shows task **duration as a timemark at bottom center** | E3.M2 | [ ] UI stub |
-| S3.3b | Slot / task **progress UI motion** via CSS (smooth fill, status color changes); keep clinical and readable | E3.M2 | [ ] |
-| S3.4 | Availability windows (early/late/end modes); dynamic `<style id>` rules reveal start + expire duration (incl. relative `+N` before expire) | E3.M3 | [ ] |
-| S3.5 | Context-menu details + miss handling polish | E3.M2 | [~] partial |
-| S3.6 | **Dynamic tasks (thin):** mid-shift spawn from config templates (e.g. pain med, call light) via `taskSystem.createTask` — weighted/random among allowed types, not hard-coded one-offs | E3.M5 | [ ] |
+| S3.1 | Formal task schema (class/type/duration) via config + `taskSystem.createTask` | E3.M1 | [x] |
+| S3.2 | Lifecycle not-yet → active → completed / overdue via `game-state` actions | E3.M1 | [x] |
+| S3.3 | Functional 3-slot execution + progress + timemark; occupied slot shows task **duration as a timemark at bottom center** | E3.M2 | [x] |
+| S3.3b | Slot / task **progress UI motion** via CSS (smooth fill, status color changes); keep clinical and readable | E3.M2 | [x] |
+| S3.4 | Availability windows (early/late/end modes); dynamic `<style id>` rules reveal start + expire duration (incl. relative `+N` before expire) | E3.M3 | [x] |
+| S3.5 | Context-menu details + miss handling polish | E3.M2 | [x] |
+| S3.6 | **Dynamic tasks (thin):** mid-shift spawn from config templates (e.g. pain med, call light) via `taskSystem.createTask` — weighted/random among allowed types, not hard-coded one-offs | E3.M5 | [x] |
 | S3.7 | Task class interactions (batch/context-switch) | E3.M4 | [ ] **Later** |
-| S3.8 | Waiting queue: enqueue when slots full; auto-assign to next free slot | E3.M6 | [ ] |
-| S3.9 | Emergent-incident tabs for thin urgents; **do not show event clock time** on the tab | E3.M5 | [ ] |
+| S3.8 | Waiting queue: enqueue when slots full; auto-assign to next free slot | E3.M6 | [x] |
+| S3.9 | Emergent-incident tabs for thin urgents; **do not show event clock time** on the tab | E3.M5 | [x] |
 
 ### Milestones
 
@@ -201,15 +201,15 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 
 | ID | Story | Milestone | Status |
 |----|-------|-----------|--------|
-| S4.1 | Scenario pack format + loader (JSON/HTML; fictional + pack-level disclaimer field) | E4.M1 | [ ] |
-| S4.2 | Pack learning objectives metadata | E4.M1 | [ ] |
-| S4.3 | Timed event unlocks / drip (authored + light random) | E4.M2 | [ ] |
-| S4.3b | **Emergency events (light):** separate **game-time** event drip (cadence / windows in config or pack) that can fire alerts such as critical new admit or unit emergency and inject follow-on tasks | E4.M2 | [ ] |
-| S4.3c | **Patient deterioration (thin):** if critical/overdue work for a patient lingers past config thresholds, worsen that patient’s status/acuity cue (and optionally spawn a follow-up task); feed scoring later | E4.M2 | [ ] |
-| S4.3d | **Code Blue escalate (hook):** from a deteriorating patient (weighted/random among eligible census), fire a Code Blue incident that opens the **E5.M4** mini-game — thin trigger only in E4; challenge UX is E5 | E4.M2 | [ ] Later gate |
-| S4.4 | Every game hour: spawn a **check doctor orders** task; expires when that hour ends (miss if not done) | E4.M3 | [ ] |
-| S4.4b | Completing the hourly check may inject new work (e.g. new med order) for that hour | E4.M3 | [ ] |
-| S4.5 | Hour-tab strip lists/filters work unlocked in that game hour (uses S1.6 chrome) | E4.M2 | [ ] |
+| S4.1 | Scenario pack format + loader (JSON/HTML; fictional + pack-level disclaimer field) | E4.M1 | [x] |
+| S4.2 | Pack learning objectives metadata | E4.M1 | [x] |
+| S4.3 | Timed event unlocks / drip (authored + light random) | E4.M2 | [x] |
+| S4.3b | **Emergency events (light):** separate **game-time** event drip (cadence / windows in config or pack) that can fire alerts such as critical new admit or unit emergency and inject follow-on tasks | E4.M2 | [x] |
+| S4.3c | **Patient deterioration (thin):** if critical/overdue work for a patient lingers past config thresholds, worsen that patient’s status/acuity cue (and optionally spawn a follow-up task); feed scoring later | E4.M2 | [x] |
+| S4.3d | **Code Blue escalate (hook):** from a deteriorating patient (weighted/random among eligible census), fire a Code Blue incident that opens the **E5.M4** mini-game — thin trigger only in E4; challenge UX is E5 | E4.M2 | [x] Later gate |
+| S4.4 | Every game hour: spawn a **check doctor orders** task; expires when that hour ends (miss if not done) | E4.M3 | [x] |
+| S4.4b | Completing the hourly check may inject new work (e.g. new med order) for that hour | E4.M3 | [x] |
+| S4.5 | Hour-tab strip lists/filters work unlocked in that game hour (uses S1.6 chrome) | E4.M2 | [x] |
 
 **E4.M1 implement notes (locked):**
 - Pack metadata includes an optional disclaimer field (fictional-only flag + text).
@@ -241,11 +241,11 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 
 | ID | Story | Milestone | Status |
 |----|-------|-----------|--------|
-| S5.1 | Challenge gate on Perform: open popover/modal mini-game; **freeze shift in-game timer** while modal stays open | E5.M1 | [ ] |
-| S5.2 | Pass → start task in a slot (duration progress, often short); fail → **not** added to a time slot; retry allowed | E5.M1 | [ ] |
-| S5.3 | Med identity quiz: type brand↔generic (random direction), **case-insensitive** | E5.M2 | [ ] |
-| S5.4 | Bed-prep / admission sequence mini-game — **must win to complete** that task. Spec: [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md) | E5.M3 | [ ] Later |
-| S5.5 | **Code Blue mini-game** for a **random deteriorating patient** (trigger from E4.M2 / S4.3d); uses E5.M1 modal + frozen shift timer; pass/fail feeds E6 | E5.M4 | [ ] Later |
+| S5.1 | Challenge gate on Perform: open popover/modal mini-game; **freeze shift in-game timer** while modal stays open | E5.M1 | [x] |
+| S5.2 | Pass → start task in a slot (duration progress, often short); fail → **not** added to a time slot; retry allowed | E5.M1 | [x] |
+| S5.3 | Med identity quiz: type brand↔generic (random direction), **case-insensitive** | E5.M2 | [x] |
+| S5.4 | Bed-prep / admission sequence mini-game — **must win to complete** that task. Spec: [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md) | E5.M3 | [x] Later |
+| S5.5 | **Code Blue mini-game** for a **random deteriorating patient** (trigger from E4.M2 / S4.3d); uses E5.M1 modal + frozen shift timer; pass/fail feeds E6 | E5.M4 | [x] Later |
 
 **E5.M1 implement notes (challenge gate — locked intent):**
 - Some tasks open a **popover/modal mini-game** on Perform (reuse existing modal shell; do not invent a second overlay system).
@@ -284,15 +284,15 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 
 | ID | Story | Milestone | Status |
 |----|-------|-----------|--------|
-| S6.0 | Thin end-of-shift closure (completed / late / missed) | E6.M0 | [ ] |
-| S6.1 | Scoring hooks from task completion / late / miss (+ challenge outcomes) | E6.M1 | [ ] |
-| S6.1b | **Patient satisfaction / status dimension** in score (timely care, deterioration avoided or reversed; thin signals from E4.M2) | E6.M1 | [ ] |
-| S6.2 | Lightweight live feedback | E6.M2 | [ ] |
-| S6.3 | Teaching debrief (by patient where feasible) + grade | E6.M2 | [ ] |
-| S6.3b | **Final score + outcome** screen at shift end (e.g. pass / needs practice / overtime risk framing — practice language, not competency claim) | E6.M2 | [ ] |
-| S6.4 | Debrief copy: practice feedback ≠ clinical assessment | E6.M2 | [ ] |
-| S6.5 | End debrief (and optional live cues) can reference bottom response/history log from S1.7 | E6.M0 | [ ] |
-| S6.6 | Challenge fail/overtime feedback can dock points and cite correct answers (supports E5.M2+; E5.M3 per [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md); E5.M4 Code Blue) | E6.M1 | [ ] |
+| S6.0 | Thin end-of-shift closure (completed / late / missed) | E6.M0 | [x] |
+| S6.1 | Scoring hooks from task completion / late / miss (+ challenge outcomes) | E6.M1 | [x] |
+| S6.1b | **Patient satisfaction / status dimension** in score (timely care, deterioration avoided or reversed; thin signals from E4.M2) | E6.M1 | [x] |
+| S6.2 | Lightweight live feedback | E6.M2 | [x] |
+| S6.3 | Teaching debrief (by patient where feasible) + grade | E6.M2 | [x] |
+| S6.3b | **Final score + outcome** screen at shift end (e.g. pass / needs practice / overtime risk framing — practice language, not competency claim) | E6.M2 | [x] |
+| S6.4 | Debrief copy: practice feedback ≠ clinical assessment | E6.M2 | [x] |
+| S6.5 | End debrief (and optional live cues) can reference bottom response/history log from S1.7 | E6.M0 | [x] |
+| S6.6 | Challenge fail/overtime feedback can dock points and cite correct answers (supports E5.M2+; E5.M3 per [`AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md`](AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md); E5.M4 Code Blue) | E6.M1 | [x] |
 
 **E6.M1 / E6.M2 implement notes (scoring — locked intent):** Track score in `game-state` from declarative outcomes (complete / late / miss / challenge). Weight **task handling** and a thin **patient satisfaction/status** signal (from overdue/deterioration flags), not a deep psychology model. **E6.M2** shows a clear **final score + outcome** at shift end; live cues stay lightweight. No leaderboards/accounts in MVP.
 
@@ -310,13 +310,13 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 
 | ID | Story | Milestone | Status |
 |----|-------|-----------|--------|
-| S7.1 | Prefer incident/content packs before art | E7.M2 | [ ] Later |
-| S7.2 | Default static floor/ICU (or unit) background art, pre-generated ahead of time (e.g. Midjourney); swap per scenario when authored | E7.M1 | [ ] Later |
-| S7.2b | Optional per-situation / per-event still images behind the challenge or panel | E7.M1 | [ ] Later |
-| S7.2c | Optional image→3D or light motion treatment for select situations (not required for all packs) | E7.M1 | [ ] Later |
-| S7.2d | Optional **UI motion polish** (progress bars, health/status changes, panel swaps) via CSS first; add a light library (e.g. **GSAP**) only if CSS is insufficient — stamp if adopted | E7.M1 | [ ] Later |
-| S7.3 | More shifts + complications; richer deterioration / acuity beyond E4.M2 thin flags | E7.M3 | [ ] Later |
-| S7.4 | E3.M4 class interactions (if still desired) | E3.M4 | [ ] Later |
+| S7.1 | Prefer incident/content packs before art | E7.M2 | [x] Later |
+| S7.2 | Default static floor/ICU (or unit) background art, pre-generated ahead of time (e.g. Midjourney); swap per scenario when authored | E7.M1 | [x] Later (CSS theme + optional URL) |
+| S7.2b | Optional per-situation / per-event still images behind the challenge or panel | E7.M1 | [x] Later (URL hook) |
+| S7.2c | Optional image→3D or light motion treatment for select situations (not required for all packs) | E7.M1 | [x] Later (deferred — CSS motion only) |
+| S7.2d | Optional **UI motion polish** (progress bars, health/status changes, panel swaps) via CSS first; add a light library (e.g. **GSAP**) only if CSS is insufficient — stamp if adopted | E7.M1 | [x] Later (CSS; no GSAP) |
+| S7.3 | More shifts + complications; richer deterioration / acuity beyond E4.M2 thin flags | E7.M3 | [x] Later |
+| S7.4 | E3.M4 class interactions (if still desired) | E3.M4 | [x] |
 
 ### Milestones
 
@@ -332,8 +332,8 @@ Next up: **E0.M3** (stamp `keep_modular_app`), then **E0.M4** (disclaimer + obje
 
 | ID | Story | Milestone | Status |
 |----|-------|-----------|--------|
-| S8.1 | Demo/portfolio packaging polish | E8.M1 | [ ] Later |
-| S8.2 | Optional auth/friends | E8.M2 | [ ] Later — re-approve only |
+| S8.1 | Demo/portfolio packaging polish | E8.M1 | [x] Later |
+| S8.2 | Optional auth/friends | E8.M2 | [ ] **Skipped** — see [`SKIPPED_MILESTONES.md`](SKIPPED_MILESTONES.md) |
 
 ---
 

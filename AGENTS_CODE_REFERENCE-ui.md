@@ -10,16 +10,21 @@ Parent: [`AGENTS_CODE_REFERENCE.md`](AGENTS_CODE_REFERENCE.md)
 
 ## Role
 
-Browser chrome around the sim: header/clock/pause, patient grid mount, modal overlay, floating docs button, bottom task-queue bar placeholders, and status CSS.
+Browser chrome around the sim: locked shell regions (E1.M2), patient main mount, modal overlay, Docs FAB, task-queue slots, shift history log, and status CSS.
 
 | File | ~Lines | Role |
 |------|--------|------|
-| `game/index.html` | ~132 | DOM shell + CDN scripts + module entry |
-| `game/assets/js/modal.js` | ~212 | Modal configs + open/close/promise helpers |
-| `game/assets/js/docs.js` | ~336 | Nested docs dropdown (non-module IIFE) |
+| `game/index.html` | ~170 | DOM shell + CDN scripts + module entry |
+| `game/assets/js/shell-chrome.js` | ~120 | Hour tabs + shift history log wiring |
+| `game/assets/js/modal.js` | ~210 | Modal configs + open/close/promise helpers |
+| `game/assets/js/debrief.js` | ~160 | E6.M0 thin prioritization debrief (completed/late/missed + shift log) |
+| `game/assets/js/docs.js` | ~ESM | Help FAB + markdown viewer |
+| `game/assets/css/shell.css` | ~180 | Shell grid / chrome layout |
+| `game/assets/css/scene.css` | ~80 | E7.M1 unit themes + situation still + light motion |
+| `game/assets/js/scene-backdrop.js` | ~80 | Apply theme/image; situation stills on modal |
 | `game/assets/css/declarative-tasks.css` | ~150 | Task status + type styles |
 | `game/assets/css/app.css` | ~8 | App-level CSS |
-| `game/assets/css/patients.css` | ~3 | Patient CSS |
+| `game/assets/css/patients.css` | — | Patient + clinical-status badge CSS |
 
 ---
 
@@ -27,17 +32,20 @@ Browser chrome around the sim: header/clock/pause, patient grid mount, modal ove
 
 | Region | Selector / id | Notes |
 |--------|---------------|--------|
-| Title | header `h1` | “ICU Simulation” |
-| Clock | `#clock` | Filled by timer |
-| Shift ends hint | `#shift-ends` | Toggled via clock box click |
-| Pause | `#pause` | Wired in timer module |
-| Patients | `#patients` | Grid mount |
-| Modal | `#modal`, `#modal-title`, `#modal-content`, `#modal-footer` | Hidden by default |
-| Task queue | `#task-queue-bar` | Three slot placeholders — not full logic |
-| Docs FAB | `#docs-container` / `#docs-button` / `#docs-list` | Fixed bottom-right |
+| Shell root | `#shell` | CSS grid: top primary → top secondary → body → bottom |
+| Top primary | `#shell-top-primary` | Brand, `#fiction-disclaimer`, clock, pause |
+| Top secondary | `#shell-top-secondary` / `#shell-hour-tabs` | Hour strip (E4.M2 fills content) |
+| Left menu | `#shell-left-menu` | Placeholder for patient nav (E2) |
+| Main | `#shell-main` / `#patients` | Clinical panels mount |
+| Right menu | `#shell-right-menu` | Placeholder for tools/orders |
+| Bottom | `#shell-bottom` | History + slots + status |
+| History log | `#shift-history-log` | Append-only via `APPEND_SHIFT_LOG` |
+| Task queue | `#task-queue-bar` / `#slot-waiting-queue` | 3 slots + FIFO wait (slot-system.js) |
+| Status bar | `#shell-status-bar` / `#shell-status-message` | Live status line |
+| Clock / Pause | `#clock` / `#pause` | Timer module |
+| Modal | `#modal`… | Overlay; dims `#shell` |
+| Docs FAB | `#docs-container` | Fixed bottom-right |
 | Reveal style | `#reveal-scheduled-tasks` | Empty `<style>` filled by timer |
-
-Scripts (near end of body): jQuery, livequery, signals, contextMenu, then `app.js` module + `docs.js` classic script + CSS links.
 
 Selectors centralized in `GameConfig.selectors` (`game-config.js`).
 
@@ -49,27 +57,18 @@ Declarative `modalConfigs` near top: `gameOver`, `taskDetails`, `medicationConfi
 
 API: `openModal(typeOrConfig)`, `closeModal()`, `modifyModal`, `showGameOver`, `showTaskDetails`, `showMedicationConfirmation` (promise), `showModalWithPromise`.
 
-- Persistent `gameOver` refuses `closeModal`.  
+- Persistent `gameOver` refuses `closeModal` (kept as fallback).  
 - `window.confirmAction` used by medication confirm footer.  
-- Subscribes to `gameStatus === GAME_OVER` to show game over.  
+- Does **not** auto-open on `GAME_OVER`; `app.handleGameOver` → `debrief.showPrioritizationDebrief()`.  
 - Globals also exposed from `app.exposeGlobals`: `openModal`, `closeModal`, `modifyModal`.
 
 ---
 
-## Docs (`docs.js`)
+## Docs (`docs.js` + markdown stack)
 
-Classic jQuery IIFE (not ES module). Structure near top:
+ES module. `docsStructure` near top registers `devs` / `players` / `learning` files. Fetch stays `../docs/{category}/{file}`; render goes through `markdown-renderer.js` (`markdown-it` + texmath/KaTeX + Mermaid enhance). Opens in-page `#docs-viewer` (not a popup). Internal `[[wiki]]` / relative `.md` links + `link-popover.js` hover Preview/Contents.
 
-```js
-docsStructure = {
-  devs: { files: ['MEDICATION_WINDOW_MECHANICS.md', ...] },
-  players: { files: ['ABOUT.md'] }
-}
-```
-
-Fetches markdown from `../docs/{category}/` relative to game page, renders with `marked` into modal. Category expand/collapse in dropdown.
-
-Adding a doc: place file under `docs/devs/` or `docs/players/` **and** list it in `docsStructure`.
+Adding a doc: place under `docs/{devs,players,learning}/` **and** list it in `docsStructure`.
 
 ---
 
@@ -85,5 +84,5 @@ Adding a doc: place file under `docs/devs/` or `docs/players/` **and** list it i
 
 - Prefer Tailwind utility classes already used in shell; keep clinical panels readable (product constraint: panels-first).  
 - Do not remove `#reveal-scheduled-tasks` or modal footer hooks without updating timer/modal callers.  
-- Slot bar is visual scaffolding only until E3 slot execution.  
+- Keep shell region ids stable — E2/E4/E6 mount into these landmarks.  
 - CDN Tailwind in production is acceptable for current MVP; bundling would be a stack decision.

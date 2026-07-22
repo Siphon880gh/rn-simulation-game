@@ -4,62 +4,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>In-Game Timer</title>
+    <title>ICU Simulation</title>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markdown-it-texmath/css/texmath.min.css">
+    <link rel="stylesheet" href="assets/css/markdown-content.css">
+    <link rel="stylesheet" href="assets/css/link-popover.css">
+    <link rel="stylesheet" href="assets/css/shell.css">
+    <link rel="stylesheet" href="assets/css/scene.css">
+    <link title="timeline-styles" rel="stylesheet"
+          href="https://cdn.knightlab.com/libs/timeline3/latest/css/timeline.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-
 </head>
 
-<body class="min-h-screen bg-gray-200 text-center p-10">
-    <!-- #region Header -->
-    <div class="container mx-auto p-4">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">ICU Simulation</h1>
-
-            <!-- #region Clock and Docs -->
-            <div class="flex flex-col gap-4 items-center absolute right-12 top-12">
-                <!-- Docs Dropdown - Subtle sliding icon -->
-                <div class="relative">
-                    <div id="docs-container" class="fixed bottom-4 right-4 z-40">
-                        <div id="docs-button" class="group bg-white hover:bg-blue-50 rounded-full shadow-lg border border-gray-200 cursor-pointer transition-all duration-300 ease-in-out overflow-hidden"
-                             style="width: 40px; height: 40px;">
-                            <div class="flex items-center h-full transition-all duration-300 ease-in-out group-hover:w-32" style="width: 40px;">
-                                <div class="flex items-center justify-center w-10 h-10 flex-shrink-0">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                         class="lucide lucide-file-text text-gray-500 group-hover:text-blue-500 transition-colors">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                                        <polyline points="10 9 9 9 8 9"></polyline>
-                                    </svg>
-                                </div>
-                                <span class="text-sm font-medium text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pl-1">
-                                    Docs
-                                </span>
-                            </div>
-                        </div>
-                        <div id="docs-dropdown" class="absolute right-0 mt-2 w-60 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden -translate-y-full">
-                            <div class="py-2">
-                                <div class="px-4 py-2 text-sm font-medium text-gray-700 border-b border-gray-200">
-                                    Documentation
-                                </div>
-                                <div id="docs-list" class="py-1 overflow-y-scroll h-1/2">
-                                    <!-- Docs will be loaded here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<body class="shell-body min-h-screen bg-gray-200">
+    <div id="shell">
+        <!-- Top primary: brand + clock/pause -->
+        <header id="shell-top-primary">
+            <div class="shell-brand text-left">
+                <h1 class="text-2xl font-bold text-gray-800">ICU Simulation</h1>
+                <p id="fiction-disclaimer" class="text-xs text-gray-600 mt-1 max-w-xl">
+                    Names and scenarios are fictional. Any resemblance to actual events are coincidental.
+                    Educational training use only — not a substitute for supervised clinical practice.
+                </p>
+                <p id="scenario-pack-title" class="text-xs text-gray-500 mt-1"></p>
+                <p id="scenario-pack-note" class="text-xs text-gray-400 mt-0.5 max-w-xl" hidden></p>
+                <p id="demo-preset-links" class="text-xs text-gray-500 mt-1 max-w-xl">
+                    Demo:
+                    <a class="underline text-blue-700 hover:text-blue-900" href="?speed-factor=48">quick night</a>
+                    ·
+                    <a class="underline text-blue-700 hover:text-blue-900"
+                       href="?speed-factor=48&amp;scenario=events/scenarios/day-shift-medsurg.json">quick day</a>
+                </p>
+                <div data-scenario-objectives hidden class="mt-1 max-w-xl">
+                    <p class="text-xs font-medium text-gray-500">Pack learning objectives</p>
+                    <ul id="scenario-pack-objectives" class="text-xs text-gray-500 list-disc pl-4"></ul>
                 </div>
-                
+            </div>
+            <div class="shell-clock-cluster">
                 <div class="flex flex-col items-center gap-2 text-xl font-bold bg-white p-3 rounded-lg shadow"
                     style="width:150px; cursor:s-resize;"
                     onclick="document.getElementById('shift-ends').classList.toggle('hidden')">
                     <div class="flex w-full gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-clock w-6 h-6 text-blue-600">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -77,52 +64,121 @@
                     Pause
                 </button>
             </div>
-            <!-- #endregion Clock and Docs -->
+        </header>
 
+        <!-- Top secondary: hour-tab strip (content filled by E4.M2 drip) -->
+        <div id="shell-top-secondary" aria-label="Shift hour tabs">
+            <span class="shell-menu-label">Hours</span>
+            <div id="shell-hour-tabs" role="tablist"></div>
         </div>
-        <section id="patients"class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
-        </section>
+        <div id="shell-body">
+            <aside id="shell-left-menu" aria-label="Left menu">
+                <p class="shell-menu-label">Census <span class="font-normal normal-case tracking-normal text-gray-400">(4–6)</span></p>
+                <div id="patient-tabs" class="patient-tabs" role="tablist" aria-label="Patient and global tabs"></div>
+                <div class="incident-tabs-wrap mt-3">
+                    <p class="shell-menu-label">Incidents</p>
+                    <div id="incident-tabs" class="incident-tabs" role="list" aria-label="Emergent incidents"></div>
+                </div>
+            </aside>
+
+            <main id="shell-main">
+                <section id="global-panel" class="global-panel hidden" data-panel-kind="global" aria-label="Global shift panel">
+                    <div class="bg-white p-4 rounded-lg shadow-md text-left">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Shift overview</h3>
+                        <p class="text-sm text-gray-600 mb-2">Global tab — unit-level notes and census-wide cues.</p>
+                        <p class="text-sm text-gray-500 mb-3">Task slots stay visible in the bottom bar for all patients.</p>
+                        <div class="doctor-orders text-left">
+                            <h4 class="font-semibold text-gray-800 mb-2">Doctor orders checks</h4>
+                            <ul id="doctor-orders-list" class="space-y-2"></ul>
+                        </div>
+                    </div>
+                </section>
+                <section id="patients" class="patient-panels" aria-live="polite"></section>
+            </main>
+
+            <aside id="shell-right-menu" aria-label="Right menu">
+                <p class="shell-menu-label">Right menu</p>
+                <p class="shell-menu-placeholder">Tools / orders (later)</p>
+            </aside>
+        </div>
+
+        <!-- Bottom: history log + task slots + status bar -->
+        <footer id="shell-bottom">
+            <div id="shift-history-log" aria-live="polite" aria-label="Shift event history">
+                <p class="shift-log-empty">No shift events yet.</p>
+            </div>
+
+            <div class="slot-cluster">
+                <div id="task-queue-bar" class="task-queue-bar" aria-label="Task execution slots"></div>
+                <div id="slot-waiting-queue" class="slot-waiting-queue" aria-label="Slot waiting queue"></div>
+            </div>
+
+            <div id="shell-status-bar">
+                <span id="shell-status-message">Initializing…</span>
+                <span id="shell-score" title="Practice score">Score 100</span>
+                <span id="shell-status-meta">Slots: 3</span>
+            </div>
+        </footer>
     </div>
-    <!-- #endregion Header -->
 
-    <!-- #region Modal -->
-    <div id="modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+    <!-- Docs FAB (outside grid; fixed) -->
+    <div id="docs-container" class="fixed bottom-4 right-4 z-40">
+        <div id="docs-button" class="group bg-white hover:bg-blue-50 rounded-full shadow-lg border border-gray-200 cursor-pointer transition-all duration-300 ease-in-out overflow-hidden"
+             style="width: 40px; height: 40px;">
+            <div class="flex items-center h-full transition-all duration-300 ease-in-out group-hover:w-32" style="width: 40px;">
+                <div class="flex items-center justify-center w-10 h-10 flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="lucide lucide-file-text text-gray-500 group-hover:text-blue-500 transition-colors">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                <span class="text-sm font-medium text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pl-1">
+                    Docs
+                </span>
+            </div>
+        </div>
+        <div id="docs-dropdown" class="absolute right-0 mt-2 w-60 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden -translate-y-full">
+            <div class="py-2">
+                <div class="px-4 py-2 text-sm font-medium text-gray-700 border-b border-gray-200">
+                    Documentation
+                </div>
+                <div id="docs-list" class="py-1 overflow-y-scroll h-1/2"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="modal-panel bg-white p-6 rounded-lg shadow-lg w-1/3">
             <h2 id="modal-title" class="text-xl font-bold mb-4"></h2>
-            <p id="modal-content" class="mb-4"></p>
-            <footer id="modal-footer" class="mt-4 text-sm text-gray-500 text-center">
-            </footer>
+            <div id="modal-content" class="mb-4"></div>
+            <footer id="modal-footer" class="mt-4 text-sm text-gray-500 text-center"></footer>
         </div>
     </div>
-    <!-- #endregion Modal -->
 
-    <!-- #region Task Queue Bar -->
-    <div id="task-queue-bar" class="fixed bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 bg-white p-2 rounded-lg border border-gray-200 shadow-lg">
-        <div class="w-14 h-14 bg-gray-50 border border-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-100">
-            <img src="" alt="Task" class="w-10 h-10">
-        </div>
-        <div class="w-14 h-14 bg-gray-50 border border-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-100">
-            <img src="" alt="Task" class="w-10 h-10">
-        </div>
-        <div class="w-14 h-14 bg-gray-50 border border-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-100">
-            <img src="" alt="Task" class="w-10 h-10">
-        </div>
-    </div>
-    <!-- #endregion Task Queue Bar -->
-
-    <!-- jQuery, liveQuery, Signals (reducer-action-like events)-->
     <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="//raw.githack.com/hazzik/livequery/master/src/jquery.livequery.js"></script>
     <script src="//cdn.jsdelivr.net/npm/signals@1.0.0/dist/signals.min.js"></script>
 
-    <!-- jQuery Context Menu -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it-anchor@8.6.5/dist/markdownItAnchor.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+    <script src="https://cdn.knightlab.com/libs/timeline3/latest/js/timeline-min.js"></script>
+
     <script type="module" src="assets/js/app.js"></script>
-    <script src="assets/js/docs.js"></script>
+    <script type="module" src="assets/js/docs.js"></script>
     <link rel="stylesheet" href="assets/css/patients.css">
     <link rel="stylesheet" href="assets/css/app.css">
     <link rel="stylesheet" href="assets/css/declarative-tasks.css">

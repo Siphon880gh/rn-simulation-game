@@ -66,16 +66,12 @@ const GameTimerModule = (() => {
       console.log('Timer started');
     },
 
-    pause: () => {
-      timerState.isPaused = true;
-      gameState.dispatch('TOGGLE_PAUSE');
-      console.log('Timer paused');
+    pause: (source = GameConfig.timer.pauseSources.USER) => {
+      gameState.dispatch('SET_PAUSE', { paused: true, source });
     },
 
-    resume: () => {
-      timerState.isPaused = false;
-      gameState.dispatch('TOGGLE_PAUSE');
-      console.log('Timer resumed');
+    resume: (source = GameConfig.timer.pauseSources.USER) => {
+      gameState.dispatch('SET_PAUSE', { paused: false, source });
     },
 
     stop: () => {
@@ -170,32 +166,83 @@ const GameTimerModule = (() => {
     }
   }
 
-  // Dispatch scheduled task event
+  // Dispatch scheduled task event — style-block reveal includes expire (+N raw or absolute)
   function dispatchScheduledTaskEvent(hhmm) {
-    // Update CSS to reveal tasks
     const revealElement = document.querySelector(GameConfig.selectors.revealScheduledTasks);
-    if (revealElement) {
-      const currentRules = revealElement.innerHTML;
-      const newRule = `
-        li[data-scheduled="${hhmm}"] {
-          opacity: 1 !important;
-        }
-      `;
-      revealElement.innerHTML = currentRules + newRule;
+    const tasksMap = gameState.getStateSlice('tasks');
+    const schedKey = String(hhmm).padStart(4, '0');
+    const matching = [];
+
+    if (tasksMap) {
+      tasksMap.forEach((task) => {
+        if (Number(task.scheduled) === Number(hhmm)) matching.push(task);
+      });
     }
 
-    // Update task statuses in DOM
-    const scheduledTasks = document.querySelectorAll(`[data-scheduled="${hhmm}"]`);
-    scheduledTasks.forEach(task => {
-      task.setAttribute('data-status', GameConfig.tasks.statuses.ACTIVE);
-      task.classList.add('task-status-active');
+    if (revealElement) {
+      let rules = revealElement.innerHTML;
+      if (matching.length) {
+        matching.forEach((task) => {
+          rules += taskSystemRevealRule(task);
+        });
+      } else {
+        rules += `
+li[data-scheduled="${schedKey}"] {
+  opacity: 1 !important;
+}
+`;
+      }
+      revealElement.innerHTML = rules;
+    }
+
+    // Update task statuses in DOM (match padded or bare scheduled attrs)
+    const scheduledTasks = document.querySelectorAll(
+      `[data-scheduled="${hhmm}"], [data-scheduled="${schedKey}"]`
+    );
+    scheduledTasks.forEach((el) => {
+      el.setAttribute('data-status', GameConfig.tasks.statuses.ACTIVE);
+      el.classList.add('task-status-active');
+      const task = tasksMap?.get(el.id);
+      if (task?.expire != null) {
+        el.setAttribute('data-expire', String(task.expire).padStart(4, '0'));
+      }
     });
 
-    // Dispatch to game state
     gameState.dispatch('ACTIVATE_SCHEDULED_TASKS', { time: hhmm });
+    const hours = Math.floor(hhmm / 100);
+    const minutes = hhmm % 100;
+    const timeLabel = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    gameState.dispatch('APPEND_SHIFT_LOG', {
+      message: `Scheduled tasks unlocked for ${timeLabel}`,
+      timeLabel
+    });
   }
 
-  // Setup pause button functionality
+  function taskSystemRevealRule(task) {
+    const scheduled = String(task.scheduled).padStart(4, '0');
+    const expire = task.expire != null ? String(task.expire).padStart(4, '0') : '';
+    const expireRaw = task.metadata?.expireRaw || null;
+    const selectors = [`li[data-scheduled="${scheduled}"]`];
+    if (expire) {
+      selectors.push(`li[data-scheduled="${scheduled}"][data-expire="${expire}"]`);
+    }
+    if (expireRaw) {
+      selectors.push(`li[data-scheduled="${scheduled}"][data-expire="${expireRaw}"]`);
+    }
+    return `
+${selectors.join(',\n')} {
+  opacity: 1 !important;
+}
+`;
+  }
+
+  function syncPauseButtonLabel() {
+    const pauseButton = document.querySelector(timerState.pauseSelector);
+    if (!pauseButton) return;
+    pauseButton.textContent = timerState.isPaused ? 'Resume' : 'Pause';
+  }
+
+  // Setup pause button functionality (toggles only the `user` pause source)
   function setupPauseButton() {
     const pauseButton = document.querySelector(timerState.pauseSelector);
     if (!pauseButton) {
@@ -206,16 +253,18 @@ const GameTimerModule = (() => {
     // Remove existing listeners
     pauseButton.replaceWith(pauseButton.cloneNode(true));
     const newPauseButton = document.querySelector(timerState.pauseSelector);
+    const userSource = GameConfig.timer.pauseSources.USER;
 
     newPauseButton.addEventListener('click', () => {
-      if (timerState.isPaused) {
-        timerActions.resume();
-        newPauseButton.textContent = 'Pause';
+      const sources = gameState.getStateSlice('pauseSources') || [];
+      if (sources.includes(userSource)) {
+        timerActions.resume(userSource);
       } else {
-        timerActions.pause();
-        newPauseButton.textContent = 'Resume';
+        timerActions.pause(userSource);
       }
     });
+
+    syncPauseButtonLabel();
   }
 
   // Handle game over
@@ -250,17 +299,14 @@ const GameTimerModule = (() => {
     };
   };
 
-  const pause = () => timerActions.pause();
-  const resume = () => timerActions.resume();
+  const pause = (source) => timerActions.pause(source);
+  const resume = (source) => timerActions.resume(source);
   const stop = () => timerActions.stop();
 
-  // Subscribe to game state changes
-  gameState.subscribe('gameStatus', (status) => {
-    if (status === GameConfig.gameStates.PAUSED && !timerState.isPaused) {
-      timerState.isPaused = true;
-    } else if (status === GameConfig.gameStates.RUNNING && timerState.isPaused) {
-      timerState.isPaused = false;
-    }
+  // Clock follows declarative pauseSources / isPaused (user, modal, challenge, system)
+  gameState.subscribe('isPaused', (isPaused) => {
+    timerState.isPaused = !!isPaused;
+    syncPauseButtonLabel();
   });
 
   return {

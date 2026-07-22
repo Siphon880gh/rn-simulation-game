@@ -1,0 +1,76 @@
+{
+  "id": "night-shift-default",
+  "title": "Night Shift — Medical-Surgical Floor",
+  "version": 1,
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Prioritize timed medication and assessment tasks under slot pressure",
+    "Use patient panels and chart history to support safe sequencing",
+    "Recognize when work falls late or remains open at shift end"
+  ],
+  "patients": ["joe", "maria", "derek", "aisha", "robert", "lin"],
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/chaos-night-medsurg.json",
+  "orderInjections": {
+    "1900": [
+      {
+        "id": "order-joe-new-ondansetron",
+        "type": "med",
+        "name": "Ondansetron (new order)",
+        "patientId": "joe",
+        "scheduled": 1900,
+        "expire": "+60",
+        "durationMins": 10,
+        "taskClass": "routine"
+      }
+    ],
+    "2000": [],
+    "default": []
+  },
+  "events": [
+    {
+      "id": "rr-admit-2000",
+      "at": 2000,
+      "type": "emergency",
+      "message": "Rapid response: critical new admit pending — triage assessment needed",
+      "injectTasks": [
+        {
+          "id": "evt-maria-rr-assess",
+          "type": "assessment",
+          "name": "Rapid-response triage assessment",
+          "patientId": "maria",
+          "scheduled": 2000,
+          "expire": "+45",
+          "durationMins": 15,
+          "taskClass": "urgent"
+        }
+      ]
+    },
+    {
+      "id": "lab-critical-2130",
+      "at": 2130,
+      "type": "unlock",
+      "message": "Lab called: critical potassium result for Robert",
+      "injectTasks": [
+        {
+          "id": "evt-robert-k-recheck",
+          "type": "assessment",
+          "name": "Recheck labs / notify provider (K+)",
+          "patientId": "robert",
+          "scheduled": 2130,
+          "expire": "+60",
+          "durationMins": 10,
+          "taskClass": "stat"
+        }
+      ]
+    }
+  ]
+}
