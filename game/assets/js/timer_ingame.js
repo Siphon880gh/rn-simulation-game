@@ -195,14 +195,28 @@ li[data-scheduled="${schedKey}"] {
       revealElement.innerHTML = rules;
     }
 
-    // Update task statuses in DOM (match padded or bare scheduled attrs)
+    // Update task statuses in DOM (match padded or bare scheduled attrs).
+    // Never revive completed/overdue tasks — registry status wins over schedule unlock.
     const scheduledTasks = document.querySelectorAll(
       `[data-scheduled="${hhmm}"], [data-scheduled="${schedKey}"]`
     );
+    const terminal = new Set([
+      GameConfig.tasks.statuses.COMPLETED,
+      GameConfig.tasks.statuses.OVERDUE
+    ]);
     scheduledTasks.forEach((el) => {
+      const task = tasksMap?.get(el.id);
+      if (task && terminal.has(task.status)) {
+        el.setAttribute('data-status', task.status);
+        el.classList.remove('task-status-active');
+        el.classList.add(`task-status-${task.status}`);
+        return;
+      }
+      if (terminal.has(el.getAttribute('data-status'))) {
+        return;
+      }
       el.setAttribute('data-status', GameConfig.tasks.statuses.ACTIVE);
       el.classList.add('task-status-active');
-      const task = tasksMap?.get(el.id);
       if (task?.expire != null) {
         el.setAttribute('data-expire', String(task.expire).padStart(4, '0'));
       }

@@ -120,9 +120,10 @@ function renderIncidentTab(task) {
     }
 }
 
-function mountTaskDom(task) {
+/** Mount an injected/dynamic task tile on the patient panel (used by event-drip too). */
+export function mountTaskDom(task) {
     if (!task.patientId) return;
-    const panel = document.querySelector(`[data-patient-id="${task.patientId}"]`);
+    const panel = document.querySelector(`.patient-panel-host[data-patient-id="${task.patientId}"]`);
     if (!panel) return;
 
     let list = panel.querySelector('.dynamic-tasks-list');
@@ -152,6 +153,7 @@ function mountTaskDom(task) {
     }
     li.setAttribute('data-duration-mins', String(task.duration || 10));
     li.setAttribute('data-task-class', task.taskClass || 'urgent');
+    li.setAttribute('title', 'Click for Perform / Details menu');
     li.className = `bg-amber-50 p-4 rounded-lg shadow flex items-center task-status-${task.status} border border-amber-200`;
     const icon = task.type === 'med' ? 'fa-pills text-blue-500' : 'fa-bell text-amber-600';
     li.innerHTML = `
@@ -260,6 +262,7 @@ export function resetDynamicTasks() {
 const DynamicTasksModule = {
     processDynamicTasksTime,
     spawnFromTemplate,
+    mountTaskDom,
     weightedPick,
     resetDynamicTasks,
     init(config = {}) {

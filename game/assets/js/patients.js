@@ -182,7 +182,7 @@ const PatientsModule = (() => {
     };
 
     const syncMountedTaskWindows = (patient) => {
-        const host = document.querySelector(`[data-patient-id="${patient.id}"]`);
+        const host = document.querySelector(`.patient-panel-host[data-patient-id="${patient.id}"]`);
         if (!host) return;
         const elements = host.querySelectorAll('[data-task-type]');
         elements.forEach((el, index) => {
@@ -339,12 +339,11 @@ const PatientsModule = (() => {
             list.classList.remove('hidden');
         });
 
-        // Task interactions - ensure all task elements have proper IDs
+        // Task interactions — DOM ids must match extractTasksFromHTML / createTask registry ids
         const taskElements = patientElement.querySelectorAll('[data-task-type]');
         taskElements.forEach((taskElement, index) => {
-            // Assign ID if not present
             if (!taskElement.id) {
-                taskElement.id = `${patient.id}-task-${index}-${Date.now()}`;
+                taskElement.id = patient.tasks[index]?.id || `${patient.id}-task-${index}`;
             }
             taskElement.setAttribute('title', 'Click for Perform / Details menu');
             setupTaskInteractions(taskElement, patient);
@@ -403,10 +402,39 @@ const PatientsModule = (() => {
         }
     };
 
+    // Update patient task statuses declaratively (panel host only — tabs also use data-patient-id)
+    const updatePatientTaskStatuses = () => {
+        const patients = gameState.getStateSlice('patients');
+        if (!patients) return;
+
+        patients.forEach(patient => {
+            const patientElement = document.querySelector(
+                `.patient-panel-host[data-patient-id="${patient.id}"]`
+            );
+            if (!patientElement) return;
+
+            const taskElements = patientElement.querySelectorAll('[data-task-type]');
+            taskElements.forEach(taskElement => {
+                const taskId = taskElement.id;
+                const task = gameState.getStateSlice('tasks').get(taskId);
+                
+                if (task) {
+                    // Update task status in DOM (\w+ alone breaks on not-yet / multi-hyphen statuses)
+                    taskElement.setAttribute('data-status', task.status);
+                    taskElement.className = taskElement.className.replace(/task-status-[\w-]+/g, '').trim();
+                    taskElement.classList.add(`task-status-${task.status}`);
+                }
+            });
+        });
+    };
+
     // Subscribe to game state changes
-    gameState.subscribe('currentTime', (currentTime) => {
-        // Update patient task statuses based on time (all mounted packs — census-aware)
-        updatePatientTaskStatuses(currentTime);
+    gameState.subscribe('currentTime', () => {
+        updatePatientTaskStatuses();
+    });
+    // Challenge wins can COMPLETE_TASK while paused — sync without waiting for a clock tick
+    gameState.subscribe('tasks', () => {
+        updatePatientTaskStatuses();
     });
 
     gameState.subscribe('activePatientId', () => {
@@ -416,30 +444,6 @@ const PatientsModule = (() => {
         applyPanelVisibility();
         renderPatientTabs();
     });
-
-    // Update patient task statuses declaratively
-    const updatePatientTaskStatuses = (currentTime) => {
-        const patients = gameState.getStateSlice('patients');
-        if (!patients) return;
-
-        patients.forEach(patient => {
-            const patientElement = document.querySelector(`[data-patient-id="${patient.id}"]`);
-            if (!patientElement) return;
-
-            const taskElements = patientElement.querySelectorAll('[data-task-type]');
-            taskElements.forEach(taskElement => {
-                const taskId = taskElement.id;
-                const task = gameState.getStateSlice('tasks').get(taskId);
-                
-                if (task) {
-                    // Update task status in DOM
-                    taskElement.setAttribute('data-status', task.status);
-                    taskElement.className = taskElement.className.replace(/task-status-\w+/g, '');
-                    taskElement.classList.add(`task-status-${task.status}`);
-                }
-            });
-        });
-    };
 
     // Public API
     return {

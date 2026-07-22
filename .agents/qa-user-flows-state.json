@@ -1,22 +1,46 @@
 {
   "suite": "QA_User_Flows",
   "seed_default": "http://localhost:8765/game/index.html?speed-factor=48",
-  "current_flow_id": "UF-01",
-  "status": "ready",
-  "last_updated_iso": "2026-07-22T05:10:00Z",
+  "current_flow_id": "UF-09",
+  "status": "in_progress",
+  "last_updated_iso": "2026-07-22T05:45:00Z",
   "results": {
-    "UF-01": { "status": "pending", "notes": "" },
-    "UF-02": { "status": "pending", "notes": "" },
-    "UF-03": { "status": "pending", "notes": "" },
-    "UF-04": { "status": "pending", "notes": "" },
-    "UF-05": { "status": "pending", "notes": "" },
-    "UF-06": { "status": "pending", "notes": "" },
-    "UF-07": { "status": "pending", "notes": "" },
-    "UF-08": { "status": "pending", "notes": "" },
+    "UF-01": {
+      "status": "pass",
+      "notes": "Disclaimer + pack objectives visible; Pause/Resume freezes/resumes #clock; Shift ends on toggles; H2 is-active without scrubbing (clock stayed 19:xx); census 6 patients + Global."
+    },
+    "UF-02": {
+      "status": "pass",
+      "notes": "Med identity pauses (#pause=Resume); wrong answer → no slot + retry feedback; Hep-Lock/heparin correct → slot (→19:26) then Finished; data-status=completed. Fixed: DOM task ids match registry; panel-host selector for status sync; schedule unlock skips terminal statuses."
+    },
+    "UF-03": {
+      "status": "pass",
+      "notes": "Tabs Robert→Aisha→Global→Joe: single .is-active host each time; Global shows Shift overview + doctor orders. Filled 3 slots (Joe Heparin, Robert Aspirin, Aisha Insulin); 4th (Derek Albuterol) entered Waiting (1); log Auto-assigned queued Albuterol neb; queue drained."
+    },
+    "UF-04": {
+      "status": "pass",
+      "notes": "Joe Chart history toggles hidden→open→hidden; TimelineJS lazy-mounts (#past-hx-timeline-joe) with events (e.g. hip pain Mar 2024; 9 markers). Lin past-hx also expands with tl-* mount. Joe tab remains usable."
+    },
+    "UF-05": {
+      "status": "pass",
+      "notes": "Atorvastatin not-yet / data-window-phase=before → no context menu. Heparin active / phase=early → Perform+Details enabled. Details alert: duration 10 mins, expires 2030."
+    },
+    "UF-06": {
+      "status": "pass",
+      "notes": "Global → orders-check-1900 menu Check orders/Details; completed with no med-identity quiz; slots unchanged empty; log includes Orders check."
+    },
+    "UF-07": {
+      "status": "pass",
+      "notes": "Lin bed prep: fail kept active + 'task not completed'; win CSBBBCL → log Challenge passed / Bed prep completed; DOM completed after sync. Added tasks-subscribe status sync for pause-time completes."
+    },
+    "UF-08": {
+      "status": "pass",
+      "notes": "20:00 drip Rapid response in shift log + Incidents; Maria Rapid-response triage assessment Perform → slot (→20:33), no med quiz, pause stayed Pause. Maria → critical → Code Blue modal (#pause=Resume, practice framing); BLS order call→CPR→AED Submit → log 'Code Blue response successful'."
+    },
     "UF-09": { "status": "pending", "notes": "" },
     "UF-10": { "status": "pending", "notes": "" },
     "UF-11": { "status": "pending", "notes": "" }
   },
   "error_fix_round": 0,
-  "notes": "Suite authored; not yet executed by QA loop."
+  "notes": "UF-01..UF-08 PASS. Next UF-09 Docs."
 }

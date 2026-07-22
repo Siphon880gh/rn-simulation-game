@@ -5,6 +5,7 @@
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
+import { mountTaskDom } from './dynamic-tasks.js';
 
 const firedEventIds = new Set();
 const deterioratedPatients = new Set();
@@ -55,7 +56,7 @@ function injectTasks(taskSpecs, at) {
     if (!Array.isArray(taskSpecs)) return;
     taskSpecs.forEach((spec) => {
         const scheduled = spec.scheduled != null ? spec.scheduled : at;
-        taskSystem.createTask({
+        const created = taskSystem.createTask({
             id: spec.id || `evt-task-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
             type: spec.type || 'assessment',
             taskClass: spec.taskClass || GameConfig.tasks.classes.URGENT,
@@ -64,10 +65,12 @@ function injectTasks(taskSpecs, at) {
             expire: spec.expire != null ? spec.expire : '+60',
             durationMins: spec.durationMins ?? 10,
             patientId: spec.patientId || null,
-            metadata: { ...(spec.metadata || {}), fromEvent: true }
+            metadata: { ...(spec.metadata || {}), fromEvent: true, incident: true }
         });
         // Activate immediately if already at/after scheduled
         taskSystem.processTasks(gameState.getStateSlice('currentTime') || scheduled);
+        const live = gameState.getStateSlice('tasks')?.get(created.id) || created;
+        mountTaskDom(live);
     });
 }
 
@@ -142,7 +145,7 @@ function bumpClinicalStatus(patientId, reason, { skipStep = false } = {}) {
 }
 
 function paintPatientStatusCue(patientId, status) {
-    const host = document.querySelector(`[data-patient-id="${patientId}"]`);
+    const host = document.querySelector(`.patient-panel-host[data-patient-id="${patientId}"]`);
     if (!host) return;
     let badge = host.querySelector('[data-clinical-status]');
     if (!badge) {
