@@ -1,5 +1,9 @@
 # About this simulation
 
+By Weng (Weng Fei Fung)
+
+<p class="credits-socials"><a target="_blank" href="https://www.linkedin.com/in/weng-fung/" rel="nofollow"><img src="https://img.shields.io/badge/LinkedIn-blue?style=flat&logo=linkedin&labelColor=blue" alt="Linked-In"></a> <a target="_blank" href="https://www.youtube.com/@WayneTeachesCode/" rel="nofollow"><img src="https://img.shields.io/badge/Youtube-red?style=flat&logo=youtube&labelColor=red" alt="Youtube"></a></p>
+
 Experience the intensity of a fast-paced 12-hour shift in this nursing simulation game. Manage multiple patients in ICU and Med-Surg units, facing real workloads and emergent situations. Your goal is to complete your shift without going into overtime, testing your clinical judgment, time management, and prioritization skills in a dynamic hospital environment.
 
 ## Disclaimer

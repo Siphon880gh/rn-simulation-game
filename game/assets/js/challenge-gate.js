@@ -36,6 +36,10 @@ import {
     pickCodeBlueQuestion,
     getCodeBlueExpectedCite as citeCodeBlueQuestion
 } from './code-blue-challenge.js';
+import {
+    buildAdmissionQuiz,
+    renderAdmissionQuizHtml
+} from './admission-quiz.js';
 import { applySituationStill, clearSituationStill } from './scene-backdrop.js';
 import { recordChallengeOutcome } from './scoring.js';
 import { applyIvChallengeResult, syncIvTaskMetadata } from './iv-system.js';
@@ -242,16 +246,20 @@ function finishAttempt(passed, reason, expected, opts = {}) {
         recordChallengeOutcome({ passed: true, reason, expected });
         const successMsg = activeSession?.bedPrep
             ? 'Correct — bed prep is done.'
-            : activeSession?.codeBluePatientId
-                ? 'Correct — Code Blue response recorded.'
-                : 'Correct — task is now performing in a slot.';
+            : activeSession?.admissionQuiz
+                ? 'Correct — admission step complete.'
+                : activeSession?.codeBluePatientId
+                    ? 'Correct — Code Blue response recorded.'
+                    : 'Correct — task is now performing in a slot.';
         setChallengeFeedback(successMsg, { ok: true });
         gameState.dispatch('APPEND_SHIFT_LOG', {
-            message: `Challenge passed: ${activeSession?.taskName || 'task'} → performing in slot`,
+            message: activeSession?.admissionQuiz || activeSession?.bedPrep
+                ? `Challenge passed: ${activeSession?.taskName || 'task'}`
+                : `Challenge passed: ${activeSession?.taskName || 'task'} → performing in slot`,
             timeLabel: String(gameState.getStateSlice('currentTime') ?? '—')
         });
         const statusEl = document.querySelector(GameConfig.selectors.statusMessage);
-        if (statusEl && !activeSession?.bedPrep && !activeSession?.codeBluePatientId) {
+        if (statusEl && !activeSession?.bedPrep && !activeSession?.codeBluePatientId && !activeSession?.admissionQuiz) {
             statusEl.textContent = `Performing ${activeSession?.taskName || 'task'} in a slot`;
         }
         activeSession.closing = true;
@@ -480,9 +488,11 @@ export function runChallengeGate(task) {
     return new Promise((resolve) => {
         const liveTask = isIvTask(task) ? syncIvTaskMetadata(task) : task;
         const bedPrep = isBedPrepTask(liveTask);
-        const useIv = !bedPrep && isIvTask(liveTask);
+        const admissionQuiz = !bedPrep ? buildAdmissionQuiz(liveTask) : null;
+        const useIv = !bedPrep && !admissionQuiz && isIvTask(liveTask);
         const ivPrompt = useIv ? buildIvPrompt(liveTask) : null;
-        const isMed = !bedPrep && !useIv && (!liveTask?.type || String(liveTask.type).toLowerCase() === 'med');
+        const isMed = !bedPrep && !admissionQuiz && !useIv
+            && (!liveTask?.type || String(liveTask.type).toLowerCase() === 'med');
         const useAccucheck = isMed && isAccucheckTask(liveTask);
         const accucheckPrompt = useAccucheck ? buildAccucheckPrompt(liveTask) : null;
         const medPrompt = isMed && !useAccucheck ? buildMedIdentityPrompt(liveTask) : null;
@@ -497,7 +507,8 @@ export function runChallengeGate(task) {
             ivPrompt,
             ivTask: useIv ? liveTask : null,
             bedPrep,
-            safety: !bedPrep && !useIv && !accucheckPrompt && !useMedQuiz
+            admissionQuiz: Boolean(admissionQuiz),
+            safety: !bedPrep && !admissionQuiz && !useIv && !accucheckPrompt && !useMedQuiz
         };
 
         gameState.dispatch('SET_PAUSE', { paused: true, source: CHALLENGE });
@@ -521,6 +532,15 @@ export function runChallengeGate(task) {
                     }
                 });
             }, 0);
+        } else if (admissionQuiz) {
+            ModalModule.openModal({
+                title: admissionQuiz.title || 'Admission challenge',
+                content: renderAdmissionQuizHtml(admissionQuiz, liveTask?.name),
+                footer: challengeModalFooter({ showSubmit: false }),
+                overlay: true,
+                persistent: false
+            });
+            setTimeout(wireSafetyHandlers, 0);
         } else if (ivPrompt) {
             ModalModule.openModal({
                 title: ivPrompt.kind === 'heparin-ptt'

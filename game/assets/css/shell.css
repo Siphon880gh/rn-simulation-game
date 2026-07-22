@@ -42,6 +42,19 @@ body.shell-body {
     margin: 0;
 }
 
+.shell-brand-heading #shell-brand-title.shell-brand-title--interactive {
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.shell-brand-heading #shell-brand-title.shell-brand-title--interactive:hover,
+.shell-brand-heading #shell-brand-title.shell-brand-title--interactive:focus-visible {
+    color: #1d4ed8;
+    background-color: rgba(37, 99, 235, 0.08);
+    outline: none;
+}
+
 .shell-test-mode {
     position: relative;
     display: inline-flex;

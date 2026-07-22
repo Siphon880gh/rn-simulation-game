@@ -1,8 +1,8 @@
 {
-  "current_epic_id": "E4",
-  "current_milestone_id": "E4.M4",
+  "current_epic_id": "E9",
+  "current_milestone_id": "E9.M6",
   "status": "backlog_complete",
-  "last_updated_iso": "2026-07-22T06:00:00Z",
+  "last_updated_iso": "2026-07-22T08:00:00Z",
   "decisions": {
     "platform": "web",
     "app_name": "RN Simulation Game",
@@ -53,7 +53,9 @@
     "markdown_renderer_rationale": "Default for Help/learning MD: plugin surface for wiki links, Mermaid fences, and KaTeX math; matches locked vanilla CDN shell. marked kept only as rejected thin fallback.",
     "ui_motion": "css_first",
     "ui_motion_rationale": "E7.M1: CSS panel-swap + status pulse; no GSAP until CSS ceiling proven.",
-    "skipped_doc": "SKIPPED_MILESTONES.md"
+    "skipped_doc": "SKIPPED_MILESTONES.md",
+    "admission_census_mode": "hold_last_pack_patient",
+    "admission_census_mode_rationale": "E9: census=minus1|openAdmit holds last pack patients[] id off boot census; openAdmit spawns that patient mid-shift with admission checklist. Reuse bed-prep + critical-lab Dr callback/recall."
   },
   "identified_epics": [
     {
@@ -100,6 +102,11 @@
       "id": "E8",
       "name": "Portfolio Packaging & Optional Social",
       "priority": "Later"
+    },
+    {
+      "id": "E9",
+      "name": "Open Admit & Admission Workflow",
+      "priority": "Post-MVP"
     }
   ],
   "milestones": [
@@ -294,6 +301,42 @@
       "epic": "E8",
       "name": "Optional auth/friends",
       "status": "skipped"
+    },
+    {
+      "id": "E9.M1",
+      "epic": "E9",
+      "name": "Landing census choice + census URL + hold-back boot",
+      "status": "done"
+    },
+    {
+      "id": "E9.M2",
+      "epic": "E9",
+      "name": "Open-to-admit schedule + mid-shift spawn + Admitting tab",
+      "status": "done"
+    },
+    {
+      "id": "E9.M3",
+      "epic": "E9",
+      "name": "Admission task spawn + bed-prep + perform wiring",
+      "status": "done"
+    },
+    {
+      "id": "E9.M4",
+      "epic": "E9",
+      "name": "Admission quizzes (allergies through flu / home recon)",
+      "status": "done"
+    },
+    {
+      "id": "E9.M5",
+      "epic": "E9",
+      "name": "Find-nurse skin-check retries",
+      "status": "done"
+    },
+    {
+      "id": "E9.M6",
+      "epic": "E9",
+      "name": "Call admitting quiz + MD callback + consult + clear Admitting",
+      "status": "done"
     }
   ],
   "completed": [
@@ -328,9 +371,15 @@
     "E7.M1",
     "E7.M2",
     "E7.M3",
-    "E8.M1"
+    "E8.M1",
+    "E9.M1",
+    "E9.M2",
+    "E9.M3",
+    "E9.M4",
+    "E9.M5",
+    "E9.M6"
   ],
-  "notes": "User confirmed Option A. Added E3.M6 waiting queue after E3.M2. E4.M3 pulled into MVP as hourly check-doctor-orders (expire end of hour); E2.M1 includes patient chart history (past hx). Architecture bar locked: decisions.architecture_style=declarative_modular (see IMPLEMENTATION_STORIES.md). E0.M3 stamped decisions.game_runtime=keep_modular_app (custom vanilla shell; no third-party engine). E0.M5 added: markdown-it + Mermaid Help/learning MD authoring + internal-link hover preview (decision docs AGENTS_POSSIBLE_DECISIONS__MARKDOWN*.md; port from context-devbrain/). Framework expansion folded into milestones (text/web GUI RN sim): E2.M2 panel swap + dynamic content + CSS transitions; E3.M5 dynamic template spawn; E4.M2 game-time emergency drip + thin deterioration; E6.M1\u2013M2 satisfaction/status score + final outcome; CSS motion in E3.M2/E2.M2, optional GSAP in E7.M1. Later backlog: E5.M3 bed-prep; E7 richer acuity/art. E0.M4 done (shell #fiction-disclaimer + ABOUT.md learning objectives). E0.M5 done (markdown-it + Mermaid + KaTeX + hover preview). E1.M1 done (SET_PAUSE ownership + GameConfig.timer defaults). E1.M2 done (shell chrome regions + hour tabs + shift log). Next: E2.M1 single-patient panels + past hx. Product focus locked: Clinical Training (EPIC_MAP + IMPLEMENTATION_STORIES). E2.M1 done (TimelineJS past hx). Next: E2.M2 panel swap. E2.M2 done (patient/global tabs + CSS panel swap + maria pack). Next: E2.M3 4-6 census. E2.M3 done (6-patient census). Next: E3.M1 task schema. E3.M1 done (task schema + MARK_OVERDUE lifecycle). Next: E3.M2 slot execution. E3.M2 done (3-slot execution + progress timemark). Next: E3.M6 waiting queue. E3.M6 done (FIFO waiting queue + auto-assign). E6.M0 done (thin prioritization debrief + shift log). Next: E4.M1 scenario pack loader. E4.M1 done (JSON scenario pack + loader; shell disclaimer kept). Next: E4.M2 timed event drip (\u2225 E5.M1). E4.M2 done (game-time event drip + thin deterioration + Code Blue hook log). Next: E5.M1 challenge gate. E5.M1 done (challenge modal + challenge pause source; pass\u2192slot / fail\u2192no slot). Next: E5.M2 med identity quiz. E5.M2 done (med brand\u2194generic typed quiz on Perform). Next: E3.M3 availability windows. E3.M3 done (availability windows gate Perform; early/late/end phases; style reveal with expire). Next: E4.M3 hourly check-doctor-orders. E4.M3 done (hourly check doctor orders + pack injections). Next: E3.M5 dynamic/urgent spawn. E3.M5 done (dynamic/urgent spawn + incident tabs without clock time). Next: E6.M1 scoring hooks. E6.M1 done (score state + challenge dock/cite + satisfaction). Next: E6.M2 final outcome debrief. E6.M2 done (practice outcome bands + live score cues + teaching debrief). MVP implementation_order complete; Later: E3.M4, E5.M3, E5.M4, E7, E8. E3.M4 done (batch/context-switch duration). Next: E5.M3 bed-prep admission mini-game. E5.M3 done (bed-prep CSBBBCL win-to-complete). E5.M4 done (Code Blue BLS order from E4 escalate). Next: E7.M1 scene art. E7.M1 done (CSS unit themes + situation still hooks; no GSAP). Next: E7.M2 chaos/incident packs. E7.M2 done (chaos incident pack merge). Next: E7.M3 richer acuity/complications. E7.M3 done (critical acuity + day shift pack). Next: E8.M1 portfolio packaging. E8.M1 done (README demo presets + shell links). Later order complete except E8.M2 auth/friends \u2014 STOP pending explicit re-approve. E8.M2 skipped by user (2026-07-22); see SKIPPED_MILESTONES.md. Backlog complete. E4.M4 done: root index department picker (Tele/Med-Surg/ICU) + packs tele-4/medsurg-5/icu-2 + patientOverrides acuity.",
+  "notes": "E9 open-to-admit shipped: landing census modal (minus1 / openAdmit), hold last pack patient, mid-shift admit spawn, Admitting tab, admission checklist + quizzes, find-nurse retries, call admitting + MD callback/consult. decisions.admission_census_mode=hold_last_pack_patient. Prior backlog (E0-E8 except skipped E8.M2) remains complete.",
   "skipped": [
     {
       "id": "E8.M2",

@@ -517,7 +517,48 @@ export function handleCriticalLabRecallComplete(task, opts = {}) {
 }
 
 /**
- * Player takes the callback — document orders (no further wait).
+ * After MD callback: spawn follow-up tasks declared on the lab (meds, assessments).
+ */
+function applyCallbackEffects(task, lab, now) {
+    const effects = Array.isArray(lab?.callbackEffects) ? lab.callbackEffects : [];
+    if (!effects.length) return [];
+
+    const spawned = [];
+    const callKey = task.metadata?.callTaskId || task.id;
+    effects.forEach((effect, index) => {
+        if (!effect?.name) return;
+        const id = `crit-fx-${callKey}-${index}`;
+        if (gameState.getStateSlice('tasks')?.has(id)) return;
+
+        const created = taskSystem.createTask({
+            id,
+            type: effect.type || 'assessment',
+            taskClass: effect.taskClass || GameConfig.tasks.classes.STAT,
+            name: effect.name,
+            scheduled: now,
+            expire: effect.expire != null ? effect.expire : '+90',
+            durationMins: effect.durationMins ?? 10,
+            patientId: task.patientId || null,
+            metadata: {
+                ...(effect.metadata || {}),
+                fromCriticalLabCallback: true,
+                labId: lab.id,
+                labShort: lab.shortName,
+                incident: true
+            }
+        });
+
+        taskSystem.processTasks(now);
+        const live = gameState.getStateSlice('tasks')?.get(created.id) || created;
+        mountTaskDom(live);
+        spawned.push(live);
+    });
+
+    return spawned;
+}
+
+/**
+ * Player takes the callback — document orders and apply MD side-effect tasks.
  */
 export function handleCriticalLabCallbackComplete(task) {
     if (!task?.id || task.metadata?.kind !== 'critical-lab-callback') return;
@@ -531,12 +572,22 @@ export function handleCriticalLabCallbackComplete(task) {
     }
     hideAwaitingCallbackToast();
     const now = gameState.getStateSlice('currentTime') ?? task.scheduled;
-    const hint = task.metadata.ordersHint || 'Follow new MD orders';
+    const lab = resolveLab(task.metadata);
+    const hint = lab.ordersHint || task.metadata.ordersHint || 'Follow new MD orders';
+    const effects = applyCallbackEffects(task, lab, now);
+    const effectNames = effects.map((t) => t.name).filter(Boolean);
+
     gameState.dispatch('APPEND_SHIFT_LOG', {
-        message: `MD orders for critical ${task.metadata.labShort}: ${hint}`,
+        message: effectNames.length
+            ? `MD orders for critical ${lab.shortName || task.metadata.labShort}: ${hint} → new tasks: ${effectNames.join('; ')}`
+            : `MD orders for critical ${lab.shortName || task.metadata.labShort}: ${hint}`,
         timeLabel: formatHHMM(now)
     });
-    statusMessage(`Orders received — ${task.metadata.labShort}`);
+    statusMessage(
+        effectNames.length
+            ? `Orders received — ${effectNames.join('; ')}`
+            : `Orders received — ${lab.shortName || task.metadata.labShort}`
+    );
 }
 
 function onTime(currentTime) {

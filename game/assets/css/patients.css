@@ -72,10 +72,34 @@
     line-height: 1.2;
 }
 
+.patient-tab-admit {
+    margin-top: 0.15rem;
+    align-self: flex-start;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #0f766e;
+    background: #ccfbf1;
+    border: 1px solid #5eead4;
+    border-radius: 0.25rem;
+    padding: 0.05rem 0.35rem;
+}
+
+.patient-tab.is-admitting {
+    border-color: #5eead4;
+}
+
 .patient-tab.is-active {
     background: #2563eb;
     border-color: #1d4ed8;
     color: #fff;
+}
+
+.patient-tab.is-active .patient-tab-admit {
+    color: #ecfeff;
+    background: rgba(15, 118, 110, 0.45);
+    border-color: rgba(204, 251, 241, 0.55);
 }
 
 .patient-tab[data-tab="global"] {

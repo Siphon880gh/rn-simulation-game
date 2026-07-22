@@ -62,6 +62,19 @@
 .markdown-content h3 { font-size: 1.15rem; }
 
 .markdown-content p { margin: 0 0 0.9rem; }
+
+.markdown-content .credits-socials {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.markdown-content .credits-socials a,
+.markdown-content .credits-socials img {
+    display: inline-block;
+    vertical-align: middle;
+}
 .markdown-content ul,
 .markdown-content ol { margin: 0 0 0.9rem; padding-left: 1.4rem; }
 .markdown-content li { margin: 0.25rem 0; }

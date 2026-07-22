@@ -21,6 +21,7 @@ let hourPeekShowTimer = null;
 let hourPeekHideTimer = null;
 let hourPeekActiveBtn = null;
 let hourPeekModalOpen = false;
+let brandMenuModalOpen = false;
 
 function formatHHMM(hhmm) {
     const n = Number(hhmm) || 0;
@@ -241,6 +242,103 @@ function openHourPeekModal(hourIndex, marks) {
 
 window.hourPeekClose = closeHourPeekModal;
 
+function closeBrandMenuModal() {
+    document.removeEventListener('keydown', onBrandMenuKeydown);
+    if (!brandMenuModalOpen) {
+        ModalModule.closeModal();
+        return;
+    }
+    brandMenuModalOpen = false;
+    gameState.dispatch('SET_PAUSE', { paused: false, source: PAUSE_MODAL });
+    ModalModule.closeModal();
+    setStatusMessage(gameState.getStateSlice('isPaused') ? 'Shift paused' : 'Shift running');
+}
+
+function onBrandMenuKeydown(event) {
+    if (event.key === 'Escape' && brandMenuModalOpen) {
+        event.preventDefault();
+        closeBrandMenuModal();
+    }
+}
+
+function restartCurrentShift() {
+    window.location.reload();
+}
+
+function chooseAnotherDepartment() {
+    window.location.href = '../index.html';
+}
+
+function wireBrandMenuModalActions() {
+    const footer = document.querySelector(GameConfig.selectors.modalFooter);
+    if (!footer) return;
+    footer.querySelectorAll('[data-brand-menu-action]').forEach((btn) => {
+        btn.addEventListener('click', (event) => {
+            event.preventDefault();
+            const action = btn.getAttribute('data-brand-menu-action');
+            if (action === 'resume') closeBrandMenuModal();
+            else if (action === 'restart') restartCurrentShift();
+            else if (action === 'department') chooseAnotherDepartment();
+        });
+    });
+}
+
+function openBrandMenuModal() {
+    if (brandMenuModalOpen || hourPeekModalOpen) return;
+    if (gameState.getStateSlice('gameStatus') === GameConfig.gameStates.GAME_OVER) return;
+
+    gameState.dispatch('SET_PAUSE', { paused: true, source: PAUSE_MODAL });
+    brandMenuModalOpen = true;
+    document.addEventListener('keydown', onBrandMenuKeydown);
+
+    ModalModule.openModal({
+        title: 'Shift menu',
+        content: `
+            <div class="brand-menu-modal space-y-3 text-left">
+                <p class="text-sm text-gray-600">Shift clock is paused. Restart this assignment, pick another unit, or resume.</p>
+            </div>
+        `,
+        footer: `
+            <div class="brand-menu-modal__actions flex flex-wrap gap-2 justify-end">
+                <button type="button" data-brand-menu-action="resume"
+                    class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Resume</button>
+                <button type="button" data-brand-menu-action="restart"
+                    class="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700">Restart shift</button>
+                <button type="button" data-brand-menu-action="department"
+                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Choose department</button>
+            </div>
+        `,
+        overlay: true,
+        persistent: false
+    });
+    wireBrandMenuModalActions();
+    setStatusMessage('Paused — shift menu');
+}
+
+function wireBrandMenu() {
+    const brandEl = document.querySelector(GameConfig.selectors.brandTitle);
+    if (!brandEl) return;
+
+    brandEl.classList.add('shell-brand-title--interactive');
+    brandEl.setAttribute('role', 'button');
+    brandEl.setAttribute('tabindex', '0');
+    brandEl.setAttribute('title', 'Shift menu');
+    brandEl.setAttribute('aria-haspopup', 'dialog');
+    brandEl.setAttribute('aria-label', 'Open shift menu');
+
+    const open = (event) => {
+        event.preventDefault();
+        openBrandMenuModal();
+    };
+    brandEl.addEventListener('click', open);
+    brandEl.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openBrandMenuModal();
+        }
+    });
+}
+
 function clampBottomHeight(px) {
     const topPrimary = document.querySelector(GameConfig.selectors.topPrimary);
     const topSecondary = document.querySelector(GameConfig.selectors.topSecondary);
@@ -451,6 +549,7 @@ const ShellChromeModule = {
         const activeHour = gameState.getStateSlice('activeHourIndex') || 0;
 
         initBottomResize();
+        wireBrandMenu();
         renderHourTabs(shiftStart, shiftDuration, activeHour);
         renderShiftLog(gameState.getStateSlice('shiftLog') || []);
         setStatusMessage('Shift ready');
@@ -467,7 +566,7 @@ const ShellChromeModule = {
         });
 
         gameState.subscribe('isPaused', (isPaused) => {
-            if (hourPeekModalOpen) return;
+            if (hourPeekModalOpen || brandMenuModalOpen) return;
             setStatusMessage(isPaused ? 'Shift paused' : 'Shift running');
         });
 

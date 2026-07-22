@@ -131,11 +131,32 @@ function applyShellBrand(pack) {
     document.title = brand;
 }
 
+/** Gray subtitle under brand — pack title plus census/admission mode. */
+function resolveCensusModeSubtitle() {
+    const key = GameConfig.urlParams?.census || 'census';
+    const raw = new URLSearchParams(window.location.search).get(key);
+    switch (raw) {
+        case 'minus1':
+            return 'one less, no admission';
+        case 'admitStart':
+            return 'one less, starting admission';
+        case 'admitMiddle':
+            return 'one less, middle admission';
+        case 'openAdmit':
+            return 'one less, open to admit';
+        default:
+            return null;
+    }
+}
+
 function applyPackChrome(pack) {
     applyShellBrand(pack);
     const titleEl = document.querySelector('#scenario-pack-title');
     if (titleEl) {
-        titleEl.textContent = pack.title;
+        const modeNote = resolveCensusModeSubtitle();
+        titleEl.textContent = modeNote
+            ? `${pack.title} · ${modeNote}`
+            : pack.title;
     }
     // Pack disclaimer is optional pack metadata — do not replace #fiction-disclaimer
     const packNote = document.querySelector('#scenario-pack-note');

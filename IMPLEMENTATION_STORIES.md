@@ -342,6 +342,34 @@ Next up: **Later** backlog (E3.M4, E5.M3, E5.M4, E7, E8) — MVP `implementation
 
 ---
 
+## E9 — Open Admit & Admission Workflow *(Post-MVP)*
+
+| ID | Story | Milestone | Status |
+|----|-------|-----------|--------|
+| S9.1 | Department picker census choice: subtract 1 **or** subtract 1 + open to admit (`?census=`) | E9.M1 | [x] |
+| S9.2 | Hold last pack patient off census at boot (`SET_ADMIT_HOLD`) | E9.M1 | [x] |
+| S9.3 | Open-to-admit random window (start / middle / near-end) + mid-shift `initializePatient` | E9.M2 | [x] |
+| S9.4 | Left-tab **Admitting** badge while `admissionPhase === 'admitting'` | E9.M2 | [x] |
+| S9.5 | Config-driven admission checklist spawn + bed-prep reuse + perform wiring | E9.M3 | [x] |
+| S9.6 | Admission quizzes: allergies, belongings, code status, home recon, NPO, BP, flu | E9.M4 | [x] |
+| S9.7 | Find nurse for skin check — fail/retry every 30 game min, max 4 (4th always succeeds) | E9.M5 | [x] |
+| S9.8 | Call admitting quiz + Dr callback / 15‑min recall + consult + clear Admitting | E9.M6 | [x] |
+
+### Milestones
+
+| Milestone | Goal | Non-goals | MVP? |
+|-----------|------|-----------|------|
+| **E9.M1** | Landing census modal + URL `census` + hold last pack patient | No new patient packs | Post-MVP |
+| **E9.M2** | Schedule admit + spawn + Admitting tab | No empty-bed inventory | Post-MVP |
+| **E9.M3** | Checklist spawn + bed-prep + context-menu perform | No full acuity physiology | Post-MVP |
+| **E9.M4** | Admission MCQ challenges via challenge-gate | No separate Phaser games | Post-MVP |
+| **E9.M5** | Find-nurse skin-check retries | No multiplayer nurses | Post-MVP |
+| **E9.M6** | Call admitting + MD callback/consult + clear phase | No separate order-entry EHR | Post-MVP |
+
+**E9 implement notes:** Admit identity = last id in pack `patients[]`. ICU consult = Intensivist; floor profiles in `GameConfig.admission.profiles`. Reuse bed-prep challenge + critical-lab “Dr will call back” toast/recall pattern.
+
+---
+
 ## Confirmation gate
 
 - [x] User approved `EPIC_MAP.md`

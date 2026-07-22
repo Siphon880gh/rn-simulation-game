@@ -118,6 +118,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 | E6 | Scoring & Shift Debrief | Player knows how the shift went | Points, grades, live feedback, end summary | Success signal | MVP |
 | E7 | Chaos, Presentation & Content Scale | Harder, richer, more replayable shifts | Art, chaos packs, incidents, more shifts/complications | Later wishlist | Later |
 | E8 | Portfolio Packaging & Optional Social | Ship/share beyond local demo | Polish, packaging; optional auth/friends | Later / social | Later |
+| E9 | Open Admit & Admission Workflow | Choose lighter census / open bed; run a full admission checklist when an admit arrives | Census choice, mid-shift admit spawn, Admitting tab, quizzes, find-nurse retries, admitting MD callback | Post-MVP clinical loop | Post-MVP |
 
 ---
 
@@ -204,6 +205,14 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 - **Out of scope:** Multiplayer realtime clinical sync.
 - **Suggested order:** Last.
 
+### E9. Open Admit & Admission Workflow
+- **Goal / user outcome:** At unit select, start with census −1, optionally open to admit; when the admit arrives, run a teachable admission checklist (bed prep, allergies, belongings, code status, home recon, NPO, BP, flu, skin check with nurse find retries, call admitting + MD callback/consult).
+- **Why:** Extends department picker into realistic capacity + admission pressure without new patient HTML packs (held last pack patient).
+- **Includes:** Landing census modal; `?census=minus1|openAdmit`; `admission-system.js` schedule (start/mid/near-end); Admitting tab badge; challenge-gate admission quizzes; find-nurse 30‑min retries (max 4); admitting call-back patterned on critical labs.
+- **Dependencies:** E4.M4 picker, E5.M3 bed-prep, E5.M1 challenge gate, critical-lab callback UX.
+- **Out of scope:** New patient art packs; empty-bed inventory UI; multiplayer nurse availability.
+- **Suggested order:** After E4.M4 / E5.M3 (shipped post-MVP).
+
 ---
 
 ## C. Coverage Check
@@ -221,6 +230,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 | Scoring (tasks + satisfaction/status) + final outcome + debrief | E6 |
 | Chaos, art, richer acuity, content scale | E7 |
 | Auth/friends / packaging | E8 |
+| Open-to-admit census choice + admission checklist / MD callback | E9 |
 | Fictional disclaimer + clinical tone | Decisions + all content epics |
 | Help / learning MD authoring + Mermaid + LaTeX math | E0.M5 (+ content epics author files) |
 | Vanilla/light stack | Decisions in state.json |

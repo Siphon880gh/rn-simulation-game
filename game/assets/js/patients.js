@@ -91,7 +91,9 @@ const PatientsModule = (() => {
     let panelMode = 'patient'; // 'patient' | 'global'
 
     // Declarative patient initialization
-    const initializePatient = async (patientConfig) => {
+    // options.skipPackTasks — admit spawn: panel only; checklist comes from admission-system
+    // options.admissionPhase — 'admitting' | 'admitted' | null
+    const initializePatient = async (patientConfig, options = {}) => {
         try {
             // Load patient HTML template
             const response = await fetch(patientConfig.htmlFile);
@@ -117,32 +119,47 @@ const PatientsModule = (() => {
                 ? Number(overrides.acuityScore)
                 : 0;
 
+            const skipPackTasks = Boolean(options.skipPackTasks);
+            const packTasks = extractTasksFromHTML(html, patientConfig.id);
+
             // Create patient data model
             const patient = {
                 ...patientConfig,
-                tasks: extractTasksFromHTML(html, patientConfig.id),
+                tasks: skipPackTasks ? [] : packTasks,
                 pastHx: pastHxPack.pastHx || [],
                 pastHxPack,
                 status: 'active',
                 clinicalStatus,
-                clinicalStatusReason: overrides.clinicalStatusReason || null,
+                clinicalStatusReason: overrides.clinicalStatusReason
+                    || (options.admissionPhase === 'admitting' ? 'New admission' : null),
                 acuityScore,
+                admissionPhase: options.admissionPhase || null,
                 loadedAt: new Date().toISOString()
             };
 
             // Register patient in game state
             gameState.dispatch('REGISTER_PATIENT', { patient });
             
-            // Register patient tasks in task system
-            patient.tasks.forEach((taskData) => {
-                taskSystem.createTask({
-                    ...taskData,
-                    patientId: patient.id
+            // Register patient tasks in task system (skipped for mid-shift admits)
+            if (!skipPackTasks) {
+                patient.tasks.forEach((taskData) => {
+                    taskSystem.createTask({
+                        ...taskData,
+                        patientId: patient.id
+                    });
                 });
-            });
+            }
 
             // Render patient in UI (all packs stay mounted; swap via activePatientId)
             renderPatient(patient, html);
+
+            if (skipPackTasks) {
+                const panelHost = document.querySelector(
+                    `.patient-panel-host[data-patient-id="${patient.id}"]`
+                );
+                panelHost?.querySelectorAll('[data-task-type]').forEach((el) => el.remove());
+            }
+
             // E3.M3: write absolute expire (+ resolved) onto DOM for reveal rules / window phase
             syncMountedTaskWindows(patient);
             paintInitialClinicalStatus(patient);
@@ -287,8 +304,14 @@ const PatientsModule = (() => {
             btn.setAttribute('role', 'tab');
             btn.dataset.tab = 'patient';
             btn.dataset.patientId = patient.id;
+            if (patient.admissionPhase === 'admitting') {
+                btn.classList.add('is-admitting');
+            }
             const room = (patient.room || '').replace(/^Room\s+/i, '');
-            btn.innerHTML = `<span class="patient-tab-room">${room}</span><span class="patient-tab-name">${patient.name}</span>`;
+            const admitBadge = patient.admissionPhase === 'admitting'
+                ? '<span class="patient-tab-admit">Admitting</span>'
+                : '';
+            btn.innerHTML = `<span class="patient-tab-room">${room}</span><span class="patient-tab-name">${patient.name}</span>${admitBadge}`;
             if (panelMode === 'patient' && patient.id === activeId) {
                 btn.classList.add('is-active');
                 btn.setAttribute('aria-selected', 'true');
@@ -424,21 +447,52 @@ const PatientsModule = (() => {
 
     const handleTaskAction = () => {};
 
+    function resolveCensusMode() {
+        const key = GameConfig.urlParams?.census || 'census';
+        const raw = new URLSearchParams(window.location.search).get(key);
+        // full / absent = full pack; minus1 = N-1 no admit; admit* / openAdmit = hold + spawn
+        if (
+            raw === 'minus1'
+            || raw === 'admitStart'
+            || raw === 'admitMiddle'
+            || raw === 'openAdmit'
+        ) {
+            return raw;
+        }
+        return null;
+    }
+
     // Main initialization function — census order from active scenario pack (E4.M1) when present
     const init = async () => {
         try {
             const pack = gameState.getStateSlice('scenarioPack');
             const packIds = Array.isArray(pack?.patients) ? pack.patients : null;
-            const configs = packIds
+            let ids = packIds
                 ? packIds.map((id) => {
                     const cfg = patientConfigs[id];
                     if (!cfg) {
                         throw new Error(`Scenario pack references unknown patient id: ${id}`);
                     }
-                    return cfg;
+                    return id;
                 })
-                : Object.values(patientConfigs);
+                : Object.keys(patientConfigs);
 
+            const censusMode = resolveCensusMode();
+            let heldPatientId = null;
+            if (censusMode && ids.length > 1) {
+                heldPatientId = ids[ids.length - 1];
+                ids = ids.slice(0, -1);
+                gameState.dispatch('SET_ADMIT_HOLD', {
+                    heldPatientId,
+                    mode: censusMode,
+                    spawned: false,
+                    findNurseAttempt: 0
+                });
+            } else if (censusMode && ids.length <= 1) {
+                console.warn('Census hold skipped — pack has fewer than 2 patients');
+            }
+
+            const configs = ids.map((id) => patientConfigs[id]);
             const patients = await Promise.all(
                 configs.map((config) => initializePatient(config))
             );
@@ -453,7 +507,10 @@ const PatientsModule = (() => {
             applyPanelVisibility();
             updateCensusMeta();
 
-            console.log(`Initialized ${patients.length} patients (census)`);
+            console.log(
+                `Initialized ${patients.length} patients (census)`
+                + (heldPatientId ? `; held ${heldPatientId} (${censusMode})` : '')
+            );
             return patients;
         } catch (error) {
             console.error('Failed to initialize patients:', error);

@@ -26,6 +26,7 @@ class GameState {
       })),
       slotQueue: [],
       scenarioPack: null,
+      admitHold: null,
       firedEvents: [],
       codeBlueHook: null,
       score: {
@@ -223,6 +224,29 @@ class GameState {
       ...this.state,
       scenarioPack: payload.pack || null
     }));
+
+    /** E9: held patient off census (minus1 / admitStart / admitMiddle / openAdmit) */
+    this.actions.set('SET_ADMIT_HOLD', (payload) => ({
+      ...this.state,
+      admitHold: payload?.heldPatientId
+        ? {
+            heldPatientId: payload.heldPatientId,
+            mode: payload.mode || 'minus1',
+            admitAt: payload.admitAt ?? null,
+            windowKey: payload.windowKey ?? null,
+            spawned: Boolean(payload.spawned),
+            findNurseAttempt: Number(payload.findNurseAttempt) || 0
+          }
+        : null
+    }));
+
+    this.actions.set('UPDATE_ADMIT_HOLD', (payload) => {
+      if (!this.state.admitHold) return this.state;
+      return {
+        ...this.state,
+        admitHold: { ...this.state.admitHold, ...(payload || {}) }
+      };
+    });
 
     this.actions.set('UPDATE_PATIENT', (payload) => {
       const patients = new Map(this.state.patients);

@@ -165,10 +165,13 @@ export function mountTaskDom(task) {
             : 'fa-bell text-amber-600';
     const badge = isCrit ? 'critical lab' : 'dynamic';
     const badgeClass = isCrit ? 'text-red-700' : 'text-amber-700';
+    const labResult = isCrit && task.metadata?.labResult
+        ? `<span class="block text-xs text-red-800 mt-0.5 font-normal">${task.metadata.labResult}</span>`
+        : '';
     li.innerHTML = `
       <data class="slot-label" value="1"></data>
       <i class="fas ${icon} text-xl mr-3"></i>
-      <span class="font-medium text-gray-900">${task.name}</span>
+      <span class="font-medium text-gray-900 flex-1 min-w-0">${task.name}${labResult}</span>
       <span class="ml-auto text-xs uppercase tracking-wide ${badgeClass}">${badge}</span>
     `;
     list.appendChild(li);

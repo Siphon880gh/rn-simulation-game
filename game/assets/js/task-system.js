@@ -102,6 +102,19 @@ class TaskSystem {
       }),
       render: (task) => this.renderGenericTask(task)
     });
+
+    // Open-to-admit checklist (E9)
+    this.taskProcessors.set('admission', {
+      shouldActivate: (task, currentTime) => isAtOrAfterInShift(currentTime, task.scheduled),
+      shouldExpire: (task, currentTime) => (
+        task.expire != null && isAfterInShift(currentTime, task.expire)
+      ),
+      getContextMenu: () => ({
+        perform: { name: 'Perform', icon: 'add' },
+        details: { name: 'Details', icon: 'question' }
+      }),
+      render: (task) => this.renderGenericTask(task)
+    });
   }
 
   /**

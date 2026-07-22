@@ -1,8 +1,8 @@
 # RN Simulation Game
 
-By Weng Fei Fung
+By Weng (Weng Fei Fung)
 
-![Last Commit](https://img.shields.io/github/last-commit/Siphon880gh/In-Game-Timer/main)
+![Last Commit](https://img.shields.io/github/last-commit/Siphon880gh/rn-simulation-game/main)
 <a target="_blank" href="https://github.com/Siphon880gh" rel="nofollow"><img src="https://img.shields.io/badge/GitHub--blue?style=social&logo=GitHub" alt="Github" data-canonical-src="https://img.shields.io/badge/GitHub--blue?style=social&logo=GitHub" style="max-width:8.5ch;"></a>
 <a target="_blank" href="https://www.linkedin.com/in/weng-fung/" rel="nofollow"><img src="https://img.shields.io/badge/LinkedIn-blue?style=flat&logo=linkedin&labelColor=blue" alt="Linked-In" data-canonical-src="https://img.shields.io/badge/LinkedIn-blue?style=flat&amp;logo=linkedin&amp;labelColor=blue" style="max-width:10ch;"></a>
 <a target="_blank" href="https://www.youtube.com/@WayneTeachesCode/" rel="nofollow"><img src="https://img.shields.io/badge/Youtube-red?style=flat&logo=youtube&labelColor=red" alt="Youtube" data-canonical-src="https://img.shields.io/badge/Youtube-red?style=flat&amp;logo=youtube&amp;labelColor=red" style="max-width:10ch;"></a>
@@ -34,6 +34,8 @@ python3 -m http.server 8765
 | Telemetry | 4 patients | `http://localhost:8765/` → **Start Tele** |
 | Med-Surg | 5 patients | `http://localhost:8765/` → **Start Med-Surg** |
 | ICU | 2 patients (higher acuity) | `http://localhost:8765/` → **Start ICU** |
+
+After picking a unit, choose: **Full load**, **No admission** (N−1, no admit), **Admission — start of shift**, or **Admission — middle of shift**. Admit options start at N−1 and bring the held patient with an admission checklist. Query: omit `census`, or `census=minus1` / `admitStart` / `admitMiddle`.
 
 Packs: `game/events/scenarios/tele-4.json`, `medsurg-5.json`, `icu-2.json`.
 

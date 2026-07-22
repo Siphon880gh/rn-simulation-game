@@ -38,6 +38,8 @@ Adding a patient = new config entry + HTML under `game/events/patients/` (+ opti
 
 **E4.M1 packs:** `game/events/scenarios/*.json` lists patient ids + optional `disclaimer` / `learningObjectives`. `ScenarioPackModule` loads before `patients.init()`; census order follows pack `patients[]`. Shell `#fiction-disclaimer` is not replaced by pack text.
 
+**E9 census hold / admit:** Landing choice → `?census=` omitted/`full` (full load), `minus1` (N−1, no admit), `admitStart` / `admitMiddle` (hold last pack patient + spawn in that band). Legacy `openAdmit` still randomizes start/middle/near-end. Spawn via `admission-system.js`; new patient gets `admissionPhase: 'admitting'` (left-tab **Admitting** badge) + config-driven checklist.
+
 **E2.M2 swap:** All packs mount under `#patients` as `.patient-panel-host`. `#patient-tabs` + Global tab drive `SET_ACTIVE_PATIENT` / `panelMode`; CSS opacity/translate transitions; task DOM stays mounted (census-aware).
 
 ---

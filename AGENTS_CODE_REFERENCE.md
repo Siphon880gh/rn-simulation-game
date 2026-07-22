@@ -94,6 +94,8 @@ rngame/
 │   │   ├── med-identity-quiz.js       # E5.M2 brand↔generic typed quiz
 │   │   ├── bed-prep-challenge.js      # E5.M3 CSBBBCL bed prep (win to complete)
 │   │   ├── code-blue-challenge.js     # E5.M4 BLS order mini-game
+│   │   ├── admission-system.js        # E9 open-to-admit schedule + checklist / MD callback
+│   │   ├── admission-quiz.js          # E9 admission MCQ content for challenge-gate
 │   │   ├── task-class-interactions.js # E3.M4 batch/context-switch duration
 │   │   ├── scene-backdrop.js          # E7.M1 unit theme + situation still hooks
 │   │   ├── availability-windows.js    # E3.M3 window phases + Perform gate
@@ -110,6 +112,7 @@ rngame/
 │       ├── scenarios/*.json           # night + day packs (census, scene, incidentPackUrl)
 │       ├── incidents/*.json           # E7.M2 chaos templates + events (merged into pack)
 │       └── patients/*.html            # six census packs (+ optional *-past-hx.json)
+├── assets/js/landing-census.js        # root picker census −1 / open-to-admit modal
 ├── docs/{devs,players,learning}/      # markdown shown in docs dropdown (ABOUT.md = disclaimer + objectives)
 └── prompts/                           # milestone authoring (not runtime)
 ```
@@ -122,11 +125,11 @@ Line counts are approximate totals to help decide whether to load a whole file.
 
 1. **Boot** — `app.js` constructs `GameApplication`, runs `initialize()` on DOM ready.
 2. **Scenario pack** — `ScenarioPackModule.init()` loads JSON (`?scenario=` or default), optionally merges `incidentPackUrl` / default chaos pack, stores `scenarioPack`, paints pack title/objectives (shell `#fiction-disclaimer` stays default). `scene-backdrop` applies unit theme.
-3. **Patients** — `PatientsModule.init()` loads census from pack `patients[]` (fallback: all configs), parses `[data-task-type]`, registers into state/DOM.
+3. **Patients** — `PatientsModule.init()` loads census from pack `patients[]` (fallback: all configs). With `?census=minus1|openAdmit`, holds last pack patient (`admitHold`) and boots N−1. Parses `[data-task-type]`, registers into state/DOM.
 4. **Subscriptions** — `currentTime` → `taskSystem.processTasks()`; also patients refresh DOM status classes.
-5. **Start** — URL params (or pack `shiftStart`) → `INITIALIZE_GAME` → pack log line → `GameTimerModule.start(...)`.
-6. **Tick** — timer interval (scaled by speed factor) updates `#clock`, `UPDATE_TIME`, reveals scheduled tasks at 15-min poll marks (CSS + `data-status="active"`). `event-drip` fires pack events; `doctor-orders` spawns a per-hour check; overdue work bumps `clinicalStatus` / `acuityScore` and may open Code Blue via `codeBlueHook` subscribe.
-7. **Interact** — contextMenu Perform → `challenge-gate` (pause `challenge`; med quiz / bed-prep / safety; bed-prep must win to `completeTask`) → pass → slot (most types) or complete (bed-prep).
+5. **Start** — URL params (or pack `shiftStart`) → `INITIALIZE_GAME` → pack log line → `admission.init` (schedules open-to-admit HHMM) → `GameTimerModule.start(...)`.
+6. **Tick** — timer interval (scaled by speed factor) updates `#clock`, `UPDATE_TIME`, reveals scheduled tasks at 15-min poll marks (CSS + `data-status="active"`). `event-drip` fires pack events; `doctor-orders` spawns a per-hour check; `admission-system` may spawn held patient + checklist; overdue work bumps `clinicalStatus` / `acuityScore` and may open Code Blue via `codeBlueHook` subscribe.
+7. **Interact** — contextMenu Perform → `challenge-gate` (pause `challenge`; med quiz / bed-prep / admission quizzes / safety; bed-prep + admission steps must win to `completeTask`) → pass → slot (most types) or complete (bed-prep / admission). Find-nurse + admitting call/callback follow critical-lab-style recall.
 8. **End** — timer seconds exhausted → `GAME_OVER` → finalize score → practice **outcome** debrief (bands + by-patient notes + ethics framing) + dimmed shell.
 
 ### Snippet — entry pipeline (near top / middle of `app.js`)

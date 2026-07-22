@@ -97,6 +97,15 @@ export const GameConfig = {
           details: { name: 'Details', icon: 'question' }
         }
       },
+      ADMISSION: {
+        name: 'Admission',
+        icon: 'fas fa-hospital-user',
+        color: 'teal',
+        contextMenu: {
+          perform: { name: 'Perform', icon: 'add' },
+          details: { name: 'Details', icon: 'question' }
+        }
+      },
       DEFAULT: {
         name: 'Task',
         icon: 'fas fa-tasks',
@@ -281,7 +290,198 @@ export const GameConfig = {
     speedFactor: 'speed-factor',
     shiftStarts: 'shift-starts',
     shiftDuration: 'shift-duration',
-    scenarioPack: 'scenario'
+    scenarioPack: 'scenario',
+    /** E9: full (omit) | minus1 | admitStart | admitMiddle | openAdmit (legacy random) */
+    census: 'census'
+  },
+
+  /**
+   * Open-to-admit / admission checklist (E9).
+   * Hold last pack patient when census=minus1|admitStart|admitMiddle|openAdmit.
+   * Spawn admit + tasks for admitStart / admitMiddle / openAdmit.
+   */
+  admission: {
+    windows: {
+      start: { minPct: 0.05, maxPct: 0.15 },
+      middle: { minPct: 0.45, maxPct: 0.55 },
+      nearEnd: { minPct: 0.80, maxPct: 0.90 }
+    },
+    findNurse: {
+      maxAttempts: 4,
+      retryEveryMins: 30,
+      /** Fail chance by attempt index 0..3 (4th always succeeds) */
+      failChances: [0.7, 0.5, 0.3, 0],
+      durationMins: 8,
+      expireOffsetMins: 45
+    },
+    callAdmitting: {
+      callWindowMins: 60,
+      callDurationMins: 8,
+      callbackDurationMins: 10,
+      recallEveryMins: 15,
+      recallDurationMins: 5,
+      immediateCallbackChance: 0.35,
+      callbackDelayMins: { min: 5, max: 40 },
+      awaitingToastMessage: 'Dr will call back',
+      expireOffsetMins: 90
+    },
+    /** Per-patient consult / quiz flavor (ICU pack overrides consult → Intensivist) */
+    profiles: {
+      aisha: {
+        consult: 'Endocrinology',
+        allergies: ['NKDA'],
+        homeMeds: ['insulin glargine', 'metformin'],
+        bpTarget: { systolicMin: 100, systolicMax: 150, diastolicMin: 60, diastolicMax: 95 },
+        diagnosisHint: 'DKA resolving — endocrine follow-up'
+      },
+      lin: {
+        consult: 'Surgery',
+        allergies: ['Penicillin — rash'],
+        homeMeds: ['omeprazole', 'acetaminophen'],
+        bpTarget: { systolicMin: 100, systolicMax: 150, diastolicMin: 60, diastolicMax: 95 },
+        diagnosisHint: 'Post-op lap chole'
+      },
+      derek: {
+        consult: 'Pulmonology',
+        allergies: ['Sulfa'],
+        homeMeds: ['albuterol', 'tiotropium', 'prednisone'],
+        bpTarget: { systolicMin: 100, systolicMax: 160, diastolicMin: 60, diastolicMax: 100 },
+        diagnosisHint: 'COPD exacerbation'
+      },
+      robert: {
+        consult: 'Cardiology',
+        allergies: ['NKDA'],
+        homeMeds: ['aspirin', 'atorvastatin', 'metoprolol'],
+        bpTarget: { systolicMin: 90, systolicMax: 140, diastolicMin: 55, diastolicMax: 90 },
+        diagnosisHint: 'NSTEMI rule-out'
+      },
+      maria: {
+        consult: 'Infectious Disease',
+        allergies: ['Codeine'],
+        homeMeds: ['lisinopril', 'albuterol'],
+        bpTarget: { systolicMin: 100, systolicMax: 150, diastolicMin: 60, diastolicMax: 95 },
+        diagnosisHint: 'Community-acquired pneumonia'
+      },
+      joe: {
+        consult: 'Orthopedics',
+        allergies: ['Latex'],
+        homeMeds: ['warfarin', 'metformin'],
+        bpTarget: { systolicMin: 100, systolicMax: 150, diastolicMin: 60, diastolicMax: 95 },
+        diagnosisHint: 'Post-op total hip'
+      },
+      default: {
+        consult: 'Hospitalist',
+        allergies: ['NKDA'],
+        homeMeds: ['multivitamin'],
+        bpTarget: { systolicMin: 100, systolicMax: 150, diastolicMin: 60, diastolicMax: 95 },
+        diagnosisHint: 'New admission'
+      }
+    },
+    /** Checklist spawned at admit time (skinCheck / callback spawn separately) */
+    tasks: [
+      {
+        id: 'prepare-bed',
+        type: 'bedprep',
+        name: 'Prepare bed for admission',
+        taskClass: 'urgent',
+        scheduledOffsetMins: 0,
+        expireOffsetMins: 90,
+        durationMins: 15
+      },
+      {
+        id: 'allergies',
+        type: 'admission',
+        challenge: 'allergies',
+        name: 'Ask patient allergies',
+        taskClass: 'urgent',
+        scheduledOffsetMins: 0,
+        expireOffsetMins: 120,
+        durationMins: 5
+      },
+      {
+        id: 'belongings',
+        type: 'admission',
+        challenge: 'belongings',
+        name: 'Check belongings',
+        taskClass: 'routine',
+        scheduledOffsetMins: 5,
+        expireOffsetMins: 120,
+        durationMins: 8
+      },
+      {
+        id: 'code-status',
+        type: 'admission',
+        challenge: 'codeStatus',
+        name: 'Ask patient code status',
+        taskClass: 'urgent',
+        scheduledOffsetMins: 5,
+        expireOffsetMins: 120,
+        durationMins: 8
+      },
+      {
+        id: 'home-recon',
+        type: 'admission',
+        challenge: 'homeRecon',
+        name: 'Home medication reconciliation',
+        taskClass: 'urgent',
+        scheduledOffsetMins: 10,
+        expireOffsetMins: 150,
+        durationMins: 12
+      },
+      {
+        id: 'npo',
+        type: 'admission',
+        challenge: 'npo',
+        name: 'NPO at first (explain to patient waiting on doctor for diet order)',
+        taskClass: 'urgent',
+        scheduledOffsetMins: 0,
+        expireOffsetMins: 90,
+        durationMins: 5
+      },
+      {
+        id: 'bp',
+        type: 'admission',
+        challenge: 'bp',
+        name: 'Take admission blood pressure',
+        taskClass: 'urgent',
+        scheduledOffsetMins: 0,
+        expireOffsetMins: 90,
+        durationMins: 5
+      },
+      {
+        id: 'flu-shot',
+        type: 'admission',
+        challenge: 'fluShot',
+        name: 'Offer flu shot',
+        taskClass: 'routine',
+        scheduledOffsetMins: 15,
+        expireOffsetMins: 180,
+        durationMins: 5
+      },
+      {
+        id: 'find-nurse',
+        type: 'admission',
+        phase: 'findNurse',
+        name: 'Find second nurse for skin check (Might no one available)',
+        taskClass: 'urgent',
+        scheduledOffsetMins: 10,
+        expireOffsetMins: 45,
+        durationMins: 8,
+        spawn: 'findNurse'
+      },
+      {
+        id: 'call-admitting',
+        type: 'admission',
+        phase: 'call',
+        challenge: 'callAdmitting',
+        name: 'Call admitting for orders',
+        taskClass: 'stat',
+        scheduledOffsetMins: 20,
+        expireOffsetMins: 90,
+        durationMins: 8,
+        spawn: 'call'
+      }
+    ]
   },
 
   /**
@@ -356,7 +556,7 @@ export const GameConfig = {
     recallDurationMins: 5,
     awaitingToastMs: 4200,
     awaitingToastMessage: 'Dr will call back',
-    maxPerShift: 4,
+    maxPerShift: 5,
     immediateCallbackChance: 0.35,
     callbackDelayMins: { min: 5, max: 40 },
     labs: [
@@ -364,49 +564,185 @@ export const GameConfig = {
         id: 'k-high',
         shortName: 'K+',
         fullName: 'Potassium',
-        result: '6.2 mEq/L (critical high)',
-        ordersHint: 'ECG, hold K supplements, notify MD — consider kayexalate / insulin-dextrose per protocol'
+        result: '6.8 mEq/L (critical high — risk of arrhythmia)',
+        ordersHint: 'STAT ECG, hold K supplements / ACEI, insulin-dextrose + kayexalate per MD',
+        callbackEffects: [
+          {
+            type: 'assessment',
+            name: 'STAT 12-lead ECG (hyperkalemia)',
+            durationMins: 10,
+            expire: '+45',
+            taskClass: 'stat'
+          },
+          {
+            type: 'med',
+            name: 'Insulin regular IV + D50W (K+ shift)',
+            durationMins: 15,
+            expire: '+60',
+            taskClass: 'stat'
+          }
+        ]
       },
       {
         id: 'hh-drop',
         shortName: 'H/H',
         fullName: 'Hemoglobin / Hematocrit',
-        result: 'Hgb 6.8 / Hct 20.4 (critical low)',
-        ordersHint: 'Type & cross, hold anticoagulants, prepare for possible transfusion'
+        result: 'Hgb 5.9 g/dL / Hct 17.8% (critical low)',
+        ordersHint: 'Type & cross 2U PRBCs, hold anticoagulants, prepare transfusion',
+        callbackEffects: [
+          {
+            type: 'assessment',
+            name: 'Type & crossmatch 2 units PRBCs',
+            durationMins: 12,
+            expire: '+90',
+            taskClass: 'stat'
+          },
+          {
+            type: 'med',
+            name: 'Transfuse PRBCs 1 unit',
+            durationMins: 45,
+            expire: '+180',
+            taskClass: 'urgent'
+          }
+        ]
       },
       {
         id: 'blood-culture',
         shortName: 'Blood culture',
         fullName: 'Blood culture',
-        result: 'Gram-positive cocci in clusters (prelim positive)',
-        ordersHint: 'Review antibiotics, source control, consider ID consult'
+        result: 'Gram-positive cocci in clusters — prelim positive (likely Staph)',
+        ordersHint: 'Start empiric vancomycin, source control, consider ID consult',
+        callbackEffects: [
+          {
+            type: 'med',
+            name: 'Vancomycin 1 g IV (new — blood culture +)',
+            durationMins: 20,
+            expire: '+120',
+            taskClass: 'stat'
+          },
+          {
+            type: 'assessment',
+            name: 'Repeat blood cultures ×2 (different sites)',
+            durationMins: 15,
+            expire: '+90',
+            taskClass: 'urgent'
+          }
+        ]
       },
       {
         id: 'troponin',
         shortName: 'Troponin',
         fullName: 'Troponin I',
-        result: 'Elevated — critical',
-        ordersHint: 'ECG, continuous telemetry, hold for cardiology callback orders'
+        result: 'Troponin I 4.6 ng/mL (critical high — ACS range)',
+        ordersHint: 'STAT ECG, continuous telemetry, NSTEMI pathway / cardiology',
+        callbackEffects: [
+          {
+            type: 'assessment',
+            name: 'STAT 12-lead ECG (troponin+)',
+            durationMins: 10,
+            expire: '+30',
+            taskClass: 'stat'
+          },
+          {
+            type: 'med',
+            name: 'Aspirin 325 mg PO (chew) — ACS order',
+            durationMins: 10,
+            expire: '+45',
+            taskClass: 'stat'
+          }
+        ]
       },
       {
         id: 'mag-low',
         shortName: 'Mg',
         fullName: 'Magnesium',
-        result: '1.0 mg/dL (critical low)',
-        ordersHint: 'IV magnesium repletion, telemetry if dysrhythmia risk'
+        result: '0.8 mg/dL (critical low — tetany / QT risk)',
+        ordersHint: 'IV magnesium sulfate repletion, telemetry',
+        callbackEffects: [
+          {
+            type: 'med',
+            name: 'Magnesium sulfate 2 g IV',
+            durationMins: 20,
+            expire: '+90',
+            taskClass: 'stat'
+          }
+        ]
       },
       {
         id: 'inr-high',
         shortName: 'INR',
         fullName: 'INR',
-        result: '4.8 (critical high)',
-        ordersHint: 'Hold warfarin, assess bleeding, vitamin K / FFP per MD'
+        result: '6.2 (critical high — bleeding risk)',
+        ordersHint: 'Hold warfarin, assess bleeding, vitamin K ± FFP/PCC per MD',
+        callbackEffects: [
+          {
+            type: 'med',
+            name: 'Vitamin K 10 mg IV (supratherapeutic INR)',
+            durationMins: 15,
+            expire: '+60',
+            taskClass: 'stat'
+          },
+          {
+            type: 'assessment',
+            name: 'Bleed check — puncture sites / guaiac',
+            durationMins: 10,
+            expire: '+45',
+            taskClass: 'urgent'
+          }
+        ]
+      },
+      {
+        id: 'abg-resp-acidosis',
+        shortName: 'ABG',
+        fullName: 'Arterial blood gas',
+        result: 'pH 7.18 · PaCO₂ 68 mmHg · HCO₃ 26 mEq/L · PaO₂ 48 mmHg · SaO₂ 82% (acute respiratory acidosis + hypoxemia)',
+        ordersHint: 'Support ventilation (BiPAP/RT), treat cause, repeat ABG after intervention',
+        callbackEffects: [
+          {
+            type: 'assessment',
+            name: 'RT / BiPAP setup — ABG respiratory failure',
+            durationMins: 20,
+            expire: '+45',
+            taskClass: 'stat'
+          },
+          {
+            type: 'assessment',
+            name: 'Repeat ABG after vent support',
+            durationMins: 10,
+            expire: '+60',
+            taskClass: 'urgent'
+          }
+        ]
+      },
+      {
+        id: 'abg-met-acidosis',
+        shortName: 'ABG',
+        fullName: 'Arterial blood gas',
+        result: 'pH 7.10 · PaCO₂ 22 mmHg · HCO₃ 8 mEq/L · PaO₂ 88 mmHg · base excess −22 (severe metabolic acidosis)',
+        ordersHint: 'Treat underlying cause, fluids, consider bicarb only per MD, serial ABGs',
+        callbackEffects: [
+          {
+            type: 'med',
+            name: 'Sodium bicarbonate IV (MD-ordered)',
+            durationMins: 15,
+            expire: '+60',
+            taskClass: 'stat'
+          },
+          {
+            type: 'assessment',
+            name: 'Repeat ABG + lactate after bicarb',
+            durationMins: 10,
+            expire: '+75',
+            taskClass: 'urgent'
+          }
+        ]
       }
     ],
     /** Timed spawns (shift HHMM). patientId must be on census. */
     schedule: [
       { id: 'crit-k-joe-2015', at: 2015, labId: 'k-high', patientId: 'joe' },
       { id: 'crit-hh-maria-2145', at: 2145, labId: 'hh-drop', patientId: 'maria' },
+      { id: 'crit-abg-robert-2215', at: 2215, labId: 'abg-resp-acidosis', patientId: 'robert' },
       { id: 'crit-bcx-aisha-2310', at: 2310, labId: 'blood-culture', patientId: 'aisha' },
       { id: 'crit-trop-derek-0030', at: 30, labId: 'troponin', patientId: 'derek' }
     ]

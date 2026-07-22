@@ -29,7 +29,27 @@ assert(Array.isArray(GameConfig.criticalLabs.labs) && GameConfig.criticalLabs.la
 assert(GameConfig.criticalLabs.labs.some((l) => l.id === 'k-high'), 'K+ lab');
 assert(GameConfig.criticalLabs.labs.some((l) => l.id === 'hh-drop'), 'H/H lab');
 assert(GameConfig.criticalLabs.labs.some((l) => l.id === 'blood-culture'), 'blood culture lab');
+assert(GameConfig.criticalLabs.labs.some((l) => l.id === 'abg-resp-acidosis'), 'ABG respiratory acidosis lab');
+assert(GameConfig.criticalLabs.labs.some((l) => l.id === 'abg-met-acidosis'), 'ABG metabolic acidosis lab');
 assert(Array.isArray(GameConfig.criticalLabs.schedule) && GameConfig.criticalLabs.schedule.length >= 1, 'schedule');
+
+const abg = GameConfig.criticalLabs.labs.find((l) => l.id === 'abg-resp-acidosis');
+assert(abg && /pH/i.test(abg.result) && /PaCO|CO₂|CO2/i.test(abg.result) && /HCO/i.test(abg.result), 'ABG result includes pH / CO2 / HCO3');
+
+GameConfig.criticalLabs.labs.forEach((lab) => {
+  assert(typeof lab.result === 'string' && lab.result.length > 8, `${lab.id} has a critical result string`);
+  assert(/critical|positive|ACS|acidosis|high|low|Staph/i.test(lab.result), `${lab.id} result reads clinically bad`);
+  assert(Array.isArray(lab.callbackEffects) && lab.callbackEffects.length >= 1, `${lab.id} has callbackEffects`);
+  lab.callbackEffects.forEach((fx, i) => {
+    assert(fx.name && (fx.type === 'med' || fx.type === 'assessment'), `${lab.id} effect[${i}] typed`);
+  });
+});
+
+const bcx = GameConfig.criticalLabs.labs.find((l) => l.id === 'blood-culture');
+assert(
+  bcx?.callbackEffects?.some((fx) => /vancomycin|antibiotic/i.test(fx.name)),
+  'blood culture callback spawns antibiotic'
+);
 
 const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
 assert(appSrc.includes('CriticalLabsModule') || appSrc.includes('critical-labs'), 'app wires critical labs');
@@ -78,6 +98,8 @@ const modSrc = readFileSync(join(root, 'game/assets/js/critical-labs.js'), 'utf8
 assert(modSrc.includes('handleCriticalLabCallComplete'), 'call complete handler');
 assert(modSrc.includes('handleCriticalLabRecallComplete'), 'recall complete handler');
 assert(modSrc.includes('handleCriticalLabCallbackComplete'), 'callback complete handler');
+assert(modSrc.includes('applyCallbackEffects'), 'callback side-effect spawner');
+assert(modSrc.includes('fromCriticalLabCallback'), 'effect task metadata');
 assert(modSrc.includes('pendingCallbacks'), 'pending callback queue');
 assert(modSrc.includes('showAwaitingCallbackToast'), 'awaiting toast helper');
 assert(modSrc.includes('critical-lab-recall'), 'recall task kind');

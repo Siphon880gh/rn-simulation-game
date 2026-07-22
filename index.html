@@ -24,29 +24,35 @@
         </header>
 
         <section class="landing-choices" aria-label="Department assignments">
-            <a class="unit-tile unit-tile--tele"
-               href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/tele-4.json">
+            <button type="button"
+               class="unit-tile unit-tile--tele"
+               data-href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/tele-4.json"
+               data-census-full="4">
                 <span class="unit-tile__dept">Telemetry</span>
                 <span class="unit-tile__census">4 patients</span>
                 <span class="unit-tile__blurb">Rhythm watch and bedside alarms with a mid-size census.</span>
                 <span class="unit-tile__cta">Start Tele</span>
-            </a>
+            </button>
 
-            <a class="unit-tile unit-tile--medsurg"
-               href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/medsurg-5.json">
+            <button type="button"
+               class="unit-tile unit-tile--medsurg"
+               data-href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/medsurg-5.json"
+               data-census-full="5">
                 <span class="unit-tile__dept">Med-Surg</span>
                 <span class="unit-tile__census">5 patients</span>
                 <span class="unit-tile__blurb">Floor workload — meds, assessments, and slot pressure.</span>
                 <span class="unit-tile__cta">Start Med-Surg</span>
-            </a>
+            </button>
 
-            <a class="unit-tile unit-tile--icu"
-               href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/icu-2.json">
+            <button type="button"
+               class="unit-tile unit-tile--icu"
+               data-href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/icu-2.json"
+               data-census-full="2">
                 <span class="unit-tile__dept">ICU</span>
                 <span class="unit-tile__census">2 patients · higher acuity</span>
                 <span class="unit-tile__blurb">Smaller census, sicker starts — protect critical windows.</span>
                 <span class="unit-tile__cta">Start ICU</span>
-            </a>
+            </button>
         </section>
 
         <p class="landing-foot">
@@ -54,5 +60,39 @@
             <a href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/night-shift-default.json">open demo</a>.
         </p>
     </main>
+
+    <dialog id="census-choice-dialog" class="census-choice-dialog" aria-labelledby="census-choice-title">
+        <form method="dialog" class="census-choice-card">
+            <h2 id="census-choice-title" class="census-choice-title">Unit assignment</h2>
+            <p id="census-choice-blurb" class="census-choice-blurb"></p>
+            <div class="census-choice-actions">
+                <button type="button" id="census-choice-full" class="census-choice-btn census-choice-btn--primary"
+                        data-census="full">
+                    Full load
+                    <span class="census-choice-btn__hint">Start with the full unit census</span>
+                </button>
+                <button type="button" id="census-choice-minus1" class="census-choice-btn"
+                        data-census="minus1">
+                    No admission
+                    <span class="census-choice-btn__hint">Start with one fewer patient; no new admit</span>
+                </button>
+                <button type="button" id="census-choice-admit-start" class="census-choice-btn census-choice-btn--accent"
+                        data-census="admitStart">
+                    Admission — start of shift
+                    <span class="census-choice-btn__hint">Start lighter; new admit early in the shift</span>
+                </button>
+                <button type="button" id="census-choice-admit-middle" class="census-choice-btn census-choice-btn--accent"
+                        data-census="admitMiddle">
+                    Admission — middle of shift
+                    <span class="census-choice-btn__hint">Start lighter; new admit around mid-shift</span>
+                </button>
+                <button type="submit" id="census-choice-cancel" class="census-choice-btn census-choice-btn--ghost" value="cancel">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="assets/js/landing-census.js" defer></script>
 </body>
 </html>

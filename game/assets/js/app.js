@@ -21,6 +21,7 @@ import CriticalLabsModule from './critical-labs.js';
 import TestModeModule from './test-mode.js';
 import SoundModule from './sound.js';
 import NurseAlertsModule from './nurse-alerts.js';
+import AdmissionSystemModule from './admission-system.js';
 import { setShiftAnchor } from './availability-windows.js';
 
 // Declarative Application Configuration
@@ -44,7 +45,8 @@ const AppConfig = {
         criticalLabs: CriticalLabsModule,
         testMode: TestModeModule,
         sound: SoundModule,
-        nurseAlerts: NurseAlertsModule
+        nurseAlerts: NurseAlertsModule,
+        admission: AdmissionSystemModule
     },
     
     urlParams: GameConfig.urlParams,
@@ -110,7 +112,7 @@ class GameApplication {
 
     // Initialize modules with dependency management
     async initializeModules() {
-        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs, testMode, sound, nurseAlerts } = this.config.modules;
+        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs, testMode, sound, nurseAlerts, admission } = this.config.modules;
         
         // Register modules
         this.modules.set('modal', modal);
@@ -132,6 +134,7 @@ class GameApplication {
         this.modules.set('testMode', testMode);
         this.modules.set('sound', sound);
         this.modules.set('nurseAlerts', nurseAlerts);
+        this.modules.set('admission', admission);
 
         if (slots && slots.init) {
             slots.init();
@@ -222,7 +225,7 @@ class GameApplication {
     // Setup task context menus declaratively
     setupTaskContextMenus() {
         const contextMenuConfig = {
-            selector: '[data-task-type="med"][data-status="active"], [data-task-type="orders"][data-status="active"], [data-task-type="assessment"][data-status="active"], [data-task-type="bedprep"][data-status="active"], [data-task-type="iv"][data-status="active"], [data-task-type="criticallab"][data-status="active"]',
+            selector: '[data-task-type="med"][data-status="active"], [data-task-type="orders"][data-status="active"], [data-task-type="assessment"][data-status="active"], [data-task-type="bedprep"][data-status="active"], [data-task-type="iv"][data-status="active"], [data-task-type="criticallab"][data-status="active"], [data-task-type="admission"][data-status="active"]',
             trigger: 'left',
             build: (triggerElement, e) => {
                 const element = e.target.closest('[data-task-type]');
@@ -259,6 +262,12 @@ class GameApplication {
                         || task.metadata?.kind === 'critical-lab-call'
                         || task.metadata?.kind === 'critical-lab-recall');
                 const isCritCb = kind === 'criticallab' && task.metadata?.phase === 'callback';
+                const isAdmitFind = kind === 'admission' && task.metadata?.phase === 'findNurse';
+                const isAdmitCall = kind === 'admission'
+                    && (task.metadata?.phase === 'call' || task.metadata?.kind === 'admission-call');
+                const isAdmitRecall = kind === 'admission'
+                    && (task.metadata?.phase === 'recall' || task.metadata?.kind === 'admission-recall');
+                const isAdmitCb = kind === 'admission' && task.metadata?.phase === 'callback';
                 let performName = 'Perform';
                 if (isOrders) performName = 'Check orders';
                 if (isCritCall) {
@@ -268,6 +277,10 @@ class GameApplication {
                         : 'Call doctor';
                 }
                 if (isCritCb) performName = 'Take callback';
+                if (isAdmitFind) performName = 'Look for second nurse';
+                if (isAdmitCall) performName = 'Call admitting';
+                if (isAdmitRecall) performName = 'Call admitting again';
+                if (isAdmitCb) performName = 'Take admitting callback';
                 
                 return {
                     callback: (key, options) => {
@@ -316,6 +329,10 @@ class GameApplication {
                 }
                 if (kind === 'criticallab') {
                     this.performCriticalLabTask(task);
+                    return;
+                }
+                if (kind === 'admission') {
+                    this.performAdmissionTask(task);
                     return;
                 }
                 console.log(`Performing medication: ${task.name}`);
@@ -406,6 +423,68 @@ class GameApplication {
         const doctorOrders = this.modules.get('doctorOrders');
         const live = gameState.getStateSlice('tasks').get(task.id);
         doctorOrders?.handleOrdersCheckComplete?.(live || task);
+    }
+
+    // E9: admission checklist — quizzes, find-nurse, admitting call/callback
+    async performAdmissionTask(task) {
+        const now = gameState.getStateSlice('currentTime');
+        if (!taskSystem.isPerformAllowed(task, now)) {
+            alert(`Cannot perform outside the availability window (${taskSystem.getWindowPhase(task, now)}).`);
+            return;
+        }
+        const admission = this.modules.get('admission');
+        const phase = task.metadata?.phase;
+        const kind = task.metadata?.kind;
+
+        if (phase === 'findNurse') {
+            admission?.handleFindNursePerform?.(task, { now });
+            return;
+        }
+
+        if (phase === 'recall' || kind === 'admission-recall') {
+            taskSystem.completeTask(task.id);
+            const live = gameState.getStateSlice('tasks')?.get(task.id) || task;
+            admission?.handleAdmissionRecallComplete?.(live, { now });
+            return;
+        }
+
+        if (phase === 'callback' || kind === 'admission-callback') {
+            const slotSystem = this.modules.get('slots');
+            const result = slotSystem?.requestSlot(task, now);
+            if (!result?.ok) {
+                alert('Could not start or queue the admitting callback.');
+            }
+            return;
+        }
+
+        if (phase === 'consult') {
+            taskSystem.completeTask(task.id);
+            gameState.dispatch('APPEND_SHIFT_LOG', {
+                message: `Consult placed: ${task.name}`,
+                timeLabel: String(now ?? '—')
+            });
+            return;
+        }
+
+        const challengeGate = this.modules.get('challengeGate');
+        const outcome = challengeGate?.runChallengeGate
+            ? await challengeGate.runChallengeGate(task)
+            : { passed: false, reason: 'no-gate' };
+        if (!outcome?.passed) {
+            console.log(`Admission challenge not passed (${outcome?.reason || 'fail'})`);
+            return;
+        }
+
+        taskSystem.completeTask(task.id);
+        const live = gameState.getStateSlice('tasks')?.get(task.id) || task;
+        if (phase === 'call' || kind === 'admission-call' || live.metadata?.challenge === 'callAdmitting') {
+            admission?.handleAdmissionCallComplete?.(live, { now });
+        } else {
+            gameState.dispatch('APPEND_SHIFT_LOG', {
+                message: `Admission step done: ${task.name}`,
+                timeLabel: String(now ?? '—')
+            });
+        }
     }
 
     // Critical lab: call MD (complete + schedule callback) or take callback (slot)
@@ -574,6 +653,15 @@ class GameApplication {
         const nurseAlerts = this.modules.get('nurseAlerts');
         if (nurseAlerts && nurseAlerts.init) {
             nurseAlerts.init(gameConfig);
+        }
+
+        // E9: open-to-admit schedule + admission checklist
+        const admission = this.modules.get('admission');
+        if (admission && admission.init) {
+            admission.init({
+                patients: this.modules.get('patients'),
+                shiftConfig: gameConfig
+            });
         }
 
         // Start the timer
