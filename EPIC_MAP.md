@@ -240,11 +240,11 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 - **Suggested order:** After E11.
 
 ### E13. Delegate assist (CCT / CNA)
-- **Goal / user outcome:** Right-rail **Delegate** lists who can help: ICU critical care tech (half of each hour) or floor CNAs (up to two, ~⅓ of shift, split by patient/room). Turning with an available aide halves slot time.
-- **Why:** Teaches realistic delegation timing and patient-assignment boundaries (not every aide can touch every patient).
-- **Includes:** `delegation.js` + `GameConfig.delegation`; rail under Orders/Tools; labels like `CNA Wendy · 201`; turn context-menu “Turn with … (½ time)”.
+- **Goal / user outcome:** Right-rail **Delegate** lists who can help. Select an aide to see eligible tasks. **Team · ½ time** (turns) vs **They do this · instant** (solo care). Soft hint if the aide can’t do a clicked task.
+- **Why:** Teaches realistic delegation timing, assignment boundaries, and when to work with vs hand off.
+- **Includes:** ICU CCT half-hour windows; floor ≤2 CNAs on **distinct non-overlapping shift thirds**; room labels; select-to-highlight; team/solo modes.
 - **Dependencies:** E10 right rail, E12 turn tasks, scenario `department`.
-- **Out of scope:** Full staffing matrix, delegating meds/assessments beyond turns, charge-nurse whole-unit float.
+- **Out of scope:** Full staffing matrix, delegating meds/IV, charge-nurse whole-unit float.
 - **Suggested order:** After E12.
 
 ---

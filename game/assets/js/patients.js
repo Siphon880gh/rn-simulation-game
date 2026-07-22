@@ -152,7 +152,8 @@ const PatientsModule = (() => {
                 status: GameConfig.tasks.statuses.NOT_YET,
                 metadata: {
                     careSchedule: scheduleKey,
-                    reason: careReason || null
+                    reason: careReason || null,
+                    delegateMode: scheduleKey === 'turnQ2h' ? 'team' : undefined
                 }
             });
         }
@@ -218,6 +219,7 @@ const PatientsModule = (() => {
                 );
             }
             li.setAttribute('data-duration-mins', String(live.duration || 10));
+            li.setAttribute('data-delegate-mode', 'team');
             li.setAttribute('title', 'Click for Perform / Details menu');
             li.className = `bg-emerald-50 p-4 rounded-lg shadow flex items-center task-status-${live.status} border border-emerald-200`;
             const timeLabel = String(live.scheduled).padStart(4, '0');
@@ -352,6 +354,8 @@ const PatientsModule = (() => {
             if (element.getAttribute('data-iv-rate') != null) {
                 metadata.currentRate = Number(element.getAttribute('data-iv-rate'));
             }
+            const delegateMode = element.getAttribute('data-delegate-mode');
+            if (delegateMode) metadata.delegateMode = delegateMode;
             return {
                 id: element.id || `${patientId}-task-${index}`,
                 name: element.querySelector('.font-medium')?.textContent || 'Unknown Task',
@@ -565,8 +569,8 @@ const PatientsModule = (() => {
             header.removeAttribute('onclick');
         });
 
-        // Learning UX: medications + IV + turning schedule start open so timed work is visible
-        patientElement.querySelectorAll('.meds-list, .iv-list, .care-tasks-list').forEach((list) => {
+        // Learning UX: medications + IV + turning / CNA care start open so timed work is visible
+        patientElement.querySelectorAll('.meds-list, .iv-list, .care-tasks-list, .care-solo-list').forEach((list) => {
             list.classList.remove('hidden');
         });
 

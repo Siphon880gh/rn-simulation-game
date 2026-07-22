@@ -92,7 +92,14 @@ CSS classes: `task-status-*` in `declarative-tasks.css`.
 
 ## Delegate assist (E13)
 
-`delegation.js` + `GameConfig.delegation`. ICU: one **CCT**, free first or second half of each hour. Floor: up to **2 CNAs**, each ~⅓ of shift, patients split evenly; label `CNA Wendy · 201`. Rail `#delegate-rail`. Turn tasks: context menu **Turn with … (½ time)** when aide available for that patient (`metadata.assistFactor` via `resolveEffectiveDuration`). AUTO: `node scripts/verify-e13.mjs`.
+`delegation.js` + `GameConfig.delegation`. ICU: one **CCT**, free first or second half of each hour. Floor: up to **2 CNAs** on **distinct non-overlapping thirds** of the shift; patients split; label `CNA Wendy · 201`. Select aide on `#delegate-rail` → borders on aide + eligible tasks.
+
+| Mode | When | Effect |
+|------|------|--------|
+| **Team · ½ time** | Turns / reposition | Slot duration ×0.5 |
+| **They do this · instant** | `data-delegate-mode="solo"` (e.g. linen/hygiene) | `COMPLETE_TASK` immediately |
+
+Invalid click while aide selected → soft `#shell-delegate-hint`. AUTO: `node scripts/verify-e13.mjs`.
 
 ## Doctor orders + E11
 

@@ -147,6 +147,26 @@ export const GameConfig = {
   delegation: {
     sectionLabel: 'Delegate',
     turnAssistFactor: 0.5,
+    hintMs: 2800,
+    /**
+     * Two clear modes:
+     * - team: you work with them (turns) → half slot time
+     * - solo: they do it for you → instant complete
+     */
+    modes: {
+      team: {
+        id: 'team',
+        label: 'Team effort',
+        shortLabel: 'Team · ½ time',
+        effect: 'half'
+      },
+      solo: {
+        id: 'solo',
+        label: 'Aide completes',
+        shortLabel: 'They do this · instant',
+        effect: 'instant'
+      }
+    },
     icu: {
       role: 'cct',
       roleLabel: 'CCT',
@@ -157,7 +177,9 @@ export const GameConfig = {
       role: 'cna',
       roleLabel: 'CNA',
       maxCount: 2,
+      /** Each CNA gets one distinct third of the shift (non-overlapping). */
       availabilityFraction: 1 / 3,
+      staggerThirds: true,
       names: ['Wendy', 'Luis', 'Pat', 'Sam', 'Nina', 'Omar']
     }
   },
@@ -315,6 +337,7 @@ export const GameConfig = {
     ordersRail: '#orders-rail',
     toolsRail: '#tools-rail',
     delegateRail: '#delegate-rail',
+    delegateHint: '#shell-delegate-hint',
     main: '#shell-main',
     bottom: '#shell-bottom',
     statusBar: '#shell-status-bar',

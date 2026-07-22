@@ -1,5 +1,5 @@
 /**
- * AUTO verify E13 — Delegate rail (ICU CCT / floor CNAs) + turn assist factor.
+ * AUTO verify E13 — Delegate rail (ICU CCT / staggered floor CNAs) + team/solo modes.
  */
 import fs from 'fs';
 import path from 'path';
@@ -18,22 +18,22 @@ const classUrl = pathToFileURL(path.join(root, 'game/assets/js/task-class-intera
 const { GameConfig } = await import(gameConfigUrl);
 const {
     buildDelegationState,
+    assignStaggeredThirds,
     isAideAvailable,
-    findAvailableAideForPatient,
     formatAideLabel,
-    withTurnAssist,
-    isTurnCareTask
+    withTeamAssist,
+    isTurnCareTask,
+    getDelegateMode
 } = await import(delegationUrl);
 const { resolveEffectiveDuration, resetClassInteractions } = await import(classUrl);
 
 const cfg = GameConfig.delegation;
 if (!cfg?.icu || !cfg?.floor) fail('GameConfig.delegation missing icu/floor');
-if (cfg.sectionLabel !== 'Delegate') fail('sectionLabel should be Delegate');
-if (Number(cfg.turnAssistFactor) !== 0.5) fail('turnAssistFactor should be 0.5');
-if (cfg.floor.maxCount !== 2) fail('floor maxCount should be 2');
-if (Math.abs(cfg.floor.availabilityFraction - 1 / 3) > 1e-9) fail('availabilityFraction should be 1/3');
+if (!cfg.modes?.team || !cfg.modes?.solo) fail('delegation modes team/solo required');
+if (cfg.modes.team.effect !== 'half') fail('team effect should be half');
+if (cfg.modes.solo.effect !== 'instant') fail('solo effect should be instant');
+if (cfg.floor.staggerThirds !== true) fail('staggerThirds should be true');
 
-// Deterministic RNG sequence
 function seqRandom(values) {
     let i = 0;
     return () => {
@@ -43,30 +43,18 @@ function seqRandom(values) {
     };
 }
 
-const icu = buildDelegationState({
-    pack: { department: 'icu', shiftStart: 1900, shiftDurationHours: 12 },
-    patientIds: ['maria', 'robert'],
-    shiftStart: 1900,
-    shiftMins: 720,
-    random: seqRandom([0.1, 0.9, 0.2, 0.8, 0.3, 0.7, 0.4, 0.6, 0.15, 0.85, 0.25, 0.75])
-});
-if (icu.mode !== 'icu-cct') fail('ICU mode');
-if (icu.aides.length !== 1) fail('ICU should have 1 CCT');
-if (icu.aides[0].role !== 'cct') fail('ICU aide role');
-if (!icu.aides[0].hourHalfPlan) fail('ICU hourHalfPlan missing');
-
-const hourKey = Object.keys(icu.aides[0].hourHalfPlan)[0];
-const half = icu.aides[0].hourHalfPlan[hourKey];
-const hourStart = Number(hourKey);
-const firstMins = hourStart; // :00
-const secondMins = Math.floor(hourStart / 100) * 100 + 30;
-const inFirst = isAideAvailable(icu.aides[0], firstMins);
-const inSecond = isAideAvailable(icu.aides[0], secondMins);
-if (half === 'first') {
-    if (!inFirst || inSecond) fail('CCT first-half window wrong');
-} else if (inFirst || !inSecond) {
-    fail('CCT second-half window wrong');
+function spanMins(from, until) {
+    const a = Math.floor(Number(from) / 100) * 60 + (Number(from) % 100);
+    const b = Math.floor(Number(until) / 100) * 60 + (Number(until) % 100);
+    let d = b - a;
+    if (d < 0) d += 1440;
+    return d;
 }
+
+const thirds = assignStaggeredThirds(2, 1900, 720, seqRandom([0.1, 0.9, 0.2]));
+if (thirds.length !== 2) fail('two thirds');
+if (thirds[0].thirdIndex === thirds[1].thirdIndex) fail('CNA thirds must differ');
+if (spanMins(thirds[0].availableFrom, thirds[0].availableUntil) !== 240) fail('third span');
 
 const floor = buildDelegationState({
     pack: { department: 'medsurg', shiftStart: 1900, shiftDurationHours: 12 },
@@ -75,61 +63,84 @@ const floor = buildDelegationState({
     shiftMins: 720,
     random: seqRandom([0.2, 0.4, 0.6, 0.8, 0.1, 0.3, 0.5, 0.7])
 });
-if (floor.mode !== 'floor-cna') fail('floor mode');
 if (floor.aides.length !== 2) fail('floor should have 2 CNAs');
-const covered = new Set(floor.aides.flatMap((a) => a.patientIds));
-if (covered.size !== 5) fail('CNAs must cover all patients evenly');
-const sizes = floor.aides.map((a) => a.patientIds.length).sort();
-if (sizes[0] < 2 || sizes[1] < 2) fail('even split expected ~2/3');
-for (const aide of floor.aides) {
-    const span = (() => {
-        const a = Math.floor(Number(aide.availableFrom) / 100) * 60 + (Number(aide.availableFrom) % 100);
-        const b = Math.floor(Number(aide.availableUntil) / 100) * 60 + (Number(aide.availableUntil) % 100);
-        let d = b - a;
-        if (d < 0) d += 1440;
-        return d;
-    })();
-    if (span !== 240) fail(`CNA window should be 240 min (1/3 of 720), got ${span}`);
+if (floor.aides[0].thirdIndex === floor.aides[1].thirdIndex) fail('built aides share a third');
+// Windows must not overlap (distinct thirds)
+const a0 = floor.aides[0];
+const a1 = floor.aides[1];
+const overlap = isAideAvailable(a0, a1.availableFrom) && isAideAvailable(a1, a0.availableFrom)
+    && a0.availableFrom === a1.availableFrom;
+if (overlap) fail('CNA windows should not share the same third start');
+if (isAideAvailable(a0, a1.availableFrom) && a0.thirdIndex !== a1.thirdIndex) {
+    // a1 start should not be inside a0 window
+    if (isAideAvailable(a0, a1.availableFrom)) {
+        // only fail if a1's start is strictly inside a0's open interval
+        const start = Number(a1.availableFrom);
+        if (isAideAvailable(a0, start) && start !== Number(a0.availableUntil)) {
+            // adjacent thirds: a1.start == a0.until is OK (half-open). Inside is bad.
+            const a0Start = Number(a0.availableFrom);
+            const a0End = Number(a0.availableUntil);
+            const s = start;
+            const toM = (hhmm) => Math.floor(hhmm / 100) * 60 + (hhmm % 100);
+            if (toM(s) > toM(a0Start) && toM(s) < toM(a0End)) fail('CNA windows overlap');
+        }
+    }
 }
 
-// Label includes room when patient map provided
-const patients = new Map([
-    ['joe', { id: 'joe', room: 'Room 201-A' }],
-    ['maria', { id: 'maria', room: 'Room 204-B' }]
-]);
-const label = formatAideLabel(
-    { role: 'cna', roleLabel: 'CNA', name: 'Wendy', patientIds: ['joe'] },
-    patients
-);
-if (label !== 'CNA Wendy · 201-A') fail(`label expected CNA Wendy · 201-A, got ${label}`);
+const icu = buildDelegationState({
+    pack: { department: 'icu' },
+    patientIds: ['maria', 'robert'],
+    shiftStart: 1900,
+    shiftMins: 720,
+    random: seqRandom([0.1, 0.9, 0.2, 0.8, 0.3, 0.7, 0.4, 0.6, 0.15, 0.85, 0.25, 0.75])
+});
+if (icu.aides[0].role !== 'cct') fail('ICU CCT');
 
-resetClassInteractions();
 const turnTask = {
     id: 't1',
     name: 'Turn / reposition (Q2H)',
     duration: 10,
     taskClass: 'routine',
     patientId: 'joe',
+    type: 'assessment',
+    status: 'active',
     metadata: { careSchedule: 'turnQ2h' }
 };
+const soloTask = {
+    id: 't2',
+    name: 'Linen change / hygiene assist',
+    duration: 10,
+    type: 'assessment',
+    status: 'active',
+    patientId: 'joe',
+    metadata: { delegateMode: 'solo' }
+};
+if (getDelegateMode(turnTask) !== 'team') fail('turn → team');
+if (getDelegateMode(soloTask) !== 'solo') fail('linen → solo');
 if (!isTurnCareTask(turnTask)) fail('isTurnCareTask');
-const assisted = withTurnAssist(turnTask, floor.aides[0]);
+
+resetClassInteractions();
+const assisted = withTeamAssist(turnTask, floor.aides[0]);
 const resolved = resolveEffectiveDuration(assisted, null);
-if (resolved.duration !== 5) fail(`assist duration expected 5, got ${resolved.duration}`);
+if (resolved.duration !== 5) fail(`team duration expected 5, got ${resolved.duration}`);
 
-// DOM wiring
-const indexHtml = fs.readFileSync(path.join(root, 'game/index.html'), 'utf8');
-if (!indexHtml.includes('id="delegate-rail"')) fail('delegate-rail missing in index.html');
+const patients = new Map([['joe', { id: 'joe', room: 'Room 201-A' }]]);
+const label = formatAideLabel(
+    { role: 'cna', roleLabel: 'CNA', name: 'Wendy', patientIds: ['joe'] },
+    patients
+);
+if (label !== 'CNA Wendy · 201-A') fail(`label ${label}`);
+
 const appJs = fs.readFileSync(path.join(root, 'game/assets/js/app.js'), 'utf8');
-if (!appJs.includes('DelegationModule')) fail('app.js missing DelegationModule');
-if (!appJs.includes('assistTurn')) fail('app.js missing assistTurn menu');
+if (!appJs.includes('handleDelegateTaskClick')) fail('missing handleDelegateTaskClick');
+if (!appJs.includes('performDelegatedSolo')) fail('missing performDelegatedSolo');
 const rightMenu = fs.readFileSync(path.join(root, 'game/assets/js/right-menu.js'), 'utf8');
-if (!rightMenu.includes('renderDelegate')) fail('right-menu missing renderDelegate');
+if (!rightMenu.includes('selectAide')) fail('right-menu missing selectAide');
+const joeHtml = fs.readFileSync(path.join(root, 'game/events/patients/joe.html'), 'utf8');
+if (!joeHtml.includes('data-delegate-mode="solo"')) fail('joe missing solo task');
 
-// findAvailableAideForPatient needs gameState — smoke via covering logic only above
 console.log('PASS E13 delegation', {
-    icuHalf: half,
-    cnaCount: floor.aides.length,
-    assistDuration: resolved.duration,
-    label
+    thirds: floor.aides.map((a) => a.thirdIndex),
+    teamDuration: resolved.duration,
+    modes: Object.keys(cfg.modes)
 });

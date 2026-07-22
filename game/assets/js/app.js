@@ -26,8 +26,13 @@ import RightMenuModule from './right-menu.js';
 import DelegationModule, {
     findAvailableAideForPatient,
     isTurnCareTask,
-    withTurnAssist,
-    formatAideLabel
+    withTeamAssist,
+    formatAideLabel,
+    getSelectedAide,
+    canAidePerformTask,
+    showDelegateHint,
+    modeConfig,
+    getDelegateMode
 } from './delegation.js';
 import { setShiftAnchor } from './availability-windows.js';
 
@@ -216,12 +221,26 @@ class GameApplication {
 
     // Setup task UI handlers declaratively
     setupTaskUIHandlers() {
+        // E13: when a CNA/CCT is selected, capture task clicks for delegate modes
+        document.addEventListener('click', (e) => {
+            const aide = getSelectedAide();
+            if (!aide) return;
+            const taskElement = e.target.closest('[data-task-type]');
+            if (!taskElement?.id) return;
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof e.stopImmediatePropagation === 'function') {
+                e.stopImmediatePropagation();
+            }
+            this.handleDelegateTaskClick(taskElement, aide);
+        }, true);
+
         // Use event delegation for dynamic task elements
         document.addEventListener('click', (e) => {
+            if (getSelectedAide()) return;
             const taskElement = e.target.closest('[data-task-type]');
             if (!taskElement) return;
 
-            const taskType = taskElement.getAttribute('data-task-type');
             const taskStatus = taskElement.getAttribute('data-status');
             
             if (taskStatus === GameConfig.tasks.statuses.ACTIVE) {
@@ -231,6 +250,52 @@ class GameApplication {
 
         // Setup context menu for tasks
         this.setupTaskContextMenus();
+    }
+
+    /** E13: click task while aide selected — team (½) / solo (instant) / soft deny */
+    handleDelegateTaskClick(taskElement, aide) {
+        const taskId = taskElement.id;
+        const task = gameState.getStateSlice('tasks').get(taskId);
+        if (!task) {
+            showDelegateHint('Task not ready');
+            return;
+        }
+        const now = gameState.getStateSlice('currentTime');
+        const check = canAidePerformTask(aide, task, now);
+        if (!check.ok) {
+            const who = formatAideLabel(aide);
+            const hints = {
+                'wrong-patient': `${who} is not assigned to this patient`,
+                'not-active': 'That task is not available yet',
+                'not-delegable': `${who} can't perform this task`,
+                'wrong-type': `${who} can't perform this task`,
+                'aide-unavailable': `${who} is not available right now`
+            };
+            showDelegateHint(hints[check.reason] || `${who} can't perform this task`);
+            return;
+        }
+        if (check.mode === 'solo') {
+            this.performDelegatedSolo(task, aide);
+            return;
+        }
+        if (check.mode === 'team') {
+            this.performAssessmentTask(task, { assist: true, aide });
+        }
+    }
+
+    performDelegatedSolo(task, aide) {
+        const now = gameState.getStateSlice('currentTime');
+        if (!taskSystem.isPerformAllowed(task, now)) {
+            showDelegateHint('Task is outside its time window');
+            return;
+        }
+        const mode = modeConfig('solo');
+        taskSystem.completeTask(task.id);
+        gameState.dispatch('APPEND_SHIFT_LOG', {
+            message: `${formatAideLabel(aide)} completed ${task.name} (${mode?.label || 'CNA completes'})`,
+            timeLabel: String(now ?? '—')
+        });
+        showDelegateHint(`${formatAideLabel(aide)} finished it · instant`);
     }
 
     // Setup task context menus declaratively
@@ -304,12 +369,21 @@ class GameApplication {
                     details: { name: 'Details', icon: 'question' }
                 };
 
-                // E13: turn with CCT/CNA when that aide is available for this patient
-                if (canPerform && isTurnCareTask(task) && task.patientId) {
+                // E13: clear mode labels when aide available (no selection required)
+                if (canPerform && task.patientId) {
                     const aide = findAvailableAideForPatient(task.patientId, now);
-                    if (aide) {
+                    const mode = getDelegateMode(task);
+                    if (aide && mode === 'team') {
+                        const label = modeConfig('team')?.shortLabel || 'Team · ½ time';
                         items.assistTurn = {
-                            name: `Turn with ${formatAideLabel(aide)} (½ time)`,
+                            name: `${label} with ${formatAideLabel(aide)}`,
+                            icon: 'add'
+                        };
+                    }
+                    if (aide && mode === 'solo') {
+                        const label = modeConfig('solo')?.shortLabel || 'CNA does this · instant';
+                        items.delegateSolo = {
+                            name: `${label} — ${formatAideLabel(aide)}`,
                             icon: 'add'
                         };
                     }
@@ -364,6 +438,14 @@ class GameApplication {
             },
             assistTurn: () => {
                 this.performAssessmentTask(task, { assist: true });
+            },
+            delegateSolo: () => {
+                const aide = findAvailableAideForPatient(task.patientId);
+                if (!aide) {
+                    showDelegateHint('No aide available for this patient right now');
+                    return;
+                }
+                this.performDelegatedSolo(task, aide);
             },
             details: () => {
                 const durationMins = task.duration;
@@ -425,7 +507,7 @@ class GameApplication {
     }
 
     // E3.M5: assessment/dynamic perform — window gate → short slot (no med quiz)
-    // E13: opts.assist → turn with available CCT/CNA at half duration
+    // E13: opts.assist → team effort with CCT/CNA at half duration
     async performAssessmentTask(task, opts = {}) {
         const now = gameState.getStateSlice('currentTime');
         if (!taskSystem.isPerformAllowed(task, now)) {
@@ -434,16 +516,23 @@ class GameApplication {
         }
         let workTask = task;
         if (opts.assist && isTurnCareTask(task) && task.patientId) {
-            const aide = findAvailableAideForPatient(task.patientId, now);
+            const aide = opts.aide || findAvailableAideForPatient(task.patientId, now);
             if (!aide) {
-                alert('No assist available for this patient right now.');
+                showDelegateHint('No assist available for this patient right now');
                 return;
             }
-            workTask = withTurnAssist(task, aide);
+            const check = canAidePerformTask(aide, task, now);
+            if (!check.ok || check.mode !== 'team') {
+                showDelegateHint(`${formatAideLabel(aide)} can't team on this task`);
+                return;
+            }
+            workTask = withTeamAssist(task, aide);
+            const teamLabel = modeConfig('team')?.label || 'Team effort';
             gameState.dispatch('APPEND_SHIFT_LOG', {
-                message: `Delegated turn to ${formatAideLabel(aide)}`,
+                message: `${teamLabel}: turn with ${formatAideLabel(aide)} (½ time)`,
                 timeLabel: String(now ?? '—')
             });
+            showDelegateHint(`${teamLabel} · ½ time with ${formatAideLabel(aide)}`);
         }
         const slotSystem = this.modules.get('slots');
         const result = slotSystem?.requestSlot(workTask, now);

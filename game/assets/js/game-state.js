@@ -429,6 +429,19 @@ class GameState {
       ...this.state,
       delegation: payload.delegation ?? null
     }));
+
+    this.actions.set('SET_DELEGATE_SELECTION', (payload = {}) => {
+      if (!this.state.delegation) return this.state;
+      const aideId = payload.aideId == null ? null : String(payload.aideId);
+      if (this.state.delegation.selectedAideId === aideId) return this.state;
+      return {
+        ...this.state,
+        delegation: {
+          ...this.state.delegation,
+          selectedAideId: aideId
+        }
+      };
+    });
   }
 
   // Subscribe to state changes

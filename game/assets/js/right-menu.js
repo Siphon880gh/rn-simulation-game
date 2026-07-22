@@ -7,7 +7,11 @@ import gameState from './game-state.js';
 import { listPendingCriticalLabCallbacks } from './critical-labs.js';
 import { listPendingAdmissionCallbacks, isOpenAdmitMode } from './admission-system.js';
 import { isAtOrAfterInShift } from './availability-windows.js';
-import { listDelegateRailRows } from './delegation.js';
+import {
+    listDelegateRailRows,
+    selectAide,
+    modeConfig
+} from './delegation.js';
 
 /** @type {{ showGlobalPanel?: Function, getPatient?: Function } | null} */
 let patientsApi = null;
@@ -308,23 +312,35 @@ function renderDelegate() {
         return;
     }
 
+    const team = modeConfig('team');
+    const solo = modeConfig('solo');
+    const legend = document.createElement('p');
+    legend.className = 'delegate-legend';
+    legend.textContent = `${team?.shortLabel || 'Team · ½ time'} · ${solo?.shortLabel || 'CNA does this · instant'}`;
+    host.appendChild(legend);
+
     rows.forEach((row) => {
-        const el = document.createElement('div');
-        el.className = `rail-item is-delegate ${row.available ? 'is-available' : 'is-away'}`;
+        const el = document.createElement('button');
+        el.type = 'button';
+        el.className = `rail-item is-delegate ${row.available ? 'is-available' : 'is-away'}${row.selected ? ' is-selected' : ''}`;
         el.setAttribute('role', 'listitem');
         el.dataset.railKind = 'delegate';
         el.dataset.aideId = row.id;
+        el.setAttribute('aria-pressed', row.selected ? 'true' : 'false');
         el.innerHTML = `
           <span class="rail-item__title">${row.title}</span>
-          <span class="rail-item__meta">${row.meta}</span>
+          <span class="rail-item__meta">${row.meta}${row.selected ? ' · selected — click a highlighted task' : row.available ? ' · click to select' : ''}</span>
         `;
-        if (row.available && row.patientIds?.[0]) {
-            el.style.cursor = 'pointer';
-            el.title = 'Jump to covered patient';
-            el.addEventListener('click', () => {
-                onPatientJump(row.patientIds[0], `Opened patient for ${row.title}`);
-            });
-        }
+        el.title = row.available
+            ? (row.selected ? 'Click again to deselect' : 'Select to highlight tasks they can do')
+            : 'Not available now';
+        el.addEventListener('click', () => {
+            if (!row.available) {
+                selectAide(row.id);
+                return;
+            }
+            selectAide(row.id);
+        });
         host.appendChild(el);
     });
 }

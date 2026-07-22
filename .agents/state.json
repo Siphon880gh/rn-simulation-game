@@ -1,8 +1,8 @@
 {
   "current_epic_id": "E13",
-  "current_milestone_id": "E13.M5",
+  "current_milestone_id": "E13.M8",
   "status": "backlog_complete",
-  "last_updated_iso": "2026-07-22T15:00:00.000Z",
+  "last_updated_iso": "2026-07-22T15:20:00.000Z",
   "decisions": {
     "platform": "web",
     "app_name": "RN Simulation Game",
@@ -62,8 +62,8 @@
     "orders_carryover_procedures_rationale": "E11: carry undelivered pack injections + overdue injected orders; engine injects ≤1 diagnosis-matched sudden procedure with consent; sameDay ≥2h or tomorrow NPO until midnight.",
     "care_schedules": "turn_q2h_opt_in",
     "care_schedules_rationale": "E12: Q2H turn/reposition via GameConfig.careSchedules + patient opt-in (config and/or data-care-schedule); assessment Perform/slot; for obesity, bedbound, stroke/weakness risk.",
-    "delegation_assist": "cct_half_hour_cna_third_shift",
-    "delegation_assist_rationale": "E13: rail section Delegate lists helpers (not Whole/Team). ICU=1 CCT half of each hour; floor≤2 CNAs ~⅓ shift, patients split, label CNA Name · room. Turn with aide → assistFactor 0.5."
+    "delegation_assist": "cct_half_hour_cna_staggered_thirds_team_solo",
+    "delegation_assist_rationale": "E13: Delegate rail. ICU CCT half-hour windows; floor ≤2 CNAs on distinct non-overlapping shift thirds; select aide highlights tasks. team=turns ½ time; solo=instant (data-delegate-mode=solo)."
   },
   "identified_epics": [
     {
@@ -467,6 +467,24 @@
       "epic": "E13",
       "name": "AUTO verify + maps",
       "status": "done"
+    },
+    {
+      "id": "E13.M6",
+      "epic": "E13",
+      "name": "Stagger CNA non-overlapping thirds",
+      "status": "done"
+    },
+    {
+      "id": "E13.M7",
+      "epic": "E13",
+      "name": "Select aide highlight eligible tasks",
+      "status": "done"
+    },
+    {
+      "id": "E13.M8",
+      "epic": "E13",
+      "name": "Team vs solo delegate + soft deny",
+      "status": "done"
     }
   ],
   "completed": [
@@ -524,9 +542,12 @@
     "E13.M2",
     "E13.M3",
     "E13.M4",
-    "E13.M5"
+    "E13.M5",
+    "E13.M6",
+    "E13.M7",
+    "E13.M8"
   ],
-  "notes": "E13 shipped: Delegate rail — ICU CCT (half-hour windows) / floor CNAs (≤2, ~⅓ shift, room labels); turn with assist → ½ slot time. AUTO: node scripts/verify-e13.mjs.",
+  "notes": "E13.M6–M8: CNAs on distinct shift thirds; select aide → highlight tasks; team (turns ½ time) vs solo (instant); soft deny toast. AUTO: node scripts/verify-e13.mjs.",
   "skipped": [
     {
       "id": "E8.M2",

@@ -460,6 +460,9 @@ Next up: **Later** backlog (E3.M4, E5.M3, E5.M4, E7, E8) — MVP `implementation
 | S13.3 | Floor: up to 2 CNAs; each available ~⅓ shift; patients split evenly; label `CNA Wendy · 201` | E13.M3 | [x] |
 | S13.4 | Turn/reposition: “Turn with … (½ time)” when aide available for that patient | E13.M4 | [x] |
 | S13.5 | AUTO verify + maps | E13.M5 | [x] |
+| S13.6 | Floor CNAs use distinct non-overlapping thirds of the shift | E13.M6 | [x] |
+| S13.7 | Select aide → border on aide + eligible tasks; mode badges | E13.M7 | [x] |
+| S13.8 | Two modes: **Team · ½ time** (turns) vs **They do this · instant** (solo); soft deny toast | E13.M8 | [x] |
 
 ### Milestones
 
@@ -470,8 +473,11 @@ Next up: **Later** backlog (E3.M4, E5.M3, E5.M4, E7, E8) — MVP `implementation
 | **E13.M3** | Floor CNA windows + room labels | ICU CCT | Post-MVP |
 | **E13.M4** | Assisted turn → `assistFactor` 0.5 on slot duration | Delegate meds | Post-MVP |
 | **E13.M5** | `verify-e13.mjs` + maps | — | Post-MVP |
+| **E13.M6** | Stagger CNA thirds (1/3 each, not overlapping) | Random overlapping windows | Post-MVP |
+| **E13.M7** | Select-to-highlight eligible tasks | Multi-select aides | Post-MVP |
+| **E13.M8** | Team vs solo click path + soft hint | Delegate meds/IV | Post-MVP |
 
-**E13 implement notes:** `delegation.js` + `GameConfig.delegation`. Init after census; `right-menu.js` renders `#delegate-rail`. Duration via `resolveEffectiveDuration` + `metadata.assistFactor`. Stamp `decisions.delegation_assist`.
+**E13 implement notes:** `delegation.js` + `GameConfig.delegation.modes` (`team` / `solo`). CNAs: `assignStaggeredThirds`. Select aide on `#delegate-rail` → `paintDelegateHighlights`. Turns = team (½ slot); `data-delegate-mode="solo"` = instant complete. Stamp `decisions.delegation_assist`.
 
 **AUTO verify:** `node scripts/verify-e13.mjs`.
 
