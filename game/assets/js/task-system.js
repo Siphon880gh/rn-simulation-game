@@ -6,7 +6,9 @@ import {
   isPerformAllowed,
   buildRevealRule,
   syncTaskWindowDomAttrs,
-  applyWindowPhaseClass
+  applyWindowPhaseClass,
+  isAtOrAfterInShift,
+  isAfterInShift
 } from './availability-windows.js';
 
 class TaskSystem {
@@ -21,11 +23,11 @@ class TaskSystem {
     // Generic task processor
     this.taskProcessors.set('default', {
       shouldActivate: (task, currentTime) => {
-        return currentTime >= task.scheduled;
+        return isAtOrAfterInShift(currentTime, task.scheduled);
       },
       
       shouldExpire: (task, currentTime) => {
-        return task.expire && currentTime > task.expire;
+        return task.expire != null && isAfterInShift(currentTime, task.expire);
       },
 
       getContextMenu: (task) => {
@@ -39,11 +41,11 @@ class TaskSystem {
     // Medication-specific processor
     this.taskProcessors.set('med', {
       shouldActivate: (task, currentTime) => {
-        return currentTime >= task.scheduled;
+        return isAtOrAfterInShift(currentTime, task.scheduled);
       },
       
       shouldExpire: (task, currentTime) => {
-        return task.expire && currentTime > task.expire;
+        return task.expire != null && isAfterInShift(currentTime, task.expire);
       },
 
       getContextMenu: (task) => ({
@@ -64,9 +66,9 @@ class TaskSystem {
 
     // Hourly doctor-orders check (E4.M3) — expire at hour boundary (>=)
     this.taskProcessors.set('orders', {
-      shouldActivate: (task, currentTime) => currentTime >= task.scheduled,
+      shouldActivate: (task, currentTime) => isAtOrAfterInShift(currentTime, task.scheduled),
       shouldExpire: (task, currentTime) => (
-        task.expire != null && currentTime >= task.expire
+        task.expire != null && isAtOrAfterInShift(currentTime, task.expire)
       ),
       getContextMenu: () => ({
         perform: { name: 'Check orders', icon: 'add' },
@@ -77,12 +79,25 @@ class TaskSystem {
 
     // Bed prep / admission (E5.M3) — completion gated by mini-game win
     this.taskProcessors.set('bedprep', {
-      shouldActivate: (task, currentTime) => currentTime >= task.scheduled,
+      shouldActivate: (task, currentTime) => isAtOrAfterInShift(currentTime, task.scheduled),
       shouldExpire: (task, currentTime) => (
-        task.expire && currentTime > task.expire
+        task.expire != null && isAfterInShift(currentTime, task.expire)
       ),
       getContextMenu: () => ({
         perform: { name: 'Prepare bed', icon: 'add' },
+        details: { name: 'Details', icon: 'question' }
+      }),
+      render: (task) => this.renderGenericTask(task)
+    });
+
+    // IV / drip titration + Heparin PTT
+    this.taskProcessors.set('iv', {
+      shouldActivate: (task, currentTime) => isAtOrAfterInShift(currentTime, task.scheduled),
+      shouldExpire: (task, currentTime) => (
+        task.expire != null && isAfterInShift(currentTime, task.expire)
+      ),
+      getContextMenu: () => ({
+        perform: { name: 'Adjust / check IV', icon: 'add' },
         details: { name: 'Details', icon: 'question' }
       }),
       render: (task) => this.renderGenericTask(task)

@@ -14,7 +14,7 @@ http://localhost:8765/game/index.html?speed-factor=48
 |---------|--------|--------|
 | Demo presets | Brand area links `quick night` / `quick day` | Reloads with URL params |
 | Clock / Pause | Top-right `#clock` / `#pause` | Pause freezes shift time |
-| Hour tabs | `#shell-hour-tabs` (`H1 19:00` …) | Highlights active hour; does not scrub time |
+| Hour tabs | `#shell-hour-tabs` (`19:00` …) | Hover = truncated peek; click = pause + full hour modal (does not scrub time) |
 | Patient tabs | Left `#patient-tabs` | Room + name; swaps clinical panel |
 | Global tab | Last tab in census list | Doctor-orders checks live here |
 | Task Perform | **Left-click** an active task tile | Opens menu: **Perform** / **Details** (not right-click) |
@@ -81,7 +81,7 @@ Aligned with [`docs/players/ABOUT.md`](docs/players/ABOUT.md) and scenario pack 
 6. Click **Pause** → label becomes **Resume**; clock stops advancing.
 7. Click **Resume** → clock resumes.
 8. Click the clock tile once → **Shift ends on** detail toggles visible/hidden.
-9. Click hour tab **H1 19:00** (and optionally **H2 20:00**) → active hour styling moves; shift time itself is not scrubbed.
+9. Hover hour tab **19:00** → truncated peek popover. Click → shift pauses and full hour-peek modal opens; **Resume shift** (or Esc) clears modal pause. Clock is not scrubbed.
 
 ### Pass criteria
 

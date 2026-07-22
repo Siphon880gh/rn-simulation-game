@@ -82,6 +82,67 @@ body.shell-body {
     box-shadow: inset 0 -2px 0 #f59e0b;
 }
 
+/* Hour peek: hover truncated popover */
+.hour-peek-popover {
+    position: absolute;
+    z-index: 60;
+    max-width: 280px;
+    padding: 0.55rem 0.7rem;
+    background: #111827;
+    color: #f9fafb;
+    border-radius: 0.375rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.28);
+    font-size: 0.75rem;
+    line-height: 1.35;
+    pointer-events: auto;
+}
+
+.hour-peek-popover.hidden {
+    display: none;
+}
+
+.hour-peek-popover__title {
+    margin: 0 0 0.35rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #e5e7eb;
+}
+
+.hour-peek-popover__list {
+    margin: 0;
+    padding-left: 1rem;
+}
+
+.hour-peek-popover__list li {
+    margin: 0.15rem 0;
+}
+
+.hour-peek-popover__empty,
+.hour-peek-popover__more {
+    margin: 0.25rem 0 0;
+    color: #d1d5db;
+}
+
+.hour-peek-popover__hint {
+    margin: 0.45rem 0 0;
+    padding-top: 0.35rem;
+    border-top: 1px solid #374151;
+    color: #93c5fd;
+    font-size: 0.7rem;
+}
+
+.hour-peek-modal__list {
+    margin: 0.25rem 0 0;
+    padding-left: 1.1rem;
+    max-height: 16rem;
+    overflow-y: auto;
+    font-size: 0.875rem;
+}
+
+.hour-peek-modal__list li {
+    margin: 0.2rem 0;
+}
+
 /* E6.M2 — lightweight live score cues */
 #shell-score {
     font-weight: 700;

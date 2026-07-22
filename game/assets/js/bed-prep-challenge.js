@@ -222,9 +222,27 @@ export function wireBedPrepHandlers({ onDone, random = Math.random } = {}) {
         });
     };
 
+    /** Practice aid: fill correct sequence; player still presses Submit. */
+    window.bedPrepCheat = () => {
+        stopFlash();
+        if (flashEl) flashEl.textContent = 'Sequence locked — assemble below';
+        build?.classList.remove('hidden');
+        chosen.length = 0;
+        getBedPrepSequence().forEach((step) => {
+            chosen.push(step.label);
+        });
+        paintChosen();
+        if (feedback) {
+            feedback.classList.remove('hidden', 'text-rose-600');
+            feedback.classList.add('text-emerald-700');
+            feedback.textContent = 'Cheat filled the correct sequence — press Submit when ready.';
+        }
+    };
+
     return () => {
         stopFlash();
         delete window.bedPrepSubmit;
+        delete window.bedPrepCheat;
     };
 }
 

@@ -2,6 +2,7 @@
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
+import { registerPatientIv } from './iv-system.js';
 import { loadPastHxPack, ensurePastHxTimeline } from './past-hx-timeline.js';
 
 const PatientsModule = (() => {
@@ -146,6 +147,14 @@ const PatientsModule = (() => {
             syncMountedTaskWindows(patient);
             paintInitialClinicalStatus(patient);
 
+            // IV panel: fluids / IVPB / drips from [data-iv-line]
+            const panelHost = document.querySelector(
+                `.patient-panel-host[data-patient-id="${patient.id}"]`
+            );
+            if (panelHost) {
+                registerPatientIv(patient.id, panelHost);
+            }
+
             console.log(`Patient ${patient.name} initialized with ${patient.tasks.length} tasks`);
             return patient;
             
@@ -161,17 +170,35 @@ const PatientsModule = (() => {
         const doc = parser.parseFromString(html, 'text/html');
         const taskElements = doc.querySelectorAll('[data-task-type]');
         
-        return Array.from(taskElements).map((element, index) => ({
-            id: element.id || `${patientId}-task-${index}`,
-            name: element.querySelector('.font-medium')?.textContent || 'Unknown Task',
-            type: element.getAttribute('data-task-type'),
-            taskClass: element.getAttribute('data-task-class') || GameConfig.tasks.classes.ROUTINE,
-            scheduled: element.getAttribute('data-scheduled'),
-            expire: element.getAttribute('data-expire'),
-            durationMins: parseInt(element.getAttribute('data-duration-mins')) || 0,
-            status: element.getAttribute('data-status') || GameConfig.tasks.statuses.NOT_YET,
-            element: element.outerHTML
-        }));
+        return Array.from(taskElements).map((element, index) => {
+            const challenge = element.getAttribute('data-challenge');
+            const metadata = {};
+            if (challenge) metadata.challenge = challenge;
+            if (element.getAttribute('data-iv-drug')) {
+                metadata.drug = element.getAttribute('data-iv-drug');
+            }
+            if (element.getAttribute('data-iv-line-id')) {
+                metadata.lineId = element.getAttribute('data-iv-line-id');
+            }
+            if (element.getAttribute('data-iv-unit')) {
+                metadata.unit = element.getAttribute('data-iv-unit');
+            }
+            if (element.getAttribute('data-iv-rate') != null) {
+                metadata.currentRate = Number(element.getAttribute('data-iv-rate'));
+            }
+            return {
+                id: element.id || `${patientId}-task-${index}`,
+                name: element.querySelector('.font-medium')?.textContent || 'Unknown Task',
+                type: element.getAttribute('data-task-type'),
+                taskClass: element.getAttribute('data-task-class') || GameConfig.tasks.classes.ROUTINE,
+                scheduled: element.getAttribute('data-scheduled'),
+                expire: element.getAttribute('data-expire'),
+                durationMins: parseInt(element.getAttribute('data-duration-mins')) || 0,
+                status: element.getAttribute('data-status') || GameConfig.tasks.statuses.NOT_YET,
+                metadata,
+                element: element.outerHTML
+            };
+        });
     };
 
     // Declarative patient rendering — keep hosts mounted for efficient swap
@@ -366,8 +393,8 @@ const PatientsModule = (() => {
             header.removeAttribute('onclick');
         });
 
-        // Learning UX: medications start open so timed work is visible without an extra click
-        patientElement.querySelectorAll('.meds-list').forEach((list) => {
+        // Learning UX: medications + IV start open so timed work is visible without an extra click
+        patientElement.querySelectorAll('.meds-list, .iv-list').forEach((list) => {
             list.classList.remove('hidden');
         });
 

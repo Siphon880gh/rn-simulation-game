@@ -232,6 +232,32 @@ class GameState {
       return { ...this.state, patients };
     });
 
+    /** Replace or set IV lines on a patient (fluids / IVPB / drips). */
+    this.actions.set('REGISTER_IV_LINES', (payload) => {
+      const patients = new Map(this.state.patients);
+      const existing = patients.get(payload.patientId);
+      if (!existing) return this.state;
+      patients.set(payload.patientId, {
+        ...existing,
+        ivLines: Array.isArray(payload.lines) ? payload.lines : []
+      });
+      return { ...this.state, patients };
+    });
+
+    /** Patch one IV line by id (rate, status, lastPtt, nextPttAt, …). */
+    this.actions.set('UPDATE_IV_LINE', (payload) => {
+      const patients = new Map(this.state.patients);
+      const existing = patients.get(payload.patientId);
+      if (!existing || !Array.isArray(existing.ivLines)) return this.state;
+      const lines = existing.ivLines.map((line) => (
+        line.id === payload.lineId
+          ? { ...line, ...(payload.patch || {}) }
+          : line
+      ));
+      patients.set(payload.patientId, { ...existing, ivLines: lines });
+      return { ...this.state, patients };
+    });
+
     this.actions.set('MARK_EVENT_FIRED', (payload) => ({
       ...this.state,
       firedEvents: [

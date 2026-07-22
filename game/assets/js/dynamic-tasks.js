@@ -154,13 +154,22 @@ export function mountTaskDom(task) {
     li.setAttribute('data-duration-mins', String(task.duration || 10));
     li.setAttribute('data-task-class', task.taskClass || 'urgent');
     li.setAttribute('title', 'Click for Perform / Details menu');
-    li.className = `bg-amber-50 p-4 rounded-lg shadow flex items-center task-status-${task.status} border border-amber-200`;
-    const icon = task.type === 'med' ? 'fa-pills text-blue-500' : 'fa-bell text-amber-600';
+    const isCrit = task.type === 'criticallab' || task.metadata?.criticalLab;
+    li.className = isCrit
+        ? `bg-red-50 p-4 rounded-lg shadow flex items-center task-status-${task.status} border border-red-300`
+        : `bg-amber-50 p-4 rounded-lg shadow flex items-center task-status-${task.status} border border-amber-200`;
+    const icon = task.type === 'med'
+        ? 'fa-pills text-blue-500'
+        : isCrit
+            ? 'fa-vial text-red-600'
+            : 'fa-bell text-amber-600';
+    const badge = isCrit ? 'critical lab' : 'dynamic';
+    const badgeClass = isCrit ? 'text-red-700' : 'text-amber-700';
     li.innerHTML = `
       <data class="slot-label" value="1"></data>
       <i class="fas ${icon} text-xl mr-3"></i>
       <span class="font-medium text-gray-900">${task.name}</span>
-      <span class="ml-auto text-xs uppercase tracking-wide text-amber-700">dynamic</span>
+      <span class="ml-auto text-xs uppercase tracking-wide ${badgeClass}">${badge}</span>
     `;
     list.appendChild(li);
 }

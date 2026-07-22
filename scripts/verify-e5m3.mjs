@@ -37,6 +37,8 @@ const gateSrc = readFileSync(join(root, 'game/assets/js/challenge-gate.js'), 'ut
 const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
 const lin = readFileSync(join(root, 'game/events/patients/lin.html'), 'utf8');
 assert(gateSrc.includes('bed-prep-challenge'), 'gate wires bed prep');
+assert(gateSrc.includes('challengeGateCheat'), 'cheat on bed-prep modal');
+assert(readFileSync(join(root, 'game/assets/js/bed-prep-challenge.js'), 'utf8').includes('bedPrepCheat'), 'bedPrepCheat');
 assert(appSrc.includes('performBedPrepTask'), 'app complete-on-win path');
 assert(lin.includes('data-task-type="bedprep"'), 'lin has bedprep task');
 

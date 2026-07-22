@@ -16,6 +16,9 @@ import DoctorOrdersModule from './doctor-orders.js';
 import DynamicTasksModule from './dynamic-tasks.js';
 import ScoringModule from './scoring.js';
 import SceneBackdropModule from './scene-backdrop.js';
+import IvSystemModule from './iv-system.js';
+import CriticalLabsModule from './critical-labs.js';
+import { setShiftAnchor } from './availability-windows.js';
 
 // Declarative Application Configuration
 const AppConfig = {
@@ -33,7 +36,9 @@ const AppConfig = {
         doctorOrders: DoctorOrdersModule,
         dynamicTasks: DynamicTasksModule,
         scoring: ScoringModule,
-        scene: SceneBackdropModule
+        scene: SceneBackdropModule,
+        iv: IvSystemModule,
+        criticalLabs: CriticalLabsModule
     },
     
     urlParams: GameConfig.urlParams,
@@ -99,7 +104,7 @@ class GameApplication {
 
     // Initialize modules with dependency management
     async initializeModules() {
-        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene } = this.config.modules;
+        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs } = this.config.modules;
         
         // Register modules
         this.modules.set('modal', modal);
@@ -116,6 +121,8 @@ class GameApplication {
         this.modules.set('dynamicTasks', dynamicTasks);
         this.modules.set('scoring', scoring);
         this.modules.set('scene', scene);
+        this.modules.set('iv', iv);
+        this.modules.set('criticalLabs', criticalLabs);
 
         if (slots && slots.init) {
             slots.init();
@@ -128,6 +135,12 @@ class GameApplication {
         }
         if (scoring && scoring.init) {
             scoring.init();
+        }
+        if (iv && iv.init) {
+            iv.init();
+        }
+        if (criticalLabs && criticalLabs.init) {
+            criticalLabs.init();
         }
 
         // E4.M1: load scenario pack before census so patient order comes from pack
@@ -197,7 +210,7 @@ class GameApplication {
     // Setup task context menus declaratively
     setupTaskContextMenus() {
         const contextMenuConfig = {
-            selector: '[data-task-type="med"][data-status="active"], [data-task-type="orders"][data-status="active"], [data-task-type="assessment"][data-status="active"], [data-task-type="bedprep"][data-status="active"]',
+            selector: '[data-task-type="med"][data-status="active"], [data-task-type="orders"][data-status="active"], [data-task-type="assessment"][data-status="active"], [data-task-type="bedprep"][data-status="active"], [data-task-type="iv"][data-status="active"], [data-task-type="criticallab"][data-status="active"]',
             trigger: 'left',
             build: (triggerElement, e) => {
                 const element = e.target.closest('[data-task-type]');
@@ -212,6 +225,7 @@ class GameApplication {
                 }
 
                 // Create a basic task object from DOM if not in state yet
+                const challenge = element.getAttribute('data-challenge');
                 const task = gameState.getStateSlice('tasks').get(taskId) || {
                     id: taskId,
                     name: element.querySelector('.font-medium')?.textContent || 'Unknown Task',
@@ -219,13 +233,21 @@ class GameApplication {
                     scheduled: element.getAttribute('data-scheduled'),
                     expire: element.getAttribute('data-expire'),
                     duration: parseInt(element.getAttribute('data-duration-mins')) || 0,
-                    status: element.getAttribute('data-status')
+                    status: element.getAttribute('data-status'),
+                    metadata: challenge ? { challenge } : {}
                 };
 
                 const now = gameState.getStateSlice('currentTime');
                 const canPerform = taskSystem.isPerformAllowed(task, now);
                 const phase = taskSystem.getWindowPhase(task, now);
-                const isOrders = String(task.type).toLowerCase() === 'orders';
+                const kind = String(task.type).toLowerCase();
+                const isOrders = kind === 'orders';
+                const isCritCall = kind === 'criticallab' && task.metadata?.phase === 'call';
+                const isCritCb = kind === 'criticallab' && task.metadata?.phase === 'callback';
+                let performName = 'Perform';
+                if (isOrders) performName = 'Check orders';
+                if (isCritCall) performName = 'Call doctor';
+                if (isCritCb) performName = 'Take callback';
                 
                 return {
                     callback: (key, options) => {
@@ -235,7 +257,7 @@ class GameApplication {
                         perform: {
                             name: !canPerform
                                 ? `Perform (outside window: ${phase})`
-                                : (isOrders ? 'Check orders' : 'Perform'),
+                                : performName,
                             icon: 'add',
                             disabled: !canPerform
                         },
@@ -268,6 +290,14 @@ class GameApplication {
                     this.performBedPrepTask(task);
                     return;
                 }
+                if (kind === 'iv') {
+                    this.performIvTask(task);
+                    return;
+                }
+                if (kind === 'criticallab') {
+                    this.performCriticalLabTask(task);
+                    return;
+                }
                 console.log(`Performing medication: ${task.name}`);
                 this.performMedicationTask(task);
             },
@@ -283,6 +313,28 @@ class GameApplication {
             handler();
         } else {
             console.warn(`Unknown action: ${action}`);
+        }
+    }
+
+    // IV drip check / titration / Heparin PTT — challenge then slot
+    async performIvTask(task) {
+        const now = gameState.getStateSlice('currentTime');
+        if (!taskSystem.isPerformAllowed(task, now)) {
+            alert(`Cannot perform outside the availability window (${taskSystem.getWindowPhase(task, now)}).`);
+            return;
+        }
+        const challengeGate = this.modules.get('challengeGate');
+        const slotSystem = this.modules.get('slots');
+        const outcome = challengeGate?.runChallengeGate
+            ? await challengeGate.runChallengeGate(task)
+            : { passed: false, reason: 'no-gate' };
+        if (!outcome?.passed) {
+            console.log(`IV challenge not passed (${outcome?.reason || 'fail'})`);
+            return;
+        }
+        const result = slotSystem?.requestSlot(task, gameState.getStateSlice('currentTime'));
+        if (!result?.ok) {
+            alert('Could not start or queue that IV task.');
         }
     }
 
@@ -334,6 +386,29 @@ class GameApplication {
         const doctorOrders = this.modules.get('doctorOrders');
         const live = gameState.getStateSlice('tasks').get(task.id);
         doctorOrders?.handleOrdersCheckComplete?.(live || task);
+    }
+
+    // Critical lab: call MD (complete + schedule callback) or take callback (slot)
+    async performCriticalLabTask(task) {
+        const now = gameState.getStateSlice('currentTime');
+        if (!taskSystem.isPerformAllowed(task, now)) {
+            alert(`Cannot perform outside the availability window (${taskSystem.getWindowPhase(task, now)}).`);
+            return;
+        }
+        const criticalLabs = this.modules.get('criticalLabs');
+        const phase = task.metadata?.phase || task.metadata?.kind;
+        if (phase === 'call' || task.metadata?.kind === 'critical-lab-call') {
+            taskSystem.completeTask(task.id);
+            const live = gameState.getStateSlice('tasks')?.get(task.id) || task;
+            criticalLabs?.handleCriticalLabCallComplete?.(live, { now });
+            return;
+        }
+        // MD callback — occupy a slot while taking orders
+        const slotSystem = this.modules.get('slots');
+        const result = slotSystem?.requestSlot(task, now);
+        if (!result?.ok) {
+            alert('Could not start or queue the doctor callback.');
+        }
     }
 
     // Handle medication task performance — window gate → challenge → slot/queue
@@ -432,6 +507,9 @@ class GameApplication {
         gameState.dispatch('INITIALIZE_GAME', {
             startTime: gameConfig.shiftStarts
         });
+
+        // Night-shift wrap: task windows compare relative to shift start
+        setShiftAnchor(gameConfig.shiftStarts);
 
         if (pack?.title) {
             gameState.dispatch('APPEND_SHIFT_LOG', {

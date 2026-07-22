@@ -8,7 +8,8 @@ import {
   normalizeAnswer,
   resolveMedPair,
   buildMedIdentityPrompt,
-  checkMedIdentityAnswer
+  checkMedIdentityAnswer,
+  applyMedIdentityCheat
 } from '../game/assets/js/med-identity-quiz.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -20,6 +21,9 @@ const gateSrc = readFileSync(join(root, 'game/assets/js/challenge-gate.js'), 'ut
 assert(gateSrc.includes('med-identity-quiz'), 'gate imports quiz');
 assert(gateSrc.includes('buildMedIdentityPrompt'), 'gate uses prompt builder');
 assert(gateSrc.includes('challengeGateSubmit'), 'submit wired');
+assert(gateSrc.includes('challengeGateCheat'), 'cheat wired');
+assert(gateSrc.includes('applyMedIdentityCheat'), 'med cheat fill');
+assert(gateSrc.includes('cheatChallenge'), 'unified cheat');
 
 assert(normalizeAnswer('  Lipitor ') === 'lipitor', 'normalize trim/case');
 assert(resolveMedPair('Atorvastatin')?.brand === 'Lipitor', 'resolve atorvastatin');
@@ -48,6 +52,7 @@ assert(checkMedIdentityAnswer(' CEFTRIAXONE ', genericAsk), 'trim/case generic')
 // Random direction still returns a valid prompt
 const randomPrompt = buildMedIdentityPrompt({ name: 'Heparin', type: 'med' }, { random: () => 0.1 });
 assert(randomPrompt && randomPrompt.expected, 'random prompt');
+assert(typeof applyMedIdentityCheat === 'function', 'applyMedIdentityCheat export');
 
 if (failures.length) {
   console.error('E5.M2 AUTO FAIL');

@@ -3,12 +3,12 @@
  * Matching is case-insensitive; practice framing only.
  */
 
-/** @type {{ generic: string, brand: string, aliases?: string[] }[]} */
+/** @type {{ generic: string, brand: string, aliases?: string[], brandAliases?: string[] }[]} */
 export const MED_PAIRS = [
     { generic: 'atorvastatin', brand: 'Lipitor' },
     { generic: 'acetaminophen', brand: 'Tylenol', aliases: ['paracetamol'] },
     { generic: 'aspirin', brand: 'Bayer', aliases: ['asa', 'acetylsalicylic acid'] },
-    { generic: 'heparin', brand: 'Hep-Lock' },
+    { generic: 'heparin', brand: 'Hep-Lock', brandAliases: ['heplock', 'hep lock'] },
     { generic: 'gabapentin', brand: 'Neurontin' },
     { generic: 'melatonin', brand: 'Circadin' },
     { generic: 'trazodone', brand: 'Desyrel' },
@@ -46,7 +46,8 @@ export function resolveMedPair(taskName) {
         const keys = [
             pair.generic,
             pair.brand,
-            ...(pair.aliases || [])
+            ...(pair.aliases || []),
+            ...(pair.brandAliases || [])
         ].map(normalizeAnswer);
 
         if (keys.some((k) => normalized === k || normalized.includes(k) || k.includes(normalized))) {
@@ -93,7 +94,7 @@ export function buildMedIdentityPrompt(task, opts = {}) {
         shownLabel: 'generic',
         shown: pair.generic,
         expected: pair.brand,
-        accepted: [pair.brand].map(normalizeAnswer)
+        accepted: [pair.brand, ...(pair.brandAliases || [])].map(normalizeAnswer)
     };
 }
 
@@ -106,7 +107,12 @@ export function checkMedIdentityAnswer(answer, prompt) {
 export function renderMedIdentityHtml(prompt, taskName) {
     return `
       <div class="challenge-gate med-identity-quiz space-y-3 text-left" data-challenge="med-identity">
-        <p class="text-sm text-gray-600">Practice challenge (not a competency assessment). Timer is paused.</p>
+        <p class="text-sm text-gray-900 font-semibold">
+          Complete this challenge to perform the task.
+        </p>
+        <p class="text-sm text-gray-600">
+          Correct → task starts in a slot. Incorrect → task not started; try again. Timer is paused.
+        </p>
         <p class="text-sm text-gray-800">
           Medication task: <strong>${taskName || 'med'}</strong>
         </p>
@@ -118,7 +124,17 @@ export function renderMedIdentityHtml(prompt, taskName) {
         <input id="med-identity-answer" type="text" autocomplete="off" spellcheck="false"
           class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
           placeholder="Type ${prompt.promptLabel}" />
-        <p id="challenge-feedback" class="text-sm text-rose-600 hidden"></p>
+        <p id="challenge-feedback" class="text-sm font-medium rounded px-3 py-2 hidden" role="status" aria-live="polite"></p>
       </div>
     `;
+}
+
+/** Fill the answer field with the expected name (does not submit). */
+export function applyMedIdentityCheat(prompt) {
+    const input = document.querySelector('#med-identity-answer');
+    if (!input || !prompt) return false;
+    input.value = String(prompt.expected || '');
+    input.focus();
+    input.select();
+    return true;
 }

@@ -48,8 +48,11 @@ function annotateHourTab(at, label) {
     best.classList.add('has-events');
     const base = best.textContent.replace(/\s*\(\d+\)$/, '');
     best.textContent = `${base} (${count})`;
-    const prev = best.getAttribute('title') || '';
-    best.setAttribute('title', prev ? `${prev}\n• ${label}` : `• ${label}`);
+    // Full event text lives in hour-peek popover/modal (shell-chrome).
+    best.setAttribute(
+        'aria-description',
+        `${count} event${count === 1 ? '' : 's'} this hour. Latest: ${label}`
+    );
 }
 
 function injectTasks(taskSpecs, at) {

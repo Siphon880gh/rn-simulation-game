@@ -1,13 +1,50 @@
 /**
  * Availability windows (E3.M3) — scheduled→expire gating + early/late/end phases.
  * Relative +N expire is resolved at task create; DOM should carry absolute data-expire.
+ * Night-shift wrap: compare times relative to shift anchor (default 1900).
  */
 import { GameConfig } from './game-config.js';
+
+let shiftAnchorHhmm = GameConfig.timer.defaultShiftStart;
+
+export function setShiftAnchor(hhmm) {
+    const n = Number(hhmm);
+    if (Number.isFinite(n)) {
+        shiftAnchorHhmm = n;
+    }
+}
+
+export function getShiftAnchor() {
+    return shiftAnchorHhmm;
+}
 
 export function hhmmToMinutes(hhmm) {
     const n = Number(hhmm);
     if (!Number.isFinite(n)) return null;
     return Math.floor(n / 100) * 60 + (n % 100);
+}
+
+/** Minutes since shift anchor (0…1439+), wrapping past midnight. */
+export function minutesFromShiftAnchor(hhmm, anchor = shiftAnchorHhmm) {
+    const startM = hhmmToMinutes(anchor);
+    let curM = hhmmToMinutes(hhmm);
+    if (startM == null || curM == null) return null;
+    if (curM < startM) curM += 24 * 60;
+    return curM - startM;
+}
+
+export function isAtOrAfterInShift(currentHhmm, targetHhmm, anchor = shiftAnchorHhmm) {
+    const a = minutesFromShiftAnchor(currentHhmm, anchor);
+    const b = minutesFromShiftAnchor(targetHhmm, anchor);
+    if (a == null || b == null) return false;
+    return a >= b;
+}
+
+export function isAfterInShift(currentHhmm, targetHhmm, anchor = shiftAnchorHhmm) {
+    const a = minutesFromShiftAnchor(currentHhmm, anchor);
+    const b = minutesFromShiftAnchor(targetHhmm, anchor);
+    if (a == null || b == null) return false;
+    return a > b;
 }
 
 export function minutesBetween(startHhmm, endHhmm) {
@@ -25,19 +62,21 @@ export function minutesBetween(startHhmm, endHhmm) {
  */
 export function getWindowPhase(task, currentTime) {
     if (task == null || currentTime == null) return 'before';
-    const t = Number(currentTime);
-    const start = Number(task.scheduled);
-    if (!Number.isFinite(start)) return 'before';
-    if (t < start) return 'before';
+    const tRel = minutesFromShiftAnchor(currentTime);
+    const startRel = minutesFromShiftAnchor(task.scheduled);
+    if (tRel == null || startRel == null) return 'before';
+    if (tRel < startRel) return 'before';
 
     const expire = task.expire != null && task.expire !== '' ? Number(task.expire) : null;
     if (expire == null || !Number.isFinite(expire)) {
         return 'open';
     }
-    if (t > expire) return 'after';
+    const expireRel = minutesFromShiftAnchor(expire);
+    if (expireRel == null) return 'open';
+    if (tRel > expireRel) return 'after';
 
-    const span = minutesBetween(start, expire) || 1;
-    const into = minutesBetween(start, t) || 0;
+    const span = Math.max(1, expireRel - startRel);
+    const into = Math.max(0, tRel - startRel);
     const ratio = into / span;
     if (ratio < 1 / 3) return 'early';
     if (ratio < 2 / 3) return 'late';
@@ -52,14 +91,10 @@ export function isPerformAllowed(task, currentTime) {
     if (status === GameConfig.tasks.statuses.OVERDUE) return false;
     if (status === GameConfig.tasks.statuses.NOT_YET) return false;
 
-    const t = Number(currentTime);
-    const start = Number(task.scheduled);
-    if (!Number.isFinite(t) || !Number.isFinite(start)) return false;
-    if (t < start) return false;
+    if (!isAtOrAfterInShift(currentTime, task.scheduled)) return false;
 
     if (task.expire != null && task.expire !== '') {
-        const expire = Number(task.expire);
-        if (Number.isFinite(expire) && t > expire) return false;
+        if (isAfterInShift(currentTime, task.expire)) return false;
     }
     return status === GameConfig.tasks.statuses.ACTIVE;
 }

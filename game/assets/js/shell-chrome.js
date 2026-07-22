@@ -1,14 +1,26 @@
 /**
  * Shell chrome: hour-tab strip + append-only shift history log (E1.M2).
+ * Hour tabs: hover peek (truncated popover) / click peek (pause + modal).
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
+import ModalModule from './modal.js';
 import { timemarkPlusMinutes } from './timer_utils.js';
 
 const BOTTOM_HEIGHT_STORAGE_KEY = 'rngame.shellBottomHeightPx';
 const BOTTOM_HEIGHT_MIN_PX = 120;
 const BOTTOM_HEIGHT_MAX_VH = 0.55;
 const BOTTOM_HEIGHT_DEFAULT_PX = 176;
+const HOUR_PEEK_TRUNCATE = 3;
+const HOUR_PEEK_SHOW_MS = 220;
+const HOUR_PEEK_HIDE_MS = 180;
+const PAUSE_MODAL = GameConfig.timer.pauseSources.MODAL;
+
+let hourPeekPopoverEl = null;
+let hourPeekShowTimer = null;
+let hourPeekHideTimer = null;
+let hourPeekActiveBtn = null;
+let hourPeekModalOpen = false;
 
 function formatHHMM(hhmm) {
     const n = Number(hhmm) || 0;
@@ -16,6 +28,218 @@ function formatHHMM(hhmm) {
     const m = n % 100;
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
+
+function escapeHtml(str) {
+    return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function hhmmToMinutes(hhmm) {
+    const n = Number(hhmm) || 0;
+    return Math.floor(n / 100) * 60 + (n % 100);
+}
+
+function parseTimeLabelToMinutes(label) {
+    if (label == null) return null;
+    if (typeof label === 'number') return hhmmToMinutes(label);
+    const m = String(label).trim().match(/^(\d{1,2}):(\d{2})$/);
+    if (!m) return null;
+    return Number(m[1]) * 60 + Number(m[2]);
+}
+
+function minutesInHourWindow(mins, hourStartHhmm, hourEndHhmm) {
+    if (mins == null || !Number.isFinite(mins)) return false;
+    const start = hhmmToMinutes(hourStartHhmm);
+    let end = hhmmToMinutes(hourEndHhmm);
+    if (end <= start) end += 24 * 60;
+    let t = mins;
+    if (t < start) t += 24 * 60;
+    return t >= start && t < end;
+}
+
+function hourEndMark(marks, index) {
+    if (index + 1 < marks.length) return Number(marks[index + 1]);
+    return Number(timemarkPlusMinutes(marks[index], 60));
+}
+
+/**
+ * Collect truncated/full peek lines for one shift hour.
+ * @returns {{ label: string, hourStart: number, hourEnd: number, lines: string[], more: number }}
+ */
+function collectHourPeek(hourIndex, marks) {
+    const hourStart = Number(marks[hourIndex]);
+    const hourEnd = hourEndMark(marks, hourIndex);
+    const label = formatHHMM(hourStart);
+    const lines = [];
+
+    const fired = gameState.getStateSlice('firedEvents') || [];
+    fired.forEach((ev) => {
+        if (!minutesInHourWindow(hhmmToMinutes(ev.at), hourStart, hourEnd)) return;
+        const prefix = ev.type === 'emergency' ? '⚠ ' : '';
+        lines.push(`${prefix}${ev.message || ev.eventId || 'Event'}`);
+    });
+
+    const tasks = gameState.getStateSlice('tasks');
+    if (tasks) {
+        tasks.forEach((task) => {
+            if (!minutesInHourWindow(hhmmToMinutes(task.scheduled), hourStart, hourEnd)) return;
+            const status = task.status || 'pending';
+            lines.push(`Task: ${task.name || task.id} (${status})`);
+        });
+    }
+
+    const log = gameState.getStateSlice('shiftLog') || [];
+    log.forEach((entry) => {
+        const mins = parseTimeLabelToMinutes(entry.timeLabel);
+        if (!minutesInHourWindow(mins, hourStart, hourEnd)) return;
+        const msg = entry.message || '';
+        // Skip chrome seed noise; prefer event/task lines already listed
+        if (/^Shift chrome ready/i.test(msg)) return;
+        if (lines.some((l) => msg.includes(l.replace(/^⚠\s*/, '').slice(0, 24)))) return;
+        lines.push(msg);
+    });
+
+    return {
+        label,
+        hourStart,
+        hourEnd,
+        lines,
+        more: 0
+    };
+}
+
+function truncatePeekLines(peek, limit = HOUR_PEEK_TRUNCATE) {
+    if (peek.lines.length <= limit) {
+        return { ...peek, shown: peek.lines, more: 0 };
+    }
+    return {
+        ...peek,
+        shown: peek.lines.slice(0, limit),
+        more: peek.lines.length - limit
+    };
+}
+
+function ensureHourPeekPopover() {
+    if (hourPeekPopoverEl) return hourPeekPopoverEl;
+    hourPeekPopoverEl = document.createElement('div');
+    hourPeekPopoverEl.id = 'hour-peek-popover';
+    hourPeekPopoverEl.className = 'hour-peek-popover hidden';
+    hourPeekPopoverEl.setAttribute('role', 'tooltip');
+    document.body.appendChild(hourPeekPopoverEl);
+
+    hourPeekPopoverEl.addEventListener('mouseenter', () => {
+        clearTimeout(hourPeekHideTimer);
+    });
+    hourPeekPopoverEl.addEventListener('mouseleave', () => {
+        scheduleHideHourPeekPopover();
+    });
+    return hourPeekPopoverEl;
+}
+
+function hideHourPeekPopover() {
+    clearTimeout(hourPeekShowTimer);
+    clearTimeout(hourPeekHideTimer);
+    hourPeekActiveBtn = null;
+    if (hourPeekPopoverEl) hourPeekPopoverEl.classList.add('hidden');
+}
+
+function scheduleHideHourPeekPopover() {
+    clearTimeout(hourPeekHideTimer);
+    hourPeekHideTimer = setTimeout(hideHourPeekPopover, HOUR_PEEK_HIDE_MS);
+}
+
+function positionHourPeekPopover(anchor) {
+    const el = ensureHourPeekPopover();
+    const rect = anchor.getBoundingClientRect();
+    const pad = 8;
+    const width = Math.min(280, window.innerWidth - pad * 2);
+    el.style.width = `${width}px`;
+    el.classList.remove('hidden');
+    let left = rect.left + window.scrollX;
+    let top = rect.bottom + window.scrollY + 6;
+    const box = el.getBoundingClientRect();
+    if (left + box.width > window.scrollX + window.innerWidth - pad) {
+        left = window.scrollX + window.innerWidth - box.width - pad;
+    }
+    if (left < window.scrollX + pad) left = window.scrollX + pad;
+    if (rect.bottom + box.height + 6 > window.innerHeight && rect.top > box.height + 6) {
+        top = rect.top + window.scrollY - box.height - 6;
+    }
+    el.style.left = `${left}px`;
+    el.style.top = `${top}px`;
+}
+
+function renderHourPeekPopover(btn, marks) {
+    const hourIndex = Number(btn.dataset.hourIndex);
+    const peek = truncatePeekLines(collectHourPeek(hourIndex, marks));
+    const el = ensureHourPeekPopover();
+    const items = peek.shown.length
+        ? `<ul class="hour-peek-popover__list">${peek.shown.map((line) =>
+            `<li>${escapeHtml(line)}</li>`).join('')}</ul>`
+        : '<p class="hour-peek-popover__empty">No activity yet this hour.</p>';
+    const more = peek.more > 0
+        ? `<p class="hour-peek-popover__more">+${peek.more} more</p>`
+        : '';
+    el.innerHTML = `
+        <p class="hour-peek-popover__title">${escapeHtml(peek.label)}–${escapeHtml(formatHHMM(peek.hourEnd))}</p>
+        ${items}
+        ${more}
+        <p class="hour-peek-popover__hint">Click to pause &amp; peek full hour</p>
+    `;
+    positionHourPeekPopover(btn);
+}
+
+function closeHourPeekModal() {
+    document.removeEventListener('keydown', onHourPeekKeydown);
+    if (!hourPeekModalOpen) {
+        ModalModule.closeModal();
+        return;
+    }
+    hourPeekModalOpen = false;
+    gameState.dispatch('SET_PAUSE', { paused: false, source: PAUSE_MODAL });
+    ModalModule.closeModal();
+    setStatusMessage(gameState.getStateSlice('isPaused') ? 'Shift paused' : 'Shift running');
+}
+
+function onHourPeekKeydown(event) {
+    if (event.key === 'Escape' && hourPeekModalOpen) {
+        event.preventDefault();
+        closeHourPeekModal();
+    }
+}
+
+function openHourPeekModal(hourIndex, marks) {
+    hideHourPeekPopover();
+    const peek = collectHourPeek(hourIndex, marks);
+    gameState.dispatch('SET_ACTIVE_HOUR', { hourIndex, hourHhmm: peek.hourStart });
+    gameState.dispatch('SET_PAUSE', { paused: true, source: PAUSE_MODAL });
+    hourPeekModalOpen = true;
+    document.addEventListener('keydown', onHourPeekKeydown);
+
+    const listHtml = peek.lines.length
+        ? `<ul class="hour-peek-modal__list">${peek.lines.map((line) =>
+            `<li>${escapeHtml(line)}</li>`).join('')}</ul>`
+        : '<p class="text-sm text-gray-600">No events or tasks recorded for this hour yet.</p>';
+
+    ModalModule.openModal({
+        title: `Hour peek · ${formatHHMM(peek.hourStart)}–${formatHHMM(peek.hourEnd)}`,
+        content: `
+            <div class="hour-peek-modal space-y-2 text-left">
+                <p class="text-sm text-gray-600">Shift clock paused while you review this hour.</p>
+                ${listHtml}
+            </div>
+        `,
+        footer: `<button type="button" class="px-4 py-2 bg-blue-500 text-white rounded" onclick="window.hourPeekClose()">Resume shift</button>`,
+        overlay: true,
+        persistent: false
+    });
+    setStatusMessage(`Paused — peeking ${formatHHMM(peek.hourStart)}`);
+}
+
+window.hourPeekClose = closeHourPeekModal;
 
 function clampBottomHeight(px) {
     const topPrimary = document.querySelector(GameConfig.selectors.topPrimary);
@@ -147,12 +371,38 @@ function renderHourTabs(shiftStart, shiftDurationMinutes, activeHour) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'shell-hour-tab';
+        btn.setAttribute('role', 'tab');
         btn.dataset.hourIndex = String(index);
         btn.dataset.hourHhmm = String(hhmm);
-        btn.textContent = `H${index + 1} ${formatHHMM(hhmm)}`;
+        const label = formatHHMM(hhmm);
+        btn.textContent = label;
+        btn.setAttribute('aria-label', `Peek hour ${label}`);
+        btn.setAttribute('aria-haspopup', 'dialog');
         if (index === activeHour) btn.classList.add('is-active');
+
+        btn.addEventListener('mouseenter', () => {
+            if (hourPeekModalOpen) return;
+            clearTimeout(hourPeekHideTimer);
+            clearTimeout(hourPeekShowTimer);
+            hourPeekActiveBtn = btn;
+            hourPeekShowTimer = setTimeout(() => {
+                if (hourPeekActiveBtn === btn) renderHourPeekPopover(btn, marks);
+            }, HOUR_PEEK_SHOW_MS);
+        });
+        btn.addEventListener('mouseleave', () => {
+            scheduleHideHourPeekPopover();
+        });
+        btn.addEventListener('focus', () => {
+            if (hourPeekModalOpen) return;
+            clearTimeout(hourPeekHideTimer);
+            hourPeekActiveBtn = btn;
+            renderHourPeekPopover(btn, marks);
+        });
+        btn.addEventListener('blur', () => {
+            scheduleHideHourPeekPopover();
+        });
         btn.addEventListener('click', () => {
-            gameState.dispatch('SET_ACTIVE_HOUR', { hourIndex: index, hourHhmm: hhmm });
+            openHourPeekModal(index, marks);
         });
         host.appendChild(btn);
     });
@@ -217,6 +467,7 @@ const ShellChromeModule = {
         });
 
         gameState.subscribe('isPaused', (isPaused) => {
+            if (hourPeekModalOpen) return;
             setStatusMessage(isPaused ? 'Shift paused' : 'Shift running');
         });
 

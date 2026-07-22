@@ -44,6 +44,16 @@ assert(GameConfig.selectors.hourTabs === '#shell-hour-tabs', 'hourTabs selector'
 assert(GameConfig.selectors.shiftHistoryLog === '#shift-history-log', 'history selector');
 assert(GameConfig.selectors.leftMenu === '#shell-left-menu', 'left menu selector');
 
+const shellSrc = readFileSync(join(root, 'game/assets/js/shell-chrome.js'), 'utf8');
+const cssSrc = readFileSync(join(root, 'game/assets/css/shell.css'), 'utf8');
+assert(shellSrc.includes('openHourPeekModal'), 'hour peek modal open');
+assert(shellSrc.includes('renderHourPeekPopover'), 'hour peek hover popover');
+assert(shellSrc.includes('PAUSE_MODAL') || shellSrc.includes("pauseSources.MODAL"), 'peek uses modal pause source');
+assert(shellSrc.includes('hourPeekClose'), 'resume handler exposed');
+assert(cssSrc.includes('.hour-peek-popover'), 'hour peek popover CSS');
+assert(html.includes('Hour peek'), 'hour peek label in shell');
+assert(GameConfig.timer.pauseSources.MODAL === 'modal', 'modal pause source id');
+
 gameState.dispatch('INITIALIZE_GAME', { startTime: 1900 });
 gameState.dispatch('SET_ACTIVE_HOUR', { hourIndex: 2, hourHhmm: 2100 });
 assert(gameState.getStateSlice('activeHourIndex') === 2, 'active hour');

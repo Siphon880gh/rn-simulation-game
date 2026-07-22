@@ -79,6 +79,24 @@ export const GameConfig = {
           details: { name: 'Details', icon: 'question' }
         }
       },
+      IV: {
+        name: 'IV / Drip',
+        icon: 'fas fa-syringe',
+        color: 'teal',
+        contextMenu: {
+          perform: { name: 'Adjust / check IV', icon: 'add' },
+          details: { name: 'Details', icon: 'question' }
+        }
+      },
+      CRITICALLAB: {
+        name: 'Critical lab',
+        icon: 'fas fa-vial',
+        color: 'red',
+        contextMenu: {
+          perform: { name: 'Call doctor', icon: 'add' },
+          details: { name: 'Details', icon: 'question' }
+        }
+      },
       DEFAULT: {
         name: 'Task',
         icon: 'fas fa-tasks',
@@ -121,7 +139,7 @@ export const GameConfig = {
     }
   },
 
-  // Code Blue mini-game (E5.M4 Later) — thin BLS priority order
+  // Code Blue mini-game (E5.M4 Later) — random practice questions (+ optional order item)
   codeBlueChallenge: {
     steps: [
       { id: 'call', label: 'Activate Code Blue / call for help' },
@@ -132,6 +150,75 @@ export const GameConfig = {
       'Leave to finish charting first',
       'Wait for the physician to arrive before acting',
       'Give oral meds before calling for help'
+    ],
+    questions: [
+      {
+        id: 'unresponsive-first',
+        type: 'choice',
+        prompt: 'Adult found unresponsive with no pulse. What do you do first?',
+        choices: [
+          'Activate Code Blue / call for help and start CPR',
+          'Run to the med room for epinephrine',
+          'Finish charting the last set of vitals',
+          'Wait for the physician before touching the patient'
+        ],
+        correct: 'Activate Code Blue / call for help and start CPR'
+      },
+      {
+        id: 'compression-rate',
+        type: 'choice',
+        prompt: 'Target chest compression rate for adult CPR?',
+        choices: ['60–80/min', '100–120/min', '140–160/min', 'As fast as possible'],
+        correct: '100–120/min'
+      },
+      {
+        id: 'compression-depth',
+        type: 'choice',
+        prompt: 'Adult chest compression depth target?',
+        choices: ['About 1 inch', 'At least 2 inches (5 cm)', '4–5 inches', 'Whatever feels firm'],
+        correct: 'At least 2 inches (5 cm)'
+      },
+      {
+        id: 'aed-wet',
+        type: 'choice',
+        prompt: 'Patient is in water / chest is soaking wet before AED shock. Best action?',
+        choices: [
+          'Dry the chest quickly, then apply pads',
+          'Shock through wet clothing immediately',
+          'Skip AED and only do breaths',
+          'Move pads to the abdomen'
+        ],
+        correct: 'Dry the chest quickly, then apply pads'
+      },
+      {
+        id: 'pulse-check',
+        type: 'choice',
+        prompt: 'During CPR, pulse checks should be:',
+        choices: [
+          'Brief (≤10 seconds) and limited',
+          'At least 30 seconds every cycle',
+          'Continuous with fingers on the neck',
+          'Skipped entirely once compressions start'
+        ],
+        correct: 'Brief (≤10 seconds) and limited'
+      },
+      {
+        id: 'team-role',
+        type: 'choice',
+        prompt: 'When Code Blue arrives, the bedside nurse should typically:',
+        choices: [
+          'Hand off situation, stay to help / document as assigned',
+          'Leave immediately to avoid crowding',
+          'Take over airway from respiratory without handoff',
+          'Stop all compressions until the team lead arrives'
+        ],
+        correct: 'Hand off situation, stay to help / document as assigned'
+      },
+      {
+        id: 'bls-order',
+        type: 'order',
+        prompt: 'Order the first response priorities (1 → 3):'
+      }
     ]
   },
 
@@ -219,6 +306,70 @@ export const GameConfig = {
     taskType: 'orders'
   },
 
+  /**
+   * Critical lab incidents — call MD within callWindowMins; callback always lands
+   * inside that same window (immediate or delayed after the call).
+   */
+  criticalLabs: {
+    callWindowMins: 60,
+    callDurationMins: 5,
+    callbackDurationMins: 8,
+    maxPerShift: 4,
+    immediateCallbackChance: 0.35,
+    callbackDelayMins: { min: 5, max: 40 },
+    labs: [
+      {
+        id: 'k-high',
+        shortName: 'K+',
+        fullName: 'Potassium',
+        result: '6.2 mEq/L (critical high)',
+        ordersHint: 'ECG, hold K supplements, notify MD — consider kayexalate / insulin-dextrose per protocol'
+      },
+      {
+        id: 'hh-drop',
+        shortName: 'H/H',
+        fullName: 'Hemoglobin / Hematocrit',
+        result: 'Hgb 6.8 / Hct 20.4 (critical low)',
+        ordersHint: 'Type & cross, hold anticoagulants, prepare for possible transfusion'
+      },
+      {
+        id: 'blood-culture',
+        shortName: 'Blood culture',
+        fullName: 'Blood culture',
+        result: 'Gram-positive cocci in clusters (prelim positive)',
+        ordersHint: 'Review antibiotics, source control, consider ID consult'
+      },
+      {
+        id: 'troponin',
+        shortName: 'Troponin',
+        fullName: 'Troponin I',
+        result: 'Elevated — critical',
+        ordersHint: 'ECG, continuous telemetry, hold for cardiology callback orders'
+      },
+      {
+        id: 'mag-low',
+        shortName: 'Mg',
+        fullName: 'Magnesium',
+        result: '1.0 mg/dL (critical low)',
+        ordersHint: 'IV magnesium repletion, telemetry if dysrhythmia risk'
+      },
+      {
+        id: 'inr-high',
+        shortName: 'INR',
+        fullName: 'INR',
+        result: '4.8 (critical high)',
+        ordersHint: 'Hold warfarin, assess bleeding, vitamin K / FFP per MD'
+      }
+    ],
+    /** Timed spawns (shift HHMM). patientId must be on census. */
+    schedule: [
+      { id: 'crit-k-joe-2015', at: 2015, labId: 'k-high', patientId: 'joe' },
+      { id: 'crit-hh-maria-2145', at: 2145, labId: 'hh-drop', patientId: 'maria' },
+      { id: 'crit-bcx-aisha-2310', at: 2310, labId: 'blood-culture', patientId: 'aisha' },
+      { id: 'crit-trop-derek-0030', at: 30, labId: 'troponin', patientId: 'derek' }
+    ]
+  },
+
   // Scoring hooks (E6.M1) — practice points, not competency claims
   scoring: {
     startingTotal: 100,
@@ -243,6 +394,38 @@ export const GameConfig = {
       needsPractice: { min: 70, id: 'needs-practice', label: 'Needs more practice' },
       overtimeRisk: { min: 0, id: 'overtime-risk', label: 'Overtime / miss risk framing' }
     }
+  },
+
+  /**
+   * IV / drip panel + titration / Heparin PTT (practice framing).
+   * Patient HTML authors lines via [data-iv-line]; iv-system syncs rates + spawns tasks.
+   */
+  iv: {
+    heparinPttIntervalMins: 360,
+    heparinAdjustStep: 2, // units/kg/hr practice step
+    pressorAdjustStep: 2, // mcg/min practice step
+    insulinAdjustStep: 1, // units/hr
+    /** Timed BP / drip incidents (shift HHMM) — spawn titration tasks */
+    titrationIncidents: [
+      {
+        id: 'bp-drop-maria-levophed',
+        at: 2030,
+        patientId: 'maria',
+        drug: 'levophed',
+        brand: 'norepinephrine',
+        sbp: 78,
+        direction: 'increase'
+      },
+      {
+        id: 'bp-rise-maria-levophed',
+        at: 2300,
+        patientId: 'maria',
+        drug: 'levophed',
+        brand: 'norepinephrine',
+        sbp: 162,
+        direction: 'decrease'
+      }
+    ]
   },
 
   // Thin dynamic/urgent spawn (E3.M5) — game-time cadence, capped
