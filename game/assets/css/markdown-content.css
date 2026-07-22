@@ -2,12 +2,14 @@
 
 #docs-viewer {
     position: fixed;
-    inset: 1.5rem;
+    inset: 0;
     z-index: 60;
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    pointer-events: none;
+    padding: 1.5rem;
+    background: rgba(15, 23, 42, 0.55);
+    pointer-events: auto;
 }
 
 #docs-viewer.hidden {
@@ -22,7 +24,7 @@
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.28);
     text-align: left;
 }
 
