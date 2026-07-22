@@ -139,6 +139,30 @@ export const GameConfig = {
   },
 
   /**
+   * Right-rail Delegate / assist staff (E13).
+   * Naming: section "Delegate" (action verb). Helpers listed by role+name —
+   * ICU = CCT (critical care tech); floor = CNA + room. Replaces vague
+   * "Delegate-Whole" / "Delegate-Team" labels.
+   */
+  delegation: {
+    sectionLabel: 'Delegate',
+    turnAssistFactor: 0.5,
+    icu: {
+      role: 'cct',
+      roleLabel: 'CCT',
+      count: 1,
+      names: ['Morgan', 'Riley', 'Casey', 'Quinn']
+    },
+    floor: {
+      role: 'cna',
+      roleLabel: 'CNA',
+      maxCount: 2,
+      availabilityFraction: 1 / 3,
+      names: ['Wendy', 'Luis', 'Pat', 'Sam', 'Nina', 'Omar']
+    }
+  },
+
+  /**
    * Recurring bedside care schedules (pressure-injury prevention).
    * Patient packs opt in via patientConfigs.careSchedules and/or
    * HTML `data-care-schedule="turn-q2h"` on `.patient` (reason in data-care-reason).
@@ -290,6 +314,7 @@ export const GameConfig = {
     rightMenu: '#shell-right-menu',
     ordersRail: '#orders-rail',
     toolsRail: '#tools-rail',
+    delegateRail: '#delegate-rail',
     main: '#shell-main',
     bottom: '#shell-bottom',
     statusBar: '#shell-status-bar',

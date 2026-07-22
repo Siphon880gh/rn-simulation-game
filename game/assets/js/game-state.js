@@ -27,6 +27,8 @@ class GameState {
       slotQueue: [],
       scenarioPack: null,
       admitHold: null,
+      /** E13: { department, mode, aides: [...] } — CCT/CNA availability */
+      delegation: null,
       firedEvents: [],
       codeBlueHook: null,
       score: {
@@ -64,6 +66,7 @@ class GameState {
         progress: 0
       })),
       slotQueue: [],
+      delegation: null,
       score: {
         total: Number(GameConfig.scoring?.startingTotal) || 100,
         taskPoints: 0,
@@ -421,6 +424,11 @@ class GameState {
       queue.shift();
       return { ...this.state, slotQueue: queue };
     });
+
+    this.actions.set('SET_DELEGATION', (payload = {}) => ({
+      ...this.state,
+      delegation: payload.delegation ?? null
+    }));
   }
 
   // Subscribe to state changes

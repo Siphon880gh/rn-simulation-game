@@ -451,6 +451,32 @@ Next up: **Later** backlog (E3.M4, E5.M3, E5.M4, E7, E8) — MVP `implementation
 
 ---
 
+## E13 — Delegate assist (CCT / CNA) *(Post-MVP)*
+
+| ID | Story | Milestone | Status |
+|----|-------|-----------|--------|
+| S13.1 | Rail section **Delegate** (not Delegate-Whole/Team); list helpers by role+name | E13.M1 | [x] |
+| S13.2 | ICU: one CCT; each hour randomly first or second half available | E13.M2 | [x] |
+| S13.3 | Floor: up to 2 CNAs; each available ~⅓ shift; patients split evenly; label `CNA Wendy · 201` | E13.M3 | [x] |
+| S13.4 | Turn/reposition: “Turn with … (½ time)” when aide available for that patient | E13.M4 | [x] |
+| S13.5 | AUTO verify + maps | E13.M5 | [x] |
+
+### Milestones
+
+| Milestone | Goal | Non-goals | MVP? |
+|-----------|------|-----------|------|
+| **E13.M1** | Config + state + rail shell + naming | Availability math | Post-MVP |
+| **E13.M2** | ICU CCT half-hour windows | Floor CNAs | Post-MVP |
+| **E13.M3** | Floor CNA windows + room labels | ICU CCT | Post-MVP |
+| **E13.M4** | Assisted turn → `assistFactor` 0.5 on slot duration | Delegate meds | Post-MVP |
+| **E13.M5** | `verify-e13.mjs` + maps | — | Post-MVP |
+
+**E13 implement notes:** `delegation.js` + `GameConfig.delegation`. Init after census; `right-menu.js` renders `#delegate-rail`. Duration via `resolveEffectiveDuration` + `metadata.assistFactor`. Stamp `decisions.delegation_assist`.
+
+**AUTO verify:** `node scripts/verify-e13.mjs`.
+
+---
+
 ## Confirmation gate
 
 - [x] User approved `EPIC_MAP.md`

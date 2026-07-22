@@ -90,6 +90,10 @@ CSS classes: `task-status-*` in `declarative-tasks.css`.
 
 `GameConfig.careSchedules.turnQ2h` — every 120 game-min from shift start; `assessment` tasks (duration 10, expire +60). Built in `patients.js` (`buildCareScheduleTasks` / `mountCareScheduleTasks`). Perform = existing assessment → slot path in `app.js`.
 
+## Delegate assist (E13)
+
+`delegation.js` + `GameConfig.delegation`. ICU: one **CCT**, free first or second half of each hour. Floor: up to **2 CNAs**, each ~⅓ of shift, patients split evenly; label `CNA Wendy · 201`. Rail `#delegate-rail`. Turn tasks: context menu **Turn with … (½ time)** when aide available for that patient (`metadata.assistFactor` via `resolveEffectiveDuration`). AUTO: `node scripts/verify-e13.mjs`.
+
 ## Doctor orders + E11
 
 `doctor-orders.js` — hourly `doctor-orders-check` (duration 5). On **complete**: inject pack `orderInjections` + **carryover** (missed-check undelivered specs + overdue `fromOrdersCheck` tasks) + maybe **one** sudden procedure (`GameConfig.doctorOrders.procedures`).

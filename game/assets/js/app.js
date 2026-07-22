@@ -23,6 +23,12 @@ import SoundModule from './sound.js';
 import NurseAlertsModule from './nurse-alerts.js';
 import AdmissionSystemModule from './admission-system.js';
 import RightMenuModule from './right-menu.js';
+import DelegationModule, {
+    findAvailableAideForPatient,
+    isTurnCareTask,
+    withTurnAssist,
+    formatAideLabel
+} from './delegation.js';
 import { setShiftAnchor } from './availability-windows.js';
 
 // Declarative Application Configuration
@@ -48,7 +54,8 @@ const AppConfig = {
         sound: SoundModule,
         nurseAlerts: NurseAlertsModule,
         admission: AdmissionSystemModule,
-        rightMenu: RightMenuModule
+        rightMenu: RightMenuModule,
+        delegation: DelegationModule
     },
     
     urlParams: GameConfig.urlParams,
@@ -114,7 +121,7 @@ class GameApplication {
 
     // Initialize modules with dependency management
     async initializeModules() {
-        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs, testMode, sound, nurseAlerts, admission, rightMenu } = this.config.modules;
+        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs, testMode, sound, nurseAlerts, admission, rightMenu, delegation } = this.config.modules;
         
         // Register modules
         this.modules.set('modal', modal);
@@ -138,6 +145,7 @@ class GameApplication {
         this.modules.set('nurseAlerts', nurseAlerts);
         this.modules.set('admission', admission);
         this.modules.set('rightMenu', rightMenu);
+        this.modules.set('delegation', delegation);
 
         if (slots && slots.init) {
             slots.init();
@@ -284,21 +292,34 @@ class GameApplication {
                 if (isAdmitCall) performName = 'Call admitting';
                 if (isAdmitRecall) performName = 'Call admitting again';
                 if (isAdmitCb) performName = 'Take admitting callback';
-                
+
+                const items = {
+                    perform: {
+                        name: !canPerform
+                            ? `Perform (outside window: ${phase})`
+                            : performName,
+                        icon: 'add',
+                        disabled: !canPerform
+                    },
+                    details: { name: 'Details', icon: 'question' }
+                };
+
+                // E13: turn with CCT/CNA when that aide is available for this patient
+                if (canPerform && isTurnCareTask(task) && task.patientId) {
+                    const aide = findAvailableAideForPatient(task.patientId, now);
+                    if (aide) {
+                        items.assistTurn = {
+                            name: `Turn with ${formatAideLabel(aide)} (½ time)`,
+                            icon: 'add'
+                        };
+                    }
+                }
+
                 return {
                     callback: (key, options) => {
                         this.handleTaskAction(key, task, element);
                     },
-                    items: {
-                        perform: {
-                            name: !canPerform
-                                ? `Perform (outside window: ${phase})`
-                                : performName,
-                            icon: 'add',
-                            disabled: !canPerform
-                        },
-                        details: { name: 'Details', icon: 'question' }
-                    }
+                    items
                 };
             }
         };
@@ -319,7 +340,7 @@ class GameApplication {
                     return;
                 }
                 if (kind === 'assessment') {
-                    this.performAssessmentTask(task);
+                    this.performAssessmentTask(task, { assist: false });
                     return;
                 }
                 if (kind === 'bedprep') {
@@ -340,6 +361,9 @@ class GameApplication {
                 }
                 console.log(`Performing medication: ${task.name}`);
                 this.performMedicationTask(task);
+            },
+            assistTurn: () => {
+                this.performAssessmentTask(task, { assist: true });
             },
             details: () => {
                 const durationMins = task.duration;
@@ -401,14 +425,28 @@ class GameApplication {
     }
 
     // E3.M5: assessment/dynamic perform — window gate → short slot (no med quiz)
-    async performAssessmentTask(task) {
+    // E13: opts.assist → turn with available CCT/CNA at half duration
+    async performAssessmentTask(task, opts = {}) {
         const now = gameState.getStateSlice('currentTime');
         if (!taskSystem.isPerformAllowed(task, now)) {
             alert(`Cannot perform outside the availability window (${taskSystem.getWindowPhase(task, now)}).`);
             return;
         }
+        let workTask = task;
+        if (opts.assist && isTurnCareTask(task) && task.patientId) {
+            const aide = findAvailableAideForPatient(task.patientId, now);
+            if (!aide) {
+                alert('No assist available for this patient right now.');
+                return;
+            }
+            workTask = withTurnAssist(task, aide);
+            gameState.dispatch('APPEND_SHIFT_LOG', {
+                message: `Delegated turn to ${formatAideLabel(aide)}`,
+                timeLabel: String(now ?? '—')
+            });
+        }
         const slotSystem = this.modules.get('slots');
-        const result = slotSystem?.requestSlot(task, now);
+        const result = slotSystem?.requestSlot(workTask, now);
         if (!result?.ok) {
             alert('Could not start or queue that task.');
         }
@@ -667,7 +705,13 @@ class GameApplication {
             });
         }
 
-        // E10: Orders & Tools right rail
+        // E13: CCT / CNA availability for Delegate rail (after census)
+        const delegation = this.modules.get('delegation');
+        if (delegation && delegation.init) {
+            delegation.init();
+        }
+
+        // E10: Orders & Tools right rail (+ E13 Delegate)
         const rightMenu = this.modules.get('rightMenu');
         if (rightMenu && rightMenu.init) {
             rightMenu.init({

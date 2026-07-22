@@ -239,6 +239,14 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 - **Out of scope:** Full Braden scoring, skin-breakdown physiology sim, other ADLs (feed/bath) unless added later.
 - **Suggested order:** After E11.
 
+### E13. Delegate assist (CCT / CNA)
+- **Goal / user outcome:** Right-rail **Delegate** lists who can help: ICU critical care tech (half of each hour) or floor CNAs (up to two, ~⅓ of shift, split by patient/room). Turning with an available aide halves slot time.
+- **Why:** Teaches realistic delegation timing and patient-assignment boundaries (not every aide can touch every patient).
+- **Includes:** `delegation.js` + `GameConfig.delegation`; rail under Orders/Tools; labels like `CNA Wendy · 201`; turn context-menu “Turn with … (½ time)”.
+- **Dependencies:** E10 right rail, E12 turn tasks, scenario `department`.
+- **Out of scope:** Full staffing matrix, delegating meds/assessments beyond turns, charge-nurse whole-unit float.
+- **Suggested order:** After E12.
+
 ---
 
 ## C. Coverage Check
@@ -260,6 +268,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 | Always-visible Orders + Tools right rail | E10 |
 | Orders carryover + ≤1 sudden procedure / consent / NPO | E11 |
 | Q2H turning / skin care for high-risk patients | E12 |
+| Delegate CCT/CNA assist (availability + half-time turns) | E13 |
 | Fictional disclaimer + clinical tone | Decisions + all content epics |
 | Help / learning MD authoring + Mermaid + LaTeX math | E0.M5 (+ content epics author files) |
 | Vanilla/light stack | Decisions in state.json |
@@ -282,7 +291,7 @@ Empty · Loading · Error · Success/confirm · First-run · Edge (slots full / 
 
 1. Report: [`council-report-epics-milestones.md`](council-report-epics-milestones.md)
 2. Milestones: [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md)
-3. Resume: [`.agents/state.json`](.agents/state.json) → **E12** after E11; prior MVP + Later slices shipped except skipped E8.M2
+3. Resume: [`.agents/state.json`](.agents/state.json) → **E13** after E12; prior MVP + Later slices shipped except skipped E8.M2
 
-**Order:** `E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E5.M4, E7, E8 → E9 → E10 → E11 → E12`
+**Order:** `E0.M3 → E0.M4 → E0.M5 → E1 → E2 → E3.M1–M2 → E3.M6 → E6.M0 → E4.M1 → (E4.M2 ∥ E5) → E3.M3 → E4.M3 → E3.M5 → E6.M1–M2 → Later: E3.M4, E5.M3, E5.M4, E7, E8 → E9 → E10 → E11 → E12 → E13`
 

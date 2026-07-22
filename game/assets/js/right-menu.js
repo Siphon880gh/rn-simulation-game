@@ -7,6 +7,7 @@ import gameState from './game-state.js';
 import { listPendingCriticalLabCallbacks } from './critical-labs.js';
 import { listPendingAdmissionCallbacks, isOpenAdmitMode } from './admission-system.js';
 import { isAtOrAfterInShift } from './availability-windows.js';
+import { listDelegateRailRows } from './delegation.js';
 
 /** @type {{ showGlobalPanel?: Function, getPatient?: Function } | null} */
 let patientsApi = null;
@@ -23,6 +24,10 @@ function ordersHost() {
 
 function toolsHost() {
     return document.querySelector(GameConfig.selectors.toolsRail || '#tools-rail');
+}
+
+function delegateHost() {
+    return document.querySelector(GameConfig.selectors.delegateRail || '#delegate-rail');
 }
 
 function emptyRow(host, message) {
@@ -286,9 +291,48 @@ function renderTools() {
     });
 }
 
+function renderDelegate() {
+    const host = delegateHost();
+    if (!host) return;
+    host.replaceChildren();
+
+    const label = document.querySelector('#delegate-rail-label');
+    const sectionLabel = gameState.getStateSlice('delegation')?.sectionLabel
+        || GameConfig.delegation?.sectionLabel
+        || 'Delegate';
+    if (label) label.textContent = sectionLabel;
+
+    const rows = listDelegateRailRows();
+    if (!rows.length) {
+        emptyRow(host, 'No assist staff this assignment');
+        return;
+    }
+
+    rows.forEach((row) => {
+        const el = document.createElement('div');
+        el.className = `rail-item is-delegate ${row.available ? 'is-available' : 'is-away'}`;
+        el.setAttribute('role', 'listitem');
+        el.dataset.railKind = 'delegate';
+        el.dataset.aideId = row.id;
+        el.innerHTML = `
+          <span class="rail-item__title">${row.title}</span>
+          <span class="rail-item__meta">${row.meta}</span>
+        `;
+        if (row.available && row.patientIds?.[0]) {
+            el.style.cursor = 'pointer';
+            el.title = 'Jump to covered patient';
+            el.addEventListener('click', () => {
+                onPatientJump(row.patientIds[0], `Opened patient for ${row.title}`);
+            });
+        }
+        host.appendChild(el);
+    });
+}
+
 function renderAll() {
     renderOrders();
     renderTools();
+    renderDelegate();
 }
 
 export function initRightMenu(deps = {}) {
@@ -300,12 +344,14 @@ export function initRightMenu(deps = {}) {
     gameState.subscribe('admitHold', renderTools);
     gameState.subscribe('activeHourHhmm', renderOrders);
     gameState.subscribe('activePatientId', renderOrders);
+    gameState.subscribe('delegation', renderDelegate);
 }
 
 const RightMenuModule = {
     init: initRightMenu,
     renderOrders,
     renderTools,
+    renderDelegate,
     listOrderChecks,
     listInjectedOrders
 };

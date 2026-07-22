@@ -688,7 +688,8 @@ body.shell-bottom-resizing {
 }
 
 .orders-rail,
-.tools-rail {
+.tools-rail,
+.delegate-rail {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
@@ -751,6 +752,26 @@ body.shell-bottom-resizing {
     border-color: #93c5fd;
     background: #eff6ff;
     color: #1e40af;
+}
+
+.rail-item.is-delegate {
+    border-color: #c4b5fd;
+    background: #f5f3ff;
+    color: #5b21b6;
+    cursor: default;
+}
+
+.rail-item.is-delegate.is-available {
+    border-color: #34d399;
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.rail-item.is-delegate.is-away {
+    opacity: 0.72;
+    border-color: #d1d5db;
+    background: #f9fafb;
+    color: #6b7280;
 }
 
 .rail-item.status-active {
