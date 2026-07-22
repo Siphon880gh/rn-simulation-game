@@ -37,8 +37,9 @@ function renderSlots(slots) {
     bar.innerHTML = slots.map((slot) => {
         if (!slot.taskId) {
             return `
-              <div class="task-slot task-slot--empty" data-slot-id="${slot.id}">
+              <div class="task-slot task-slot--empty" data-slot-id="${slot.id}" title="Click an active task → Perform to fill this slot">
                 <span class="task-slot-label">Slot ${slot.id + 1}</span>
+                <span class="task-slot-hint">idle</span>
               </div>`;
         }
         const progress = Number(slot.progress) || 0;

@@ -77,6 +77,36 @@
                     style="width:150px;">
                     Pause
                 </button>
+                <!-- Docs control lives in top chrome so it never covers bottom task slots -->
+                <div id="docs-container" class="shell-docs-control relative z-40">
+                    <div id="docs-button" class="group bg-white hover:bg-blue-50 rounded-full shadow border border-gray-200 cursor-pointer transition-all duration-300 ease-in-out overflow-hidden"
+                         style="width: 40px; height: 40px;" title="Documentation">
+                        <div class="flex items-center h-full transition-all duration-300 ease-in-out group-hover:w-32" style="width: 40px;">
+                            <div class="flex items-center justify-center w-10 h-10 flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                     class="lucide lucide-file-text text-gray-500 group-hover:text-blue-500 transition-colors">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pl-1">
+                                Docs
+                            </span>
+                        </div>
+                    </div>
+                    <div id="docs-dropdown" class="absolute right-0 mt-2 w-60 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden">
+                        <div class="py-2">
+                            <div class="px-4 py-2 text-sm font-medium text-gray-700 border-b border-gray-200">
+                                Documentation
+                            </div>
+                            <div id="docs-list" class="py-1 overflow-y-scroll h-1/2"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -117,8 +147,10 @@
             </aside>
         </div>
 
-        <!-- Bottom: history log + task slots + status bar -->
+        <!-- Bottom: history log + task slots + status bar (drag top edge to resize) -->
         <footer id="shell-bottom">
+            <div id="shell-bottom-resize" role="separator" aria-orientation="horizontal"
+                 aria-label="Resize bottom panel" tabindex="0" title="Drag to resize bottom panel"></div>
             <div id="shift-history-log" aria-live="polite" aria-label="Shift event history">
                 <p class="shift-log-empty">No shift events yet.</p>
             </div>
@@ -134,37 +166,6 @@
                 <span id="shell-status-meta">Slots: 3</span>
             </div>
         </footer>
-    </div>
-
-    <!-- Docs FAB (outside grid; fixed) -->
-    <div id="docs-container" class="fixed bottom-4 right-4 z-40">
-        <div id="docs-button" class="group bg-white hover:bg-blue-50 rounded-full shadow-lg border border-gray-200 cursor-pointer transition-all duration-300 ease-in-out overflow-hidden"
-             style="width: 40px; height: 40px;">
-            <div class="flex items-center h-full transition-all duration-300 ease-in-out group-hover:w-32" style="width: 40px;">
-                <div class="flex items-center justify-center w-10 h-10 flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                         class="lucide lucide-file-text text-gray-500 group-hover:text-blue-500 transition-colors">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                </div>
-                <span class="text-sm font-medium text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pl-1">
-                    Docs
-                </span>
-            </div>
-        </div>
-        <div id="docs-dropdown" class="absolute right-0 mt-2 w-60 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden -translate-y-full">
-            <div class="py-2">
-                <div class="px-4 py-2 text-sm font-medium text-gray-700 border-b border-gray-200">
-                    Documentation
-                </div>
-                <div id="docs-list" class="py-1 overflow-y-scroll h-1/2"></div>
-            </div>
-        </div>
     </div>
 
     <!-- Modal -->

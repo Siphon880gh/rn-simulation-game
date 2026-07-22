@@ -202,11 +202,23 @@ li[data-status="active"] {
     overflow: hidden;
 }
 
+.task-slot--empty {
+    justify-content: center;
+    gap: 0.15rem;
+}
+
 .task-slot--empty .task-slot-label {
-    margin: auto;
     font-size: 0.7rem;
     color: #9ca3af;
     font-weight: 600;
+}
+
+.task-slot--empty .task-slot-hint {
+    font-size: 0.6rem;
+    color: #d1d5db;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .task-slot--busy {

@@ -5,11 +5,122 @@ import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import { timemarkPlusMinutes } from './timer_utils.js';
 
+const BOTTOM_HEIGHT_STORAGE_KEY = 'rngame.shellBottomHeightPx';
+const BOTTOM_HEIGHT_MIN_PX = 120;
+const BOTTOM_HEIGHT_MAX_VH = 0.55;
+const BOTTOM_HEIGHT_DEFAULT_PX = 176;
+
 function formatHHMM(hhmm) {
     const n = Number(hhmm) || 0;
     const h = Math.floor(n / 100);
     const m = n % 100;
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+function clampBottomHeight(px) {
+    const topPrimary = document.querySelector(GameConfig.selectors.topPrimary);
+    const topSecondary = document.querySelector(GameConfig.selectors.topSecondary);
+    const topChrome = (topPrimary?.offsetHeight || 0) + (topSecondary?.offsetHeight || 0);
+    const minBodyPx = 140;
+    const maxByViewport = Math.floor(window.innerHeight * BOTTOM_HEIGHT_MAX_VH);
+    const maxByLayout = window.innerHeight - topChrome - minBodyPx;
+    const maxPx = Math.max(BOTTOM_HEIGHT_MIN_PX, Math.min(maxByViewport, maxByLayout));
+    return Math.min(maxPx, Math.max(BOTTOM_HEIGHT_MIN_PX, Math.round(px)));
+}
+
+function applyBottomHeight(px) {
+    const shell = document.querySelector(GameConfig.selectors.shell);
+    if (!shell) return;
+    const next = clampBottomHeight(px);
+    shell.style.setProperty('--shell-bottom-height', `${next}px`);
+    document.documentElement.style.setProperty('--shell-bottom-height', `${next}px`);
+    return next;
+}
+
+function readStoredBottomHeight() {
+    try {
+        const raw = localStorage.getItem(BOTTOM_HEIGHT_STORAGE_KEY);
+        if (raw == null) return null;
+        const n = Number(raw);
+        return Number.isFinite(n) ? n : null;
+    } catch {
+        return null;
+    }
+}
+
+function storeBottomHeight(px) {
+    try {
+        localStorage.setItem(BOTTOM_HEIGHT_STORAGE_KEY, String(px));
+    } catch {
+        /* ignore quota / private mode */
+    }
+}
+
+function initBottomResize() {
+    const handle = document.getElementById('shell-bottom-resize');
+    if (!handle || handle.dataset.bound === '1') return;
+    handle.dataset.bound = '1';
+
+    const stored = readStoredBottomHeight();
+    applyBottomHeight(stored ?? BOTTOM_HEIGHT_DEFAULT_PX);
+
+    let dragStartY = 0;
+    let dragStartHeight = 0;
+
+    const onPointerMove = (event) => {
+        const delta = dragStartY - event.clientY;
+        applyBottomHeight(dragStartHeight + delta);
+    };
+
+    const onPointerUp = (event) => {
+        handle.releasePointerCapture?.(event.pointerId);
+        document.body.classList.remove('shell-bottom-resizing');
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        const shell = document.querySelector(GameConfig.selectors.shell);
+        const current = shell
+            ? Number.parseFloat(getComputedStyle(shell).getPropertyValue('--shell-bottom-height'))
+            : BOTTOM_HEIGHT_DEFAULT_PX;
+        if (Number.isFinite(current)) {
+            storeBottomHeight(clampBottomHeight(current));
+        }
+    };
+
+    handle.addEventListener('pointerdown', (event) => {
+        if (event.button != null && event.button !== 0) return;
+        event.preventDefault();
+        const shell = document.querySelector(GameConfig.selectors.shell);
+        const current = shell
+            ? Number.parseFloat(getComputedStyle(shell).getPropertyValue('--shell-bottom-height'))
+            : BOTTOM_HEIGHT_DEFAULT_PX;
+        dragStartY = event.clientY;
+        dragStartHeight = Number.isFinite(current) ? current : BOTTOM_HEIGHT_DEFAULT_PX;
+        document.body.classList.add('shell-bottom-resizing');
+        handle.setPointerCapture?.(event.pointerId);
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+    });
+
+    handle.addEventListener('keydown', (event) => {
+        const step = event.shiftKey ? 32 : 12;
+        if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+        event.preventDefault();
+        const shell = document.querySelector(GameConfig.selectors.shell);
+        const current = shell
+            ? Number.parseFloat(getComputedStyle(shell).getPropertyValue('--shell-bottom-height'))
+            : BOTTOM_HEIGHT_DEFAULT_PX;
+        const delta = event.key === 'ArrowUp' ? step : -step;
+        const next = applyBottomHeight((Number.isFinite(current) ? current : BOTTOM_HEIGHT_DEFAULT_PX) + delta);
+        if (next != null) storeBottomHeight(next);
+    });
+
+    window.addEventListener('resize', () => {
+        const shell = document.querySelector(GameConfig.selectors.shell);
+        const current = shell
+            ? Number.parseFloat(getComputedStyle(shell).getPropertyValue('--shell-bottom-height'))
+            : BOTTOM_HEIGHT_DEFAULT_PX;
+        if (Number.isFinite(current)) applyBottomHeight(current);
+    });
 }
 
 function hourCount(shiftDurationMinutes) {
@@ -89,6 +200,7 @@ const ShellChromeModule = {
         const shiftDuration = shiftConfig.shiftDuration ?? GameConfig.timer.defaultShiftDuration;
         const activeHour = gameState.getStateSlice('activeHourIndex') || 0;
 
+        initBottomResize();
         renderHourTabs(shiftStart, shiftDuration, activeHour);
         renderShiftLog(gameState.getStateSlice('shiftLog') || []);
         setStatusMessage('Shift ready');

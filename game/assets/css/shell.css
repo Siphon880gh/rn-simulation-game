@@ -10,9 +10,11 @@ body.shell-body {
 
 #shell {
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-rows: auto auto 1fr var(--shell-bottom-height, 11rem);
     min-height: 100vh;
+    max-height: 100vh;
     max-width: 100%;
+    --shell-bottom-height: 11rem;
 }
 
 #shell-top-primary {
@@ -35,6 +37,10 @@ body.shell-body {
     align-items: flex-end;
     gap: 0.5rem;
     flex-shrink: 0;
+}
+
+#shell-top-primary .shell-docs-control {
+    align-self: flex-end;
 }
 
 #shell-top-secondary {
@@ -175,19 +181,58 @@ body.shell-body {
 }
 
 #shell-bottom {
+    position: relative;
     display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
+    grid-template-columns: 1fr minmax(12rem, auto);
+    grid-template-rows: minmax(0, 1fr) auto;
     gap: 0.5rem 1rem;
-    padding: 0.5rem 1rem 0.75rem;
+    padding: 0.65rem 1rem 0.75rem;
     background: #f9fafb;
     border-top: 1px solid #d1d5db;
+    min-height: 0;
+    overflow: hidden;
+    height: 100%;
+}
+
+#shell-bottom-resize {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0.45rem;
+    margin-top: -0.2rem;
+    cursor: ns-resize;
+    z-index: 2;
+    touch-action: none;
+}
+
+#shell-bottom-resize::before {
+    content: '';
+    display: block;
+    width: 2.5rem;
+    height: 0.2rem;
+    margin: 0.12rem auto 0;
+    border-radius: 999px;
+    background: #9ca3af;
+}
+
+#shell-bottom-resize:hover::before,
+#shell-bottom-resize:focus-visible::before,
+body.shell-bottom-resizing #shell-bottom-resize::before {
+    background: #2563eb;
+}
+
+body.shell-bottom-resizing {
+    cursor: ns-resize;
+    user-select: none;
 }
 
 #shift-history-log {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
-    max-height: 7.5rem;
+    min-height: 0;
+    max-height: none;
+    height: 100%;
     overflow-y: auto;
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -219,16 +264,23 @@ body.shell-body {
     font-variant-numeric: tabular-nums;
 }
 
-#task-queue-bar {
+.slot-cluster {
     grid-column: 2 / 3;
     grid-row: 1 / 2;
+    align-self: stretch;
+    justify-self: end;
+    min-height: 0;
+    overflow: auto;
+}
+
+#task-queue-bar {
     position: static;
     transform: none;
     left: auto;
     bottom: auto;
     display: flex;
     gap: 0.5rem;
-    align-self: end;
+    flex-shrink: 0;
 }
 
 #shell-status-bar {
@@ -239,7 +291,10 @@ body.shell-body {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
+    align-items: center;
+    flex-shrink: 0;
 }
+
 
 .shell-menu-label {
     font-size: 0.7rem;
@@ -292,8 +347,12 @@ body.shell-body {
         grid-template-columns: 1fr;
     }
 
-    #task-queue-bar {
+    .slot-cluster {
         grid-column: 1;
+        justify-self: stretch;
+    }
+
+    #task-queue-bar {
         justify-content: center;
     }
 
