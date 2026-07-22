@@ -1,6 +1,8 @@
 /**
  * Critical lab incidents — call MD within 1h; doctor callback always within that window
  * (immediate or randomly delayed after the nurse places the call).
+ * After a delayed page: temporary “Dr will call back” toast; every recallEveryMins
+ * without a callback, spawn a repeat urgent Call MD task.
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
@@ -9,10 +11,25 @@ import { isAtOrAfterInShift, hhmmToMinutes, minutesFromShiftAnchor } from './ava
 import { mountTaskDom } from './dynamic-tasks.js';
 
 const spawnedLabKeys = new Set();
-/** @type {Map<string, { callbackAt: number, windowEnd: number, labId: string, patientId: string, callTaskId: string, lab: object }>} */
+/**
+ * @type {Map<string, {
+ *   callbackAt: number,
+ *   windowEnd: number,
+ *   labId: string,
+ *   patientId: string,
+ *   callTaskId: string,
+ *   lab: object,
+ *   nextRecallAt: number|null,
+ *   recallCount: number
+ * }>}
+ */
 const pendingCallbacks = new Map();
 const spawnedCallbackKeys = new Set();
+const spawnedRecallKeys = new Set();
 const callbackCompleteHandled = new Set();
+
+/** @type {ReturnType<typeof setTimeout>|null} */
+let toastHideTimer = null;
 
 function cfg() {
     return GameConfig.criticalLabs || {};
@@ -70,6 +87,96 @@ export function pickCallbackAt(nowHhmm, windowEndHhmm, random = Math.random) {
 function statusMessage(text) {
     const el = document.querySelector(GameConfig.selectors.statusMessage);
     if (el) el.textContent = text;
+}
+
+function ensureToastEl() {
+    const sel = GameConfig.selectors.awaitingCallbackToast || '#shell-awaiting-callback-toast';
+    let el = document.querySelector(sel);
+    if (el) return el;
+    el = document.createElement('div');
+    el.id = 'shell-awaiting-callback-toast';
+    el.className = 'shell-awaiting-toast';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    el.hidden = true;
+    el.innerHTML = `
+        <div class="shell-awaiting-toast__card">
+            <span class="shell-awaiting-toast__icon" aria-hidden="true"><i class="fas fa-phone-alt"></i></span>
+            <div class="shell-awaiting-toast__copy">
+                <p class="shell-awaiting-toast__title">Dr will call back</p>
+                <p class="shell-awaiting-toast__detail"></p>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(el);
+    return el;
+}
+
+/**
+ * Temporary, polished banner after paging MD (delayed callback path).
+ * @param {{ labShort?: string, patientId?: string }} [detail]
+ */
+export function showAwaitingCallbackToast(detail = {}) {
+    if (typeof document === 'undefined') return;
+    const el = ensureToastEl();
+    const title = cfg().awaitingToastMessage || 'Dr will call back';
+    const titleEl = el.querySelector('.shell-awaiting-toast__title');
+    const detailEl = el.querySelector('.shell-awaiting-toast__detail');
+    if (titleEl) titleEl.textContent = title;
+    if (detailEl) {
+        const bits = [];
+        if (detail.labShort) bits.push(`Critical ${detail.labShort}`);
+        if (detail.patientId) bits.push(detail.patientId);
+        detailEl.textContent = bits.length ? bits.join(' · ') : '';
+    }
+    el.hidden = false;
+    // Force reflow so the enter transition runs when re-shown
+    void el.offsetWidth;
+    el.classList.add('is-visible');
+
+    if (toastHideTimer) clearTimeout(toastHideTimer);
+    const ms = Number(cfg().awaitingToastMs);
+    const hideAfter = Number.isFinite(ms) && ms > 0 ? ms : 4200;
+    toastHideTimer = setTimeout(() => {
+        el.classList.remove('is-visible');
+        toastHideTimer = setTimeout(() => {
+            el.hidden = true;
+            toastHideTimer = null;
+        }, 300);
+    }, hideAfter);
+}
+
+function hideAwaitingCallbackToast() {
+    if (typeof document === 'undefined') return;
+    if (toastHideTimer) {
+        clearTimeout(toastHideTimer);
+        toastHideTimer = null;
+    }
+    const el = document.querySelector(
+        GameConfig.selectors.awaitingCallbackToast || '#shell-awaiting-callback-toast'
+    );
+    if (!el) return;
+    el.classList.remove('is-visible');
+    el.hidden = true;
+}
+
+function pickPatientId(preferred, random = Math.random) {
+    const patients = gameState.getStateSlice('patients');
+    if (!patients?.size) return null;
+    if (preferred && patients.has(preferred)) return preferred;
+    const ids = [...patients.keys()];
+    return ids[Math.floor(random() * ids.length)] || null;
+}
+
+function resolveLab(metaOrPending) {
+    const labId = metaOrPending.labId || metaOrPending.lab?.id;
+    return labById(labId) || metaOrPending.lab || {
+        id: labId,
+        shortName: metaOrPending.labShort || metaOrPending.shortName,
+        fullName: metaOrPending.labFull || metaOrPending.fullName,
+        result: metaOrPending.labResult || metaOrPending.result,
+        ordersHint: metaOrPending.ordersHint
+    };
 }
 
 function createCallTask(spec) {
@@ -148,6 +255,112 @@ function spawnScheduledLabs(currentTime) {
     });
 }
 
+function hasOpenRecallFor(callTaskId) {
+    const tasks = gameState.getStateSlice('tasks');
+    if (!tasks?.size) return false;
+    const open = new Set([
+        GameConfig.tasks.statuses.NOT_YET,
+        GameConfig.tasks.statuses.ACTIVE,
+        GameConfig.tasks.statuses.OVERDUE
+    ]);
+    for (const task of tasks.values()) {
+        if (
+            task.metadata?.kind === 'critical-lab-recall'
+            && task.metadata?.callTaskId === callTaskId
+            && open.has(task.status)
+        ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function spawnRecallTask(pending, atHhmm) {
+    const n = (pending.recallCount || 0) + 1;
+    const key = `crit-recall-${pending.callTaskId}-${n}`;
+    if (spawnedRecallKeys.has(key)) return null;
+    if (gameState.getStateSlice('tasks')?.has(key)) {
+        spawnedRecallKeys.add(key);
+        return null;
+    }
+    if (hasOpenRecallFor(pending.callTaskId)) return null;
+
+    spawnedRecallKeys.add(key);
+    pending.recallCount = n;
+
+    const lab = pending.lab;
+    const created = taskSystem.createTask({
+        id: key,
+        type: 'criticallab',
+        taskClass: GameConfig.tasks.classes.STAT,
+        name: `Call MD again — critical ${lab.shortName}`,
+        scheduled: atHhmm,
+        expire: pending.windowEnd,
+        durationMins: cfg().recallDurationMins ?? cfg().callDurationMins ?? 5,
+        patientId: pending.patientId,
+        metadata: {
+            kind: 'critical-lab-recall',
+            phase: 'recall',
+            labId: lab.id,
+            labShort: lab.shortName,
+            labFull: lab.fullName,
+            labResult: lab.result,
+            ordersHint: lab.ordersHint,
+            callTaskId: pending.callTaskId,
+            windowEnd: pending.windowEnd,
+            recallIndex: n,
+            incident: true,
+            criticalLab: true,
+            urgent: true
+        }
+    });
+
+    taskSystem.processTasks(gameState.getStateSlice('currentTime') || atHhmm);
+    const live = gameState.getStateSlice('tasks')?.get(created.id) || created;
+    mountTaskDom(live);
+
+    gameState.dispatch('APPEND_SHIFT_LOG', {
+        message: `Still no MD callback for critical ${lab.shortName} — call again (${pending.patientId})`,
+        timeLabel: formatHHMM(atHhmm)
+    });
+    statusMessage(`Call MD again — ${lab.shortName}`);
+    return live;
+}
+
+function scheduleNextRecall(pending, fromHhmm) {
+    const every = Number(cfg().recallEveryMins);
+    const mins = Number.isFinite(every) && every > 0 ? every : 15;
+    const next = addMinutesToHhmm(fromHhmm, mins);
+    // Only schedule if still before the doctor callback and inside the critical window
+    if (isAtOrAfterInShift(next, pending.callbackAt)) {
+        pending.nextRecallAt = null;
+        return null;
+    }
+    if (isAtOrAfterInShift(next, pending.windowEnd)) {
+        pending.nextRecallAt = null;
+        return null;
+    }
+    pending.nextRecallAt = next;
+    return next;
+}
+
+function processPendingRecalls(currentTime) {
+    pendingCallbacks.forEach((pending) => {
+        if (pending.nextRecallAt == null) return;
+        if (!isAtOrAfterInShift(currentTime, pending.nextRecallAt)) return;
+        // Doctor already due / about to spawn — do not stack a recall
+        if (isAtOrAfterInShift(currentTime, pending.callbackAt)) {
+            pending.nextRecallAt = null;
+            return;
+        }
+        // One open re-call at a time; next 15m clock restarts when that Call MD is completed
+        if (hasOpenRecallFor(pending.callTaskId)) return;
+        const at = pending.nextRecallAt;
+        pending.nextRecallAt = null;
+        spawnRecallTask(pending, at);
+    });
+}
+
 function spawnCallbackTask(pending, atHhmm) {
     const key = `crit-cb-${pending.callTaskId}`;
     if (spawnedCallbackKeys.has(key)) return null;
@@ -156,6 +369,7 @@ function spawnCallbackTask(pending, atHhmm) {
         return null;
     }
     spawnedCallbackKeys.add(key);
+    pending.nextRecallAt = null;
 
     const lab = pending.lab;
     const created = taskSystem.createTask({
@@ -203,6 +417,33 @@ function processPendingCallbacks(currentTime) {
 }
 
 /**
+ * Force-spawn a critical lab call at current (or given) game time — for test mode / QA.
+ * @param {{ labId?: string, patientId?: string, at?: number, random?: () => number }} [opts]
+ */
+export function spawnCriticalLabNow(opts = {}) {
+    const random = opts.random || Math.random;
+    const now = opts.at ?? gameState.getStateSlice('currentTime')
+        ?? GameConfig.timer.defaultShiftStart;
+    const labs = cfg().labs || [];
+    let lab = opts.labId ? labById(opts.labId) : null;
+    if (!lab && labs.length) {
+        lab = labs[Math.floor(random() * labs.length)];
+    }
+    if (!lab) return null;
+
+    const patientId = pickPatientId(opts.patientId, random);
+    if (!patientId) return null;
+
+    const id = opts.id || `crit-test-${lab.id}-${Date.now()}-${Math.floor(random() * 1e4)}`;
+    return createCallTask({
+        id,
+        at: Number(now),
+        patientId,
+        lab
+    });
+}
+
+/**
  * After nurse completes the call task: schedule MD callback inside the 1h window.
  */
 export function handleCriticalLabCallComplete(task, opts = {}) {
@@ -214,23 +455,20 @@ export function handleCriticalLabCallComplete(task, opts = {}) {
     const now = opts.now ?? gameState.getStateSlice('currentTime') ?? task.scheduled;
     const windowEnd = task.metadata.windowEnd
         ?? addMinutesToHhmm(task.scheduled, cfg().callWindowMins || 60);
-    const lab = labById(task.metadata.labId) || {
-        id: task.metadata.labId,
-        shortName: task.metadata.labShort,
-        fullName: task.metadata.labFull,
-        result: task.metadata.labResult,
-        ordersHint: task.metadata.ordersHint
-    };
+    const lab = resolveLab(task.metadata);
 
     const callbackAt = pickCallbackAt(now, windowEnd, opts.random || Math.random);
-    pendingCallbacks.set(task.id, {
+    const pending = {
         callbackAt,
         windowEnd,
         labId: lab.id,
         patientId: task.patientId,
         callTaskId: task.id,
-        lab
-    });
+        lab,
+        nextRecallAt: null,
+        recallCount: 0
+    };
+    pendingCallbacks.set(task.id, pending);
 
     const immediate = Number(callbackAt) === Number(now);
     gameState.dispatch('APPEND_SHIFT_LOG', {
@@ -239,18 +477,43 @@ export function handleCriticalLabCallComplete(task, opts = {}) {
             : `Called MD about critical ${lab.shortName} — awaiting callback (by ${formatHHMM(windowEnd)})`,
         timeLabel: formatHHMM(now)
     });
-    statusMessage(
-        immediate
-            ? `Doctor on the line — ${lab.shortName}`
-            : `Paged MD — waiting on callback (${lab.shortName})`
-    );
 
-    // Immediate callback: spawn on this same tick
     if (immediate) {
+        statusMessage(`Doctor on the line — ${lab.shortName}`);
         processPendingCallbacks(now);
+    } else {
+        statusMessage(`Paged MD — ${lab.shortName}`);
+        showAwaitingCallbackToast({ labShort: lab.shortName, patientId: task.patientId });
+        scheduleNextRecall(pending, now);
     }
 
-    return { callbackAt, windowEnd, immediate };
+    return { callbackAt, windowEnd, immediate, nextRecallAt: pending.nextRecallAt };
+}
+
+/**
+ * Nurse re-pages MD after 15+ min with no callback — toast again; keep original callbackAt.
+ */
+export function handleCriticalLabRecallComplete(task, opts = {}) {
+    if (!task?.id || task.metadata?.kind !== 'critical-lab-recall') return null;
+    const callTaskId = task.metadata.callTaskId;
+    const pending = callTaskId ? pendingCallbacks.get(callTaskId) : null;
+    if (!pending) {
+        statusMessage('MD already called back — no need to re-page');
+        return null;
+    }
+
+    const now = opts.now ?? gameState.getStateSlice('currentTime') ?? task.scheduled;
+    const lab = pending.lab || resolveLab(task.metadata);
+
+    gameState.dispatch('APPEND_SHIFT_LOG', {
+        message: `Re-paged MD about critical ${lab.shortName} — still awaiting callback`,
+        timeLabel: formatHHMM(now)
+    });
+    statusMessage(`Re-paged MD — ${lab.shortName}`);
+    showAwaitingCallbackToast({ labShort: lab.shortName, patientId: pending.patientId });
+    scheduleNextRecall(pending, now);
+
+    return { nextRecallAt: pending.nextRecallAt, callbackAt: pending.callbackAt };
 }
 
 /**
@@ -260,6 +523,13 @@ export function handleCriticalLabCallbackComplete(task) {
     if (!task?.id || task.metadata?.kind !== 'critical-lab-callback') return;
     if (callbackCompleteHandled.has(task.id)) return;
     callbackCompleteHandled.add(task.id);
+    const callTaskId = task.metadata.callTaskId;
+    if (callTaskId) {
+        const pending = pendingCallbacks.get(callTaskId);
+        if (pending) pending.nextRecallAt = null;
+        pendingCallbacks.delete(callTaskId);
+    }
+    hideAwaitingCallbackToast();
     const now = gameState.getStateSlice('currentTime') ?? task.scheduled;
     const hint = task.metadata.ordersHint || 'Follow new MD orders';
     gameState.dispatch('APPEND_SHIFT_LOG', {
@@ -274,6 +544,7 @@ function onTime(currentTime) {
     if (gameState.getStateSlice('isPaused')) return;
     if (gameState.getStateSlice('gameStatus') === GameConfig.gameStates.GAME_OVER) return;
     spawnScheduledLabs(currentTime);
+    processPendingRecalls(currentTime);
     processPendingCallbacks(currentTime);
 }
 
@@ -281,7 +552,9 @@ export function resetCriticalLabs() {
     spawnedLabKeys.clear();
     pendingCallbacks.clear();
     spawnedCallbackKeys.clear();
+    spawnedRecallKeys.clear();
     callbackCompleteHandled.clear();
+    hideAwaitingCallbackToast();
 }
 
 export function initCriticalLabs() {
@@ -306,7 +579,10 @@ const CriticalLabsModule = {
     init: initCriticalLabs,
     reset: resetCriticalLabs,
     handleCriticalLabCallComplete,
+    handleCriticalLabRecallComplete,
     handleCriticalLabCallbackComplete,
+    showAwaitingCallbackToast,
+    spawnCriticalLabNow,
     pickCallbackAt,
     _addMinutesToHhmm: addMinutesToHhmm
 };

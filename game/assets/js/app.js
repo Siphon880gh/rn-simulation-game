@@ -18,6 +18,9 @@ import ScoringModule from './scoring.js';
 import SceneBackdropModule from './scene-backdrop.js';
 import IvSystemModule from './iv-system.js';
 import CriticalLabsModule from './critical-labs.js';
+import TestModeModule from './test-mode.js';
+import SoundModule from './sound.js';
+import NurseAlertsModule from './nurse-alerts.js';
 import { setShiftAnchor } from './availability-windows.js';
 
 // Declarative Application Configuration
@@ -38,7 +41,10 @@ const AppConfig = {
         scoring: ScoringModule,
         scene: SceneBackdropModule,
         iv: IvSystemModule,
-        criticalLabs: CriticalLabsModule
+        criticalLabs: CriticalLabsModule,
+        testMode: TestModeModule,
+        sound: SoundModule,
+        nurseAlerts: NurseAlertsModule
     },
     
     urlParams: GameConfig.urlParams,
@@ -104,7 +110,7 @@ class GameApplication {
 
     // Initialize modules with dependency management
     async initializeModules() {
-        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs } = this.config.modules;
+        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs, testMode, sound, nurseAlerts } = this.config.modules;
         
         // Register modules
         this.modules.set('modal', modal);
@@ -123,6 +129,9 @@ class GameApplication {
         this.modules.set('scene', scene);
         this.modules.set('iv', iv);
         this.modules.set('criticalLabs', criticalLabs);
+        this.modules.set('testMode', testMode);
+        this.modules.set('sound', sound);
+        this.modules.set('nurseAlerts', nurseAlerts);
 
         if (slots && slots.init) {
             slots.init();
@@ -141,6 +150,9 @@ class GameApplication {
         }
         if (criticalLabs && criticalLabs.init) {
             criticalLabs.init();
+        }
+        if (sound && sound.init) {
+            sound.init();
         }
 
         // E4.M1: load scenario pack before census so patient order comes from pack
@@ -242,11 +254,19 @@ class GameApplication {
                 const phase = taskSystem.getWindowPhase(task, now);
                 const kind = String(task.type).toLowerCase();
                 const isOrders = kind === 'orders';
-                const isCritCall = kind === 'criticallab' && task.metadata?.phase === 'call';
+                const isCritCall = kind === 'criticallab'
+                    && (task.metadata?.phase === 'call' || task.metadata?.phase === 'recall'
+                        || task.metadata?.kind === 'critical-lab-call'
+                        || task.metadata?.kind === 'critical-lab-recall');
                 const isCritCb = kind === 'criticallab' && task.metadata?.phase === 'callback';
                 let performName = 'Perform';
                 if (isOrders) performName = 'Check orders';
-                if (isCritCall) performName = 'Call doctor';
+                if (isCritCall) {
+                    performName = task.metadata?.phase === 'recall'
+                        || task.metadata?.kind === 'critical-lab-recall'
+                        ? 'Call doctor again'
+                        : 'Call doctor';
+                }
                 if (isCritCb) performName = 'Take callback';
                 
                 return {
@@ -403,6 +423,12 @@ class GameApplication {
             criticalLabs?.handleCriticalLabCallComplete?.(live, { now });
             return;
         }
+        if (phase === 'recall' || task.metadata?.kind === 'critical-lab-recall') {
+            taskSystem.completeTask(task.id);
+            const live = gameState.getStateSlice('tasks')?.get(task.id) || task;
+            criticalLabs?.handleCriticalLabRecallComplete?.(live, { now });
+            return;
+        }
         // MD callback — occupy a slot while taking orders
         const slotSystem = this.modules.get('slots');
         const result = slotSystem?.requestSlot(task, now);
@@ -524,6 +550,14 @@ class GameApplication {
             shell.init(gameConfig);
         }
 
+        // Dev/QA: Test control next to brand when game/test-mode.json enabled
+        const testMode = this.modules.get('testMode');
+        if (testMode && testMode.init) {
+            Promise.resolve(testMode.init()).catch((err) => {
+                console.warn('Test mode init failed', err);
+            });
+        }
+
         // E4.M3: hourly doctor-orders checks (subscribes to currentTime)
         const doctorOrders = this.modules.get('doctorOrders');
         if (doctorOrders && doctorOrders.init) {
@@ -534,6 +568,12 @@ class GameApplication {
         const dynamicTasks = this.modules.get('dynamicTasks');
         if (dynamicTasks && dynamicTasks.init) {
             dynamicTasks.init(gameConfig);
+        }
+
+        // Call lights + bed near-fall alarms (own cadence + sound)
+        const nurseAlerts = this.modules.get('nurseAlerts');
+        if (nurseAlerts && nurseAlerts.init) {
+            nurseAlerts.init(gameConfig);
         }
 
         // Start the timer

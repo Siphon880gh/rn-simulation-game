@@ -1,5 +1,5 @@
 /**
- * AUTO checks for critical lab call → MD callback module.
+ * AUTO checks for critical lab call → awaiting toast → 15m re-call → MD callback.
  */
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -18,6 +18,13 @@ const assert = (cond, msg) => { if (!cond) failures.push(msg); };
 assert(existsSync(join(root, 'game/assets/js/critical-labs.js')), 'critical-labs.js');
 assert(GameConfig.tasks.types.CRITICALLAB, 'CRITICALLAB task type');
 assert(GameConfig.criticalLabs.callWindowMins === 60, '1h call window');
+assert(GameConfig.criticalLabs.recallEveryMins === 15, '15m re-call cadence');
+assert(
+  typeof GameConfig.criticalLabs.awaitingToastMessage === 'string'
+    && /dr will call back/i.test(GameConfig.criticalLabs.awaitingToastMessage),
+  'awaiting toast copy'
+);
+assert(GameConfig.selectors.awaitingCallbackToast, 'toast selector');
 assert(Array.isArray(GameConfig.criticalLabs.labs) && GameConfig.criticalLabs.labs.length >= 4, 'lab catalog');
 assert(GameConfig.criticalLabs.labs.some((l) => l.id === 'k-high'), 'K+ lab');
 assert(GameConfig.criticalLabs.labs.some((l) => l.id === 'hh-drop'), 'H/H lab');
@@ -28,9 +35,18 @@ const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
 assert(appSrc.includes('CriticalLabsModule') || appSrc.includes('critical-labs'), 'app wires critical labs');
 assert(appSrc.includes('performCriticalLabTask'), 'performCriticalLabTask');
 assert(appSrc.includes('data-task-type="criticallab"'), 'context menu selector');
+assert(appSrc.includes('handleCriticalLabRecallComplete'), 'app wires recall complete');
+assert(appSrc.includes('Call doctor again'), 'recall perform label');
+
+const htmlSrc = readFileSync(join(root, 'game/index.html'), 'utf8');
+assert(htmlSrc.includes('shell-awaiting-callback-toast'), 'toast mount in shell');
+
+const cssSrc = readFileSync(join(root, 'game/assets/css/shell.css'), 'utf8');
+assert(cssSrc.includes('shell-awaiting-toast'), 'toast styles');
 
 assert(_addMinutesToHhmm(2015, 60) === 2115, '2015+60 → 2115');
 assert(_addMinutesToHhmm(2310, 60) === 10, '2310+60 → 0010');
+assert(_addMinutesToHhmm(2015, 15) === 2030, '2015+15 → 2030 recall due');
 
 // Immediate path
 const immediate = pickCallbackAt(2015, 2115, () => 0);
@@ -55,11 +71,18 @@ setShiftAnchor(1900);
 assert(isAtOrAfterInShift(2015, 2015), 'lab due at 2015');
 assert(!isAtOrAfterInShift(2000, 2015), 'not yet at 2015');
 assert(isAtOrAfterInShift(30, 30), '0030 trop due');
+assert(isAtOrAfterInShift(2030, 2030), 'recall due at +15');
+assert(!isAtOrAfterInShift(2029, 2030), 'not yet at recall');
 
 const modSrc = readFileSync(join(root, 'game/assets/js/critical-labs.js'), 'utf8');
 assert(modSrc.includes('handleCriticalLabCallComplete'), 'call complete handler');
+assert(modSrc.includes('handleCriticalLabRecallComplete'), 'recall complete handler');
 assert(modSrc.includes('handleCriticalLabCallbackComplete'), 'callback complete handler');
 assert(modSrc.includes('pendingCallbacks'), 'pending callback queue');
+assert(modSrc.includes('showAwaitingCallbackToast'), 'awaiting toast helper');
+assert(modSrc.includes('critical-lab-recall'), 'recall task kind');
+assert(modSrc.includes('processPendingRecalls'), 'recall processor');
+assert(modSrc.includes('Dr will call back') || modSrc.includes('awaitingToastMessage'), 'toast message path');
 
 if (failures.length) {
   console.error('CRITICAL LABS AUTO FAIL');

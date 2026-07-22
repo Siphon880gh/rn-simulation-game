@@ -258,10 +258,13 @@ export const GameConfig = {
     bottom: '#shell-bottom',
     statusBar: '#shell-status-bar',
     statusMessage: '#shell-status-message',
+    awaitingCallbackToast: '#shell-awaiting-callback-toast',
     hourTabs: '#shell-hour-tabs',
     shiftHistoryLog: '#shift-history-log',
     clock: '#clock',
     pauseButton: '#pause',
+    testMode: '#shell-test-mode',
+    brandTitle: '#shell-brand-title',
     modal: '#modal',
     modalTitle: '#modal-title',
     modalContent: '#modal-content',
@@ -279,6 +282,39 @@ export const GameConfig = {
     shiftStarts: 'shift-starts',
     shiftDuration: 'shift-duration',
     scenarioPack: 'scenario'
+  },
+
+  /**
+   * Dev / QA test mode — brand Test control opens a spawn-incident modal.
+   * On/off is loaded from `configUrl` JSON (`enabled: true|false`). No URL query.
+   */
+  testMode: {
+    configUrl: 'test-mode.json',
+    /** Incident menu entries (handlers resolved in test-mode.js). */
+    incidents: [
+      {
+        id: 'critical-lab',
+        label: 'Critical lab',
+        kind: 'critical-lab',
+        /** When true, show per-lab submenu from GameConfig.criticalLabs.labs */
+        expandLabs: true
+      },
+      {
+        id: 'call-light',
+        label: 'Call light (water / comfort)',
+        kind: 'call-light'
+      },
+      {
+        id: 'bed-alarm',
+        label: 'Bed alarm — near fall',
+        kind: 'bed-alarm'
+      },
+      {
+        id: 'dynamic-urgent',
+        label: 'Dynamic urgent (random)',
+        kind: 'dynamic-urgent'
+      }
+    ]
   },
 
   scenario: {
@@ -309,11 +345,17 @@ export const GameConfig = {
   /**
    * Critical lab incidents — call MD within callWindowMins; callback always lands
    * inside that same window (immediate or delayed after the call).
+   * After a delayed page: temporary “Dr will call back” toast; every recallEveryMins
+   * without a callback, spawn a repeat urgent Call MD task.
    */
   criticalLabs: {
     callWindowMins: 60,
     callDurationMins: 5,
     callbackDurationMins: 8,
+    recallEveryMins: 15,
+    recallDurationMins: 5,
+    awaitingToastMs: 4200,
+    awaitingToastMessage: 'Dr will call back',
     maxPerShift: 4,
     immediateCallbackChance: 0.35,
     callbackDelayMins: { min: 5, max: 40 },
@@ -428,22 +470,104 @@ export const GameConfig = {
     ]
   },
 
+  /**
+   * Alarm / UI sound (Web Audio beeps — no media files).
+   * Toggle persists in localStorage; master `enabledDefault` is the first-run default.
+   */
+  sound: {
+    enabledDefault: true,
+    storageKey: 'rngame.soundEnabled',
+    selector: '#shell-sound-toggle'
+  },
+
+  /**
+   * Nurse alerts — call lights (water, etc.) + bed near-fall alarms a few times / shift.
+   * Plays sound.alarms on spawn when sound is enabled.
+   */
+  nurseAlerts: {
+    callLights: {
+      cadenceGameMinutes: 120,
+      maxPerShift: 4,
+      firstAfterGameMinutes: 45,
+      templates: [
+        {
+          id: 'water',
+          weight: 4,
+          name: 'Call light — water',
+          type: 'assessment',
+          taskClass: 'urgent',
+          durationMins: 8,
+          expire: '+40',
+          alarm: 'callLight'
+        },
+        {
+          id: 'bathroom',
+          weight: 2,
+          name: 'Call light — bathroom assist',
+          type: 'assessment',
+          taskClass: 'urgent',
+          durationMins: 12,
+          expire: '+35',
+          alarm: 'callLight'
+        },
+        {
+          id: 'reposition',
+          weight: 2,
+          name: 'Call light — reposition / pillow',
+          type: 'assessment',
+          taskClass: 'urgent',
+          durationMins: 10,
+          expire: '+45',
+          alarm: 'callLight'
+        },
+        {
+          id: 'blanket',
+          weight: 1,
+          name: 'Call light — blanket / comfort',
+          type: 'assessment',
+          taskClass: 'routine',
+          durationMins: 8,
+          expire: '+50',
+          alarm: 'callLight'
+        }
+      ]
+    },
+    bedAlarms: {
+      cadenceGameMinutes: 180,
+      maxPerShift: 2,
+      firstAfterGameMinutes: 90,
+      templates: [
+        {
+          id: 'bed-exit',
+          weight: 3,
+          name: 'Bed alarm — near fall',
+          type: 'assessment',
+          taskClass: 'stat',
+          durationMins: 12,
+          expire: '+25',
+          alarm: 'bed'
+        },
+        {
+          id: 'chair-exit',
+          weight: 1,
+          name: 'Chair alarm — standing attempt',
+          type: 'assessment',
+          taskClass: 'stat',
+          durationMins: 12,
+          expire: '+25',
+          alarm: 'bed'
+        }
+      ]
+    }
+  },
+
   // Thin dynamic/urgent spawn (E3.M5) — game-time cadence, capped
+  // (Call lights / bed alarms live in nurseAlerts so they stay a few times per shift.)
   dynamicTasks: {
     cadenceGameMinutes: 60,
     maxActive: 3,
     maxPerShift: 6,
     templates: [
-      {
-        id: 'call-light',
-        weight: 3,
-        type: 'assessment',
-        taskClass: 'urgent',
-        name: 'Call light',
-        durationMins: 10,
-        expire: '+45',
-        patientScope: 'random'
-      },
       {
         id: 'pain-med',
         weight: 2,

@@ -31,12 +31,130 @@ body.shell-body {
     min-width: 0;
 }
 
+.shell-brand-heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.shell-brand-heading #shell-brand-title {
+    margin: 0;
+}
+
+.shell-test-mode {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.shell-test-mode.hidden,
+.shell-test-mode[hidden] {
+    display: none !important;
+}
+
+.shell-test-mode__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    border: 1px solid #f59e0b;
+    background: #fffbeb;
+    color: #92400e;
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+.shell-test-mode__btn:hover {
+    background: #fef3c7;
+    border-color: #d97706;
+}
+
+.shell-test-mode-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    max-height: min(60vh, 24rem);
+    overflow-y: auto;
+}
+
+.shell-test-mode__section {
+    margin: 0.4rem 0 0.15rem;
+    padding: 0.2rem 0.35rem 0;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #b45309;
+    text-transform: uppercase;
+}
+
+.shell-test-mode__item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: 1px solid transparent;
+    background: #fffbeb;
+    color: #1f2937;
+    border-radius: 0.35rem;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.shell-test-mode__item:hover {
+    background: #fef3c7;
+    border-color: #f59e0b;
+}
+
+.shell-test-mode__empty {
+    margin: 0;
+    padding: 0.35rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+body.is-test-mode #shell-brand-title::after {
+    /* visual cue kept on the Test chip; reserved for future badge */
+    content: none;
+}
+
 #shell-top-primary .shell-clock-cluster {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 0.5rem;
     flex-shrink: 0;
+}
+
+.shell-sound-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    width: 150px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #374151;
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.shell-sound-toggle:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.shell-sound-toggle.is-muted {
+    background: #f3f4f6;
+    color: #6b7280;
+    border-style: dashed;
 }
 
 #shell-top-primary .shell-docs-control {
@@ -354,6 +472,80 @@ body.shell-bottom-resizing {
     gap: 1rem;
     align-items: center;
     flex-shrink: 0;
+}
+
+/* Temporary “Dr will call back” after paging MD on a critical lab */
+.shell-awaiting-toast {
+    position: fixed;
+    left: 50%;
+    top: 4.75rem;
+    transform: translateX(-50%) translateY(-0.35rem);
+    z-index: 40;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.shell-awaiting-toast.is-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.shell-awaiting-toast[hidden] {
+    display: none !important;
+}
+
+.shell-awaiting-toast.is-visible[hidden] {
+    display: block !important;
+}
+
+.shell-awaiting-toast__card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 16rem;
+    max-width: min(22rem, calc(100vw - 2rem));
+    padding: 0.85rem 1.1rem;
+    border-radius: 0.65rem;
+    background: linear-gradient(145deg, #0f766e 0%, #115e59 55%, #134e4a 100%);
+    color: #ecfdf5;
+    box-shadow: 0 10px 28px rgba(15, 118, 110, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+}
+
+.shell-awaiting-toast__icon {
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.14);
+    color: #a7f3d0;
+    font-size: 0.95rem;
+}
+
+.shell-awaiting-toast__copy {
+    min-width: 0;
+}
+
+.shell-awaiting-toast__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    line-height: 1.25;
+}
+
+.shell-awaiting-toast__detail {
+    margin: 0.15rem 0 0;
+    font-size: 0.75rem;
+    color: #99f6e4;
+    line-height: 1.3;
+}
+
+.shell-awaiting-toast__detail:empty {
+    display: none;
 }
 
 

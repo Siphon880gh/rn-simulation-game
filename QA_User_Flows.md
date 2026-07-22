@@ -13,6 +13,8 @@ http://localhost:8765/game/index.html?speed-factor=48
 | Control | Where | Notes |
 |---------|--------|--------|
 | Demo presets | Brand area links `quick night` / `quick day` | Reloads with URL params |
+| Test mode | Brand **Test** flask when `game/test-mode.json` has `"enabled": true` | Opens modal to spawn incidents (critical labs, call light, bed alarm, dynamic) |
+| Sound | `#shell-sound-toggle` next to Pause | Mute/unmute call-light + bed alarms (persists) |
 | Clock / Pause | Top-right `#clock` / `#pause` | Pause freezes shift time |
 | Hour tabs | `#shell-hour-tabs` (`19:00` …) | Hover = truncated peek; click = pause + full hour modal (does not scrub time) |
 | Patient tabs | Left `#patient-tabs` | Room + name; swaps clinical panel |
