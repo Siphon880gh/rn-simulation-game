@@ -1,9 +1,9 @@
 {
   "suite": "QA_User_Flows",
   "seed_default": "http://localhost:8765/game/index.html?speed-factor=48",
-  "current_flow_id": "UF-09",
+  "current_flow_id": "UF-10",
   "status": "in_progress",
-  "last_updated_iso": "2026-07-22T05:45:00Z",
+  "last_updated_iso": "2026-07-22T05:48:00Z",
   "results": {
     "UF-01": {
       "status": "pass",
@@ -37,10 +37,13 @@
       "status": "pass",
       "notes": "20:00 drip Rapid response in shift log + Incidents; Maria Rapid-response triage assessment Perform → slot (→20:33), no med quiz, pause stayed Pause. Maria → critical → Code Blue modal (#pause=Resume, practice framing); BLS order call→CPR→AED Submit → log 'Code Blue response successful'."
     },
-    "UF-09": { "status": "pending", "notes": "" },
+    "UF-09": {
+      "status": "pass",
+      "notes": "Docs FAB → ABOUT in-page (disclaimer + objectives). PRIORITIZATION BASICS: h1/h2, Mermaid SVG, KaTeX. Hover About md-internal-link → .md-link-popover Preview/Contents. Close returns to shell (#clock running)."
+    },
     "UF-10": { "status": "pending", "notes": "" },
     "UF-11": { "status": "pending", "notes": "" }
   },
   "error_fix_round": 0,
-  "notes": "UF-01..UF-08 PASS. Next UF-09 Docs."
+  "notes": "UF-01..UF-09 PASS. Next UF-10 debrief."
 }
