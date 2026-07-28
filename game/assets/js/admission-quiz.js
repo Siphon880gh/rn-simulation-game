@@ -175,7 +175,9 @@ export function renderAdmissionQuizHtml(quiz, taskName) {
     return `
       <div class="challenge-gate space-y-3 text-left" data-challenge="admission-quiz">
         <p class="text-sm text-gray-900 font-semibold">${quiz.prompt}</p>
-        <p class="text-xs text-gray-500">Task: ${taskName || 'Admission'}. Timer is paused.</p>
+        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
+          || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
+        <p class="text-xs text-gray-500">Task: ${taskName || 'Admission'}.</p>
         <div class="flex flex-col gap-2">${choices}</div>
         <p id="challenge-feedback" class="text-sm font-medium rounded px-3 py-2 hidden" role="status" aria-live="polite"></p>
       </div>

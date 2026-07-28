@@ -4,7 +4,7 @@ Agent design reference for the **get a bed ready for an admission** perform chal
 Stories: [`IMPLEMENTATION_STORIES.md`](IMPLEMENTATION_STORIES.md) → **S5.4 / E5.M3**.  
 Scoring hooks: **S6.6 / E6.M1**. Scene art defaults: **S7.2+ / E7.M1**.
 
-**Contract:** Player must **win** this mini-game to **complete** the bed-prep / admission task. Fail or overtime does not complete the task (highlight wrong items, dock points, teaching copy with correct answers).
+**Contract:** Player must **win** this mini-game to **complete** the bed-prep / admission task. Fail or overtime does not complete the task (highlight wrong/missing items, dock points, teaching copy with correct answers).
 
 Use this file for challenge rules and content shape. Do not invent alternate win conditions without updating stories.
 
@@ -12,36 +12,36 @@ Use this file for challenge rules and content shape. Do not invent alternate win
 
 ## Framing
 
-You’re getting a bed ready for an admission.
+You’re getting a bed ready for an admission. There is **no linen order** — gather the right items.
 
 ---
 
-## Target sequence (mnemonic)
+## Gather items (not a sequence)
 
-Content-authored correct order (example letters):
+Content-authored **required** items (example set):
 
-| Step | Letter | Example label (pack content may refine spelling/names) |
-|------|--------|--------------------------------------------------------|
-| 1 | **C** | Chux (aka “Chuts” in draft notes) |
-| 2 | **S** | Socks |
-| 3 | **B** | Thick blanket (draft also listed “Think Blanket” as distractor) |
-| 4 | **B** | *(second B — pack-defined linen item)* |
-| 5 | **B** | *(third B — pack-defined linen item)* |
-| 6 | **C** | *(second C — pack-defined item)* |
-| 7 | **L** | Lifting sheet |
+| Example label |
+|---------------|
+| Chux |
+| Socks |
+| Thick blanket |
+| Bed sheet |
+| Pillowcase |
+| Clean gown |
+| Lifting sheet |
 
-Mnemonic string: **C S B B B C L**
+Exact item names and distractors are pack/content data in `GameConfig.bedPrepChallenge`.
 
-Exact item names and distractors are pack/content data; letters above are the stable teaching mnemonic.
+**Win condition:** selected set equals the required set (order ignored). Extra distractors selected → fail. Missing required items → fail.
 
 ---
 
 ## Hint / flash loop
 
-1. After Perform opens the challenge, flash a **randomized loop** of linen labels (targets + distractors), e.g.  
-   `Chuts, Socks, Think Blanket, Thick Blanket, Bed sheet, Chuts, Lifting sheet`
+1. After Perform opens the challenge, flash a **randomized loop** of linen labels (required + random distractors).
 2. Loop continues until the player clicks **Ready**.
 3. **Difficulty = hint chances:** how many times the player may watch the flashing loop before committing — typically **3 down to 1** (harder = fewer views).
+4. Build UI copy: **Gather these items** (toggle select / deselect). Distractor count is randomized per round (`distractorCountMin`–`distractorCountMax`).
 
 ---
 
@@ -49,11 +49,17 @@ Exact item names and distractors are pack/content data; letters above are the st
 
 | Outcome | Behavior |
 |---------|----------|
-| **Submit (Perform resolve)** | Highlight what is wrong; **dock points** (E6). |
+| **Submit gather** | Highlight extras / missing; **dock points** (E6). |
 | **Win** | Task may **complete** (required gate for this task type). |
-| **Lose / time reached (overtime)** | Task does **not** complete; copy explains overtime/fail **because** of the mistakes and shows **correct answers**. |
+| **Lose / time reached (overtime)** | Task does **not** complete; copy explains overtime/fail **because** of the mistakes and shows **needed items**. |
 
 Timer pause during the challenge follows the shared E5.M1 perform-challenge contract.
+
+---
+
+## Related: IVPB hang sequence
+
+IVPB meds (`data-challenge="ivpb"` or name contains IVPB) use the **ordered sequence** flash/build pattern in `ivpb-hang-challenge.js` (spike → secondary → above Y-site → backprime → drip check → troubleshoot). That is a separate challenge from bed prep.
 
 ---
 
@@ -78,7 +84,7 @@ Timer pause during the challenge follows the shared E5.M1 perform-challenge cont
 
 ## Open content choices (pack author)
 
-- Full label list for each letter in **CSBBBCL**
-- Distractor pool for the flash loop
+- Full required-item list
+- Distractor pool + per-round distractor count range
 - Difficulty → exact hint-view counts
 - Whether fail allows immediate retry in-modal vs dismiss and re-Perform

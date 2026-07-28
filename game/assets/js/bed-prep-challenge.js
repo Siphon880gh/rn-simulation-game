@@ -1,35 +1,48 @@
 /**
- * Bed setup for admission mini-game (E5.M3) — CSBBBCL mnemonic.
+ * Bed setup for admission mini-game (E5.M3) — gather required items (no sequence).
  * Spec: AGENTS_POSSIBLE_DECISIONS__GAME_SETUP_BED_FOR_ADMISSION.md
  */
 import { GameConfig } from './game-config.js';
 
-const DEFAULT_SEQUENCE = [
-    { letter: 'C', label: 'Chux' },
-    { letter: 'S', label: 'Socks' },
-    { letter: 'B', label: 'Thick blanket' },
-    { letter: 'B', label: 'Bed sheet' },
-    { letter: 'B', label: 'Pillowcase' },
-    { letter: 'C', label: 'Clean gown' },
-    { letter: 'L', label: 'Lifting sheet' }
+const DEFAULT_REQUIRED = [
+    'Chux',
+    'Socks',
+    'Thick blanket',
+    'Bed sheet',
+    'Pillowcase',
+    'Clean gown',
+    'Lifting sheet'
 ];
 
-const DEFAULT_DISTRACTORS = ['Think blanket', 'Extra towel', 'Trash bag', 'IV pole cover'];
+const DEFAULT_DISTRACTORS = [
+    'Think blanket',
+    'Extra towel',
+    'Trash bag',
+    'IV pole cover',
+    'Bedpan',
+    'Telemetry leads',
+    'Nasal cannula',
+    'Urinal'
+];
 
 function cfg() {
     return GameConfig.bedPrepChallenge || {};
 }
 
+/** @deprecated use getBedPrepRequired — kept for callers that still expect sequence shape */
 export function getBedPrepSequence() {
-    return Array.isArray(cfg().sequence) && cfg().sequence.length
-        ? cfg().sequence
-        : DEFAULT_SEQUENCE;
+    return getBedPrepRequired().map((label) => ({ letter: label[0] || '?', label }));
 }
 
-export function getFlashPool() {
-    const seq = getBedPrepSequence().map((s) => s.label);
-    const distractors = Array.isArray(cfg().distractors) ? cfg().distractors : DEFAULT_DISTRACTORS;
-    return [...seq, ...distractors];
+export function getBedPrepRequired() {
+    const fromCfg = cfg().requiredItems || cfg().sequence?.map((s) => (typeof s === 'string' ? s : s.label));
+    return Array.isArray(fromCfg) && fromCfg.length ? fromCfg.map(String) : [...DEFAULT_REQUIRED];
+}
+
+export function getDistractorPool() {
+    return Array.isArray(cfg().distractors) && cfg().distractors.length
+        ? cfg().distractors.map(String)
+        : [...DEFAULT_DISTRACTORS];
 }
 
 export function isBedPrepTask(task) {
@@ -49,36 +62,77 @@ export function shuffle(list, random = Math.random) {
     return arr;
 }
 
-/** Compare player order of labels to correct sequence (case-insensitive). */
-export function gradeBedPrepOrder(playerLabels, sequence = getBedPrepSequence()) {
-    const expected = sequence.map((s) => String(s.label).trim().toLowerCase());
-    const got = (playerLabels || []).map((s) => String(s).trim().toLowerCase());
-    const wrongIndexes = [];
-    const max = Math.max(expected.length, got.length);
-    for (let i = 0; i < max; i += 1) {
-        if (got[i] !== expected[i]) wrongIndexes.push(i);
-    }
+/**
+ * Build one gather round: fixed required set + random distractors mixed into options.
+ * Flash pool = required + distractors (memory cue for what to gather).
+ */
+export function buildBedPrepRound(random = Math.random) {
+    const required = [...getBedPrepRequired()];
+    const distractorPool = getDistractorPool().filter(
+        (d) => !required.some((r) => r.toLowerCase() === String(d).toLowerCase())
+    );
+    const minD = Number(cfg().distractorCountMin);
+    const maxD = Number(cfg().distractorCountMax);
+    const lo = Number.isFinite(minD) ? minD : 3;
+    const hi = Number.isFinite(maxD) ? Math.max(lo, maxD) : 5;
+    const count = Math.min(
+        distractorPool.length,
+        lo + Math.floor(random() * (hi - lo + 1))
+    );
+    const distractors = shuffle(distractorPool, random).slice(0, count);
+    const options = shuffle([...required, ...distractors], random);
+    return { required, distractors, options, flashPool: shuffle([...required, ...distractors], random) };
+}
+
+/** Set equality: selected must match required (order ignored; no extras). */
+export function gradeBedPrepGather(selectedLabels, requiredLabels = getBedPrepRequired()) {
+    const required = [...new Set((requiredLabels || []).map((s) => String(s).trim().toLowerCase()))];
+    const got = [...new Set((selectedLabels || []).map((s) => String(s).trim().toLowerCase()))];
+    const missing = required.filter((r) => !got.includes(r));
+    const extras = got.filter((g) => !required.includes(g));
     return {
-        passed: wrongIndexes.length === 0 && got.length === expected.length,
-        wrongIndexes,
-        expectedLabels: sequence.map((s) => s.label),
-        mnemonic: sequence.map((s) => s.letter).join('')
+        passed: missing.length === 0 && extras.length === 0 && got.length === required.length,
+        missing,
+        extras,
+        expectedLabels: requiredLabels.map(String)
     };
 }
 
-export function renderBedPrepHtml(taskName) {
-    const sequence = getBedPrepSequence();
-    const options = shuffle([...new Set(getFlashPool())]);
-    const optionHtml = options.map((label) => `
+/** @deprecated use gradeBedPrepGather — order no longer scored */
+export function gradeBedPrepOrder(playerLabels, sequence = getBedPrepSequence()) {
+    const required = sequence.map((s) => (typeof s === 'string' ? s : s.label));
+    const grade = gradeBedPrepGather(playerLabels, required);
+    return {
+        passed: grade.passed,
+        wrongIndexes: grade.passed ? [] : playerLabels.map((_, i) => i),
+        expectedLabels: grade.expectedLabels,
+        mnemonic: 'gather',
+        missing: grade.missing,
+        extras: grade.extras
+    };
+}
+
+function escapeHtml(text) {
+    return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+export function renderBedPrepHtml(taskName, round) {
+    const r = round || buildBedPrepRound();
+    const optionHtml = r.options.map((label) => `
       <button type="button" class="bed-prep-pick px-2 py-1 rounded border border-gray-200 text-sm hover:bg-amber-50"
-        data-label="${label}">${label}</button>
+        data-label="${escapeHtml(label)}" aria-pressed="false">${escapeHtml(label)}</button>
     `).join('');
 
     return `
       <div class="challenge-gate bed-prep-challenge space-y-3 text-left" data-challenge="bed-prep">
-        <p class="text-sm text-gray-600">Practice challenge (not a competency assessment). Timer is paused.</p>
-        <p class="text-sm text-gray-800">Get a bed ready for admission: <strong>${taskName || 'Bed prep'}</strong></p>
-        <p class="text-xs text-gray-500">Mnemonic: <strong>CSBBBCL</strong> — watch the flash, then assemble the sequence.</p>
+        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
+          || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
+        <p class="text-sm text-gray-800">Get a bed ready for admission: <strong>${escapeHtml(taskName || 'Bed prep')}</strong></p>
+        <p class="text-xs text-gray-500">Watch the flash for what you need, then gather the items (order does not matter).</p>
         <div class="rounded border border-amber-200 bg-amber-50 p-3 text-center">
           <div id="bed-prep-flash" class="text-lg font-semibold text-amber-900 min-h-[1.75rem]">…</div>
           <p class="text-xs text-amber-800 mt-1">
@@ -88,21 +142,23 @@ export function renderBedPrepHtml(taskName) {
             class="mt-2 px-3 py-1 rounded bg-amber-600 text-white text-sm hover:bg-amber-700">Ready</button>
         </div>
         <div id="bed-prep-build" class="hidden space-y-2">
-          <p class="text-sm font-medium text-gray-800">Build the linen sequence (click in order)</p>
+          <p class="text-sm font-medium text-gray-800">Gather these items</p>
+          <p class="text-xs text-gray-500">Click to select / deselect. Need ${r.required.length} items.</p>
           <div id="bed-prep-chosen" class="min-h-[2rem] flex flex-wrap gap-1 text-sm"></div>
           <div id="bed-prep-options" class="flex flex-wrap gap-1">${optionHtml}</div>
-          <button type="button" id="bed-prep-undo" class="text-xs text-gray-500 underline">Undo last</button>
+          <button type="button" id="bed-prep-clear" class="text-xs text-gray-500 underline">Clear selection</button>
         </div>
         <p id="challenge-feedback" class="text-sm text-rose-600 hidden"></p>
-        <ol id="bed-prep-answer-key" class="hidden text-xs text-gray-600 list-decimal pl-5"></ol>
+        <ul id="bed-prep-answer-key" class="hidden text-xs text-gray-600 list-disc pl-5"></ul>
       </div>
     `;
 }
 
 /**
  * Wire DOM after modal open. Calls onDone({ passed, grade, reason }).
+ * Pass the same `round` used in renderBedPrepHtml when available.
  */
-export function wireBedPrepHandlers({ onDone, random = Math.random } = {}) {
+export function wireBedPrepHandlers({ onDone, random = Math.random, round } = {}) {
     const flashEl = document.querySelector('#bed-prep-flash');
     const hintsEl = document.querySelector('#bed-prep-hints');
     const readyBtn = document.querySelector('#bed-prep-ready');
@@ -111,20 +167,35 @@ export function wireBedPrepHandlers({ onDone, random = Math.random } = {}) {
     const optionsEl = document.querySelector('#bed-prep-options');
     const feedback = document.querySelector('#challenge-feedback');
     const answerKey = document.querySelector('#bed-prep-answer-key');
-    const undoBtn = document.querySelector('#bed-prep-undo');
+    const clearBtn = document.querySelector('#bed-prep-clear');
 
+    const activeRound = round || buildBedPrepRound(random);
     let hintsLeft = Number(cfg().hintViews) || 3;
     let flashing = true;
     let flashTimer = null;
-    const pool = shuffle(getFlashPool(), random);
+    const pool = activeRound.flashPool?.length
+        ? activeRound.flashPool
+        : shuffle([...activeRound.required, ...activeRound.distractors], random);
     let flashIdx = 0;
-    const chosen = [];
+    /** @type {Set<string>} */
+    const selected = new Set();
 
     function paintChosen() {
         if (!chosenEl) return;
-        chosenEl.innerHTML = chosen.length
-            ? chosen.map((label, i) => `<span class="px-2 py-0.5 rounded bg-white border text-xs" data-idx="${i}">${i + 1}. ${label}</span>`).join('')
-            : '<span class="text-gray-400 text-xs">No items yet</span>';
+        const labels = [...selected];
+        chosenEl.innerHTML = labels.length
+            ? labels.map((label) => `<span class="px-2 py-0.5 rounded bg-white border text-xs">${escapeHtml(label)}</span>`).join('')
+            : '<span class="text-gray-400 text-xs">No items selected</span>';
+    }
+
+    function paintOptionState(btn) {
+        const label = btn.getAttribute('data-label');
+        const on = label && selected.has(label);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        btn.classList.toggle('bg-amber-100', Boolean(on));
+        btn.classList.toggle('border-amber-500', Boolean(on));
+        btn.classList.toggle('ring-2', Boolean(on));
+        btn.classList.toggle('ring-amber-400', Boolean(on));
     }
 
     function stopFlash() {
@@ -155,7 +226,7 @@ export function wireBedPrepHandlers({ onDone, random = Math.random } = {}) {
             hintsLeft -= 1;
             if (hintsEl) hintsEl.textContent = String(Math.max(0, hintsLeft));
             stopFlash();
-            if (flashEl) flashEl.textContent = 'Sequence locked — assemble below';
+            if (flashEl) flashEl.textContent = 'Gather the items you need below';
             build?.classList.remove('hidden');
             if (hintsLeft <= 0 && readyBtn) {
                 readyBtn.disabled = true;
@@ -165,7 +236,6 @@ export function wireBedPrepHandlers({ onDone, random = Math.random } = {}) {
             }
             return;
         }
-        // Watch again if hints remain
         if (hintsLeft > 0) {
             startFlash();
             if (readyBtn) readyBtn.textContent = 'Ready';
@@ -175,67 +245,75 @@ export function wireBedPrepHandlers({ onDone, random = Math.random } = {}) {
     optionsEl?.querySelectorAll('.bed-prep-pick').forEach((btn) => {
         btn.addEventListener('click', () => {
             const label = btn.getAttribute('data-label');
-            if (!label || chosen.length >= getBedPrepSequence().length) return;
-            chosen.push(label);
+            if (!label) return;
+            if (selected.has(label)) selected.delete(label);
+            else selected.add(label);
+            paintOptionState(btn);
             paintChosen();
         });
     });
 
-    undoBtn?.addEventListener('click', () => {
-        chosen.pop();
+    clearBtn?.addEventListener('click', () => {
+        selected.clear();
+        optionsEl?.querySelectorAll('.bed-prep-pick').forEach((btn) => paintOptionState(btn));
         paintChosen();
     });
 
     window.bedPrepSubmit = () => {
         stopFlash();
-        const grade = gradeBedPrepOrder(chosen);
+        const grade = gradeBedPrepGather([...selected], activeRound.required);
         if (grade.passed) {
             if (feedback) {
                 feedback.classList.remove('hidden', 'text-rose-600');
                 feedback.classList.add('text-emerald-700');
-                feedback.textContent = 'Correct sequence — bed ready for admission.';
+                feedback.textContent = GameConfig.challengeCopy?.passedFeedback
+                    || 'You passed. Task being completed.';
             }
             onDone?.({ passed: true, grade, reason: 'bed-prep-correct' });
             return;
         }
         if (feedback) {
             feedback.classList.remove('hidden');
-            feedback.textContent = 'Incorrect sequence — task not completed. Correct order shown below.';
+            feedback.textContent = 'Incorrect gather — task not completed. Needed items shown below.';
         }
         if (answerKey) {
             answerKey.classList.remove('hidden');
             answerKey.innerHTML = grade.expectedLabels
-                .map((label, i) => `<li class="${grade.wrongIndexes.includes(i) ? 'text-rose-600 font-semibold' : ''}">${label}</li>`)
+                .map((label) => `<li>${escapeHtml(label)}</li>`)
                 .join('');
         }
-        chosenEl?.querySelectorAll('[data-idx]').forEach((el) => {
-            const idx = Number(el.getAttribute('data-idx'));
-            if (grade.wrongIndexes.includes(idx)) {
-                el.classList.add('border-rose-500', 'bg-rose-50');
+        optionsEl?.querySelectorAll('.bed-prep-pick').forEach((btn) => {
+            const label = String(btn.getAttribute('data-label') || '').toLowerCase();
+            const needed = grade.expectedLabels.some((e) => e.toLowerCase() === label);
+            const on = selected.has(btn.getAttribute('data-label') || '');
+            if (on && !needed) {
+                btn.classList.add('border-rose-500', 'bg-rose-50');
+            }
+            if (needed && !on) {
+                btn.classList.add('border-emerald-500', 'bg-emerald-50');
             }
         });
         onDone?.({
             passed: false,
             grade,
             reason: 'bed-prep-incorrect',
-            expected: grade.expectedLabels.join(' → ')
+            expected: grade.expectedLabels.join(', ')
         });
     };
 
-    /** Practice aid: fill correct sequence; player still presses Submit. */
+    /** Practice aid: select all required items; player still presses Submit. */
     window.bedPrepCheat = () => {
         stopFlash();
-        if (flashEl) flashEl.textContent = 'Sequence locked — assemble below';
+        if (flashEl) flashEl.textContent = 'Gather the items you need below';
         build?.classList.remove('hidden');
-        chosen.length = 0;
-        getBedPrepSequence().forEach((step) => {
-            chosen.push(step.label);
-        });
+        selected.clear();
+        activeRound.required.forEach((label) => selected.add(label));
+        optionsEl?.querySelectorAll('.bed-prep-pick').forEach((btn) => paintOptionState(btn));
         paintChosen();
         if (feedback) {
             feedback.classList.remove('hidden', 'text-rose-600');
             feedback.classList.add('text-emerald-700');
-            feedback.textContent = 'Cheat filled the correct sequence — press Submit when ready.';
+            feedback.textContent = 'Cheat selected the correct items — press Submit when ready.';
         }
     };
 
@@ -248,10 +326,13 @@ export function wireBedPrepHandlers({ onDone, random = Math.random } = {}) {
 
 const BedPrepChallenge = {
     isBedPrepTask,
+    gradeBedPrepGather,
     gradeBedPrepOrder,
     renderBedPrepHtml,
     wireBedPrepHandlers,
-    getBedPrepSequence
+    getBedPrepRequired,
+    getBedPrepSequence,
+    buildBedPrepRound
 };
 
 export default BedPrepChallenge;

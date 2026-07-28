@@ -20,7 +20,7 @@ Also: [`AGENTS.md`](AGENTS.md) (entry), [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](A
 
 **RN Simulation Game** — browser sim of a fast-paced ~12-hour nursing shift. Player manages patients (vitals, meds, tasks) under an accelerated military clock. Goal: complete the shift without overtime by prioritizing timed work.
 
-Multi-patient census (6 packs), declarative tasks + 3-slot execution with FIFO waiting queue, shell chrome, TimelineJS past hx, markdown Help. Challenges: med identity, bed-prep (win-to-complete), Code Blue (E4 escalate). Scenario + optional chaos incident packs; CSS unit scene themes; scoring/debrief at shift end.
+Multi-patient census (6 packs), declarative tasks + 3-slot execution with FIFO waiting queue, shell chrome, TimelineJS past hx, markdown Help. Challenges: med identity, bed-prep gather (win-to-complete), IVPB hang sequence, Code Blue (E4 escalate). Scenario + optional chaos incident packs; CSS unit scene themes; scoring/debrief at shift end.
 
 ---
 
@@ -92,7 +92,8 @@ rngame/
 │   │   ├── event-drip.js              # E4.M2 game-time events + thin deterioration
 │   │   ├── challenge-gate.js          # E5.M1–M4 challenges + challenge pause
 │   │   ├── med-identity-quiz.js       # E5.M2 brand↔generic typed quiz
-│   │   ├── bed-prep-challenge.js      # E5.M3 CSBBBCL bed prep (win to complete)
+│   │   ├── bed-prep-challenge.js      # E5.M3 bed prep gather items (win to complete)
+│   │   ├── ivpb-hang-challenge.js     # IVPB spike→Y-site→backprime sequence
 │   │   ├── code-blue-challenge.js     # E5.M4 BLS order mini-game
 │   │   ├── admission-system.js        # E9 open-to-admit schedule + checklist / MD callback
 │   │   ├── admission-quiz.js          # E9 admission MCQ content for challenge-gate
@@ -130,7 +131,7 @@ Line counts are approximate totals to help decide whether to load a whole file.
 4. **Subscriptions** — `currentTime` → `taskSystem.processTasks()`; also patients refresh DOM status classes.
 5. **Start** — URL params (or pack `shiftStart`) → `INITIALIZE_GAME` → pack log line → `admission.init` (schedules open-to-admit HHMM) → `GameTimerModule.start(...)`.
 6. **Tick** — timer interval (scaled by speed factor) updates `#clock`, `UPDATE_TIME`, reveals scheduled tasks at 15-min poll marks (CSS + `data-status="active"`). `event-drip` fires pack events; `doctor-orders` spawns a per-hour check (5 min; complete injects pack + carryover + ≤1 sudden procedure); `admission-system` may spawn held patient + checklist; overdue work bumps `clinicalStatus` / `acuityScore` and may open Code Blue via `codeBlueHook` subscribe.
-7. **Interact** — contextMenu Perform → `challenge-gate` (pause `challenge`; med quiz / bed-prep / admission quizzes / safety; bed-prep + admission steps must win to `completeTask`) → pass → slot (most types) or complete (bed-prep / admission). Find-nurse + admitting call/callback follow critical-lab-style recall.
+7. **Interact** — contextMenu Perform → `challenge-gate` (pause `challenge`; med quiz / IVPB hang sequence / bed-prep gather / admission quizzes / safety; bed-prep + admission steps must win to `completeTask`) → pass → slot (most types) or complete (bed-prep / admission). Find-nurse + admitting call/callback follow critical-lab-style recall.
 8. **End** — timer seconds exhausted → `GAME_OVER` → finalize score → practice **outcome** debrief (bands + by-patient notes + ethics framing) + dimmed shell.
 
 ### Snippet — entry pipeline (near top / middle of `app.js`)

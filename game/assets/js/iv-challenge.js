@@ -150,7 +150,8 @@ export function renderIvChallengeHtml(prompt, taskName) {
         return `
       <div class="challenge-gate iv-challenge space-y-3 text-left" data-challenge="iv-check">
         <p class="text-sm text-gray-900 font-semibold">IV drip check</p>
-        <p class="text-sm text-gray-600">Confirm the running rate from the IV panel. Timer is paused.</p>
+        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
+          || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
         <p class="text-sm text-gray-800">Task: <strong>${escapeHtml(taskName || 'IV check')}</strong></p>
         <p class="text-sm text-gray-800">
           Drip: <strong>${escapeHtml(prompt.brand)}</strong> — continuous IV infusion
@@ -170,7 +171,8 @@ export function renderIvChallengeHtml(prompt, taskName) {
         return `
       <div class="challenge-gate iv-challenge space-y-3 text-left" data-challenge="heparin-ptt">
         <p class="text-sm text-gray-900 font-semibold">Heparin drip — PTT result</p>
-        <p class="text-sm text-gray-600">Practice only. Enter the new rate. Timer is paused.</p>
+        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
+          || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
         <p class="text-sm text-gray-800">Task: <strong>${escapeHtml(taskName || 'Heparin PTT')}</strong></p>
         <p class="text-sm text-gray-800">Current rate: <strong>${escapeHtml(String(prompt.currentRate))}</strong> ${escapeHtml(prompt.unit)}</p>
         <p class="text-sm text-gray-800">PTT: <strong id="iv-ptt-result">${escapeHtml(prompt.pttLabel)}</strong></p>
@@ -199,7 +201,8 @@ export function renderIvChallengeHtml(prompt, taskName) {
     return `
       <div class="challenge-gate iv-challenge space-y-3 text-left" data-challenge="iv-titration">
         <p class="text-sm text-gray-900 font-semibold">IV drip titration</p>
-        <p class="text-sm text-gray-600">Practice only. Enter the new rate. Timer is paused.</p>
+        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
+          || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
         <p class="text-sm text-gray-800">Task: <strong>${escapeHtml(taskName || 'Titrate drip')}</strong></p>
         <p class="text-sm text-gray-800">
           Drip: <strong>${escapeHtml(prompt.brand)}</strong> (${escapeHtml(prompt.drug)})

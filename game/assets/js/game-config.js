@@ -313,20 +313,60 @@ export const GameConfig = {
     ]
   },
 
-  // Bed prep admission mini-game (E5.M3 Later)
+  // Shared perform challenge / quiz chrome copy (E5 + admission quizzes)
+  challengeCopy: {
+    pauseBanner:
+      'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list',
+    passedFeedback: 'You passed. Task being completed.'
+  },
+
+  // Bed prep admission mini-game (E5.M3) — gather items (no sequence)
   bedPrepChallenge: {
     hintViews: 3,
     flashMs: 700,
-    sequence: [
-      { letter: 'C', label: 'Chux' },
-      { letter: 'S', label: 'Socks' },
-      { letter: 'B', label: 'Thick blanket' },
-      { letter: 'B', label: 'Bed sheet' },
-      { letter: 'B', label: 'Pillowcase' },
-      { letter: 'C', label: 'Clean gown' },
-      { letter: 'L', label: 'Lifting sheet' }
+    distractorCountMin: 3,
+    distractorCountMax: 5,
+    requiredItems: [
+      'Chux',
+      'Socks',
+      'Thick blanket',
+      'Bed sheet',
+      'Pillowcase',
+      'Clean gown',
+      'Lifting sheet'
     ],
-    distractors: ['Think blanket', 'Extra towel', 'Trash bag', 'IV pole cover']
+    distractors: [
+      'Think blanket',
+      'Extra towel',
+      'Trash bag',
+      'IV pole cover',
+      'Bedpan',
+      'Telemetry leads',
+      'Nasal cannula',
+      'Urinal'
+    ]
+  },
+
+  // IVPB hang sequence mini-game (secondary piggyback)
+  ivpbHangChallenge: {
+    hintViews: 3,
+    flashMs: 700,
+    sequence: [
+      { label: 'Spike the IVPB' },
+      { label: 'Connect to secondary tubing' },
+      { label: 'Connect tubing to above Y site at primary' },
+      { label: 'Backprime' },
+      { label: "Check it's dripping" },
+      { label: 'If not dripping: open clamps / no kink / IVPB higher than primary' }
+    ],
+    distractors: [
+      'Connect tubing below Y site at primary',
+      'Hang IVPB lower than the primary bag',
+      'Spike the primary bag again',
+      'Flush with a saline syringe only',
+      'Clamp secondary and leave it closed',
+      'Connect secondary to the pump cassette'
+    ]
   },
 
   // Task class interactions (E3.M4 Later) — adjust slot duration

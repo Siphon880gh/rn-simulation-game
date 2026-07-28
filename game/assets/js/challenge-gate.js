@@ -1,6 +1,6 @@
 /**
  * Perform challenge gate (E5.M1) — modal mini-game + shift timer freeze.
- * E5.M2: med brand↔generic; E5.M3: bed-prep; E5.M4: Code Blue (E4 escalate).
+ * E5.M2: med brand↔generic; E5.M3: bed-prep gather; IVPB hang sequence; E5.M4: Code Blue.
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
@@ -28,8 +28,14 @@ import {
 import {
     isBedPrepTask,
     renderBedPrepHtml,
-    wireBedPrepHandlers
+    wireBedPrepHandlers,
+    buildBedPrepRound
 } from './bed-prep-challenge.js';
+import {
+    isIvpbTask,
+    renderIvpbHangHtml,
+    wireIvpbHangHandlers
+} from './ivpb-hang-challenge.js';
 import {
     renderCodeBlueHtml,
     wireCodeBlueHandlers,
@@ -75,6 +81,7 @@ function challengeModalFooter({
 
 let activeSession = null;
 let cleanupBedPrep = null;
+let cleanupIvpbHang = null;
 let cleanupCodeBlue = null;
 let codeBlueOpenPending = false;
 
@@ -84,6 +91,10 @@ function endSession(result) {
     if (typeof cleanupBedPrep === 'function') {
         cleanupBedPrep();
         cleanupBedPrep = null;
+    }
+    if (typeof cleanupIvpbHang === 'function') {
+        cleanupIvpbHang();
+        cleanupIvpbHang = null;
     }
     if (typeof cleanupCodeBlue === 'function') {
         cleanupCodeBlue();
@@ -98,34 +109,50 @@ function endSession(result) {
 }
 
 function finishCodeBlue(passed, reason, expected, patientId) {
-    recordChallengeOutcome({ passed, reason, expected });
+    if (activeSession?.closing) return;
+
+    const settle = () => {
+        recordChallengeOutcome({ passed, reason, expected });
+        if (passed) {
+            gameState.dispatch('UPDATE_PATIENT', {
+                patientId,
+                patch: {
+                    clinicalStatus: 'stable',
+                    clinicalStatusReason: 'code blue response (practice)'
+                }
+            });
+            gameState.dispatch('APPEND_SHIFT_LOG', {
+                message: `Code Blue response successful: ${activeSession?.taskName || patientId}`,
+                timeLabel: String(gameState.getStateSlice('currentTime') ?? '—')
+            });
+        } else {
+            gameState.dispatch('UPDATE_PATIENT', {
+                patientId,
+                patch: {
+                    clinicalStatus: 'critical',
+                    clinicalStatusReason: 'code blue response incomplete (practice)'
+                }
+            });
+            gameState.dispatch('APPEND_SHIFT_LOG', {
+                message: `Code Blue response incomplete: ${activeSession?.taskName || patientId}`,
+                timeLabel: String(gameState.getStateSlice('currentTime') ?? '—')
+            });
+        }
+        gameState.dispatch('RESOLVE_CODE_BLUE', { patientId, passed });
+        endSession({ passed, reason, expected });
+    };
+
     if (passed) {
-        gameState.dispatch('UPDATE_PATIENT', {
-            patientId,
-            patch: {
-                clinicalStatus: 'stable',
-                clinicalStatusReason: 'code blue response (practice)'
-            }
+        setChallengeFeedback(challengePassedFeedback(), { ok: true });
+        activeSession.closing = true;
+        document.querySelectorAll('#modal-footer button').forEach((btn) => {
+            btn.disabled = true;
         });
-        gameState.dispatch('APPEND_SHIFT_LOG', {
-            message: `Code Blue response successful: ${activeSession?.taskName || patientId}`,
-            timeLabel: String(gameState.getStateSlice('currentTime') ?? '—')
-        });
-    } else {
-        gameState.dispatch('UPDATE_PATIENT', {
-            patientId,
-            patch: {
-                clinicalStatus: 'critical',
-                clinicalStatusReason: 'code blue response incomplete (practice)'
-            }
-        });
-        gameState.dispatch('APPEND_SHIFT_LOG', {
-            message: `Code Blue response incomplete: ${activeSession?.taskName || patientId}`,
-            timeLabel: String(gameState.getStateSlice('currentTime') ?? '—')
-        });
+        setTimeout(settle, 900);
+        return;
     }
-    gameState.dispatch('RESOLVE_CODE_BLUE', { patientId, passed });
-    endSession({ passed, reason, expected });
+
+    settle();
 }
 
 /**
@@ -185,12 +212,21 @@ export function runCodeBlueChallenge(hook) {
     });
 }
 
+function challengePauseBanner() {
+    return GameConfig.challengeCopy?.pauseBanner
+        || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list';
+}
+
+function challengePassedFeedback() {
+    return GameConfig.challengeCopy?.passedFeedback || 'You passed. Task being completed.';
+}
+
 function buildSafetyContent(task) {
     const name = task?.name || 'this task';
     return `
       <div class="challenge-gate space-y-3 text-left" data-challenge="safety-first">
         <p class="text-sm text-gray-900 font-semibold">Complete this challenge to perform the task.</p>
-        <p class="text-sm text-gray-600">Correct → task starts in a slot. Incorrect → try again. Timer is paused.</p>
+        <p class="text-sm text-gray-600">${challengePauseBanner()}</p>
         <p class="text-sm text-gray-800">Before performing <strong>${name}</strong>, which action comes first?</p>
         <div class="flex flex-col gap-2">
           <button type="button" class="challenge-choice px-3 py-2 rounded border border-gray-200 text-left text-sm hover:bg-gray-50"
@@ -244,14 +280,7 @@ function finishAttempt(passed, reason, expected, opts = {}) {
 
     if (passed) {
         recordChallengeOutcome({ passed: true, reason, expected });
-        const successMsg = activeSession?.bedPrep
-            ? 'Correct — bed prep is done.'
-            : activeSession?.admissionQuiz
-                ? 'Correct — admission step complete.'
-                : activeSession?.codeBluePatientId
-                    ? 'Correct — Code Blue response recorded.'
-                    : 'Correct — task is now performing in a slot.';
-        setChallengeFeedback(successMsg, { ok: true });
+        setChallengeFeedback(challengePassedFeedback(), { ok: true });
         gameState.dispatch('APPEND_SHIFT_LOG', {
             message: activeSession?.admissionQuiz || activeSession?.bedPrep
                 ? `Challenge passed: ${activeSession?.taskName || 'task'}`
@@ -416,6 +445,12 @@ export function cheatChallenge() {
         }
         return;
     }
+    if (activeSession.ivpbHang) {
+        if (typeof window.ivpbHangCheat === 'function') {
+            window.ivpbHangCheat();
+        }
+        return;
+    }
     if (activeSession.codeBluePatientId) {
         if (typeof window.codeBlueCheat === 'function') {
             window.codeBlueCheat();
@@ -488,10 +523,11 @@ export function runChallengeGate(task) {
     return new Promise((resolve) => {
         const liveTask = isIvTask(task) ? syncIvTaskMetadata(task) : task;
         const bedPrep = isBedPrepTask(liveTask);
-        const admissionQuiz = !bedPrep ? buildAdmissionQuiz(liveTask) : null;
-        const useIv = !bedPrep && !admissionQuiz && isIvTask(liveTask);
+        const ivpbHang = !bedPrep && isIvpbTask(liveTask);
+        const admissionQuiz = !bedPrep && !ivpbHang ? buildAdmissionQuiz(liveTask) : null;
+        const useIv = !bedPrep && !ivpbHang && !admissionQuiz && isIvTask(liveTask);
         const ivPrompt = useIv ? buildIvPrompt(liveTask) : null;
-        const isMed = !bedPrep && !admissionQuiz && !useIv
+        const isMed = !bedPrep && !ivpbHang && !admissionQuiz && !useIv
             && (!liveTask?.type || String(liveTask.type).toLowerCase() === 'med');
         const useAccucheck = isMed && isAccucheckTask(liveTask);
         const accucheckPrompt = useAccucheck ? buildAccucheckPrompt(liveTask) : null;
@@ -507,19 +543,21 @@ export function runChallengeGate(task) {
             ivPrompt,
             ivTask: useIv ? liveTask : null,
             bedPrep,
+            ivpbHang,
             admissionQuiz: Boolean(admissionQuiz),
-            safety: !bedPrep && !admissionQuiz && !useIv && !accucheckPrompt && !useMedQuiz
+            safety: !bedPrep && !ivpbHang && !admissionQuiz && !useIv && !accucheckPrompt && !useMedQuiz
         };
 
         gameState.dispatch('SET_PAUSE', { paused: true, source: CHALLENGE });
 
         if (bedPrep) {
+            const bedRound = buildBedPrepRound();
             applySituationStill('bed-prep');
             ModalModule.openModal({
                 title: 'Bed prep for admission',
-                content: renderBedPrepHtml(task?.name),
+                content: renderBedPrepHtml(task?.name, bedRound),
                 footer: challengeModalFooter({
-                    submitLabel: 'Submit sequence',
+                    submitLabel: 'Submit gather',
                     submitHandler: 'bedPrepSubmit'
                 }),
                 overlay: true,
@@ -527,8 +565,28 @@ export function runChallengeGate(task) {
             });
             setTimeout(() => {
                 cleanupBedPrep = wireBedPrepHandlers({
+                    round: bedRound,
                     onDone: ({ passed, reason, expected }) => {
                         finishAttempt(passed, reason, expected);
+                    }
+                });
+            }, 0);
+        } else if (ivpbHang) {
+            ModalModule.openModal({
+                title: 'IVPB hang sequence',
+                content: renderIvpbHangHtml(liveTask?.name),
+                footer: challengeModalFooter({
+                    submitLabel: 'Submit sequence',
+                    submitHandler: 'ivpbHangSubmit'
+                }),
+                overlay: true,
+                persistent: false
+            });
+            setTimeout(() => {
+                cleanupIvpbHang = wireIvpbHangHandlers({
+                    onDone: ({ passed, reason, expected }) => {
+                        // On fail, omit expected so retry does not spoil the sequence.
+                        finishAttempt(passed, reason, passed ? expected : undefined, { allowRetry: true });
                     }
                 });
             }, 0);

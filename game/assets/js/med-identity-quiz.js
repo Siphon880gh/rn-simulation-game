@@ -2,6 +2,7 @@
  * Med brand ↔ generic typed quiz (E5.M2) — DOM challenge content for challenge-gate.
  * Matching is case-insensitive; practice framing only.
  */
+import { GameConfig } from './game-config.js';
 
 /** @type {{ generic: string, brand: string, aliases?: string[], brandAliases?: string[] }[]} */
 export const MED_PAIRS = [
@@ -111,7 +112,8 @@ export function renderMedIdentityHtml(prompt, taskName) {
           Complete this challenge to perform the task.
         </p>
         <p class="text-sm text-gray-600">
-          Correct → task starts in a slot. Incorrect → task not started; try again. Timer is paused.
+          ${GameConfig.challengeCopy?.pauseBanner
+            || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}
         </p>
         <p class="text-sm text-gray-800">
           Medication task: <strong>${taskName || 'med'}</strong>

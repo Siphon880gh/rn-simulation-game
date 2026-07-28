@@ -3,6 +3,7 @@
  * BS randomly 60–200; player enters units from the scale for the ordered insulin.
  * Cheat fills the correct units; player still submits.
  */
+import { GameConfig } from './game-config.js';
 
 export const INSULIN_TYPES = ['regular', 'aspart', 'lispro'];
 
@@ -128,7 +129,8 @@ export function renderAccucheckHtml(prompt) {
           Accucheck / sliding-scale insulin
         </p>
         <p class="text-sm text-gray-600">
-          Correct units → task starts in a slot. Incorrect → try again. Timer is paused.
+          ${GameConfig.challengeCopy?.pauseBanner
+            || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}
         </p>
         <p class="text-sm text-gray-800">
           Task: <strong>${taskName}</strong>

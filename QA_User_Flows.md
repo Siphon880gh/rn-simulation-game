@@ -225,7 +225,7 @@ Aligned with [`docs/players/ABOUT.md`](docs/players/ABOUT.md) and scenario pack 
 1. Click census tab **206-A Lin Chen**.
 2. Under **Admission / bed prep**, find **Bed prep for admission** when status is `active`.
 3. Left-click the tile → **Perform**.
-4. Complete the **CSBBBCL** bed-prep sequence challenge (watch flash, assemble order, **Submit sequence**).
+4. Complete the bed-prep **Gather these items** challenge (watch flash, select required items — order does not matter — **Submit gather**).
 5. On win: task completes (win-to-complete; not a normal slot finish path).
 6. On fail / cancel: task remains incomplete; may retry Perform later while still in window.
 
