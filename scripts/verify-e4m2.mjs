@@ -90,6 +90,98 @@ assert(
   'thin deterioration → watch'
 );
 
+// E9: patient-bound emergencies must not fire while target is admit-held.
+function resetCensusState() {
+  resetEventDrip();
+  gameState.state.patients = new Map();
+  gameState.state.tasks = new Map();
+  gameState.state.firedEvents = [];
+  gameState.state.shiftLog = [];
+  gameState.state.admitHold = null;
+  gameState.dispatch('INITIALIZE_GAME', { startTime: 1900 });
+}
+
+const icuRaw = JSON.parse(readFileSync(join(root, 'game/events/scenarios/icu-2.json'), 'utf8'));
+const icuPack = normalizePack(icuRaw, 'icu-hold-test');
+
+resetCensusState();
+gameState.dispatch('SET_SCENARIO_PACK', { pack: icuPack });
+gameState.dispatch('REGISTER_PATIENT', {
+  patient: {
+    id: 'maria',
+    name: 'Maria Santos',
+    clinicalStatus: 'watch',
+    status: 'active'
+  }
+});
+gameState.dispatch('SET_ADMIT_HOLD', {
+  heldPatientId: 'robert',
+  mode: 'admitMiddle',
+  admitAt: 2100,
+  windowKey: 'middle',
+  spawned: false
+});
+
+processGameTime(1930);
+assert(
+  !(gameState.getStateSlice('firedEvents') || []).some((e) => e.eventId === 'icu-lab-critical-1930'),
+  'Critical K+ deferred while robert admit-held'
+);
+assert(
+  !gameState.getStateSlice('tasks')?.has('evt-icu-robert-k'),
+  'no Critical K+ task for held robert'
+);
+
+gameState.dispatch('REGISTER_PATIENT', {
+  patient: {
+    id: 'robert',
+    name: 'Robert Hale',
+    clinicalStatus: 'worsening',
+    status: 'active'
+  }
+});
+gameState.dispatch('UPDATE_ADMIT_HOLD', { spawned: true });
+processGameTime(1931);
+assert(
+  (gameState.getStateSlice('firedEvents') || []).some((e) => e.eventId === 'icu-lab-critical-1930'),
+  'Critical K+ fires after robert admitted'
+);
+assert(
+  gameState.getStateSlice('tasks')?.has('evt-icu-robert-k'),
+  'Critical K+ task after admit spawn'
+);
+
+// minus1: held patient never arrives — drop event once, no incident task.
+resetCensusState();
+gameState.dispatch('SET_SCENARIO_PACK', { pack: icuPack });
+gameState.dispatch('REGISTER_PATIENT', {
+  patient: {
+    id: 'maria',
+    name: 'Maria Santos',
+    clinicalStatus: 'watch',
+    status: 'active'
+  }
+});
+gameState.dispatch('SET_ADMIT_HOLD', {
+  heldPatientId: 'robert',
+  mode: 'minus1',
+  spawned: false
+});
+processGameTime(1930);
+assert(
+  !gameState.getStateSlice('tasks')?.has('evt-icu-robert-k'),
+  'minus1: no Critical K+ for held robert'
+);
+assert(
+  !(gameState.getStateSlice('firedEvents') || []).some((e) => e.eventId === 'icu-lab-critical-1930'),
+  'minus1: Critical K+ not logged as fired emergency'
+);
+processGameTime(1935);
+assert(
+  !gameState.getStateSlice('tasks')?.has('evt-icu-robert-k'),
+  'minus1: stays suppressed on later ticks'
+);
+
 if (failures.length) {
   console.error('E4.M2 AUTO FAIL');
   failures.forEach((f) => console.error(' -', f));

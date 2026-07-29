@@ -1,16 +1,54 @@
 /**
  * Game-time event drip + thin overdue→status deterioration (E4.M2).
  * Honors pause/speed because it only runs on currentTime updates.
+ * Patient-bound injects wait until the patient is on census (E9 admit-hold).
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
 import { mountTaskDom } from './dynamic-tasks.js';
+import { isOpenAdmitMode } from './admission-system.js';
 
 const firedEventIds = new Set();
 const deterioratedPatients = new Set();
 let codeBlueHookUsed = false;
 let lastProcessedTime = null;
+
+/** True when patientId is on the live census (or task is unit-level). */
+function isPatientOnCensus(patientId) {
+    if (!patientId) return true;
+    return Boolean(gameState.getStateSlice('patients')?.has(patientId));
+}
+
+/**
+ * Held for a future open-admit spawn — defer patient-bound work.
+ * minus1 hold never spawns; treat as permanently ineligible.
+ */
+function isDeferredAdmitHold(patientId) {
+    if (!patientId) return false;
+    const hold = gameState.getStateSlice('admitHold');
+    return Boolean(
+        hold?.heldPatientId === patientId
+        && !hold.spawned
+        && isOpenAdmitMode(hold.mode)
+    );
+}
+
+/**
+ * @returns {'ready'|'defer'|'skip'}
+ * - ready: fire (inject only census-present patients)
+ * - defer: open-admit hold still pending — try again later
+ * - skip: target never on census (minus1 / unknown) — drop once
+ */
+function eventReadiness(event) {
+    const specs = Array.isArray(event?.injectTasks) ? event.injectTasks : [];
+    const bound = specs.filter((s) => s?.patientId);
+    if (!bound.length) return 'ready';
+
+    if (bound.some((s) => isPatientOnCensus(s.patientId))) return 'ready';
+    if (bound.some((s) => isDeferredAdmitHold(s.patientId))) return 'defer';
+    return 'skip';
+}
 
 function formatHHMM(hhmm) {
     const n = Number(hhmm) || 0;
@@ -58,6 +96,9 @@ function annotateHourTab(at, label) {
 function injectTasks(taskSpecs, at) {
     if (!Array.isArray(taskSpecs)) return;
     taskSpecs.forEach((spec) => {
+        // No clinical work for patients not yet on census (held admit / minus1).
+        if (spec?.patientId && !isPatientOnCensus(spec.patientId)) return;
+
         const scheduled = spec.scheduled != null ? spec.scheduled : at;
         const created = taskSystem.createTask({
             id: spec.id || `evt-task-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -79,6 +120,14 @@ function injectTasks(taskSpecs, at) {
 
 function fireEvent(event, currentTime) {
     if (!event?.id || firedEventIds.has(event.id)) return false;
+
+    const readiness = eventReadiness(event);
+    if (readiness === 'defer') return false;
+    if (readiness === 'skip') {
+        firedEventIds.add(event.id);
+        return false;
+    }
+
     firedEventIds.add(event.id);
 
     const message = event.message || `Event: ${event.id}`;

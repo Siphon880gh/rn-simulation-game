@@ -89,7 +89,7 @@ rngame/
 │   │   ├── debrief.js                 # E6.M0/M2 practice outcome debrief + by-patient notes
 │   │   ├── scoring.js                 # E6.M1–M2 score hooks, live cues, outcome bands
 │   │   ├── scenario-pack.js           # E4.M1 JSON scenario pack loader
-│   │   ├── event-drip.js              # E4.M2 game-time events + thin deterioration
+│   │   ├── event-drip.js              # E4.M2 events + deterioration; defer/skip admit-held targets
 │   │   ├── challenge-gate.js          # E5.M1–M4 challenges + challenge pause
 │   │   ├── med-identity-quiz.js       # E5.M2 brand↔generic typed quiz
 │   │   ├── bed-prep-challenge.js      # E5.M3 bed prep gather items (win to complete)
@@ -130,7 +130,7 @@ Line counts are approximate totals to help decide whether to load a whole file.
 3. **Patients** — `PatientsModule.init()` loads census from pack `patients[]` (fallback: all configs). With `?census=minus1|openAdmit`, holds last pack patient (`admitHold`) and boots N−1. Parses `[data-task-type]`, registers into state/DOM.
 4. **Subscriptions** — `currentTime` → `taskSystem.processTasks()`; also patients refresh DOM status classes.
 5. **Start** — URL params (or pack `shiftStart`) → `INITIALIZE_GAME` → pack log line → `admission.init` (schedules open-to-admit HHMM) → `GameTimerModule.start(...)`.
-6. **Tick** — timer interval (scaled by speed factor) updates `#clock`, `UPDATE_TIME`, reveals scheduled tasks at 15-min poll marks (CSS + `data-status="active"`). `event-drip` fires pack events; `doctor-orders` spawns a per-hour check (5 min; complete injects pack + carryover + ≤1 sudden procedure); `admission-system` may spawn held patient + checklist; overdue work bumps `clinicalStatus` / `acuityScore` and may open Code Blue via `codeBlueHook` subscribe.
+6. **Tick** — timer interval (scaled by speed factor) updates `#clock`, `UPDATE_TIME`, reveals scheduled tasks at 15-min poll marks (CSS + `data-status="active"`). `event-drip` fires pack events (patient-bound injects defer while target is open-admit held; `minus1` held targets are dropped); `doctor-orders` spawns a per-hour check (5 min; complete injects pack + carryover + ≤1 sudden procedure); `admission-system` may spawn held patient + checklist; overdue work bumps `clinicalStatus` / `acuityScore` and may open Code Blue via `codeBlueHook` subscribe.
 7. **Interact** — contextMenu Perform → `challenge-gate` (pause `challenge`; med quiz / IVPB hang sequence / bed-prep gather / admission quizzes / safety; bed-prep + admission steps must win to `completeTask`) → pass → slot (most types) or complete (bed-prep / admission). Find-nurse + admitting call/callback follow critical-lab-style recall.
 8. **End** — timer seconds exhausted → `GAME_OVER` → finalize score → practice **outcome** debrief (bands + by-patient notes + ethics framing) + dimmed shell.
 
