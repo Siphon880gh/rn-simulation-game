@@ -597,11 +597,8 @@ const PatientsModule = (() => {
                 btn.setAttribute('aria-selected', 'false');
             }
             btn.addEventListener('click', () => {
-                panelMode = 'patient';
-                gameState.dispatch('SET_ACTIVE_PATIENT', { patientId: patient.id });
-                gameState.dispatch('APPEND_SHIFT_LOG', {
-                    message: `Switched to ${patient.name}`,
-                    timeLabel: 'nav'
+                showPatientPanel(patient.id, {
+                    logMessage: `Switched to ${patient.name}`
                 });
             });
             tabsHost.appendChild(btn);
@@ -620,13 +617,7 @@ const PatientsModule = (() => {
             globalBtn.setAttribute('aria-selected', 'false');
         }
         globalBtn.addEventListener('click', () => {
-            panelMode = 'global';
-            applyPanelVisibility();
-            renderPatientTabs();
-            gameState.dispatch('APPEND_SHIFT_LOG', {
-                message: 'Opened global shift panel',
-                timeLabel: 'nav'
-            });
+            showGlobalPanel();
         });
         tabsHost.appendChild(globalBtn);
         updateCensusMeta();
@@ -839,11 +830,44 @@ const PatientsModule = (() => {
         renderPatientTabs();
     });
 
+    /** Reset main clinical pane scroll when opening a patient or Global. */
+    const scrollMainPanelToTop = () => {
+        const main = document.querySelector(GameConfig.selectors.main);
+        if (main) main.scrollTop = 0;
+    };
+
+    /**
+     * Open a patient panel. Must apply visibility even when patientId is already
+     * active — Global keeps the prior activePatientId, so SET_ACTIVE_PATIENT is a
+     * no-op and the activePatientId subscriber would never leave Global (ICU
+     * admitStart / N−1 single-census case).
+     */
+    const showPatientPanel = (patientId, opts = {}) => {
+        if (!patientId) return;
+        panelMode = 'patient';
+        const prev = gameState.getStateSlice('activePatientId');
+        if (prev !== patientId) {
+            gameState.dispatch('SET_ACTIVE_PATIENT', { patientId });
+            // Subscriber applies visibility + tabs when id changes.
+        } else {
+            applyPanelVisibility();
+            renderPatientTabs();
+        }
+        scrollMainPanelToTop();
+        if (opts.logMessage !== false) {
+            gameState.dispatch('APPEND_SHIFT_LOG', {
+                message: opts.logMessage || `Switched to ${patientId}`,
+                timeLabel: 'nav'
+            });
+        }
+    };
+
     /** E10: open Global from Orders/Tools rail (or other chrome). */
     const showGlobalPanel = (opts = {}) => {
         panelMode = 'global';
         applyPanelVisibility();
         renderPatientTabs();
+        scrollMainPanelToTop();
         if (opts.logMessage !== false) {
             gameState.dispatch('APPEND_SHIFT_LOG', {
                 message: opts.logMessage || 'Opened global shift panel',
@@ -859,6 +883,7 @@ const PatientsModule = (() => {
         extractTasksFromHTML,
         renderPatient,
         handleTaskAction,
+        showPatientPanel,
         showGlobalPanel,
         
         // Getters

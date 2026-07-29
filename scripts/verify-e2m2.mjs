@@ -23,6 +23,12 @@ assert(existsSync(join(root, 'game/events/patients/maria.html')), 'maria pack');
 assert(existsSync(join(root, 'game/events/patients/maria-past-hx.json')), 'maria past hx');
 assert(patientsSrc.includes("id: 'maria'"), 'maria in patientConfigs');
 assert(patientsSrc.includes('applyPanelVisibility'), 'panel visibility helper');
+assert(patientsSrc.includes('showPatientPanel'), 'showPatientPanel helper');
+assert(patientsSrc.includes('scrollMainPanelToTop'), 'scroll main panel to top on open');
+assert(
+    patientsSrc.includes('prev !== patientId') || patientsSrc.includes('already active'),
+    'same-id Global→patient restore'
+);
 assert(patientsSrc.includes('patient-panel-host'), 'panel host class');
 assert(patientsSrc.includes("subscribe('activePatientId'"), 'subscribe-driven swap');
 assert(css.includes('.patient-panel-host.is-active'), 'active panel CSS');

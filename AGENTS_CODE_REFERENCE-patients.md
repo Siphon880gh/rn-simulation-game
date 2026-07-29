@@ -42,7 +42,7 @@ Adding a patient = new config entry + HTML under `game/events/patients/` (+ opti
 
 **E9 census hold / admit:** Landing choice → `?census=` omitted/`full` (full load), `minus1` (N−1, no admit), `admitStart` / `admitMiddle` (hold last pack patient + spawn in that band). Legacy `openAdmit` still randomizes start/middle/near-end. Spawn via `admission-system.js`; new patient gets `admissionPhase: 'admitting'` (left-tab **Admitting** badge) + config-driven checklist.
 
-**E2.M2 swap:** All packs mount under `#patients` as `.patient-panel-host`. `#patient-tabs` + Global tab drive `SET_ACTIVE_PATIENT` / `panelMode`; CSS opacity/translate transitions; task DOM stays mounted (census-aware).
+**E2.M2 swap:** All packs mount under `#patients` as `.patient-panel-host`. `#patient-tabs` + Global tab drive `panelMode` via `showPatientPanel` / `showGlobalPanel`. Returning from Global to the already-active patient must call `showPatientPanel` (same `activePatientId` is a no-op for subscribers — ICU admitStart / N−1 single-census). CSS opacity/translate transitions; task DOM stays mounted (census-aware).
 
 ---
 

@@ -84,10 +84,8 @@ function onOrdersCheckClick(task) {
 
 function onInjectedOrderClick(task) {
     if (task.patientId) {
-        gameState.dispatch('SET_ACTIVE_PATIENT', { patientId: task.patientId });
-        gameState.dispatch('APPEND_SHIFT_LOG', {
-            message: `Jumped to order: ${task.name}`,
-            timeLabel: 'nav'
+        patientsApi?.showPatientPanel?.(task.patientId, {
+            logMessage: `Jumped to order: ${task.name}`
         });
         window.requestAnimationFrame(() => {
             const el = document.getElementById(task.id);
@@ -207,13 +205,9 @@ function admitGlanceRows() {
 
 function onPatientJump(patientId, message) {
     if (!patientId) return;
-    gameState.dispatch('SET_ACTIVE_PATIENT', { patientId });
-    if (message) {
-        gameState.dispatch('APPEND_SHIFT_LOG', {
-            message,
-            timeLabel: 'nav'
-        });
-    }
+    patientsApi?.showPatientPanel?.(patientId, {
+        logMessage: message || false
+    });
 }
 
 function renderTools() {

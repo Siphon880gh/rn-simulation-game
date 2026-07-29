@@ -72,7 +72,10 @@ assert(appSrc.includes('RightMenuModule'), 'app wires right menu');
 assert(appSrc.includes('rightMenu.init'), 'rightMenu.init called');
 
 const patientsSrc = readFileSync(join(root, 'game/assets/js/patients.js'), 'utf8');
+const rightSrc = readFileSync(join(root, 'game/assets/js/right-menu.js'), 'utf8');
 assert(patientsSrc.includes('showGlobalPanel'), 'patients showGlobalPanel');
+assert(patientsSrc.includes('showPatientPanel'), 'patients showPatientPanel');
+assert(rightSrc.includes('showPatientPanel'), 'right-menu uses showPatientPanel');
 
 const css = readFileSync(join(root, 'game/assets/css/shell.css'), 'utf8');
 assert(css.includes('.rail-item'), 'rail-item CSS');
