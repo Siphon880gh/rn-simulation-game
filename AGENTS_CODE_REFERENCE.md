@@ -90,13 +90,16 @@ rngame/
 │   │   ├── scoring.js                 # E6.M1–M2 score hooks, live cues, outcome bands
 │   │   ├── scenario-pack.js           # E4.M1 JSON scenario pack loader
 │   │   ├── event-drip.js              # E4.M2 events + deterioration; defer/skip admit-held targets
-│   │   ├── challenge-gate.js          # E5.M1–M4 challenges + challenge pause
-│   │   ├── med-identity-quiz.js       # E5.M2 brand↔generic typed quiz
-│   │   ├── bed-prep-challenge.js      # E5.M3 bed prep gather items (win to complete)
-│   │   ├── ivpb-hang-challenge.js     # IVPB spike→Y-site→backprime sequence
-│   │   ├── code-blue-challenge.js     # E5.M4 BLS order mini-game
+│   │   ├── challenges/                # E5 perform mini-games (see challenges/README.md)
+│   │   │   ├── challenge-gate.js      # pause + modal routing
+│   │   │   ├── registry.js            # kind → skills|emergencies paths
+│   │   │   ├── shared/copy-config.js  # pause banner / pass copy
+│   │   │   ├── skills/<id>/           # config.js (author) + challenge.js
+│   │   │   │                          # ivpb-hang, med-identity, bed-prep, accucheck, iv-check, admission
+│   │   │   └── emergencies/code-blue/ # config.js (author) + challenge.js
+│   │   ├── *-challenge.js / med-identity-quiz.js / admission-quiz.js / challenge-gate.js
+│   │   │                              # thin re-exports → challenges/ (deprecated import paths)
 │   │   ├── admission-system.js        # E9 open-to-admit schedule + checklist / MD callback
-│   │   ├── admission-quiz.js          # E9 admission MCQ content for challenge-gate
 │   │   ├── task-class-interactions.js # E3.M4 batch/context-switch duration
 │   │   ├── scene-backdrop.js          # E7.M1 unit theme + situation still hooks
 │   │   ├── availability-windows.js    # E3.M3 window phases + Perform gate

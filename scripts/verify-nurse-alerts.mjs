@@ -46,6 +46,12 @@ assert(playAlarm('bed') === false, 'node has no AudioContext');
 
 const alertSrc = readFileSync(join(root, 'game/assets/js/nurse-alerts.js'), 'utf8');
 assert(alertSrc.includes("playAlarm(alarm)"), 'alerts play sound on spawn');
+assert(alertSrc.includes('presentSpawnedTask'), 'alerts present task as active/selectable');
+assert(alertSrc.includes('opts.patientId'), 'alerts accept patientId override');
+
+const dynSrc = readFileSync(join(root, 'game/assets/js/dynamic-tasks.js'), 'utf8');
+assert(dynSrc.includes('export function presentSpawnedTask'), 'presentSpawnedTask export');
+assert(dynSrc.includes('ACTIVATE_TASK'), 'presentSpawnedTask can force-activate');
 
 if (failures.length) {
   console.error('NURSE ALERTS AUTO FAIL');

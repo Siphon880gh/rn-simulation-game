@@ -25,7 +25,7 @@ globalThis.document = {
 assert(existsSync(join(root, 'game/assets/js/scoring.js')), 'scoring.js');
 assert(GameConfig.scoring.startingTotal === 100, 'starting total');
 const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
-const gateSrc = readFileSync(join(root, 'game/assets/js/challenge-gate.js'), 'utf8');
+const gateSrc = readFileSync(join(root, 'game/assets/js/challenges/challenge-gate.js'), 'utf8');
 const html = readFileSync(join(root, 'game/index.html'), 'utf8');
 assert(appSrc.includes('ScoringModule'), 'app wires scoring');
 assert(gateSrc.includes('recordChallengeOutcome'), 'challenge docks/awards');

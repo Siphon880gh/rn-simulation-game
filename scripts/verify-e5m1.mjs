@@ -24,7 +24,10 @@ function el(tag = 'div') {
       toggle(c, on) { if (on === false) this.remove(c); else if (on === true) this.add(c); else if (this._s.has(c)) this.remove(c); else this.add(c); },
       contains(c) { return this._s.has(c); }
     },
-    style: {},
+    style: {
+      removeProperty() {},
+      setProperty() {}
+    },
     attributes: {},
     children: [],
     textContent: '',
@@ -119,7 +122,8 @@ const { runChallengeGate, cancelChallengeGate, resetForTests } = await import(
   };
 });
 
-assert(existsSync(join(root, 'game/assets/js/challenge-gate.js')), 'challenge-gate.js');
+assert(existsSync(join(root, 'game/assets/js/challenges/challenge-gate.js')), 'challenges/challenge-gate.js');
+assert(existsSync(join(root, 'game/assets/js/challenges/README.md')), 'challenges authoring README');
 const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
 assert(appSrc.includes('ChallengeGateModule'), 'app wires challenge gate');
 assert(appSrc.includes('runChallengeGate'), 'perform uses gate');
@@ -144,13 +148,15 @@ assert(
   'challenge pause cleared'
 );
 
-// Fail path: no lingering pause
+// Incorrect keeps modal open for retry (pause held); cancel clears pause
 const failPromise = runChallengeGate({ id: 't2', name: 'Fail Med' });
 await new Promise((r) => setTimeout(r, 5));
 choiceButtons[0].click();
+assert(gameState.getStateSlice('isPaused') === true, 'still paused after incorrect retry');
+cancelChallengeGate();
 const failResult = await failPromise;
-assert(failResult.passed === false, 'fail outcome');
-assert(gameState.getStateSlice('isPaused') === false, 'unpaused after fail');
+assert(failResult.passed === false, 'fail/cancel after incorrect');
+assert(gameState.getStateSlice('isPaused') === false, 'unpaused after cancel');
 
 // Cancel path
 const cancelPromise = runChallengeGate({ id: 't3', name: 'Cancel Med' });

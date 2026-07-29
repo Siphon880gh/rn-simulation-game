@@ -76,7 +76,7 @@ CSS classes: `task-status-*` in `declarative-tasks.css`.
 1. **Create** — patients extract HTML → `createTask` → `REGISTER_TASK`.
 2. **Process** — `currentTime` subscribe → `processTasks`.
 3. **Reveal (DOM)** — timer poll may also force opacity/active on `data-scheduled` (keep aligned).
-4. **Perform** — contextMenu on active meds; **disabled outside availability window** (early/late/end phases on `data-window-phase`); pass → challenge gate → slot. Med challenges: identity quiz; `data-challenge="ivpb"` / name IVPB → hang sequence (`ivpb-hang-challenge.js`); `bedprep` → gather items (`bed-prep-challenge.js`, win completes). Reveal CSS in `#reveal-scheduled-tasks` includes scheduled + absolute/`+N` expire selectors.
+4. **Perform** — contextMenu on active meds; **disabled outside availability window** (early/late/end phases on `data-window-phase`); pass → `challenges/challenge-gate.js` → slot. Author content under `challenges/skills/<id>/config.js` or `challenges/emergencies/<id>/config.js` (see `challenges/README.md`). Med identity / IVPB hang / bed-prep / accucheck / IV / admission are **skills**; Code Blue is an **emergency**. Test spawn groups match: Skills / Emergencies. Reveal CSS in `#reveal-scheduled-tasks` includes scheduled + absolute/`+N` expire selectors.
 
 ---
 

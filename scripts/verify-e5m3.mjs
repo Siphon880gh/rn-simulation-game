@@ -21,10 +21,14 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const failures = [];
 const assert = (cond, msg) => { if (!cond) failures.push(msg); };
 
-assert(existsSync(join(root, 'game/assets/js/bed-prep-challenge.js')), 'bed-prep-challenge.js');
-assert(existsSync(join(root, 'game/assets/js/ivpb-hang-challenge.js')), 'ivpb-hang-challenge.js');
+assert(existsSync(join(root, 'game/assets/js/challenges/skills/bed-prep/config.js')), 'bed-prep config path');
+assert(existsSync(join(root, 'game/assets/js/challenges/skills/ivpb-hang/config.js')), 'ivpb-hang config path');
+assert(existsSync(join(root, 'game/assets/js/challenges/skills/bed-prep/challenge.js')), 'bed-prep challenge.js');
+assert(existsSync(join(root, 'game/assets/js/challenges/skills/ivpb-hang/challenge.js')), 'ivpb-hang challenge.js');
 assert(GameConfig.tasks.types.BEDPREP, 'bedprep type');
 assert(GameConfig.bedPrepChallenge.hintViews === 3, 'hint views');
+assert(GameConfig.bedPrepChallenge.flashSpeedMinPct === 50, 'bed-prep min preview speed 50%');
+assert(GameConfig.ivpbHangChallenge.flashSpeedMinPct === 50, 'ivpb min preview speed 50%');
 assert(Array.isArray(GameConfig.bedPrepChallenge.requiredItems), 'requiredItems config');
 assert(Array.isArray(GameConfig.ivpbHangChallenge.sequence), 'ivpb sequence config');
 
@@ -48,9 +52,13 @@ assert(round.required.length === required.length, 'round keeps required');
 assert(round.options.length > round.required.length, 'round mixes distractors');
 assert(round.options.every((o) => typeof o === 'string'), 'option labels');
 
-const bedSrc = readFileSync(join(root, 'game/assets/js/bed-prep-challenge.js'), 'utf8');
+const bedSrc = readFileSync(join(root, 'game/assets/js/challenges/skills/bed-prep/challenge.js'), 'utf8');
 assert(bedSrc.includes('Gather these items'), 'gather copy');
 assert(bedSrc.includes('bedPrepCheat'), 'bedPrepCheat');
+assert(bedSrc.includes('bed-prep-speed') && bedSrc.includes('paintNow'), 'bed-prep preview speed + rewatch');
+
+const ivpbSrc = readFileSync(join(root, 'game/assets/js/challenges/skills/ivpb-hang/challenge.js'), 'utf8');
+assert(ivpbSrc.includes('ivpb-hang-speed') && ivpbSrc.includes('paintNow'), 'ivpb preview speed + rewatch');
 
 const seq = getIvpbHangSequence();
 assert(seq.length === 6, 'ivpb step count');
@@ -64,12 +72,12 @@ assert(ivLabels[0].toLowerCase().includes('spike'), 'starts with spike');
 assert(ivLabels.some((l) => /backprime/i.test(l)), 'includes backprime');
 assert(ivLabels.some((l) => /y site/i.test(l)), 'includes Y site');
 
-const gateSrc = readFileSync(join(root, 'game/assets/js/challenge-gate.js'), 'utf8');
+const gateSrc = readFileSync(join(root, 'game/assets/js/challenges/challenge-gate.js'), 'utf8');
 const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
 const lin = readFileSync(join(root, 'game/events/patients/lin.html'), 'utf8');
 const maria = readFileSync(join(root, 'game/events/patients/maria.html'), 'utf8');
-assert(gateSrc.includes('bed-prep-challenge'), 'gate wires bed prep');
-assert(gateSrc.includes('ivpb-hang-challenge'), 'gate wires ivpb hang');
+assert(gateSrc.includes('skills/bed-prep/challenge'), 'gate wires bed prep');
+assert(gateSrc.includes('skills/ivpb-hang/challenge'), 'gate wires ivpb hang');
 assert(gateSrc.includes('Submit gather'), 'bed prep submit gather label');
 assert(gateSrc.includes('challengeGateCheat'), 'cheat on challenge modal');
 assert(appSrc.includes('performBedPrepTask'), 'app complete-on-win path');

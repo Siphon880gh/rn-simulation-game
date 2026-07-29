@@ -8,7 +8,7 @@ import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
 import { isAtOrAfterInShift, hhmmToMinutes, minutesFromShiftAnchor } from './availability-windows.js';
-import { mountTaskDom } from './dynamic-tasks.js';
+import { mountTaskDom, presentSpawnedTask } from './dynamic-tasks.js';
 
 const spawnedLabKeys = new Set();
 /**
@@ -214,9 +214,11 @@ function createCallTask(spec) {
         }
     });
 
-    taskSystem.processTasks(gameState.getStateSlice('currentTime') || spec.at);
-    const live = gameState.getStateSlice('tasks')?.get(created.id) || created;
-    mountTaskDom(live);
+    const live = presentSpawnedTask(created, {
+        at: gameState.getStateSlice('currentTime') || spec.at,
+        focusPatient: Boolean(spec.focusPatient),
+        scrollIntoView: spec.scrollIntoView
+    }) || created;
 
     gameState.dispatch('APPEND_SHIFT_LOG', {
         message: `Critical lab ${lab.shortName} (${lab.result}) — call MD within ${windowMins} min (${spec.patientId})`,
@@ -439,7 +441,9 @@ export function spawnCriticalLabNow(opts = {}) {
         id,
         at: Number(now),
         patientId,
-        lab
+        lab,
+        focusPatient: opts.focusPatient === true,
+        scrollIntoView: opts.scrollIntoView
     });
 }
 

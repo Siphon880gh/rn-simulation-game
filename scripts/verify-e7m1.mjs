@@ -18,7 +18,7 @@ assert(!GameConfig.scene?.gsap, 'no GSAP stamp');
 
 const sceneSrc = readFileSync(join(root, 'game/assets/js/scene-backdrop.js'), 'utf8');
 const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
-const gateSrc = readFileSync(join(root, 'game/assets/js/challenge-gate.js'), 'utf8');
+const gateSrc = readFileSync(join(root, 'game/assets/js/challenges/challenge-gate.js'), 'utf8');
 const indexSrc = readFileSync(join(root, 'game/index.html'), 'utf8');
 const pack = JSON.parse(readFileSync(join(root, 'game/events/scenarios/night-shift-default.json'), 'utf8'));
 

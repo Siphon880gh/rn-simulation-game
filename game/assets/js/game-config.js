@@ -1,6 +1,14 @@
 // game-config.js - Declarative game configuration
 // Canonical timer defaults for the live app (app.js / timer_ingame.js).
 // Note: game/app.config.js presets are NOT wired into app.js — treat as legacy/reference only.
+// Challenge content lives under assets/js/challenges/{skills,emergencies}/<id>/config.js
+import { challengeCopyConfig } from './challenges/shared/copy-config.js';
+import { codeBlueChallengeConfig } from './challenges/emergencies/code-blue/config.js';
+import { bedPrepChallengeConfig } from './challenges/skills/bed-prep/config.js';
+import { ivpbHangChallengeConfig } from './challenges/skills/ivpb-hang/config.js';
+import { medIdentityChallengeConfig } from './challenges/skills/med-identity/config.js';
+import { getChallengeTestSpawnIncidents } from './challenges/test-spawn.js';
+
 export const GameConfig = {
   // Timer configuration (military HHMM + accelerated real-time budget)
   timer: {
@@ -230,144 +238,12 @@ export const GameConfig = {
     }
   },
 
-  // Code Blue mini-game (E5.M4 Later) — random practice questions (+ optional order item)
-  codeBlueChallenge: {
-    steps: [
-      { id: 'call', label: 'Activate Code Blue / call for help' },
-      { id: 'cpr', label: 'Start high-quality chest compressions' },
-      { id: 'defib', label: 'Attach defibrillator / AED pads' }
-    ],
-    distractors: [
-      'Leave to finish charting first',
-      'Wait for the physician to arrive before acting',
-      'Give oral meds before calling for help'
-    ],
-    questions: [
-      {
-        id: 'unresponsive-first',
-        type: 'choice',
-        prompt: 'Adult found unresponsive with no pulse. What do you do first?',
-        choices: [
-          'Activate Code Blue / call for help and start CPR',
-          'Run to the med room for epinephrine',
-          'Finish charting the last set of vitals',
-          'Wait for the physician before touching the patient'
-        ],
-        correct: 'Activate Code Blue / call for help and start CPR'
-      },
-      {
-        id: 'compression-rate',
-        type: 'choice',
-        prompt: 'Target chest compression rate for adult CPR?',
-        choices: ['60–80/min', '100–120/min', '140–160/min', 'As fast as possible'],
-        correct: '100–120/min'
-      },
-      {
-        id: 'compression-depth',
-        type: 'choice',
-        prompt: 'Adult chest compression depth target?',
-        choices: ['About 1 inch', 'At least 2 inches (5 cm)', '4–5 inches', 'Whatever feels firm'],
-        correct: 'At least 2 inches (5 cm)'
-      },
-      {
-        id: 'aed-wet',
-        type: 'choice',
-        prompt: 'Patient is in water / chest is soaking wet before AED shock. Best action?',
-        choices: [
-          'Dry the chest quickly, then apply pads',
-          'Shock through wet clothing immediately',
-          'Skip AED and only do breaths',
-          'Move pads to the abdomen'
-        ],
-        correct: 'Dry the chest quickly, then apply pads'
-      },
-      {
-        id: 'pulse-check',
-        type: 'choice',
-        prompt: 'During CPR, pulse checks should be:',
-        choices: [
-          'Brief (≤10 seconds) and limited',
-          'At least 30 seconds every cycle',
-          'Continuous with fingers on the neck',
-          'Skipped entirely once compressions start'
-        ],
-        correct: 'Brief (≤10 seconds) and limited'
-      },
-      {
-        id: 'team-role',
-        type: 'choice',
-        prompt: 'When Code Blue arrives, the bedside nurse should typically:',
-        choices: [
-          'Hand off situation, stay to help / document as assigned',
-          'Leave immediately to avoid crowding',
-          'Take over airway from respiratory without handoff',
-          'Stop all compressions until the team lead arrives'
-        ],
-        correct: 'Hand off situation, stay to help / document as assigned'
-      },
-      {
-        id: 'bls-order',
-        type: 'order',
-        prompt: 'Order the first response priorities (1 → 3):'
-      }
-    ]
-  },
-
-  // Shared perform challenge / quiz chrome copy (E5 + admission quizzes)
-  challengeCopy: {
-    pauseBanner:
-      'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list',
-    passedFeedback: 'You passed. Task being completed.'
-  },
-
-  // Bed prep admission mini-game (E5.M3) — gather items (no sequence)
-  bedPrepChallenge: {
-    hintViews: 3,
-    flashMs: 700,
-    distractorCountMin: 3,
-    distractorCountMax: 5,
-    requiredItems: [
-      'Chux',
-      'Socks',
-      'Thick blanket',
-      'Bed sheet',
-      'Pillowcase',
-      'Clean gown',
-      'Lifting sheet'
-    ],
-    distractors: [
-      'Think blanket',
-      'Extra towel',
-      'Trash bag',
-      'IV pole cover',
-      'Bedpan',
-      'Telemetry leads',
-      'Nasal cannula',
-      'Urinal'
-    ]
-  },
-
-  // IVPB hang sequence mini-game (secondary piggyback)
-  ivpbHangChallenge: {
-    hintViews: 3,
-    flashMs: 700,
-    sequence: [
-      { label: 'Spike the IVPB' },
-      { label: 'Connect to secondary tubing' },
-      { label: 'Connect tubing to above Y site at primary' },
-      { label: 'Backprime' },
-      { label: "Check it's dripping" },
-      { label: 'If not dripping: open clamps / no kink / IVPB higher than primary' }
-    ],
-    distractors: [
-      'Connect tubing below Y site at primary',
-      'Hang IVPB lower than the primary bag',
-      'Spike the primary bag again',
-      'Flush with a saline syringe only',
-      'Clamp secondary and leave it closed',
-      'Connect secondary to the pump cassette'
-    ]
-  },
+  // Challenge configs — authored under challenges/{skills|emergencies}/<id>/config.js
+  codeBlueChallenge: codeBlueChallengeConfig,
+  challengeCopy: challengeCopyConfig,
+  bedPrepChallenge: bedPrepChallengeConfig,
+  ivpbHangChallenge: ivpbHangChallengeConfig,
+  medIdentityChallenge: medIdentityChallengeConfig,
 
   // Task class interactions (E3.M4 Later) — adjust slot duration
   taskClassInteractions: {
@@ -618,30 +494,35 @@ export const GameConfig = {
    */
   testMode: {
     configUrl: 'test-mode.json',
-    /** Incident menu entries (handlers resolved in test-mode.js). */
+    /** Incident menu entries (handlers resolved in test-mode.js). Skills/Emergencies from challenges/test-spawn.js */
     incidents: [
       {
         id: 'critical-lab',
         label: 'Critical lab',
         kind: 'critical-lab',
+        group: 'Labs',
         /** When true, show per-lab submenu from GameConfig.criticalLabs.labs */
         expandLabs: true
       },
       {
         id: 'call-light',
         label: 'Call light (water / comfort)',
-        kind: 'call-light'
+        kind: 'call-light',
+        group: 'Floor alerts'
       },
       {
         id: 'bed-alarm',
         label: 'Bed alarm — near fall',
-        kind: 'bed-alarm'
+        kind: 'bed-alarm',
+        group: 'Floor alerts'
       },
       {
         id: 'dynamic-urgent',
         label: 'Dynamic urgent (random)',
-        kind: 'dynamic-urgent'
-      }
+        kind: 'dynamic-urgent',
+        group: 'Floor alerts'
+      },
+      ...getChallengeTestSpawnIncidents()
     ]
   },
 

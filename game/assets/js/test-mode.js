@@ -5,13 +5,23 @@
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import { spawnCriticalLabNow } from './critical-labs.js';
-import { spawnFromTemplate, weightedPick } from './dynamic-tasks.js';
+import { presentSpawnedTask, spawnFromTemplate, weightedPick } from './dynamic-tasks.js';
 import { spawnCallLightNow, spawnBedAlarmNow } from './nurse-alerts.js';
+import {
+    buildTestChallengeTask,
+    isChallengeTestSpawnKind,
+    isCodeBlueTestSpawn
+} from './challenges/test-spawn.js';
 
 /** Lazy — avoids loading modal.js (window globals) during Node AUTO checks. */
 async function getModalModule() {
     const mod = await import('./modal.js');
     return mod.default;
+}
+
+/** Lazy — challenge-gate pulls modal/DOM; keep off Node AUTO import path. */
+async function getChallengeGate() {
+    return import('./challenge-gate.js');
 }
 
 let enabledFromJson = false;
@@ -52,17 +62,45 @@ function statusMessage(text) {
     if (el) el.textContent = text;
 }
 
+/** Prefer the open patient chart so Test spawns are visible/selectable immediately. */
+function resolveTestPatientId() {
+    const patients = gameState.getStateSlice('patients');
+    const activeId = gameState.getStateSlice('activePatientId');
+    if (activeId && patients?.has(activeId)) return activeId;
+    if (!patients || typeof patients.keys !== 'function') return null;
+    return [...patients.keys()][0] || null;
+}
+
+function patientLabel(patientId) {
+    if (!patientId) return '';
+    const p = gameState.getStateSlice('patients')?.get(patientId);
+    return p?.name || patientId;
+}
+
+function finishTestTaskSpawn(task, label) {
+    if (!task) return null;
+    const live = presentSpawnedTask(task, { focusPatient: true }) || task;
+    const who = patientLabel(live.patientId);
+    statusMessage(who ? `${label} — ${who}` : label);
+    return live;
+}
+
 function fireCriticalLab(labId) {
-    const task = spawnCriticalLabNow(labId ? { labId } : {});
+    const patientId = resolveTestPatientId();
+    const task = spawnCriticalLabNow({
+        labId: labId || undefined,
+        patientId,
+        focusPatient: true
+    });
     if (!task) {
         statusMessage('Test: could not spawn critical lab (no patients?)');
         return;
     }
     gameState.dispatch('APPEND_SHIFT_LOG', {
-        message: `TEST spawn: critical lab ${task.metadata?.labShort || labId || 'random'}`,
+        message: `TEST spawn: critical lab ${task.metadata?.labShort || labId || 'random'} — ${patientLabel(task.patientId)}`,
         timeLabel: formatHHMM(gameState.getStateSlice('currentTime'))
     });
-    statusMessage(`TEST: critical lab — ${task.name}`);
+    finishTestTaskSpawn(task, `TEST: critical lab — ${task.name}`);
 }
 
 function fireDynamicUrgent() {
@@ -76,45 +114,98 @@ function fireDynamicUrgent() {
         statusMessage('Test: no dynamic templates available');
         return;
     }
-    const task = spawnFromTemplate(template, now);
+    const task = spawnFromTemplate(template, now, {
+        patientId: resolveTestPatientId(),
+        focusPatient: true
+    });
     if (!task) {
         statusMessage('Test: dynamic spawn failed');
         return;
     }
     gameState.dispatch('APPEND_SHIFT_LOG', {
-        message: `TEST spawn: dynamic ${task.name}`,
+        message: `TEST spawn: dynamic ${task.name} — ${patientLabel(task.patientId)}`,
         timeLabel: formatHHMM(now)
     });
-    statusMessage(`TEST: ${task.name}`);
+    finishTestTaskSpawn(task, `TEST: ${task.name}`);
 }
 
 function fireCallLight() {
-    const task = spawnCallLightNow({ templateId: 'water' });
+    const task = spawnCallLightNow({
+        templateId: 'water',
+        patientId: resolveTestPatientId(),
+        focusPatient: true
+    });
     if (!task) {
         statusMessage('Test: call light spawn failed');
         return;
     }
     gameState.dispatch('APPEND_SHIFT_LOG', {
-        message: `TEST spawn: ${task.name}`,
+        message: `TEST spawn: ${task.name} — ${patientLabel(task.patientId)}`,
         timeLabel: formatHHMM(gameState.getStateSlice('currentTime'))
     });
-    statusMessage(`TEST: ${task.name}`);
+    finishTestTaskSpawn(task, `TEST: ${task.name}`);
 }
 
 function fireBedAlarm() {
-    const task = spawnBedAlarmNow();
+    const task = spawnBedAlarmNow({
+        patientId: resolveTestPatientId(),
+        focusPatient: true
+    });
     if (!task) {
         statusMessage('Test: bed alarm spawn failed');
         return;
     }
     gameState.dispatch('APPEND_SHIFT_LOG', {
-        message: `TEST spawn: ${task.name}`,
+        message: `TEST spawn: ${task.name} — ${patientLabel(task.patientId)}`,
         timeLabel: formatHHMM(gameState.getStateSlice('currentTime'))
     });
-    statusMessage(`TEST: ${task.name}`);
+    finishTestTaskSpawn(task, `TEST: ${task.name}`);
 }
 
-function onIncidentSelect(kind, detail) {
+async function fireCodeBlue() {
+    const patientId = resolveTestPatientId();
+    if (!patientId) {
+        statusMessage('Test: could not open Code Blue (no patients?)');
+        return;
+    }
+    const now = gameState.getStateSlice('currentTime') ?? GameConfig.timer.defaultShiftStart;
+    gameState.dispatch('SET_ACTIVE_PATIENT', { patientId });
+    gameState.dispatch('APPEND_SHIFT_LOG', {
+        message: `TEST spawn: Code Blue — ${patientLabel(patientId)}`,
+        timeLabel: formatHHMM(now)
+    });
+    statusMessage(`TEST: Code Blue — ${patientLabel(patientId)}`);
+    const { runCodeBlueChallenge } = await getChallengeGate();
+    await runCodeBlueChallenge({ patientId });
+}
+
+/** Open a Skills/Emergencies challenge from challenges/test-spawn.js */
+async function fireChallengeSpawn(kind) {
+    if (isCodeBlueTestSpawn(kind)) {
+        await fireCodeBlue();
+        return;
+    }
+    const patientId = resolveTestPatientId();
+    if (patientId) {
+        gameState.dispatch('SET_ACTIVE_PATIENT', { patientId });
+    }
+    const task = buildTestChallengeTask(kind, patientId);
+    if (!task) {
+        statusMessage(`Test: unknown challenge spawn “${kind}”`);
+        return;
+    }
+    const now = gameState.getStateSlice('currentTime') ?? GameConfig.timer.defaultShiftStart;
+    const who = patientId ? ` — ${patientLabel(patientId)}` : '';
+    gameState.dispatch('APPEND_SHIFT_LOG', {
+        message: `TEST spawn: ${task.name}${who}`,
+        timeLabel: formatHHMM(now)
+    });
+    statusMessage(`TEST: ${task.name}`);
+    const { runChallengeGate } = await getChallengeGate();
+    await runChallengeGate(task);
+}
+
+async function onIncidentSelect(kind, detail) {
     if (kind === 'critical-lab') {
         fireCriticalLab(detail?.labId || null);
         return;
@@ -129,39 +220,111 @@ function onIncidentSelect(kind, detail) {
     }
     if (kind === 'dynamic-urgent') {
         fireDynamicUrgent();
+        return;
     }
+    if (isChallengeTestSpawnKind(kind)) {
+        await fireChallengeSpawn(kind);
+    }
+}
+
+function itemButton(kind, label, attrs = '') {
+    return `
+      <button type="button" class="shell-test-mode__item" data-kind="${escapeHtml(kind)}"${attrs}>
+        ${escapeHtml(label)}
+      </button>`;
 }
 
 function buildModalBody() {
     const incidents = testCfg().incidents || [];
     const labs = GameConfig.criticalLabs?.labs || [];
-    const parts = [];
+    /** @type {Map<string, string[]>} */
+    const groups = new Map();
+
+    const bucket = (group) => {
+        const key = group || 'Other';
+        if (!groups.has(key)) groups.set(key, []);
+        return groups.get(key);
+    };
 
     incidents.forEach((inc) => {
+        const items = bucket(inc.group);
         if (inc.kind === 'critical-lab' && inc.expandLabs !== false) {
-            parts.push(`<p class="shell-test-mode__section">${escapeHtml(inc.label || 'Critical lab')}</p>`);
             labs.forEach((lab) => {
-                parts.push(`
-                  <button type="button" class="shell-test-mode__item" data-kind="critical-lab" data-lab-id="${escapeHtml(lab.id)}">
-                    ${escapeHtml(lab.shortName)} — ${escapeHtml(lab.result || lab.fullName || '')}
-                  </button>`);
+                items.push(itemButton(
+                    'critical-lab',
+                    `${lab.shortName} — ${lab.result || lab.fullName || ''}`,
+                    ` data-lab-id="${escapeHtml(lab.id)}"`
+                ));
             });
-            parts.push(`
-              <button type="button" class="shell-test-mode__item" data-kind="critical-lab" data-lab-id="">
-                Random critical lab
-              </button>`);
+            items.push(itemButton('critical-lab', 'Random critical lab', ' data-lab-id=""'));
             return;
         }
+        items.push(itemButton(inc.kind, inc.label || inc.id));
+    });
+
+    const parts = [];
+    let groupIndex = 0;
+    groups.forEach((items, group) => {
+        if (!items.length) return;
+        const panelId = `shell-test-mode-group-${groupIndex}`;
+        groupIndex += 1;
         parts.push(`
-          <button type="button" class="shell-test-mode__item" data-kind="${escapeHtml(inc.kind)}">
-            ${escapeHtml(inc.label || inc.id)}
-          </button>`);
+          <section class="shell-test-mode__group is-collapsed" data-group="${escapeHtml(group)}">
+            <button type="button" class="shell-test-mode__section"
+              aria-expanded="false" aria-controls="${panelId}">
+              <span class="shell-test-mode__section-label">${escapeHtml(group)}</span>
+              <span class="shell-test-mode__section-meta">${items.length}</span>
+              <span class="shell-test-mode__section-chevron" aria-hidden="true"></span>
+            </button>
+            <div id="${panelId}" class="shell-test-mode__group-items" hidden>
+              ${items.join('')}
+            </div>
+          </section>`);
     });
 
     if (!parts.length) {
         parts.push('<p class="shell-test-mode__empty">No test incidents configured.</p>');
     }
-    return parts.join('');
+
+    return `
+      <div class="shell-test-mode-modal__scroll" tabindex="0" role="region" aria-label="Spawnable incidents">
+        ${parts.join('')}
+      </div>
+      <p class="shell-test-mode__scroll-hint" hidden>More below ↓</p>`;
+}
+
+function bindGroupToggles(root) {
+    root?.querySelectorAll?.('.shell-test-mode__group').forEach((group) => {
+        const toggle = group.querySelector('.shell-test-mode__section');
+        const panel = group.querySelector('.shell-test-mode__group-items');
+        if (!toggle || !panel) return;
+        toggle.addEventListener('click', () => {
+            const collapsed = group.classList.toggle('is-collapsed');
+            panel.hidden = collapsed;
+            toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+            syncScrollHint(root);
+        });
+    });
+}
+
+function syncScrollHint(root) {
+    const scroller = root?.querySelector?.('.shell-test-mode-modal__scroll');
+    const hint = root?.querySelector?.('.shell-test-mode__scroll-hint');
+    if (!scroller || !hint) return;
+    const overflow = scroller.scrollHeight > scroller.clientHeight + 2;
+    const atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 6;
+    root.classList.toggle('is-scrollable', overflow);
+    root.classList.toggle('is-at-bottom', !overflow || atBottom);
+    hint.hidden = !overflow || atBottom;
+}
+
+function bindScrollHint(root) {
+    const scroller = root?.querySelector?.('.shell-test-mode-modal__scroll');
+    if (!scroller) return;
+    const update = () => syncScrollHint(root);
+    scroller.addEventListener('scroll', update, { passive: true });
+    update();
+    requestAnimationFrame(update);
 }
 
 function escapeHtml(str) {
@@ -179,8 +342,9 @@ function bindModalItems(ModalModule) {
         item.addEventListener('click', () => {
             const kind = item.getAttribute('data-kind');
             const labId = item.getAttribute('data-lab-id');
-            onIncidentSelect(kind, labId != null && labId !== '' ? { labId } : {});
+            // Close spawn menu first so skill/emergency challenge modals are not dismissed.
             ModalModule.closeModal();
+            onIncidentSelect(kind, labId != null && labId !== '' ? { labId } : {});
         });
     });
 }
@@ -194,7 +358,10 @@ async function openTestModeModal() {
         overlay: true,
         persistent: false
     });
+    const root = document.querySelector(`${GameConfig.selectors.modalContent} .shell-test-mode-modal`);
     bindModalItems(ModalModule);
+    bindGroupToggles(root);
+    bindScrollHint(root);
 }
 
 function mountTestControl() {

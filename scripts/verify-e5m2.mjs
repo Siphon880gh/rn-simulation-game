@@ -16,9 +16,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const failures = [];
 const assert = (cond, msg) => { if (!cond) failures.push(msg); };
 
-assert(existsSync(join(root, 'game/assets/js/med-identity-quiz.js')), 'med-identity-quiz.js');
-const gateSrc = readFileSync(join(root, 'game/assets/js/challenge-gate.js'), 'utf8');
-assert(gateSrc.includes('med-identity-quiz'), 'gate imports quiz');
+assert(existsSync(join(root, 'game/assets/js/challenges/skills/med-identity/config.js')), 'med-identity config');
+assert(existsSync(join(root, 'game/assets/js/challenges/skills/med-identity/challenge.js')), 'med-identity challenge');
+const gateSrc = readFileSync(join(root, 'game/assets/js/challenges/challenge-gate.js'), 'utf8');
+assert(gateSrc.includes('skills/med-identity/challenge'), 'gate imports quiz');
 assert(gateSrc.includes('buildMedIdentityPrompt'), 'gate uses prompt builder');
 assert(gateSrc.includes('challengeGateSubmit'), 'submit wired');
 assert(gateSrc.includes('challengeGateCheat'), 'cheat wired');

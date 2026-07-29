@@ -20,14 +20,14 @@ const failures = [];
 const assert = (cond, msg) => { if (!cond) failures.push(msg); };
 
 assert(existsSync(join(root, 'game/assets/js/iv-system.js')), 'iv-system.js');
-assert(existsSync(join(root, 'game/assets/js/iv-challenge.js')), 'iv-challenge.js');
+assert(existsSync(join(root, 'game/assets/js/challenges/skills/iv-check/challenge.js')), 'iv-check challenge');
 assert(GameConfig.tasks.types.IV, 'IV task type');
 assert(GameConfig.iv.heparinPttIntervalMins === 360, '6h PTT interval');
 assert(Array.isArray(GameConfig.iv.titrationIncidents), 'titration incidents');
 
-const gateSrc = readFileSync(join(root, 'game/assets/js/challenge-gate.js'), 'utf8');
+const gateSrc = readFileSync(join(root, 'game/assets/js/challenges/challenge-gate.js'), 'utf8');
 const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
-assert(gateSrc.includes('iv-challenge'), 'gate imports iv challenge');
+assert(gateSrc.includes('skills/iv-check/challenge'), 'gate imports iv challenge');
 assert(gateSrc.includes('buildIvPrompt'), 'gate builds IV prompt');
 assert(appSrc.includes('IvSystemModule') || appSrc.includes('iv-system'), 'app wires IV');
 assert(appSrc.includes('performIvTask'), 'performIvTask');

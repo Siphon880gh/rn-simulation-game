@@ -26,9 +26,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const failures = [];
 const assert = (cond, msg) => { if (!cond) failures.push(msg); };
 
-assert(existsSync(join(root, 'game/assets/js/accucheck-challenge.js')), 'accucheck-challenge.js');
-const gateSrc = readFileSync(join(root, 'game/assets/js/challenge-gate.js'), 'utf8');
-assert(gateSrc.includes('accucheck-challenge'), 'gate imports accucheck');
+assert(existsSync(join(root, 'game/assets/js/challenges/skills/accucheck/challenge.js')), 'accucheck challenge');
+const gateSrc = readFileSync(join(root, 'game/assets/js/challenges/challenge-gate.js'), 'utf8');
+assert(gateSrc.includes('skills/accucheck/challenge'), 'gate imports accucheck');
 assert(gateSrc.includes('challengeGateCheat'), 'cheat wired');
 assert(gateSrc.includes('cheatChallenge'), 'unified cheatChallenge');
 assert(gateSrc.includes('challengeModalFooter'), 'shared cheat footer');

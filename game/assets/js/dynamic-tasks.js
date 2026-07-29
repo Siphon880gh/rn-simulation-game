@@ -5,6 +5,7 @@
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
+import { isAtOrAfterInShift } from './availability-windows.js';
 
 const spawnedCadenceKeys = new Set();
 let spawnCount = 0;
@@ -47,12 +48,83 @@ export function weightedPick(templates, random = Math.random) {
     return list[list.length - 1];
 }
 
-function pickPatientId(scope, random = Math.random) {
+function pickPatientId(scope, random = Math.random, preferredId = null) {
     const patients = gameState.getStateSlice('patients');
     if (!patients || !patients.size) return null;
+    if (preferredId && patients.has(preferredId)) return preferredId;
     const ids = [...patients.keys()];
     if (scope && scope !== 'random' && patients.has(scope)) return scope;
     return ids[Math.floor(random() * ids.length)] || null;
+}
+
+function injectRevealForTask(task) {
+    const styleEl = document.querySelector(GameConfig.selectors.revealScheduledTasks);
+    if (!styleEl || task?.scheduled == null) return;
+    const sched = String(task.scheduled).padStart(4, '0');
+    const marker = `li[data-scheduled="${sched}"]`;
+    if (styleEl.textContent.includes(marker)) return;
+    styleEl.innerHTML += taskSystem.buildRevealRule(
+        task.scheduled,
+        task.expire,
+        task.metadata?.expireRaw || null
+    );
+}
+
+function syncSpawnedTaskDom(task) {
+    const el = document.getElementById(task.id);
+    if (!el) return;
+    el.setAttribute('data-status', task.status);
+    el.classList.remove(
+        'task-status-not-yet',
+        'task-status-active',
+        'task-status-completed',
+        'task-status-overdue'
+    );
+    el.classList.add(`task-status-${task.status}`);
+    taskSystem.syncTaskWindowDomAttrs(el, task);
+}
+
+/**
+ * Ensure a just-spawned task is active, mounted, revealed, and (optionally) focused.
+ * Used by nurse alerts / dynamic / critical labs / test mode.
+ */
+export function presentSpawnedTask(task, opts = {}) {
+    if (!task?.id) return null;
+    const now = opts.at
+        ?? gameState.getStateSlice('currentTime')
+        ?? task.scheduled
+        ?? GameConfig.timer.defaultShiftStart;
+
+    if (task.status === GameConfig.tasks.statuses.NOT_YET) {
+        taskSystem.processTasks(now);
+    }
+    let live = gameState.getStateSlice('tasks')?.get(task.id) || task;
+
+    if (
+        live.status === GameConfig.tasks.statuses.NOT_YET
+        && isAtOrAfterInShift(now, live.scheduled)
+    ) {
+        gameState.dispatch('ACTIVATE_TASK', { taskId: live.id });
+        live = gameState.getStateSlice('tasks')?.get(live.id) || live;
+    }
+
+    mountTaskDom(live);
+    syncSpawnedTaskDom(live);
+    injectRevealForTask(live);
+    if (live.metadata?.incident) renderIncidentTab(live);
+
+    if (opts.focusPatient && live.patientId) {
+        gameState.dispatch('SET_ACTIVE_PATIENT', { patientId: live.patientId });
+    }
+    if (opts.scrollIntoView !== false) {
+        requestAnimationFrame(() => {
+            document.getElementById(live.id)?.scrollIntoView({
+                block: 'nearest',
+                behavior: 'smooth'
+            });
+        });
+    }
+    return live;
 }
 
 function countActiveDynamic() {
@@ -179,7 +251,11 @@ export function mountTaskDom(task) {
 
 export function spawnFromTemplate(template, currentTime, opts = {}) {
     const random = opts.random || Math.random;
-    const patientId = pickPatientId(template.patientScope || 'random', random);
+    const patientId = pickPatientId(
+        template.patientScope || 'random',
+        random,
+        opts.patientId || null
+    );
     if (!patientId && template.patientScope !== 'unit') return null;
 
     const id = `dyn-${template.id || 'task'}-${Date.now()}-${Math.floor(random() * 1e4)}`;
@@ -199,10 +275,11 @@ export function spawnFromTemplate(template, currentTime, opts = {}) {
         }
     });
 
-    taskSystem.processTasks(currentTime);
-    const live = gameState.getStateSlice('tasks').get(task.id) || task;
-    mountTaskDom(live);
-    renderIncidentTab(live);
+    const live = presentSpawnedTask(task, {
+        at: currentTime,
+        focusPatient: opts.focusPatient === true,
+        scrollIntoView: opts.scrollIntoView
+    }) || task;
 
     gameState.dispatch('APPEND_SHIFT_LOG', {
         message: `Dynamic urgent: ${live.name}${patientId ? ` (${patientId})` : ''}`,
@@ -275,6 +352,7 @@ const DynamicTasksModule = {
     processDynamicTasksTime,
     spawnFromTemplate,
     mountTaskDom,
+    presentSpawnedTask,
     weightedPick,
     resetDynamicTasks,
     init(config = {}) {

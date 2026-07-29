@@ -5,7 +5,7 @@
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
-import { mountTaskDom, weightedPick } from './dynamic-tasks.js';
+import { presentSpawnedTask, weightedPick } from './dynamic-tasks.js';
 import { playAlarm } from './sound.js';
 
 const spawnedBuckets = {
@@ -61,7 +61,9 @@ function statusMessage(text) {
 export function spawnNurseAlert(channel, template, currentTime, opts = {}) {
     if (!template) return null;
     const random = opts.random || Math.random;
-    const patientId = pickPatientId(random);
+    const patientId = (opts.patientId && gameState.getStateSlice('patients')?.has(opts.patientId))
+        ? opts.patientId
+        : pickPatientId(random);
     if (!patientId) return null;
 
     const id = `alert-${channel}-${template.id || 'x'}-${Date.now()}-${Math.floor(random() * 1e4)}`;
@@ -85,9 +87,11 @@ export function spawnNurseAlert(channel, template, currentTime, opts = {}) {
         }
     });
 
-    taskSystem.processTasks(currentTime);
-    const live = gameState.getStateSlice('tasks')?.get(task.id) || task;
-    mountTaskDom(live);
+    const live = presentSpawnedTask(task, {
+        at: currentTime,
+        focusPatient: opts.focusPatient === true,
+        scrollIntoView: opts.scrollIntoView
+    }) || task;
 
     if (!opts.silent) {
         playAlarm(alarm);

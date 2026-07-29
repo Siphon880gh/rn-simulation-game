@@ -17,7 +17,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const failures = [];
 const assert = (cond, msg) => { if (!cond) failures.push(msg); };
 
-assert(existsSync(join(root, 'game/assets/js/code-blue-challenge.js')), 'code-blue-challenge.js');
+assert(existsSync(join(root, 'game/assets/js/challenges/emergencies/code-blue/config.js')), 'code-blue config path');
+assert(existsSync(join(root, 'game/assets/js/challenges/emergencies/code-blue/challenge.js')), 'code-blue challenge.js');
 assert(Array.isArray(GameConfig.codeBlueChallenge?.steps), 'config steps');
 assert(Array.isArray(GameConfig.codeBlueChallenge?.questions), 'config questions');
 const questions = getCodeBlueQuestions();
@@ -44,11 +45,11 @@ if (questions.length > 1) {
   assert(a.id !== b.id || questions.filter((q) => q.id !== a.id).length === 0, 'exclude prefers different id');
 }
 
-const src = readFileSync(join(root, 'game/assets/js/code-blue-challenge.js'), 'utf8');
+const src = readFileSync(join(root, 'game/assets/js/challenges/emergencies/code-blue/challenge.js'), 'utf8');
 assert(src.includes('codeBlueRandom'), 'Random handler');
 assert(src.includes('pickCodeBlueQuestion'), 'picker export');
 
-const gateSrc = readFileSync(join(root, 'game/assets/js/challenge-gate.js'), 'utf8');
+const gateSrc = readFileSync(join(root, 'game/assets/js/challenges/challenge-gate.js'), 'utf8');
 const dripSrc = readFileSync(join(root, 'game/assets/js/event-drip.js'), 'utf8');
 const stateSrc = readFileSync(join(root, 'game/assets/js/game-state.js'), 'utf8');
 assert(gateSrc.includes('runCodeBlueChallenge'), 'gate exports Code Blue runner');

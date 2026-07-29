@@ -30,7 +30,7 @@ Content-authored **required** items (example set):
 | Clean gown |
 | Lifting sheet |
 
-Exact item names and distractors are pack/content data in `GameConfig.bedPrepChallenge`.
+Exact item names and distractors are pack/content data in `challenges/skills/bed-prep/config.js` (re-exported as `GameConfig.bedPrepChallenge`).
 
 **Win condition:** selected set equals the required set (order ignored). Extra distractors selected → fail. Missing required items → fail.
 
@@ -59,7 +59,7 @@ Timer pause during the challenge follows the shared E5.M1 perform-challenge cont
 
 ## Related: IVPB hang sequence
 
-IVPB meds (`data-challenge="ivpb"` or name contains IVPB) use the **ordered sequence** flash/build pattern in `ivpb-hang-challenge.js` (spike → secondary → above Y-site → backprime → drip check → troubleshoot). That is a separate challenge from bed prep.
+IVPB meds (`data-challenge="ivpb"` or name contains IVPB) use the **ordered sequence** flash/build pattern in `challenges/skills/ivpb-hang/` (config + challenge; spike → secondary → above Y-site → backprime → drip check → troubleshoot). That is a separate skill from bed prep.
 
 ---
 
