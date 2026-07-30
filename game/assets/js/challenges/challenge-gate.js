@@ -47,6 +47,14 @@ import {
     buildAdmissionQuiz,
     renderAdmissionQuizHtml
 } from './skills/admission/challenge.js';
+import {
+    buildIcpQuiz,
+    renderIcpQuizHtml
+} from './skills/icp/challenge.js';
+import {
+    buildSkillMcqQuiz,
+    renderSkillMcqHtml
+} from './skills/skill-mcq/challenge.js';
 import { applySituationStill, clearSituationStill } from '../scene-backdrop.js';
 import { recordChallengeOutcome } from '../scoring.js';
 import { applyIvChallengeResult, syncIvTaskMetadata } from '../iv-system.js';
@@ -144,12 +152,7 @@ function finishCodeBlue(passed, reason, expected, patientId) {
     };
 
     if (passed) {
-        setChallengeFeedback(challengePassedFeedback(), { ok: true });
-        activeSession.closing = true;
-        document.querySelectorAll('#modal-footer button').forEach((btn) => {
-            btn.disabled = true;
-        });
-        setTimeout(settle, 900);
+        showPassedAcknowledge(settle);
         return;
     }
 
@@ -218,8 +221,57 @@ function challengePauseBanner() {
         || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list';
 }
 
-function challengePassedFeedback() {
-    return GameConfig.challengeCopy?.passedFeedback || 'You passed. Task being completed.';
+function challengeCorrectFeedback() {
+    return GameConfig.challengeCopy?.correctFeedback
+        || GameConfig.challengeCopy?.passedFeedback
+        || "You're correct.";
+}
+
+function challengeContinueLabel() {
+    return GameConfig.challengeCopy?.continueLabel || 'Continue';
+}
+
+/** Lock quiz controls so the player must click Continue after a correct answer. */
+function lockChallengeControls() {
+    const content = document.querySelector(GameConfig.selectors.modalContent || '#modal-content');
+    content?.querySelectorAll('button, input, select, textarea').forEach((el) => {
+        el.disabled = true;
+    });
+}
+
+/**
+ * Show “You're correct.” and swap the footer to a Continue control.
+ * Session stays open until the player clicks Continue.
+ */
+function showPassedAcknowledge(onContinue) {
+    if (!activeSession) {
+        onContinue?.();
+        return;
+    }
+    activeSession.closing = true;
+    activeSession.pendingPassContinue = onContinue;
+    setChallengeFeedback(challengeCorrectFeedback(), { ok: true });
+    lockChallengeControls();
+
+    const footer = document.querySelector(GameConfig.selectors.modalFooter || '#modal-footer');
+    if (!footer) {
+        onContinue?.();
+        return;
+    }
+    const label = challengeContinueLabel();
+    footer.innerHTML = `
+      <button type="button" id="challenge-continue-btn"
+        class="px-4 py-2 rounded-lg font-medium bg-emerald-600 text-white hover:bg-emerald-700"
+        onclick="window.challengeGateContinue && window.challengeGateContinue()">${label}</button>
+    `;
+    document.querySelector('#challenge-continue-btn')?.focus();
+}
+
+function continueAfterPassed() {
+    if (!activeSession?.pendingPassContinue) return;
+    const fn = activeSession.pendingPassContinue;
+    activeSession.pendingPassContinue = null;
+    fn();
 }
 
 function buildSafetyContent(task) {
@@ -283,7 +335,6 @@ function finishAttempt(passed, reason, expected, opts = {}) {
 
     if (passed) {
         recordChallengeOutcome({ passed: true, reason, expected });
-        setChallengeFeedback(challengePassedFeedback(), { ok: true });
         gameState.dispatch('APPEND_SHIFT_LOG', {
             message: activeSession?.admissionQuiz || activeSession?.bedPrep
                 ? `Challenge passed: ${activeSession?.taskName || 'task'}`
@@ -294,18 +345,12 @@ function finishAttempt(passed, reason, expected, opts = {}) {
         if (statusEl && !activeSession?.bedPrep && !activeSession?.codeBluePatientId && !activeSession?.admissionQuiz) {
             statusEl.textContent = `Performing ${activeSession?.taskName || 'task'} in a slot`;
         }
-        activeSession.closing = true;
-        document.querySelectorAll('#modal-footer button').forEach((btn) => {
-            btn.disabled = true;
-        });
-        const input = document.querySelector('#med-identity-answer, #accucheck-answer, #iv-answer');
-        if (input) input.disabled = true;
         if (activeSession?.ivPrompt && activeSession?.ivTask) {
             applyIvChallengeResult(activeSession.ivTask, activeSession.ivPrompt);
         }
-        setTimeout(() => {
+        showPassedAcknowledge(() => {
             endSession({ passed: true, reason });
-        }, 900);
+        });
         return;
     }
 
@@ -527,10 +572,14 @@ export function runChallengeGate(task) {
         const liveTask = isIvTask(task) ? syncIvTaskMetadata(task) : task;
         const bedPrep = isBedPrepTask(liveTask);
         const ivpbHang = !bedPrep && isIvpbTask(liveTask);
-        const admissionQuiz = !bedPrep && !ivpbHang ? buildAdmissionQuiz(liveTask) : null;
-        const useIv = !bedPrep && !ivpbHang && !admissionQuiz && isIvTask(liveTask);
+        const icpQuiz = !bedPrep && !ivpbHang ? buildIcpQuiz(liveTask) : null;
+        const skillMcq = !bedPrep && !ivpbHang && !icpQuiz ? buildSkillMcqQuiz(liveTask) : null;
+        const admissionQuiz = !bedPrep && !ivpbHang && !icpQuiz && !skillMcq
+            ? buildAdmissionQuiz(liveTask)
+            : null;
+        const useIv = !bedPrep && !ivpbHang && !icpQuiz && !skillMcq && !admissionQuiz && isIvTask(liveTask);
         const ivPrompt = useIv ? buildIvPrompt(liveTask) : null;
-        const isMed = !bedPrep && !ivpbHang && !admissionQuiz && !useIv
+        const isMed = !bedPrep && !ivpbHang && !icpQuiz && !skillMcq && !admissionQuiz && !useIv
             && (!liveTask?.type || String(liveTask.type).toLowerCase() === 'med');
         const useAccucheck = isMed && isAccucheckTask(liveTask);
         const accucheckPrompt = useAccucheck ? buildAccucheckPrompt(liveTask) : null;
@@ -547,8 +596,11 @@ export function runChallengeGate(task) {
             ivTask: useIv ? liveTask : null,
             bedPrep,
             ivpbHang,
+            icpQuiz: Boolean(icpQuiz),
+            skillMcq: Boolean(skillMcq),
             admissionQuiz: Boolean(admissionQuiz),
-            safety: !bedPrep && !ivpbHang && !admissionQuiz && !useIv && !accucheckPrompt && !useMedQuiz
+            safety: !bedPrep && !ivpbHang && !icpQuiz && !skillMcq && !admissionQuiz
+                && !useIv && !accucheckPrompt && !useMedQuiz
         };
 
         gameState.dispatch('SET_PAUSE', { paused: true, source: CHALLENGE });
@@ -593,6 +645,24 @@ export function runChallengeGate(task) {
                     }
                 });
             }, 0);
+        } else if (icpQuiz) {
+            ModalModule.openModal({
+                title: icpQuiz.title || 'ICP monitoring',
+                content: renderIcpQuizHtml(icpQuiz, liveTask?.name),
+                footer: challengeModalFooter({ showSubmit: false }),
+                overlay: true,
+                persistent: false
+            });
+            setTimeout(wireSafetyHandlers, 0);
+        } else if (skillMcq) {
+            ModalModule.openModal({
+                title: skillMcq.title || 'Skill practice',
+                content: renderSkillMcqHtml(skillMcq, liveTask?.name),
+                footer: challengeModalFooter({ showSubmit: false }),
+                overlay: true,
+                persistent: false
+            });
+            setTimeout(wireSafetyHandlers, 0);
         } else if (admissionQuiz) {
             ModalModule.openModal({
                 title: admissionQuiz.title || 'Admission challenge',
@@ -684,6 +754,7 @@ const ChallengeGateModule = {
         window.challengeGateCancel = () => cancelChallengeGate();
         window.challengeGateSubmit = () => submitChallengeAnswer();
         window.challengeGateCheat = () => cheatChallenge();
+        window.challengeGateContinue = () => continueAfterPassed();
         gameState.subscribe('codeBlueHook', (hook, prev) => {
             if (!hook?.patientId || hook.resolved) return;
             if (prev?.patientId === hook.patientId && prev?.at === hook.at && !prev?.resolved) {

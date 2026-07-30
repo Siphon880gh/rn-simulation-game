@@ -1,0 +1,34 @@
+{
+  "id": "skill-blood-transfusion-medsurg",
+  "title": "Skill practice — Blood transfusion (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Complete two-nurse blood product verification",
+    "Stop the transfusion first if a reaction is suspected"
+  ],
+  "patients": ["hana"],
+  "patientOverrides": {
+    "hana": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "PRBC transfusion ordered"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

@@ -42,8 +42,8 @@
         }
     }
 
-    function navigateWithCensus(mode) {
-        if (!pendingHref) return;
+    function hrefWithCensus(mode) {
+        if (!pendingHref) return '';
         try {
             const url = new URL(pendingHref, window.location.href);
             if (!mode || mode === 'full') {
@@ -51,15 +51,19 @@
             } else {
                 url.searchParams.set('census', mode);
             }
-            window.location.href = url.pathname + url.search + url.hash;
+            return url.pathname + url.search + url.hash;
         } catch {
-            if (!mode || mode === 'full') {
-                window.location.href = pendingHref;
-                return;
-            }
+            if (!mode || mode === 'full') return pendingHref;
             const join = pendingHref.includes('?') ? '&' : '?';
-            window.location.href = `${pendingHref}${join}census=${encodeURIComponent(mode)}`;
+            return `${pendingHref}${join}census=${encodeURIComponent(mode)}`;
         }
+    }
+
+    function navigateWithCensus(mode) {
+        const href = hrefWithCensus(mode);
+        if (!href) return;
+        closeChoice();
+        window.location.href = href;
     }
 
     document.querySelectorAll('.unit-tile[data-href]').forEach((tile) => {

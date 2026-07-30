@@ -5,6 +5,7 @@
  */
 import { CHALLENGE_REGISTRY, TEST_SPAWN_GROUPS } from './registry.js';
 import { medIdentityPairs } from './skills/med-identity/config.js';
+import { skillMcqBanks } from './skills/skill-mcq/config.js';
 
 /** Extra skill spawns beyond one-entry-per-registry-id (IV variants, admission MCQs). */
 const EXTRA_SKILL_SPAWNS = [
@@ -118,8 +119,9 @@ export function isCodeBlueTestSpawn(kind) {
  * Stub task for runChallengeGate. Returns null for Code Blue (use runCodeBlueChallenge).
  * @param {string} kind
  * @param {string|null} patientId
+ * @param {{ skillId?: string, skillLabel?: string }} [opts]
  */
-export function buildTestChallengeTask(kind, patientId = null) {
+export function buildTestChallengeTask(kind, patientId = null, opts = {}) {
   if (!kind || kind === 'code-blue') return null;
 
   const base = {
@@ -212,6 +214,26 @@ export function buildTestChallengeTask(kind, patientId = null) {
       return admissionTask(base, 'fluShot', 'Offer flu shot (test)');
     case 'admission-call-admitting':
       return admissionTask(base, 'callAdmitting', 'Call admitting for orders (test)');
+    case 'icp':
+      return {
+        ...base,
+        name: 'ICP monitoring (skill focus)',
+        type: 'assessment',
+        metadata: { challenge: 'icp' }
+      };
+    case 'skill-mcq': {
+      const bankIds = Object.keys(skillMcqBanks);
+      const skillId = opts.skillId && skillMcqBanks[opts.skillId]
+        ? opts.skillId
+        : bankIds[0] || 'seizure-precautions';
+      const title = opts.skillLabel || skillMcqBanks[skillId]?.title || skillId;
+      return {
+        ...base,
+        name: `${title} (skill focus)`,
+        type: 'assessment',
+        metadata: { challenge: 'skill-mcq', skillId }
+      };
+    }
     default:
       return null;
   }

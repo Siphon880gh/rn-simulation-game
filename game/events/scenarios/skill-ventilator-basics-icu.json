@@ -1,0 +1,34 @@
+{
+  "id": "skill-ventilator-basics-icu",
+  "title": "Skill practice — Ventilator basics (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Respond to common ventilator alarms at the bedside",
+    "Assess patient–ventilator interaction before silencing alarms"
+  ],
+  "patients": ["samir"],
+  "patientOverrides": {
+    "samir": {
+      "clinicalStatus": "worsening",
+      "acuityScore": 3,
+      "clinicalStatusReason": "ARDS on mechanical ventilation"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

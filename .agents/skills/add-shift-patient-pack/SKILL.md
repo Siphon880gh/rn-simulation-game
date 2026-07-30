@@ -4,8 +4,8 @@ description: >-
   Interviews for day vs night shift and unit (ICU, Med-Surg, Tele), then authors
   a condition-aware patient assignment pack for that shift. Use when adding
   patients to a shift, creating/updating scenario packs, building census
-  assignments, or when the user mentions day shift, night shift, unit pack,
-  or patient assignments.
+  assignments, skill-driven patients for ensure-skill-patients, or when the
+  user mentions day shift, night shift, unit pack, or patient assignments.
 ---
 
 # Add shift patient pack
@@ -17,20 +17,35 @@ Author **fictional** patient assignment packs where **each patient's conditions 
 - User wants to add patients to a day or night shift
 - User wants a new or expanded pack for ICU / Med-Surg / Tele
 - User asks for patient assignments keyed to diagnoses / mobility / acuity
+- **Skill-driven:** [`ensure-skill-patients`](../ensure-skill-patients/SKILL.md) needs a patient who requires a library skill
 
 ## Hard rules
 
-1. **Ask before inventing** — if shift and/or unit are missing, stop and ask (see Interview).
+1. **Ask before inventing** — if shift and/or unit are missing, stop and ask (see Interview). **Exception:** skill-driven mode when `skillId` + `unit` are already locked by ensure-skill-patients.
 2. **Condition → tasks** — every patient must have tasks justified by diagnosis, mobility, acuity, or unit norms. Do not clone the same med list onto every patient.
 3. **Fictional only** — names, orders, events are educational fiction; keep disclaimer language.
 4. **Declarative content** — prefer `game/events/patients/*.html` + `game/events/scenarios/*.json` + `patients.js` config; do not reintroduce liveQuery task loops.
 5. **Read maps first** — `AGENTS_CODE_REFERENCE-patients.md`, `AGENTS_CODE_REFERENCE-tasks.md`, then [reference.md](reference.md).
 
+## Skill-driven mode (ensure-skill-patients)
+
+When the caller provides `mode: skill-driven` with `skillId` + `unit` (+ optional `shift`, `games[]`):
+
+1. **Skip Interview** for unit/shift if both are present (`shift` defaults to night).
+2. Prefer pack file `game/events/scenarios/skill-<skillId>-<unit>.json` (create) unless the user asked to extend a shipped unit pack.
+3. Author **at least one new patient** whose diagnosis requires that skill:
+   - Set `patientConfigs.<id>.skills = ['<skillId>', …]`
+   - Include tasks / `data-challenge` aligned with the skill’s `games[]` (see ensure-skill-patients [reference.md](../ensure-skill-patients/reference.md))
+4. Census may be smaller than unit default N (skill practice pack); still keep condition→task honesty for every id in the pack.
+5. After M5, leave library `patients` / `unitHint` / `pack` updates to ensure-skill-patients (or set them in the same tick if that skill is driving the loop).
+
+Track in `progress.json` with `"mode": "skill-driven"` and `"skillId": "<id>"`.
+
 ---
 
 ## Interview (required gate)
 
-If the user has **not** already stated both answers, ask clearly (one short message):
+If **not** in skill-driven mode and the user has **not** already stated both answers, ask clearly (one short message):
 
 1. **Shift:** day or night?
 2. **Unit:** ICU, Med-Surg, or Telemetry?
@@ -117,7 +132,7 @@ Per patient:
 
 1. `game/events/patients/<id>.html` — demographics, vitals, meds/tasks with `data-task-type`, `data-scheduled`, `data-expire`, `data-duration-mins`.
 2. Optional `game/events/patients/<id>-past-hx.json`.
-3. `patientConfigs` entry in `game/assets/js/patients.js` (id, diagnosis, htmlFile, pastHxFile, careSchedules/careReason when indicated).
+3. `patientConfigs` entry in `game/assets/js/patients.js` (id, diagnosis, htmlFile, pastHxFile, careSchedules/careReason when indicated; **`skills: ['…']` when skill-driven**).
 4. Align med times to **shift start** (day vs night)—do not leave night-only `1900` windows on a day pack without retiming.
 
 ### M3 — Scenario pack
@@ -170,4 +185,5 @@ HUMAN_REQUIRED only for subjective clinical teaching tone.
 
 - [reference.md](reference.md) — schemas, census defaults, file paths
 - [milestones.md](milestones.md) — detailed milestone checklist
+- [ensure-skill-patients](../ensure-skill-patients/SKILL.md) — loop skill ↔ patient coverage
 - Repo maps: `AGENTS_CODE_REFERENCE-patients.md`, `AGENTS_CODE_REFERENCE-tasks.md`

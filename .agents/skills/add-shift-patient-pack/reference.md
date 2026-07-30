@@ -90,6 +90,14 @@ careReason: 'BMI 38; cannot self-reposition'
 
 Config lives in `GameConfig.careSchedules.turnQ2h` (120 min interval from shift start).
 
+### Skill association (skill-driven packs)
+
+```js
+skills: ['icp', 'neuro-checks'], // library skill ids this patient requires
+```
+
+Used by `ensure-skill-patients` audit + `skill-focus.js` to focus the matching census patient. Pack naming: `skill-<skillId>-<unit>.json` (see [ensure-skill-patients/reference.md](../ensure-skill-patients/reference.md)).
+
 ## Condition → task cheat sheet
 
 | Signal in chart | Prefer |

@@ -16,42 +16,66 @@
         <header class="landing-brand">
             <p class="landing-kicker">Clinical training practice</p>
             <h1 class="landing-title">RN Simulation</h1>
-            <p class="landing-lede">Choose your unit assignment, then run a compressed shift.</p>
+            <p class="landing-lede">Choose a unit for a full shift, or pick one skill to practice — the sim assigns a game.</p>
             <p class="landing-disclaimer">
                 Names and scenarios are fictional. Educational training use only —
                 not a substitute for supervised clinical practice.
             </p>
         </header>
 
-        <section class="landing-choices" aria-label="Department assignments">
-            <button type="button"
-               class="unit-tile unit-tile--tele"
-               data-href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/tele-4.json"
-               data-census-full="4">
-                <span class="unit-tile__dept">Telemetry</span>
-                <span class="unit-tile__census">4 patients</span>
-                <span class="unit-tile__blurb">Rhythm watch and bedside alarms with a mid-size census.</span>
-                <span class="unit-tile__cta">Start Tele</span>
-            </button>
+        <section class="landing-path landing-path--units" aria-labelledby="landing-units-title">
+            <div class="landing-path__intro">
+                <h2 id="landing-units-title" class="landing-path__title">Unit assignment</h2>
+                <p class="landing-path__lede">Run a full shift on a specific unit — pick Tele, Med-Surg, or ICU, then set your census.</p>
+            </div>
+            <div class="landing-choices" aria-label="Department assignments">
+                <button type="button"
+                   class="unit-tile unit-tile--tele"
+                   data-href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/tele-4.json"
+                   data-census-full="4">
+                    <span class="unit-tile__dept">Telemetry</span>
+                    <span class="unit-tile__census">4 patients</span>
+                    <span class="unit-tile__blurb">Rhythm watch and bedside alarms with a mid-size census.</span>
+                    <span class="unit-tile__cta">Start Tele</span>
+                </button>
 
-            <button type="button"
-               class="unit-tile unit-tile--medsurg"
-               data-href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/medsurg-5.json"
-               data-census-full="5">
-                <span class="unit-tile__dept">Med-Surg</span>
-                <span class="unit-tile__census">5 patients</span>
-                <span class="unit-tile__blurb">Floor workload — meds, assessments, and slot pressure.</span>
-                <span class="unit-tile__cta">Start Med-Surg</span>
-            </button>
+                <button type="button"
+                   class="unit-tile unit-tile--medsurg"
+                   data-href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/medsurg-5.json"
+                   data-census-full="5">
+                    <span class="unit-tile__dept">Med-Surg</span>
+                    <span class="unit-tile__census">5 patients</span>
+                    <span class="unit-tile__blurb">Floor workload — meds, assessments, and slot pressure.</span>
+                    <span class="unit-tile__cta">Start Med-Surg</span>
+                </button>
 
+                <button type="button"
+                   class="unit-tile unit-tile--icu"
+                   data-href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/icu-2.json"
+                   data-census-full="2">
+                    <span class="unit-tile__dept">ICU</span>
+                    <span class="unit-tile__census">2 patients · higher acuity</span>
+                    <span class="unit-tile__blurb">Smaller census, sicker starts — protect critical windows.</span>
+                    <span class="unit-tile__cta">Start ICU</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="landing-path landing-path--skills" aria-labelledby="landing-skills-title">
+            <div class="landing-path__intro">
+                <h2 id="landing-skills-title" class="landing-path__title">Skill practice</h2>
+                <p class="landing-path__lede">Skip the full unit assignment and drill one skill from the library.</p>
+            </div>
             <button type="button"
-               class="unit-tile unit-tile--icu"
-               data-href="game/index.html?speed-factor=48&amp;scenario=events/scenarios/icu-2.json"
-               data-census-full="2">
-                <span class="unit-tile__dept">ICU</span>
-                <span class="unit-tile__census">2 patients · higher acuity</span>
-                <span class="unit-tile__blurb">Smaller census, sicker starts — protect critical windows.</span>
-                <span class="unit-tile__cta">Start ICU</span>
+               class="skills-panel"
+               id="landing-skill-open"
+               aria-haspopup="dialog"
+               aria-controls="skill-choice-dialog">
+                <span class="skills-panel__eyebrow">Library</span>
+                <span class="skills-panel__name">Browse skills</span>
+                <span class="skills-panel__blurb">Search and pick one skill — the sim assigns a practice game.</span>
+                <span class="skills-panel__warning">Opens the skill’s patient pack when authored; otherwise a unit assignment.</span>
+                <span class="skills-panel__cta">Open skill library</span>
             </button>
         </section>
 
@@ -93,6 +117,33 @@
         </form>
     </dialog>
 
+    <dialog id="skill-choice-dialog" class="skill-choice-dialog" aria-labelledby="skill-choice-title">
+        <div class="skill-choice-card">
+            <h2 id="skill-choice-title" class="skill-choice-title">Skill library</h2>
+            <p class="skill-choice-warning" role="status">
+                Skill practice places you on a random department (Tele, Med-Surg, or ICU).
+                Pick a unit on the landing page if you need a specific assignment.
+            </p>
+            <p class="skill-choice-blurb">Search and pick <strong>one</strong> skill. The sim assigns a practice game for it.</p>
+            <label class="skill-choice-search-label" for="skill-choice-search">Search skills</label>
+            <input type="search" id="skill-choice-search" class="skill-choice-search"
+                   placeholder="e.g. ICP, IVPB, admission…" autocomplete="off">
+            <div id="skill-choice-list" class="skill-choice-list" role="listbox" aria-label="Skills"></div>
+            <p id="skill-choice-empty" class="skill-choice-empty" hidden>No skills match that search.</p>
+            <p id="skill-choice-picked" class="skill-choice-picked" aria-live="polite"></p>
+            <div class="skill-choice-actions">
+                <button type="button" id="skill-choice-start" class="census-choice-btn census-choice-btn--primary" disabled>
+                    Start with this skill
+                    <span class="census-choice-btn__hint">Random unit + assigned practice game</span>
+                </button>
+                <button type="button" id="skill-choice-cancel" class="census-choice-btn census-choice-btn--ghost">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="assets/js/landing-skill.js" defer></script>
     <script src="assets/js/landing-census.js" defer></script>
 </body>
 </html>

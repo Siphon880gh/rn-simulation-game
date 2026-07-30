@@ -6,7 +6,7 @@ Use with [SKILL.md](SKILL.md). Persist run state in `progress.json` beside this 
 
 | ID | Name | Done when |
 |----|------|-----------|
-| **M0** | Interview | `shift` + `unit` confirmed by user (or explicit in the triggering message) |
+| **M0** | Interview | `shift` + `unit` confirmed by user (or explicit in the triggering message). **Skill-driven:** satisfied when caller supplies `skillId` + `unit` |
 | **M1** | Pack plan | Census table: id → diagnosis → condition→tasks → reuse/new |
 | **M2** | Patient content | Each census id has HTML (+ optional past-hx) and `patients.js` entry; times match shift |
 | **M3** | Scenario pack | Pack JSON valid; `patients[]` / events / injections consistent; theme + department set |

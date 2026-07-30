@@ -1,0 +1,34 @@
+{
+  "id": "skill-stroke-assessment-icu",
+  "title": "Skill practice — Stroke assessment (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize FAST / BE-FAST stroke signs and escalate",
+    "Protect the post-tPA neuro watch window"
+  ],
+  "patients": ["priya"],
+  "patientOverrides": {
+    "priya": {
+      "clinicalStatus": "watch",
+      "acuityScore": 3,
+      "clinicalStatusReason": "Acute stroke — post-tPA watch"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

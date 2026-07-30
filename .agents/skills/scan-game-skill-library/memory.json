@@ -1,0 +1,11 @@
+{
+  "excluded": [
+    {
+      "id": "skill-mcq",
+      "label": "Skill library MCQ engine",
+      "excludedAt": "2026-07-30T10:50:00.000Z",
+      "source": "infrastructure"
+    }
+  ],
+  "updatedAt": "2026-07-30T10:50:00.000Z"
+}

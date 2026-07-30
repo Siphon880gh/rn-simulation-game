@@ -7,6 +7,8 @@ import { codeBlueChallengeConfig } from './challenges/emergencies/code-blue/conf
 import { bedPrepChallengeConfig } from './challenges/skills/bed-prep/config.js';
 import { ivpbHangChallengeConfig } from './challenges/skills/ivpb-hang/config.js';
 import { medIdentityChallengeConfig } from './challenges/skills/med-identity/config.js';
+import { icpChallengeConfig } from './challenges/skills/icp/config.js';
+import { skillMcqChallengeConfig } from './challenges/skills/skill-mcq/config.js';
 import { getChallengeTestSpawnIncidents } from './challenges/test-spawn.js';
 
 export const GameConfig = {
@@ -244,6 +246,18 @@ export const GameConfig = {
   bedPrepChallenge: bedPrepChallengeConfig,
   ivpbHangChallenge: ivpbHangChallengeConfig,
   medIdentityChallenge: medIdentityChallengeConfig,
+  icpChallenge: icpChallengeConfig,
+  skillMcqChallenge: skillMcqChallengeConfig,
+
+  /**
+   * Landing skill library (search → pick one → assign a mini-game).
+   * Catalog: game/events/skills/library.json
+   */
+  skillLibrary: {
+    url: 'events/skills/library.json',
+    /** Delay after boot before opening the assigned skill game */
+    launchDelayMs: 900
+  },
 
   // Task class interactions (E3.M4 Later) — adjust slot duration
   taskClassInteractions: {
@@ -296,7 +310,9 @@ export const GameConfig = {
     shiftDuration: 'shift-duration',
     scenarioPack: 'scenario',
     /** E9: full (omit) | minus1 | admitStart | admitMiddle | openAdmit (legacy random) */
-    census: 'census'
+    census: 'census',
+    /** Skill library: single skill id from events/skills/library.json */
+    skill: 'skill'
   },
 
   /**

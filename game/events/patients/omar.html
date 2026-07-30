@@ -1,0 +1,65 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Omar Hassan</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Room ICU-3</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 41</p>
+        <p class="text-sm text-gray-600">Sex: Male</p>
+        <p class="text-sm text-gray-600">Diagnosis: New-onset seizures — workup; seizure precautions</p>
+        <p class="text-sm text-gray-600">Safety: padded siderails, suction/O<sub>2</sub> at bedside, fall risk</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 88</div>
+        <div>BP: 128/76</div>
+        <div>Temp: 98.8°F</div>
+        <div>O<sub>2</sub>: 97% RA</div>
+        <div>Pain: 0/10</div>
+        <div>RR: 18</div>
+        <div>GCS: 15</div>
+        <div>Last seizure: 1630</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-shield-alt text-xl mr-1 text-amber-600"></i>
+            Safety / seizure
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="seizure-precautions" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="12" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-shield-alt text-amber-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Seizure precautions check</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2000" data-expire="2100" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-eye text-indigo-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Post-ictal neuro check</span>
+                <span class="ml-auto text-sm text-gray-500">2000</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-pills text-xl mr-1"></i>
+            Medications
+        </h4>
+        <ul class="meds-list space-y-3 hidden">
+            <li data-task-type="med" data-status="not-yet" data-scheduled="1930" data-expire="2030" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-pills text-blue-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Levetiracetam IV</span>
+                <span class="ml-auto text-sm text-gray-500">1930</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-omar" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

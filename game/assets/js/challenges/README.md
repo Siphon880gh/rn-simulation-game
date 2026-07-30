@@ -23,6 +23,10 @@ Test spawn (`Test` flask control) groups these as **Skills** and **Emergencies**
 | Accucheck | (task attrs + logic) | `skills/accucheck/challenge.js` |
 | IV check / titration | (task attrs + `GameConfig` IV) | `skills/iv-check/challenge.js` |
 | Admission quizzes | `GameConfig.admission` + quiz builder | `skills/admission/challenge.js` |
+| ICP monitoring | [`skills/icp/config.js`](skills/icp/config.js) | `skills/icp/challenge.js` |
+| Skill library MCQ | [`skills/skill-mcq/config.js`](skills/skill-mcq/config.js) | `skills/skill-mcq/challenge.js` |
+
+Landing skill library: [`game/events/skills/library.json`](../../../events/skills/library.json) (search → pick one → assigned game). Shared MCQ banks cover planned library skills via `games: ["skill-mcq"]` + `metadata.skillId`. Agent scan/confirm: [`.agents/skills/scan-game-skill-library/`](../../../../.agents/skills/scan-game-skill-library/).
 
 ## Emergencies (author here)
 
@@ -34,8 +38,8 @@ Test spawn (`Test` flask control) groups these as **Skills** and **Emergencies**
 
 | File | Purpose |
 |------|---------|
-| [`shared/copy-config.js`](shared/copy-config.js) | Pause banner / pass feedback |
-| [`challenge-gate.js`](challenge-gate.js) | Modal + timer pause + routing |
+| [`shared/copy-config.js`](shared/copy-config.js) | Pause banner / “You're correct.” + Continue label |
+| [`challenge-gate.js`](challenge-gate.js) | Modal + timer pause + routing; correct answers click-gate Continue |
 | [`registry.js`](registry.js) | Kind → path / category index |
 | [`test-spawn.js`](test-spawn.js) | Test flask Skills/Emergencies menu + stub tasks |
 

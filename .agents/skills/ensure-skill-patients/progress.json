@@ -1,0 +1,313 @@
+{
+  "skill": "ensure-skill-patients",
+  "shiftDefault": "night",
+  "milestone": "S1",
+  "skills": [
+    {
+      "id": "icp",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "elena",
+      "packFile": "game/events/scenarios/skill-icp-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "neuro-checks",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "elena",
+      "packFile": "game/events/scenarios/skill-icp-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "seizure-precautions",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "omar",
+      "packFile": "game/events/scenarios/skill-seizure-precautions-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "stroke-assessment",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "priya",
+      "packFile": "game/events/scenarios/skill-stroke-assessment-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "chest-tube",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "dante",
+      "packFile": "game/events/scenarios/skill-chest-tube-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "trach-care",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "kei",
+      "packFile": "game/events/scenarios/skill-trach-care-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "oxygen-therapy",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "nora",
+      "packFile": "game/events/scenarios/skill-oxygen-therapy-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "ventilator-basics",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "samir",
+      "packFile": "game/events/scenarios/skill-ventilator-basics-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "blood-transfusion",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "hana",
+      "packFile": "game/events/scenarios/skill-blood-transfusion-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "wound-vac",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "vito",
+      "packFile": "game/events/scenarios/skill-wound-vac-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "wound-care",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "pressure-injury",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "pca-pump",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "pain-assessment",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "foley-care",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "ng-tube",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "ostomy-care",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "central-line",
+      "status": "uncovered",
+      "unitHint": "icu",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "ivpb-hang",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "med-identity",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "bed-prep",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "accucheck",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "iv-check",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "admission",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "isolation-ppe",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "hand-hygiene",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "fall-precautions",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "sepsis-recognition",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "code-blue-response",
+      "status": "uncovered",
+      "unitHint": "icu",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "sbar",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "ecg-basics",
+      "status": "uncovered",
+      "unitHint": "tele",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "dvt-prophylaxis",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "fluid-balance",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "dialysis-access",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "suicide-precautions",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "restraint-safety",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "medication-rights",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    },
+    {
+      "id": "critical-labs",
+      "status": "uncovered",
+      "unitHint": "medsurg",
+      "patientId": null,
+      "packFile": null,
+      "notes": "no patientConfigs.skills / library.patients"
+    }
+  ],
+  "blocked": null,
+  "updatedAt": "2026-07-30T12:24:43.044Z"
+}

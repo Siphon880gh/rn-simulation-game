@@ -1,0 +1,83 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md" data-care-schedule="turn-q2h"
+    data-care-reason="ICH with EVD; sedated — cannot self-reposition">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Elena Vargas</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Room ICU-1</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 58</p>
+        <p class="text-sm text-gray-600">Sex: Female</p>
+        <p class="text-sm text-gray-600">Diagnosis: Spontaneous ICH with EVD — ICP monitoring</p>
+        <p class="text-sm text-gray-600">Neuro: EVD at 10 cm H<sub>2</sub>O; HOB 30°; frequent ICP / neuro checks</p>
+        <p class="text-sm text-gray-600">Mobility: bedbound / sedated</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 68</div>
+        <div>BP: 148/82</div>
+        <div>Temp: 99.1°F</div>
+        <div>O<sub>2</sub>: 98% on 2L NC</div>
+        <div>Pain: sedated</div>
+        <div>RR: 14 (vent support PRN)</div>
+        <div>ICP: 12 mmHg</div>
+        <div>GCS: 9T</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-brain text-xl mr-1 text-indigo-600"></i>
+            Neuro / ICP
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="icp" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="15" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-brain text-indigo-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">ICP monitoring check</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2000" data-expire="2100" data-duration-mins="10" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-eye text-indigo-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Neuro checks (pupils / motor)</span>
+                <span class="ml-auto text-sm text-gray-500">2000</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-pills text-xl mr-1"></i>
+            Medications
+        </h4>
+        <ul class="meds-list space-y-3 hidden">
+            <li data-task-type="med" data-status="not-yet" data-scheduled="1930" data-expire="2030" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-pills text-blue-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Levetiracetam</span>
+                <span class="ml-auto text-sm text-gray-500">1930</span>
+            </li>
+            <li data-task-type="med" data-status="not-yet" data-scheduled="2100" data-expire="2200" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-pills text-blue-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Hypertonic saline (as ordered)</span>
+                <span class="ml-auto text-sm text-gray-500">2100</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-syringe text-xl mr-1 text-teal-600"></i>
+            IV / drips
+        </h4>
+        <ul class="iv-list space-y-3 hidden" data-iv-panel>
+            <li data-iv-line data-iv-id="elena-ns" data-iv-kind="fluid" data-iv-name="0.9% NS" data-iv-rate="75" data-iv-unit="mL/hr" data-iv-status="running"></li>
+            <li data-iv-line data-iv-id="elena-propofol" data-iv-kind="drip" data-iv-drug="propofol" data-iv-name="Propofol" data-iv-rate="20" data-iv-unit="mcg/kg/min" data-iv-status="running" data-iv-started="1700"></li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-elena" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,723 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "id": "icp",
+      "label": "ICP monitoring",
+      "aliases": [
+        "intracranial pressure",
+        "ICP",
+        "neuro ICP"
+      ],
+      "tags": [
+        "neuro",
+        "icu"
+      ],
+      "blurb": "Recognize ICP ranges and nursing priorities for elevated pressure.",
+      "games": [
+        "icp"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icp-icu.json",
+      "patients": [
+        "elena"
+      ]
+    },
+    {
+      "id": "neuro-checks",
+      "label": "Neuro checks",
+      "aliases": [
+        "neurological assessment",
+        "GCS",
+        "pupils"
+      ],
+      "tags": [
+        "neuro",
+        "assessment"
+      ],
+      "blurb": "Prioritize neuro assessment findings; practice uses the ICP game until a dedicated challenge exists.",
+      "games": [
+        "icp"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icp-icu.json",
+      "patients": [
+        "elena"
+      ]
+    },
+    {
+      "id": "seizure-precautions",
+      "label": "Seizure precautions",
+      "aliases": [
+        "seizure safety",
+        "pad siderails"
+      ],
+      "tags": [
+        "neuro",
+        "safety"
+      ],
+      "blurb": "Seizure safety priorities.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-seizure-precautions-icu.json",
+      "patients": [
+        "omar"
+      ]
+    },
+    {
+      "id": "stroke-assessment",
+      "label": "Stroke assessment",
+      "aliases": [
+        "FAST",
+        "CVA",
+        "BE-FAST"
+      ],
+      "tags": [
+        "neuro",
+        "assessment"
+      ],
+      "blurb": "Recognize stroke signs and escalate.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-stroke-assessment-icu.json",
+      "patients": [
+        "priya"
+      ]
+    },
+    {
+      "id": "chest-tube",
+      "label": "Chest tube care",
+      "aliases": [
+        "chest drain",
+        "pleural tube"
+      ],
+      "tags": [
+        "respiratory",
+        "procedure"
+      ],
+      "blurb": "Chest tube assessment and troubleshooting.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-chest-tube-medsurg.json",
+      "patients": [
+        "dante"
+      ]
+    },
+    {
+      "id": "trach-care",
+      "label": "Trach care",
+      "aliases": [
+        "tracheostomy",
+        "trach suction"
+      ],
+      "tags": [
+        "respiratory",
+        "procedure"
+      ],
+      "blurb": "Tracheostomy care and suction priorities.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-trach-care-icu.json",
+      "patients": [
+        "kei"
+      ]
+    },
+    {
+      "id": "oxygen-therapy",
+      "label": "Oxygen therapy",
+      "aliases": [
+        "O2",
+        "nasal cannula",
+        "non-rebreather"
+      ],
+      "tags": [
+        "respiratory"
+      ],
+      "blurb": "Choose and titrate oxygen delivery.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-oxygen-therapy-medsurg.json",
+      "patients": [
+        "nora"
+      ]
+    },
+    {
+      "id": "ventilator-basics",
+      "label": "Ventilator basics",
+      "aliases": [
+        "vent",
+        "mechanical ventilation",
+        "alarm"
+      ],
+      "tags": [
+        "respiratory",
+        "icu"
+      ],
+      "blurb": "Vent alarms and immediate nursing response.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-ventilator-basics-icu.json",
+      "patients": [
+        "samir"
+      ]
+    },
+    {
+      "id": "blood-transfusion",
+      "label": "Blood transfusion",
+      "aliases": [
+        "PRBC",
+        "transfuse",
+        "blood product"
+      ],
+      "tags": [
+        "meds",
+        "safety"
+      ],
+      "blurb": "Transfusion checks and reaction response.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-blood-transfusion-medsurg.json",
+      "patients": [
+        "hana"
+      ]
+    },
+    {
+      "id": "wound-vac",
+      "label": "Wound vac",
+      "aliases": [
+        "NPWT",
+        "negative pressure wound"
+      ],
+      "tags": [
+        "wound",
+        "procedure"
+      ],
+      "blurb": "Negative-pressure wound therapy checks.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-wound-vac-medsurg.json",
+      "patients": [
+        "vito"
+      ]
+    },
+    {
+      "id": "wound-care",
+      "label": "Wound care / dressing",
+      "aliases": [
+        "dressing change",
+        "wound assessment"
+      ],
+      "tags": [
+        "wound",
+        "procedure"
+      ],
+      "blurb": "Dressing change and wound assessment.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "pressure-injury",
+      "label": "Pressure injury prevention",
+      "aliases": [
+        "skin check",
+        "turn schedule",
+        "decubitus"
+      ],
+      "tags": [
+        "skin",
+        "safety"
+      ],
+      "blurb": "Skin risk and turn priorities.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "pca-pump",
+      "label": "PCA pump",
+      "aliases": [
+        "patient controlled analgesia",
+        "PCA"
+      ],
+      "tags": [
+        "meds",
+        "pain"
+      ],
+      "blurb": "PCA setup checks and sedation monitoring.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "pain-assessment",
+      "label": "Pain assessment",
+      "aliases": [
+        "pain scale",
+        "OPQRST"
+      ],
+      "tags": [
+        "assessment",
+        "pain"
+      ],
+      "blurb": "Assess and reassess pain.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "foley-care",
+      "label": "Foley / catheter care",
+      "aliases": [
+        "urinary catheter",
+        "CAUTI"
+      ],
+      "tags": [
+        "procedure",
+        "infection"
+      ],
+      "blurb": "Catheter care and CAUTI prevention.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "ng-tube",
+      "label": "NG tube",
+      "aliases": [
+        "nasogastric",
+        "NGT",
+        "tube feeding"
+      ],
+      "tags": [
+        "procedure",
+        "GI"
+      ],
+      "blurb": "NG placement checks and feeding safety.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "ostomy-care",
+      "label": "Ostomy care",
+      "aliases": [
+        "stoma",
+        "colostomy",
+        "ileostomy"
+      ],
+      "tags": [
+        "GI",
+        "procedure"
+      ],
+      "blurb": "Stoma assessment and pouch change.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "central-line",
+      "label": "Central line care",
+      "aliases": [
+        "CLABSI",
+        "CVC",
+        "PICC"
+      ],
+      "tags": [
+        "iv",
+        "infection",
+        "icu"
+      ],
+      "blurb": "Central line access and CLABSI prevention.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "ivpb-hang",
+      "label": "IVPB hang sequence",
+      "aliases": [
+        "IV piggyback",
+        "secondary infusion"
+      ],
+      "tags": [
+        "meds",
+        "iv"
+      ],
+      "blurb": "Hang a piggyback in the correct clinical order.",
+      "games": [
+        "ivpb-hang"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "med-identity",
+      "label": "Med identity",
+      "aliases": [
+        "brand generic",
+        "drug names"
+      ],
+      "tags": [
+        "meds"
+      ],
+      "blurb": "Match brand and generic medication names.",
+      "games": [
+        "med-identity"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "bed-prep",
+      "label": "Bed prep for admission",
+      "aliases": [
+        "admission bed",
+        "gather supplies"
+      ],
+      "tags": [
+        "admission"
+      ],
+      "blurb": "Gather the right supplies before a new admit arrives.",
+      "games": [
+        "bed-prep"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "accucheck",
+      "label": "Accucheck / sliding scale",
+      "aliases": [
+        "blood glucose",
+        "insulin scale"
+      ],
+      "tags": [
+        "meds",
+        "diabetes"
+      ],
+      "blurb": "Read a glucose result and apply the sliding scale.",
+      "games": [
+        "accucheck"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "iv-check",
+      "label": "IV rate check",
+      "aliases": [
+        "drip check",
+        "titration"
+      ],
+      "tags": [
+        "iv"
+      ],
+      "blurb": "Verify or adjust an IV drip rate.",
+      "games": [
+        "iv-check",
+        "heparin-ptt",
+        "iv-titration"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "admission",
+      "label": "Admission quizzes",
+      "aliases": [
+        "admit checklist",
+        "allergies",
+        "code status"
+      ],
+      "tags": [
+        "admission"
+      ],
+      "blurb": "Work through admission safety checks.",
+      "games": [
+        "admission-allergies",
+        "admission-belongings",
+        "admission-code-status",
+        "admission-home-recon",
+        "admission-npo",
+        "admission-bp",
+        "admission-flu-shot",
+        "admission-call-admitting"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "isolation-ppe",
+      "label": "Isolation / PPE",
+      "aliases": [
+        "contact precautions",
+        "droplet",
+        "airborne"
+      ],
+      "tags": [
+        "infection",
+        "safety"
+      ],
+      "blurb": "Choose correct PPE for isolation type.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "hand-hygiene",
+      "label": "Hand hygiene",
+      "aliases": [
+        "hand washing",
+        "ABHR"
+      ],
+      "tags": [
+        "infection",
+        "safety"
+      ],
+      "blurb": "When to wash vs sanitize.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "fall-precautions",
+      "label": "Fall precautions",
+      "aliases": [
+        "fall risk",
+        "bed alarm"
+      ],
+      "tags": [
+        "safety"
+      ],
+      "blurb": "Fall-risk interventions.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "sepsis-recognition",
+      "label": "Sepsis recognition",
+      "aliases": [
+        "SIRS",
+        "septic shock",
+        "qSOFA"
+      ],
+      "tags": [
+        "assessment",
+        "emergency"
+      ],
+      "blurb": "Recognize sepsis and escalate.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "code-blue-response",
+      "label": "Code Blue response",
+      "aliases": [
+        "cardiac arrest",
+        "BLS",
+        "ACLS start"
+      ],
+      "tags": [
+        "emergency"
+      ],
+      "blurb": "Immediate Code Blue priorities.",
+      "games": [
+        "code-blue"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "sbar",
+      "label": "SBAR communication",
+      "aliases": [
+        "hand-off",
+        "ISBAR",
+        "report"
+      ],
+      "tags": [
+        "communication"
+      ],
+      "blurb": "Structure an SBAR report.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "ecg-basics",
+      "label": "ECG / telemetry basics",
+      "aliases": [
+        "rhythm strip",
+        "tele",
+        "arrhythmia"
+      ],
+      "tags": [
+        "cardiac",
+        "assessment"
+      ],
+      "blurb": "Recognize common tele rhythms.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "dvt-prophylaxis",
+      "label": "DVT prophylaxis",
+      "aliases": [
+        "SCDs",
+        "VTE",
+        "heparin prophylaxis"
+      ],
+      "tags": [
+        "safety",
+        "meds"
+      ],
+      "blurb": "VTE prevention priorities.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "fluid-balance",
+      "label": "Fluid balance / I&O",
+      "aliases": [
+        "intake output",
+        "I&O",
+        "fluid status"
+      ],
+      "tags": [
+        "assessment"
+      ],
+      "blurb": "Track and interpret I&O.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "dialysis-access",
+      "label": "Dialysis access care",
+      "aliases": [
+        "AV fistula",
+        "graft",
+        "HD catheter"
+      ],
+      "tags": [
+        "renal",
+        "assessment"
+      ],
+      "blurb": "Protect dialysis access.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "suicide-precautions",
+      "label": "Suicide precautions",
+      "aliases": [
+        "1:1",
+        "self-harm",
+        "safety sitter"
+      ],
+      "tags": [
+        "safety",
+        "psych"
+      ],
+      "blurb": "Safety precautions for suicide risk.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "restraint-safety",
+      "label": "Restraint safety",
+      "aliases": [
+        "restraints",
+        "least restrictive"
+      ],
+      "tags": [
+        "safety"
+      ],
+      "blurb": "Least-restrictive alternatives and restraint checks.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "medication-rights",
+      "label": "Medication rights",
+      "aliases": [
+        "5 rights",
+        "6 rights",
+        "med safety"
+      ],
+      "tags": [
+        "meds",
+        "safety"
+      ],
+      "blurb": "Apply medication rights before administer — practice uses med identity until a dedicated challenge exists.",
+      "games": [
+        "med-identity"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "critical-labs",
+      "label": "Critical lab response",
+      "aliases": [
+        "critical value",
+        "lab call",
+        "read-back"
+      ],
+      "tags": [
+        "assessment",
+        "communication"
+      ],
+      "blurb": "Receive and act on critical labs.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active"
+    }
+  ]
+}

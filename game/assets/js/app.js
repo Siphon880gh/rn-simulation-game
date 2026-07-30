@@ -34,6 +34,7 @@ import DelegationModule, {
     modeConfig,
     getDelegateMode
 } from './delegation.js';
+import SkillFocusModule from './skill-focus.js';
 import { setShiftAnchor } from './availability-windows.js';
 
 // Declarative Application Configuration
@@ -60,7 +61,8 @@ const AppConfig = {
         nurseAlerts: NurseAlertsModule,
         admission: AdmissionSystemModule,
         rightMenu: RightMenuModule,
-        delegation: DelegationModule
+        delegation: DelegationModule,
+        skillFocus: SkillFocusModule
     },
     
     urlParams: GameConfig.urlParams,
@@ -126,7 +128,7 @@ class GameApplication {
 
     // Initialize modules with dependency management
     async initializeModules() {
-        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs, testMode, sound, nurseAlerts, admission, rightMenu, delegation } = this.config.modules;
+        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs, testMode, sound, nurseAlerts, admission, rightMenu, delegation, skillFocus } = this.config.modules;
         
         // Register modules
         this.modules.set('modal', modal);
@@ -151,6 +153,7 @@ class GameApplication {
         this.modules.set('admission', admission);
         this.modules.set('rightMenu', rightMenu);
         this.modules.set('delegation', delegation);
+        this.modules.set('skillFocus', skillFocus);
 
         if (slots && slots.init) {
             slots.init();
@@ -818,6 +821,14 @@ class GameApplication {
             gameConfig.shiftStarts,
             this.handleGameOver
         );
+
+        // Landing skill library: ?skill= opens one assigned mini-game after shell/census ready
+        const skillFocus = this.modules.get('skillFocus');
+        if (skillFocus && skillFocus.init) {
+            Promise.resolve(skillFocus.init()).catch((err) => {
+                console.warn('Skill focus init failed', err);
+            });
+        }
     }
 
     // Handle game status changes

@@ -1,0 +1,34 @@
+{
+  "id": "skill-icp-icu",
+  "title": "Skill practice — ICP monitoring (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize normal vs elevated ICP and nursing priorities",
+    "Protect cerebral perfusion with positioning and timed neuro/ICP checks"
+  ],
+  "patients": ["elena"],
+  "patientOverrides": {
+    "elena": {
+      "clinicalStatus": "watch",
+      "acuityScore": 3,
+      "clinicalStatusReason": "ICH with EVD — ICP monitoring"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

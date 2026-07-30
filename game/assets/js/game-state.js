@@ -31,6 +31,8 @@ class GameState {
       delegation: null,
       firedEvents: [],
       codeBlueHook: null,
+      /** Landing skill library: { skillId, label, gameKind } or null */
+      skillFocus: null,
       score: {
         total: 100,
         taskPoints: 0,
@@ -221,6 +223,17 @@ class GameState {
     this.actions.set('SET_ACTIVE_PATIENT', (payload) => ({
       ...this.state,
       activePatientId: payload.patientId || null
+    }));
+
+    this.actions.set('SET_SKILL_FOCUS', (payload = {}) => ({
+      ...this.state,
+      skillFocus: payload?.skillId
+        ? {
+            skillId: String(payload.skillId),
+            label: payload.label != null ? String(payload.label) : String(payload.skillId),
+            gameKind: payload.gameKind != null ? String(payload.gameKind) : null
+          }
+        : null
     }));
 
     this.actions.set('SET_SCENARIO_PACK', (payload) => ({

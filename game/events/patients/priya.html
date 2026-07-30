@@ -1,0 +1,66 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md" data-care-schedule="turn-q2h"
+    data-care-reason="Acute stroke with hemiparesis — cannot self-reposition">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Priya Nair</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Room ICU-2</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 67</p>
+        <p class="text-sm text-gray-600">Sex: Female</p>
+        <p class="text-sm text-gray-600">Diagnosis: Acute ischemic stroke — post-tPA watch; FAST / neuro checks</p>
+        <p class="text-sm text-gray-600">Neuro: R-sided weakness; dysphagia screen pending; last known well 1400</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 92</div>
+        <div>BP: 162/88</div>
+        <div>Temp: 98.6°F</div>
+        <div>O<sub>2</sub>: 96% RA</div>
+        <div>Pain: 0/10</div>
+        <div>RR: 18</div>
+        <div>GCS: 14</div>
+        <div>NIHSS: 8</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-bolt text-xl mr-1 text-rose-600"></i>
+            Stroke / neuro
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="stroke-assessment" data-status="not-yet" data-scheduled="1900" data-expire="1930" data-duration-mins="12" data-task-class="stat" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-bolt text-rose-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Stroke assessment (FAST / escalate)</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2000" data-expire="2030" data-duration-mins="10" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-eye text-indigo-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">q1h neuro check</span>
+                <span class="ml-auto text-sm text-gray-500">2000</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-pills text-xl mr-1"></i>
+            Medications
+        </h4>
+        <ul class="meds-list space-y-3 hidden">
+            <li data-task-type="med" data-status="not-yet" data-scheduled="1930" data-expire="2030" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-pills text-blue-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Aspirin (per stroke protocol)</span>
+                <span class="ml-auto text-sm text-gray-500">1930</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-priya" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

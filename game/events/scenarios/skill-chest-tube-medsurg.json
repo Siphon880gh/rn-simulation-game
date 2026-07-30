@@ -1,0 +1,34 @@
+{
+  "id": "skill-chest-tube-medsurg",
+  "title": "Skill practice — Chest tube care (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Assess a chest tube drainage system",
+    "Respond to disconnection or sudden air-leak changes"
+  ],
+  "patients": ["dante"],
+  "patientOverrides": {
+    "dante": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "Right chest tube for pneumothorax"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

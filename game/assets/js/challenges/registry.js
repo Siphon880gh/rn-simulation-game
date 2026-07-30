@@ -58,6 +58,22 @@ export const CHALLENGE_REGISTRY = {
     modulePath: 'challenges/skills/admission/challenge.js'
     // Expanded as admission-* rows in test-spawn.js
   },
+  icp: {
+    id: 'icp',
+    category: 'skills',
+    label: 'ICP monitoring',
+    configPath: 'challenges/skills/icp/config.js',
+    modulePath: 'challenges/skills/icp/challenge.js',
+    testSpawnKind: 'icp'
+  },
+  'skill-mcq': {
+    id: 'skill-mcq',
+    category: 'skills',
+    label: 'Skill library MCQ',
+    configPath: 'challenges/skills/skill-mcq/config.js',
+    modulePath: 'challenges/skills/skill-mcq/challenge.js',
+    testSpawnKind: 'skill-mcq'
+  },
   'code-blue': {
     id: 'code-blue',
     category: 'emergencies',

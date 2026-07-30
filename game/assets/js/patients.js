@@ -94,6 +94,185 @@ const PatientsModule = (() => {
             diagnosis: 'Post-op lap cholecystectomy',
             htmlFile: 'events/patients/lin.html',
             pastHxFile: 'events/patients/lin-past-hx.json'
+        },
+        elena: {
+            id: 'elena',
+            name: 'Elena Vargas',
+            room: 'Room ICU-1',
+            age: 58,
+            sex: 'Female',
+            diagnosis: 'Spontaneous ICH with EVD — ICP monitoring',
+            skills: ['icp', 'neuro-checks'],
+            careSchedules: ['turnQ2h'],
+            careReason: 'ICH with EVD; sedated — cannot self-reposition',
+            vitals: {
+                hr: 68,
+                bp: '148/82',
+                temp: '99.1°F',
+                o2: '98% on 2L NC',
+                pain: 'sedated',
+                rr: 14
+            },
+            htmlFile: 'events/patients/elena.html',
+            pastHxFile: 'events/patients/elena-past-hx.json'
+        },
+        omar: {
+            id: 'omar',
+            name: 'Omar Hassan',
+            room: 'Room ICU-3',
+            age: 41,
+            sex: 'Male',
+            diagnosis: 'New-onset seizures — workup; seizure precautions',
+            skills: ['seizure-precautions'],
+            vitals: {
+                hr: 88,
+                bp: '128/76',
+                temp: '98.8°F',
+                o2: '97% RA',
+                pain: '0/10',
+                rr: 18
+            },
+            htmlFile: 'events/patients/omar.html',
+            pastHxFile: 'events/patients/omar-past-hx.json'
+        },
+        priya: {
+            id: 'priya',
+            name: 'Priya Nair',
+            room: 'Room ICU-2',
+            age: 67,
+            sex: 'Female',
+            diagnosis: 'Acute ischemic stroke — post-tPA watch',
+            skills: ['stroke-assessment'],
+            careSchedules: ['turnQ2h'],
+            careReason: 'Acute stroke with hemiparesis — cannot self-reposition',
+            vitals: {
+                hr: 92,
+                bp: '162/88',
+                temp: '98.6°F',
+                o2: '96% RA',
+                pain: '0/10',
+                rr: 18
+            },
+            htmlFile: 'events/patients/priya.html',
+            pastHxFile: 'events/patients/priya-past-hx.json'
+        },
+        dante: {
+            id: 'dante',
+            name: 'Dante Ruiz',
+            room: 'Room 312-A',
+            age: 52,
+            sex: 'Male',
+            diagnosis: 'Spontaneous pneumothorax — right chest tube',
+            skills: ['chest-tube'],
+            vitals: {
+                hr: 96,
+                bp: '124/74',
+                temp: '98.9°F',
+                o2: '94% on 2L NC',
+                pain: '4/10 R chest',
+                rr: 22
+            },
+            htmlFile: 'events/patients/dante.html',
+            pastHxFile: 'events/patients/dante-past-hx.json'
+        },
+        kei: {
+            id: 'kei',
+            name: 'Kei Nakamura',
+            room: 'Room ICU-4',
+            age: 63,
+            sex: 'Male',
+            diagnosis: 'Prolonged vent wean — new tracheostomy (POD 1)',
+            skills: ['trach-care'],
+            careSchedules: ['turnQ2h'],
+            careReason: 'Fresh trach; sedated / weak — cannot self-reposition',
+            vitals: {
+                hr: 78,
+                bp: '118/70',
+                temp: '99.0°F',
+                o2: '96% on trach collar 28%',
+                pain: '2/10 neck',
+                rr: 16
+            },
+            htmlFile: 'events/patients/kei.html',
+            pastHxFile: 'events/patients/kei-past-hx.json'
+        },
+        nora: {
+            id: 'nora',
+            name: 'Nora Blake',
+            room: 'Room 308-B',
+            age: 74,
+            sex: 'Female',
+            diagnosis: 'COPD exacerbation — oxygen titration',
+            skills: ['oxygen-therapy'],
+            vitals: {
+                hr: 102,
+                bp: '138/84',
+                temp: '99.2°F',
+                o2: '89% on 2L NC',
+                pain: '0/10',
+                rr: 24
+            },
+            htmlFile: 'events/patients/nora.html',
+            pastHxFile: 'events/patients/nora-past-hx.json'
+        },
+        samir: {
+            id: 'samir',
+            name: 'Samir Okonkwo',
+            room: 'Room ICU-5',
+            age: 56,
+            sex: 'Male',
+            diagnosis: 'ARDS — mechanical ventilation',
+            skills: ['ventilator-basics'],
+            careSchedules: ['turnQ2h'],
+            careReason: 'Intubated / sedated — cannot self-reposition',
+            vitals: {
+                hr: 110,
+                bp: '102/58',
+                temp: '100.4°F',
+                o2: '94% on FiO2 0.60',
+                pain: 'sedated',
+                rr: 18
+            },
+            htmlFile: 'events/patients/samir.html',
+            pastHxFile: 'events/patients/samir-past-hx.json'
+        },
+        hana: {
+            id: 'hana',
+            name: 'Hana Kim',
+            room: 'Room 314-A',
+            age: 48,
+            sex: 'Female',
+            diagnosis: 'Post-op anemia — PRBC transfusion ordered',
+            skills: ['blood-transfusion'],
+            vitals: {
+                hr: 108,
+                bp: '98/58',
+                temp: '98.4°F',
+                o2: '97% RA',
+                pain: '3/10 incision',
+                rr: 18
+            },
+            htmlFile: 'events/patients/hana.html',
+            pastHxFile: 'events/patients/hana-past-hx.json'
+        },
+        vito: {
+            id: 'vito',
+            name: 'Vito Moretti',
+            room: 'Room 316-B',
+            age: 61,
+            sex: 'Male',
+            diagnosis: 'Open abdominal wound — NPWT / wound vac',
+            skills: ['wound-vac'],
+            vitals: {
+                hr: 86,
+                bp: '122/76',
+                temp: '99.0°F',
+                o2: '97% RA',
+                pain: '4/10 abdomen',
+                rr: 16
+            },
+            htmlFile: 'events/patients/vito.html',
+            pastHxFile: 'events/patients/vito-past-hx.json'
         }
     };
 
@@ -467,6 +646,8 @@ const PatientsModule = (() => {
             const challenge = element.getAttribute('data-challenge');
             const metadata = {};
             if (challenge) metadata.challenge = challenge;
+            const skillId = element.getAttribute('data-skill-id');
+            if (skillId) metadata.skillId = skillId;
             if (element.getAttribute('data-iv-drug')) {
                 metadata.drug = element.getAttribute('data-iv-drug');
             }
