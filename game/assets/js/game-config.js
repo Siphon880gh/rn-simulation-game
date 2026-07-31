@@ -31,7 +31,27 @@ export const GameConfig = {
       USER: 'user',
       MODAL: 'modal',
       CHALLENGE: 'challenge',
+      /** Challenge-level booster: timed freeze (auto-clears). */
+      BOOSTER: 'booster',
       SYSTEM: 'system'
+    }
+  },
+
+  /**
+   * Boosters earned from multi-question challenge levels (N questions → N−1 boosters).
+   * Spend to freeze the clock (~15 game minutes) or finish all busy queue slots.
+   */
+  boosters: {
+    freezeGameMinutes: 15,
+    /** Floor so high speed-factor freezes still feel usable. */
+    freezeMinRealMs: 8000,
+    slotCompleteAnimMs: 700,
+    selectors: {
+      root: '#shell-boosters',
+      count: '#shell-boosters-count',
+      freezeBtn: '#shell-booster-freeze',
+      slotsBtn: '#shell-booster-slots',
+      status: '#shell-boosters-status'
     }
   },
 
@@ -290,6 +310,7 @@ export const GameConfig = {
     hourTabs: '#shell-hour-tabs',
     shiftHistoryLog: '#shift-history-log',
     clockCluster: '#shell-clock-cluster',
+    boosters: '#shell-boosters',
     topCollapse: '#shell-top-collapse',
     clock: '#clock',
     pauseButton: '#pause',

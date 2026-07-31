@@ -100,6 +100,22 @@
                     style="width:150px;">
                     Pause
                 </button>
+                <details id="shell-boosters" class="shell-boosters shell-boosters--empty" data-count="0">
+                    <summary class="shell-boosters__summary" title="Boosters from extra challenge questions">
+                        <span class="shell-boosters__label">Boosters</span>
+                        <span id="shell-boosters-count" class="shell-boosters__count">0</span>
+                        <i class="fas fa-chevron-down shell-boosters__chevron" aria-hidden="true"></i>
+                    </summary>
+                    <div class="shell-boosters__menu">
+                        <p id="shell-boosters-status" class="shell-boosters__status hidden" role="status"></p>
+                        <button type="button" id="shell-booster-freeze" class="shell-boosters__action" disabled>
+                            Freeze timer 15 min
+                        </button>
+                        <button type="button" id="shell-booster-slots" class="shell-boosters__action" disabled>
+                            Finish all slot tasks
+                        </button>
+                    </div>
+                </details>
                 <button type="button" id="shell-sound-toggle" class="shell-sound-toggle"
                         aria-pressed="true" title="Sound on — click to mute alarms">
                     <i class="fas fa-volume-up" data-sound-icon="on" aria-hidden="true"></i>

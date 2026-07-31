@@ -65,6 +65,7 @@ import {
     lockChallengeLevelControl,
     wireChallengeLevelControl
 } from './shared/copy-config.js';
+import BoostersModule from '../boosters.js';
 import { applySituationStill, clearSituationStill } from '../scene-backdrop.js';
 import { recordChallengeOutcome } from '../scoring.js';
 import { applyIvChallengeResult, syncIvTaskMetadata } from '../iv-system.js';
@@ -168,6 +169,7 @@ function noteQuizCorrectAndMaybeContinue({ onNeedNext, onComplete }) {
     lockChallengeLevelControl();
     updateChallengeLevelProgress(activeSession.quizCorrect, target);
     if (activeSession.quizCorrect >= target) {
+        BoostersModule.awardFromChallengeLevel(target);
         onComplete?.();
         return;
     }

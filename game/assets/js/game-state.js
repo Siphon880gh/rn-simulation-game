@@ -33,6 +33,9 @@ class GameState {
       codeBlueHook: null,
       /** Landing skill library: { skillId, label, gameKind } or null */
       skillFocus: null,
+      /** Challenge-level boosters: spend to freeze clock or clear busy slots */
+      boosters: 0,
+      boosterFreeze: null,
       score: {
         total: 100,
         taskPoints: 0,
@@ -69,6 +72,8 @@ class GameState {
       })),
       slotQueue: [],
       delegation: null,
+      boosters: 0,
+      boosterFreeze: null,
       score: {
         total: Number(GameConfig.scoring?.startingTotal) || 100,
         taskPoints: 0,
@@ -232,6 +237,35 @@ class GameState {
             skillId: String(payload.skillId),
             label: payload.label != null ? String(payload.label) : String(payload.skillId),
             gameKind: payload.gameKind != null ? String(payload.gameKind) : null
+          }
+        : null
+    }));
+
+    this.actions.set('ADD_BOOSTERS', (payload = {}) => {
+      const add = Math.max(0, Math.floor(Number(payload.count) || 0));
+      if (!add) return this.state;
+      return {
+        ...this.state,
+        boosters: (Number(this.state.boosters) || 0) + add
+      };
+    });
+
+    this.actions.set('SPEND_BOOSTER', (payload = {}) => {
+      const cost = Math.max(1, Math.floor(Number(payload.count) || 1));
+      const have = Number(this.state.boosters) || 0;
+      if (have < cost) return this.state;
+      return {
+        ...this.state,
+        boosters: have - cost
+      };
+    });
+
+    this.actions.set('SET_BOOSTER_FREEZE', (payload = {}) => ({
+      ...this.state,
+      boosterFreeze: payload?.active
+        ? {
+            endsAtMs: Number(payload.endsAtMs) || 0,
+            gameMinutes: Number(payload.gameMinutes) || GameConfig.boosters?.freezeGameMinutes || 15
           }
         : null
     }));

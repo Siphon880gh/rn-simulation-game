@@ -35,6 +35,7 @@ import DelegationModule, {
     getDelegateMode
 } from './delegation.js';
 import SkillFocusModule from './skill-focus.js';
+import BoostersModule from './boosters.js';
 import { setShiftAnchor } from './availability-windows.js';
 
 // Declarative Application Configuration
@@ -62,7 +63,8 @@ const AppConfig = {
         admission: AdmissionSystemModule,
         rightMenu: RightMenuModule,
         delegation: DelegationModule,
-        skillFocus: SkillFocusModule
+        skillFocus: SkillFocusModule,
+        boosters: BoostersModule
     },
     
     urlParams: GameConfig.urlParams,
@@ -128,7 +130,7 @@ class GameApplication {
 
     // Initialize modules with dependency management
     async initializeModules() {
-        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs, testMode, sound, nurseAlerts, admission, rightMenu, delegation, skillFocus } = this.config.modules;
+        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs, testMode, sound, nurseAlerts, admission, rightMenu, delegation, skillFocus, boosters } = this.config.modules;
         
         // Register modules
         this.modules.set('modal', modal);
@@ -154,9 +156,13 @@ class GameApplication {
         this.modules.set('rightMenu', rightMenu);
         this.modules.set('delegation', delegation);
         this.modules.set('skillFocus', skillFocus);
+        this.modules.set('boosters', boosters);
 
         if (slots && slots.init) {
             slots.init();
+        }
+        if (boosters && boosters.init) {
+            boosters.init({ timer, slots });
         }
         if (debrief && debrief.init) {
             debrief.init();
