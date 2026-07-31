@@ -30,6 +30,28 @@ function formatHhmm(hhmm) {
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
+/**
+ * While a booster freeze is active, slots advance on a virtual clock from freeze.baseTime
+ * (shift display clock stays frozen). Reads boosterFreeze state shape from boosters.js.
+ */
+function freezeExecutionTime() {
+    const freeze = gameState.getStateSlice('boosterFreeze');
+    if (!freeze || freeze.baseTime == null || !freeze.startedAtMs || !freeze.endsAtMs) {
+        return null;
+    }
+    const span = Math.max(1, Number(freeze.endsAtMs) - Number(freeze.startedAtMs));
+    const elapsed = Math.max(0, Math.min(span, Date.now() - Number(freeze.startedAtMs)));
+    const gameMinutes = Math.max(0, Number(freeze.gameMinutes) || 0);
+    const virtualMins = Math.floor((elapsed / span) * gameMinutes);
+    return minutesToHhmm(hhmmToMinutes(freeze.baseTime) + virtualMins);
+}
+
+function resolveExecutionTime(hint) {
+    const freezeTime = freezeExecutionTime();
+    if (freezeTime != null) return freezeTime;
+    return hint ?? gameState.getStateSlice('currentTime') ?? GameConfig.timer.defaultShiftStart;
+}
+
 function renderSlots(slots) {
     const bar = document.querySelector(GameConfig.selectors.taskQueueBar);
     if (!bar) return;
@@ -189,8 +211,9 @@ const SlotSystem = {
         if (this.findSlotForTask(task.id)) return { ok: true };
         if (this.isQueued(task.id)) return { ok: true, queued: true };
 
+        const now = resolveExecutionTime(currentTime);
         if (this.hasFreeSlot()) {
-            this.assignTaskNow(task, currentTime);
+            this.assignTaskNow(task, now);
             return { ok: true };
         }
 
@@ -201,7 +224,7 @@ const SlotSystem = {
         });
         gameState.dispatch('APPEND_SHIFT_LOG', {
             message: `Queued ${task.name} (slots full)`,
-            timeLabel: formatHhmm(currentTime ?? gameState.getStateSlice('currentTime'))
+            timeLabel: formatHhmm(now)
         });
         return { ok: true, queued: true };
     },
@@ -211,12 +234,12 @@ const SlotSystem = {
         if (!task?.id) return false;
         if (this.findSlotForTask(task.id)) return true;
         if (!this.hasFreeSlot()) return false;
-        this.assignTaskNow(task, currentTime);
+        this.assignTaskNow(task, resolveExecutionTime(currentTime));
         return true;
     },
 
     assignTaskNow(task, currentTime) {
-        const now = currentTime ?? gameState.getStateSlice('currentTime') ?? GameConfig.timer.defaultShiftStart;
+        const now = resolveExecutionTime(currentTime);
         const resolved = resolveEffectiveDuration(task);
         const duration = resolved.duration;
         const endsAt = minutesToHhmm(hhmmToMinutes(now) + duration);
@@ -237,6 +260,7 @@ const SlotSystem = {
 
     /** Pull FIFO waiting tasks into free slots (auto-assign). */
     drainQueue(currentTime) {
+        const now = resolveExecutionTime(currentTime);
         let guard = GameConfig.slots.count + 2;
         while (guard-- > 0 && this.hasFreeSlot()) {
             const queue = gameState.getStateSlice('slotQueue') || [];
@@ -256,12 +280,46 @@ const SlotSystem = {
             }
 
             gameState.dispatch('DEQUEUE_SLOT_TASK', { taskId: next.taskId });
-            this.assignTaskNow(task, currentTime);
+            this.assignTaskNow(task, now);
             gameState.dispatch('APPEND_SHIFT_LOG', {
                 message: `Auto-assigned queued ${task.name || next.taskId}`,
-                timeLabel: formatHhmm(currentTime ?? gameState.getStateSlice('currentTime'))
+                timeLabel: formatHhmm(now)
             });
         }
+    },
+
+    /**
+     * After booster freeze: finish anything due on the virtual clock, then rewrite
+     * remaining busy slots onto the frozen display clock so resume stays consistent.
+     */
+    settleAfterFreeze() {
+        const freeze = gameState.getStateSlice('boosterFreeze');
+        if (!freeze) return;
+        const effective = freezeExecutionTime() ?? resolveExecutionTime();
+        this.processSlots(effective);
+
+        const display = gameState.getStateSlice('currentTime') ?? freeze.baseTime;
+        const displayMins = hhmmToMinutes(display);
+        const effectiveMins = hhmmToMinutes(effective);
+        const slots = gameState.getStateSlice('slots') || [];
+
+        slots.forEach((slot) => {
+            if (!slot.taskId || slot.startedAt == null || slot.endsAt == null) return;
+            const endMins = hhmmToMinutes(slot.endsAt);
+            const startMins = hhmmToMinutes(slot.startedAt);
+            const duration = Math.max(1, endMins - startMins);
+            const remaining = Math.max(0, endMins - effectiveMins);
+            if (remaining <= 0) return;
+            // Remaining window on the frozen display clock (avoid startedAt before display).
+            const newEnds = minutesToHhmm(displayMins + remaining);
+            const progress = Math.round(((duration - remaining) / duration) * 100);
+            gameState.dispatch('UPDATE_SLOT_TIMING', {
+                slotId: slot.id,
+                startedAt: display,
+                endsAt: newEnds,
+                progress
+            });
+        });
     },
 
     processSlots(currentTime) {
@@ -275,10 +333,15 @@ const SlotSystem = {
             const startMins = hhmmToMinutes(slot.startedAt);
             const endMins = hhmmToMinutes(slot.endsAt);
             const span = Math.max(1, endMins - startMins);
-            const elapsed = nowMins - startMins;
-            const progress = Math.round(Math.max(0, Math.min(100, (elapsed / span) * 100)));
+            const elapsed = Math.max(0, nowMins - startMins);
+            let progress = Math.round(Math.max(0, Math.min(100, (elapsed / span) * 100)));
+            const prior = Math.round(slot.progress || 0);
+            // After freeze settle, keep earned progress until the remaining window catches up.
+            if (progress < prior && nowMins < endMins) {
+                progress = prior;
+            }
 
-            if (progress !== Math.round(slot.progress || 0)) {
+            if (progress !== prior) {
                 gameState.dispatch('UPDATE_SLOT_PROGRESS', {
                     slotId: slot.id,
                     progress

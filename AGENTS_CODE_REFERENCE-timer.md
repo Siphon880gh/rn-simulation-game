@@ -41,6 +41,7 @@ Accelerated military clock for one shift: tick display, pause/resume with **owne
 | `user` | `#pause` button | Toggle adds/removes only this source |
 | `modal` | Blocking modals (opt-in) | Hold while modal should freeze the shift |
 | `challenge` | Perform mini-games (E5) | Hold while `challenge-gate` modal is open; cleared on pass/fail/cancel |
+| `booster` | Freeze booster (`boosters.js`) | Holds shift clock/events; stackable. Queue slots keep advancing on a virtual clock; new tasks can still be chosen. Cleared when freeze ends. `#pause` Resume during freeze confirms first; if remaining freeze &gt; 15 game minutes, unused full units are reclaimed as boosters. |
 | `system` | Bootstrap / teardown | Reserved |
 
 - State: `pauseSources: string[]`, `isPaused = pauseSources.length > 0`.

@@ -345,7 +345,7 @@ function renderMatchHtml(quiz) {
       </button>
     `).join('');
   return `
-      <p class="text-xs text-gray-500">Click a term, then its matching definition. Matched pairs share a letter and color. Click a matched item to undo.</p>
+      <p class="text-xs text-gray-500">Click a term, then any definition to pair them. Pairs share a letter and color (right or wrong). Click a matched item to undo. Correctness is checked when you submit.</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-match-board>
         <div class="space-y-2">
           <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Terms</p>
@@ -419,14 +419,62 @@ export function renderSkillMcqHtml(quiz, taskName, opts = {}) {
     `;
 }
 
+function resetMatchBoard(gate) {
+  gate.querySelectorAll('.skill-match-term, .skill-match-def').forEach((btn) => {
+    const isTerm = btn.classList.contains('skill-match-term');
+    clearMatchPairClasses(btn);
+    btn.className = isTerm ? MATCH_TERM_BASE : MATCH_DEF_BASE;
+  });
+  const terms = gate.querySelectorAll('.skill-match-term');
+  const status = gate.querySelector('[data-match-status]');
+  if (status) status.textContent = `0 / ${terms.length} matched`;
+  renderMatchPairList(gate);
+}
+
+function clearSkillMcqCheat(gate, type) {
+  if (type === 'choice' || type === 'audio') {
+    gate.querySelectorAll('.challenge-choice').forEach((btn) => {
+      btn.classList.remove('ring-2', 'ring-amber-400', 'bg-amber-50');
+    });
+    return;
+  }
+  if (type === 'sata') {
+    gate.querySelectorAll('.skill-sata-choice').forEach((b) => {
+      b.checked = false;
+      b.closest('label')?.classList.remove('ring-2', 'ring-amber-400', 'bg-amber-50');
+    });
+    return;
+  }
+  if (type === 'match') {
+    resetMatchBoard(gate);
+    return;
+  }
+  if (type === 'flash') {
+    const reveal = gate.querySelector('.skill-flash-reveal');
+    const back = gate.querySelector('[data-flash-back]');
+    const grade = gate.querySelector('[data-flash-grade]');
+    back?.classList.add('hidden');
+    grade?.classList.add('hidden');
+    grade?.classList.remove('flex');
+    reveal?.classList.remove('hidden');
+  }
+}
+
 /**
  * Fill / highlight the correct answer without grading or submitting.
- * @returns {{ ok: boolean, message: string }}
+ * Second click clears cheat hints.
+ * @returns {{ ok: boolean, cleared?: boolean, message: string }}
  */
 export function applySkillMcqCheat() {
   const gate = document.querySelector('.challenge-gate[data-challenge="skill-mcq"]');
   if (!gate) return { ok: false, message: '' };
   const type = gate.getAttribute('data-quiz-type') || 'choice';
+
+  if (gate.getAttribute('data-cheat-active') === '1') {
+    clearSkillMcqCheat(gate, type);
+    gate.removeAttribute('data-cheat-active');
+    return { ok: true, cleared: true, message: 'Cheat hints cleared.' };
+  }
 
   if (type === 'choice' || type === 'audio') {
     let found = false;
@@ -438,11 +486,11 @@ export function applySkillMcqCheat() {
         found = true;
       }
     });
+    if (!found) return { ok: false, message: '' };
+    gate.setAttribute('data-cheat-active', '1');
     return {
-      ok: found,
-      message: found
-        ? 'Cheat highlighted the correct choice — click it to submit.'
-        : ''
+      ok: true,
+      message: 'Cheat highlighted the correct choice — click it to submit. Cheat again to clear.'
     };
   }
 
@@ -456,9 +504,10 @@ export function applySkillMcqCheat() {
       label?.classList.remove('ring-2', 'ring-amber-400', 'bg-amber-50');
       if (correct) label?.classList.add('ring-2', 'ring-amber-400', 'bg-amber-50');
     });
+    gate.setAttribute('data-cheat-active', '1');
     return {
       ok: true,
-      message: 'Cheat checked the correct options — press Check answer when ready.'
+      message: 'Cheat checked the correct options — press Check answer when ready. Cheat again to clear.'
     };
   }
 
@@ -466,6 +515,7 @@ export function applySkillMcqCheat() {
     const terms = [...gate.querySelectorAll('.skill-match-term')];
     const defs = [...gate.querySelectorAll('.skill-match-def')];
     if (!terms.length || !defs.length) return { ok: false, message: '' };
+    resetMatchBoard(gate);
     terms.forEach((termBtn, slot) => {
       const pairIndex = termBtn.getAttribute('data-pair-index');
       const defBtn = defs.find((d) => d.getAttribute('data-pair-index') === pairIndex);
@@ -477,9 +527,10 @@ export function applySkillMcqCheat() {
     renderMatchPairList(gate);
     const status = gate.querySelector('[data-match-status]');
     if (status) status.textContent = `${terms.length} / ${terms.length} matched`;
+    gate.setAttribute('data-cheat-active', '1');
     return {
       ok: true,
-      message: 'Cheat matched all pairs — press Check matches when ready.'
+      message: 'Cheat matched all pairs — press Check matches when ready. Cheat again to clear.'
     };
   }
 
@@ -491,9 +542,10 @@ export function applySkillMcqCheat() {
     grade?.classList.remove('hidden');
     grade?.classList.add('flex');
     reveal?.classList.add('hidden');
+    gate.setAttribute('data-cheat-active', '1');
     return {
       ok: true,
-      message: 'Cheat revealed the answer — tap Yes or No to continue.'
+      message: 'Cheat revealed the answer — tap Yes or No to continue. Cheat again to hide.'
     };
   }
 
@@ -573,6 +625,7 @@ export function wireSkillMcqInteractions(onGraded) {
           b.removeAttribute('aria-pressed');
           b.removeAttribute('title');
         });
+      gate.removeAttribute('data-cheat-active');
       refreshStatus();
     };
 
@@ -597,23 +650,26 @@ export function wireSkillMcqInteractions(onGraded) {
           return;
         }
         if (!selectedTerm) return;
-        const termIdx = selectedTerm.getAttribute('data-pair-index');
-        const defIdx = btn.getAttribute('data-pair-index');
-        if (termIdx === defIdx) {
-          applyMatchPairStyle(selectedTerm, btn, allocSlot());
-          clearSelection();
-          refreshStatus();
-        } else {
-          btn.classList.add('bg-rose-50', 'border-rose-300');
-          setTimeout(() => btn.classList.remove('bg-rose-50', 'border-rose-300'), 350);
-          clearSelection();
-        }
+        // Pair any term ↔ definition; correctness is graded on Check.
+        applyMatchPairStyle(selectedTerm, btn, allocSlot());
+        gate.removeAttribute('data-cheat-active');
+        clearSelection();
+        refreshStatus();
       });
     });
 
     gate.querySelector('.skill-quiz-check')?.addEventListener('click', () => {
       const n = total();
-      const ok = n > 0 && matchedCount() === n;
+      if (!(n > 0 && matchedCount() === n)) {
+        onGraded({ ok: false });
+        return;
+      }
+      const ok = terms().every((termBtn) => {
+        const slot = termBtn.getAttribute('data-match-slot');
+        const defBtn = defs().find((d) => d.getAttribute('data-match-slot') === slot);
+        return !!defBtn
+          && termBtn.getAttribute('data-pair-index') === defBtn.getAttribute('data-pair-index');
+      });
       onGraded({ ok });
     });
     return;

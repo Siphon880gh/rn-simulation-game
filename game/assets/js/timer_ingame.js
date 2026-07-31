@@ -1,6 +1,7 @@
 import { roundDownTo15, timemarkPlusMinutes, divideBy15Mins, list15MinTimemarksFromHHMM } from './timer_utils.js';
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
+import BoostersModule from './boosters.js';
 
 const GameTimerModule = (() => {
   // Timer state
@@ -270,6 +271,11 @@ ${selectors.join(',\n')} {
     const userSource = GameConfig.timer.pauseSources.USER;
 
     newPauseButton.addEventListener('click', () => {
+      // Booster freeze owns Resume → confirm (and optional booster reclaim)
+      if (typeof BoostersModule.handlePauseButtonClick === 'function'
+          && BoostersModule.handlePauseButtonClick()) {
+        return;
+      }
       const sources = gameState.getStateSlice('pauseSources') || [];
       if (sources.includes(userSource)) {
         timerActions.resume(userSource);

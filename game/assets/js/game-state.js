@@ -265,7 +265,12 @@ class GameState {
       boosterFreeze: payload?.active
         ? {
             endsAtMs: Number(payload.endsAtMs) || 0,
-            gameMinutes: Number(payload.gameMinutes) || GameConfig.boosters?.freezeGameMinutes || 15
+            gameMinutes: Number(payload.gameMinutes) || GameConfig.boosters?.freezeGameMinutes || 15,
+            startedAtMs: Number(payload.startedAtMs) || Date.now(),
+            /** Frozen display clock; slot execution advances from here while freeze is active. */
+            baseTime: payload.baseTime != null
+              ? Number(payload.baseTime)
+              : (this.state.currentTime ?? GameConfig.timer.defaultShiftStart)
           }
         : null
     }));
@@ -426,6 +431,21 @@ class GameState {
       const slots = this.state.slots.map((slot) => {
         if (slot.id !== payload.slotId) return slot;
         return { ...slot, progress: Math.max(0, Math.min(100, payload.progress || 0)) };
+      });
+      return { ...this.state, slots };
+    });
+
+    /** Rebase busy-slot startedAt/endsAt/progress after booster freeze (virtual clock → display clock). */
+    this.actions.set('UPDATE_SLOT_TIMING', (payload) => {
+      const slots = this.state.slots.map((slot) => {
+        if (slot.id !== payload.slotId) return slot;
+        const next = { ...slot };
+        if (payload.startedAt != null) next.startedAt = payload.startedAt;
+        if (payload.endsAt != null) next.endsAt = payload.endsAt;
+        if (payload.progress != null) {
+          next.progress = Math.max(0, Math.min(100, payload.progress));
+        }
+        return next;
       });
       return { ...this.state, slots };
     });

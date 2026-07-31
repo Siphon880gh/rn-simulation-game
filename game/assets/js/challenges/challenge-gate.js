@@ -812,7 +812,13 @@ export function cheatChallenge() {
     }
     if (activeSession.skillMcq) {
         const filled = applySkillMcqCheat();
-        if (filled.ok) {
+        if (filled.ok && filled.cleared) {
+            const feedback = document.querySelector('#challenge-feedback');
+            if (feedback) {
+                feedback.textContent = '';
+                feedback.classList.add('hidden');
+            }
+        } else if (filled.ok) {
             setChallengeFeedback(filled.message, { ok: true });
         }
         return;

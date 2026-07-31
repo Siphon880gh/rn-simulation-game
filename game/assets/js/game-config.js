@@ -39,7 +39,8 @@ export const GameConfig = {
 
   /**
    * Boosters earned from multi-question challenge levels (N questions → N−1 boosters).
-   * Spend to freeze the clock (~15 game minutes) or finish all busy queue slots.
+   * Spend to freeze the shift clock (~15 game minutes; stackable) or finish all busy queue slots.
+   * While frozen: clock/events pause, but queue slots keep running and new tasks can be chosen.
    */
   boosters: {
     freezeGameMinutes: 15,

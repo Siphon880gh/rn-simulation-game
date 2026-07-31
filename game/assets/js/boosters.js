@@ -1,11 +1,14 @@
 /**
  * Challenge-level boosters — earn via multi-question quizzes; spend near the clock.
- * Freeze (~15 game minutes) or finish every busy queue slot (animated).
+ * Freeze (~15 game minutes, stackable) or finish every busy queue slot (animated).
+ * During freeze: shift clock/events pause; queue slots keep running; new tasks can be chosen.
+ * Resume during freeze asks for confirmation; unused stacked time (>15m) reclaims boosters.
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
 import { setLastReleasedClass } from './task-class-interactions.js';
+
 const BOOSTER_PAUSE = () => GameConfig.timer.pauseSources.BOOSTER;
 const cfg = () => GameConfig.boosters || {};
 const sel = () => cfg().selectors || {};
@@ -13,6 +16,8 @@ const sel = () => cfg().selectors || {};
 let freezeTimerId = null;
 let freezeTickId = null;
 let spending = false;
+/** @type {{ processSlots?: Function, settleAfterFreeze?: Function, drainQueue?: Function } | null} */
+let slotsRef = null;
 
 function formatHhmm(hhmm) {
   if (hhmm == null) return '—';
@@ -22,6 +27,18 @@ function formatHhmm(hhmm) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
+function hhmmToMinutes(hhmm) {
+  const n = Number(hhmm) || 0;
+  return Math.floor(n / 100) * 60 + (n % 100);
+}
+
+function minutesToHhmm(totalMinutes) {
+  const normalized = ((totalMinutes % (24 * 60)) + (24 * 60)) % (24 * 60);
+  const hours = Math.floor(normalized / 60);
+  const mins = normalized % 60;
+  return hours * 100 + mins;
+}
+
 function statusMessage(text) {
   const el = document.querySelector(GameConfig.selectors.statusMessage);
   if (el) el.textContent = text;
@@ -29,6 +46,46 @@ function statusMessage(text) {
 
 function getCount() {
   return Math.max(0, Number(gameState.getStateSlice('boosters')) || 0);
+}
+
+function freezeVirtualMinutes(freeze) {
+  if (!freeze?.startedAtMs || !freeze?.endsAtMs) return 0;
+  const span = Math.max(1, Number(freeze.endsAtMs) - Number(freeze.startedAtMs));
+  const elapsed = Math.max(0, Math.min(span, Date.now() - Number(freeze.startedAtMs)));
+  return (elapsed / span) * (Math.max(0, Number(freeze.gameMinutes) || 0));
+}
+
+function freezeExecutionTime(freeze = gameState.getStateSlice('boosterFreeze')) {
+  if (!freeze || freeze.baseTime == null || !freeze.startedAtMs || !freeze.endsAtMs) {
+    return null;
+  }
+  return minutesToHhmm(hhmmToMinutes(freeze.baseTime) + Math.floor(freezeVirtualMinutes(freeze)));
+}
+
+function remainingFreezeGameMinutes(freeze = gameState.getStateSlice('boosterFreeze')) {
+  if (!freeze?.endsAtMs || freeze.endsAtMs <= Date.now()) return 0;
+  return Math.max(0, Number(freeze.gameMinutes) - freezeVirtualMinutes(freeze));
+}
+
+/** Full unused booster units when remaining freeze is greater than one unit (>15m). */
+function reclaimBoostersForRemaining(remainingMins) {
+  const unit = Number(cfg().freezeGameMinutes) || 15;
+  if (!(remainingMins > unit)) return 0;
+  return Math.floor(remainingMins / unit);
+}
+
+function isBoosterFreezeActive() {
+  const freeze = gameState.getStateSlice('boosterFreeze');
+  return Boolean(freeze?.endsAtMs && freeze.endsAtMs > Date.now());
+}
+
+function paintFreezeButton(freezeBtn, freezing, n) {
+  if (!freezeBtn) return;
+  const unit = Number(cfg().freezeGameMinutes) || 15;
+  freezeBtn.disabled = n <= 0 || spending;
+  freezeBtn.textContent = freezing
+    ? `Stack freeze +${unit} min`
+    : `Freeze timer ${unit} min`;
 }
 
 function paintCount() {
@@ -44,9 +101,7 @@ function paintCount() {
   const freezeBtn = document.querySelector(sel().freezeBtn);
   const slotsBtn = document.querySelector(sel().slotsBtn);
   const freezing = Boolean(gameState.getStateSlice('boosterFreeze'));
-  if (freezeBtn) {
-    freezeBtn.disabled = n <= 0 || freezing || spending;
-  }
+  paintFreezeButton(freezeBtn, freezing, n);
   if (slotsBtn) {
     slotsBtn.disabled = n <= 0 || spending;
   }
@@ -65,8 +120,8 @@ function paintFreezeStatus() {
   }
   const leftMs = Math.max(0, freeze.endsAtMs - Date.now());
   const leftSec = Math.ceil(leftMs / 1000);
-  const mins = Number(freeze.gameMinutes) || cfg().freezeGameMinutes || 15;
-  statusEl.textContent = `Frozen ${mins}m · ${leftSec}s`;
+  const minsLeft = Math.max(0, Math.ceil(Number(freeze.gameMinutes) - freezeVirtualMinutes(freeze)));
+  statusEl.textContent = `Frozen ~${minsLeft}m · ${leftSec}s (slots keep running)`;
   statusEl.classList.remove('hidden');
   root?.classList.add('shell-boosters--freezing');
 }
@@ -82,19 +137,93 @@ function clearFreezeTimers() {
   }
 }
 
-function endFreeze({ silent = false } = {}) {
+function tickFreezeSlots() {
+  const effective = freezeExecutionTime();
+  if (effective == null) return;
+  slotsRef?.processSlots?.(effective);
+  paintFreezeStatus();
+}
+
+function scheduleFreezeEnd() {
+  const freeze = gameState.getStateSlice('boosterFreeze');
+  if (!freeze?.endsAtMs) return;
+  clearFreezeTimers();
+  freezeTickId = setInterval(tickFreezeSlots, 250);
+  const left = Math.max(0, freeze.endsAtMs - Date.now());
+  freezeTimerId = setTimeout(() => endFreeze(), left);
+  tickFreezeSlots();
+}
+
+function endFreeze({ silent = false, reclaim = 0 } = {}) {
+  slotsRef?.settleAfterFreeze?.();
   clearFreezeTimers();
   gameState.dispatch('SET_BOOSTER_FREEZE', { active: false });
   gameState.dispatch('SET_PAUSE', { paused: false, source: BOOSTER_PAUSE() });
+  const giveBack = Math.max(0, Math.floor(Number(reclaim) || 0));
+  if (giveBack > 0) {
+    gameState.dispatch('ADD_BOOSTERS', { count: giveBack });
+  }
   paintFreezeStatus();
   paintCount();
   if (!silent) {
-    statusMessage('Booster freeze ended — clock running');
+    statusMessage(
+      giveBack > 0
+        ? `Booster freeze ended — reclaimed ${giveBack} booster${giveBack === 1 ? '' : 's'}`
+        : 'Booster freeze ended — clock running'
+    );
     gameState.dispatch('APPEND_SHIFT_LOG', {
-      message: 'Booster freeze ended',
+      message: giveBack > 0
+        ? `Booster freeze ended early (reclaimed ${giveBack})`
+        : 'Booster freeze ended',
       timeLabel: formatHhmm(gameState.getStateSlice('currentTime'))
     });
   }
+}
+
+async function confirmEarlyResumeFreeze() {
+  const freeze = gameState.getStateSlice('boosterFreeze');
+  if (!freeze?.endsAtMs || freeze.endsAtMs <= Date.now()) return;
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+  const remaining = remainingFreezeGameMinutes(freeze);
+  const reclaim = reclaimBoostersForRemaining(remaining);
+  const minsLabel = Math.max(1, Math.ceil(remaining));
+  const unit = Number(cfg().freezeGameMinutes) || 15;
+
+  let body = `<p class="text-sm text-gray-700">End the booster freeze and resume the shift clock?</p>
+    <p class="text-sm text-gray-600 mt-2">About <strong>${minsLabel} game minutes</strong> of freeze remain. Queue slots will keep their progress.</p>`;
+  if (reclaim > 0) {
+    body += `<p class="text-sm text-amber-800 mt-3 font-medium">You will reclaim <strong>${reclaim}</strong> booster${reclaim === 1 ? '' : 's'} (unused freeze beyond ${unit} min).</p>`;
+  }
+
+  const { default: ModalModule } = await import('./modal.js');
+
+  window.boosterFreezeResumeYes = () => {
+    ModalModule.closeModal();
+    endFreeze({ reclaim });
+    delete window.boosterFreezeResumeYes;
+    delete window.boosterFreezeResumeNo;
+  };
+  window.boosterFreezeResumeNo = () => {
+    ModalModule.closeModal();
+    delete window.boosterFreezeResumeYes;
+    delete window.boosterFreezeResumeNo;
+  };
+
+  ModalModule.openModal({
+    title: 'Resume during freeze?',
+    content: `<div class="space-y-1 text-left">${body}</div>`,
+    footer: `
+      <div class="flex flex-wrap gap-2 justify-end">
+        <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          onclick="window.boosterFreezeResumeNo && window.boosterFreezeResumeNo()">Keep frozen</button>
+        <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          onclick="window.boosterFreezeResumeYes && window.boosterFreezeResumeYes()">Resume shift</button>
+      </div>
+    `,
+    overlay: true,
+    persistent: false
+  });
 }
 
 function freezeRealMs(timerModule) {
@@ -114,10 +243,6 @@ function trySpend(count = 1) {
 
 function useFreeze(timerModule) {
   if (spending) return;
-  if (gameState.getStateSlice('boosterFreeze')) {
-    statusMessage('Already using a booster freeze');
-    return;
-  }
   if (!trySpend(1)) {
     statusMessage('No boosters left');
     paintCount();
@@ -125,24 +250,46 @@ function useFreeze(timerModule) {
   }
 
   const { gameMins, realMs } = freezeRealMs(timerModule);
-  const endsAtMs = Date.now() + realMs;
-  gameState.dispatch('SET_BOOSTER_FREEZE', {
-    active: true,
-    endsAtMs,
-    gameMinutes: gameMins
-  });
-  gameState.dispatch('SET_PAUSE', { paused: true, source: BOOSTER_PAUSE() });
-  gameState.dispatch('APPEND_SHIFT_LOG', {
-    message: `Booster: froze clock for ${gameMins} game minutes`,
-    timeLabel: formatHhmm(gameState.getStateSlice('currentTime'))
-  });
-  statusMessage(`Booster freeze — ${gameMins} game minutes`);
+  const existing = gameState.getStateSlice('boosterFreeze');
+  const nowMs = Date.now();
+
+  if (existing?.endsAtMs && existing.endsAtMs > nowMs && existing.baseTime != null) {
+    const virtualNow = freezeVirtualMinutes(existing);
+    const remainingReal = Math.max(0, existing.endsAtMs - nowMs);
+    const remainingVirtual = Math.max(0, Number(existing.gameMinutes) - virtualNow);
+    const totalMins = remainingVirtual + gameMins;
+    gameState.dispatch('SET_BOOSTER_FREEZE', {
+      active: true,
+      startedAtMs: nowMs,
+      endsAtMs: nowMs + remainingReal + realMs,
+      gameMinutes: totalMins,
+      baseTime: minutesToHhmm(hhmmToMinutes(existing.baseTime) + Math.floor(virtualNow))
+    });
+    gameState.dispatch('APPEND_SHIFT_LOG', {
+      message: `Booster: stacked +${gameMins} game minutes freeze (${Math.ceil(totalMins)}m total)`,
+      timeLabel: formatHhmm(gameState.getStateSlice('currentTime'))
+    });
+    statusMessage(`Booster freeze stacked — +${gameMins}m (${Math.ceil(totalMins)}m total)`);
+  } else {
+    const baseTime = gameState.getStateSlice('currentTime') ?? GameConfig.timer.defaultShiftStart;
+    gameState.dispatch('SET_BOOSTER_FREEZE', {
+      active: true,
+      startedAtMs: nowMs,
+      endsAtMs: nowMs + realMs,
+      gameMinutes: gameMins,
+      baseTime
+    });
+    gameState.dispatch('SET_PAUSE', { paused: true, source: BOOSTER_PAUSE() });
+    gameState.dispatch('APPEND_SHIFT_LOG', {
+      message: `Booster: froze clock for ${gameMins} game minutes (slots keep running)`,
+      timeLabel: formatHhmm(baseTime)
+    });
+    statusMessage(`Booster freeze — ${gameMins} game minutes (slots keep running)`);
+  }
+
   paintCount();
   paintFreezeStatus();
-
-  clearFreezeTimers();
-  freezeTickId = setInterval(paintFreezeStatus, 250);
-  freezeTimerId = setTimeout(() => endFreeze(), realMs);
+  scheduleFreezeEnd();
 }
 
 async function animateSlotComplete(slotEl) {
@@ -173,7 +320,7 @@ async function useFinishSlots(slotSystem) {
 
   spending = true;
   paintCount();
-  const currentTime = gameState.getStateSlice('currentTime');
+  const currentTime = freezeExecutionTime() ?? gameState.getStateSlice('currentTime');
   const bar = document.querySelector(GameConfig.selectors.taskQueueBar);
   let finished = 0;
 
@@ -211,6 +358,7 @@ async function useFinishSlots(slotSystem) {
 
 const BoostersModule = {
   init({ timer, slots } = {}) {
+    slotsRef = slots || null;
     paintCount();
     paintFreezeStatus();
 
@@ -238,12 +386,24 @@ const BoostersModule = {
     if (freeze?.endsAtMs && freeze.endsAtMs <= Date.now()) {
       endFreeze({ silent: true });
     } else if (freeze?.endsAtMs) {
-      const left = freeze.endsAtMs - Date.now();
-      clearFreezeTimers();
-      freezeTickId = setInterval(paintFreezeStatus, 250);
-      freezeTimerId = setTimeout(() => endFreeze(), left);
       gameState.dispatch('SET_PAUSE', { paused: true, source: BOOSTER_PAUSE() });
+      scheduleFreezeEnd();
     }
+  },
+
+  /**
+   * Pause/Resume button hook. When a booster freeze is active, Resume asks for
+   * confirmation (and may reclaim stacked boosters). Returns true if handled.
+   */
+  handlePauseButtonClick() {
+    if (!isBoosterFreezeActive()) return false;
+    void confirmEarlyResumeFreeze();
+    return true;
+  },
+
+  /** Effective HHMM for slot work during an active freeze; null when not freezing. */
+  getFreezeExecutionTime() {
+    return freezeExecutionTime();
   },
 
   /** Award boosters after a multi-question challenge pass (N answers → N−1 boosters). */
