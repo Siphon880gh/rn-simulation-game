@@ -174,6 +174,49 @@ export const GameConfig = {
   },
 
   /**
+   * Queue-slot concurrency constraints (declarative).
+   * Evaluated by slot-constraints.js before assign / enqueue / Perform.
+   *
+   * Types:
+   * - mutexSimilar: only one matching task in busy slots at a time
+   * - requiresEmptySlots: start only when all slots empty; exclusive:true
+   *   blocks other starts and disables remaining empty slots while active
+   * - blocksWith: blocked while any busy-slot task matches blocksWhen
+   */
+  slotConstraints: {
+    enabled: true,
+    rules: [
+      {
+        id: 'mutex-shift-assessment',
+        type: 'mutexSimilar',
+        match: { kind: 'shift-assessment' },
+        message: "Can't perform more than one of this same task"
+      },
+      {
+        id: 'mutex-chart-assessment',
+        type: 'mutexSimilar',
+        match: { kind: 'chart-assessment' },
+        message: "Can't perform more than one of this same task"
+      },
+      {
+        id: 'exclusive-chart-assessment',
+        type: 'requiresEmptySlots',
+        match: { kind: 'chart-assessment' },
+        exclusive: true,
+        message: 'Clear all queue slots before charting',
+        exclusiveMessage: 'Charting requires sole use of the queue — finish it first'
+      },
+      {
+        id: 'chart-blocks-with-shift-assessment',
+        type: 'blocksWith',
+        match: { kind: 'chart-assessment' },
+        blocksWhen: { kind: 'shift-assessment' },
+        message: 'Cannot chart while a shift assessment is in a queue slot'
+      }
+    ]
+  },
+
+  /**
    * Right-rail Delegate / assist staff (E13).
    * Naming: section "Delegate" (action verb). Helpers listed by role+name —
    * ICU = CCT (critical care tech); floor = CNA + room. Replaces vague

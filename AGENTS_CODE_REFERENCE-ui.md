@@ -42,7 +42,7 @@ Browser chrome around the sim: locked shell regions (E1.M2), patient main mount,
 | Right menu | `#shell-right-menu` | E10 Orders (`#orders-rail`) + Tools (`#tools-rail`) + E13 Delegate (`#delegate-rail`); `right-menu.js` |
 | Bottom | `#shell-bottom` | History + slots + status |
 | History log | `#shift-history-log` | Append-only via `APPEND_SHIFT_LOG` |
-| Task queue | `#task-queue-bar` / `#slot-waiting-queue` | 3 slots + FIFO wait (slot-system.js) |
+| Task queue | `#task-queue-bar` / `#slot-waiting-queue` | 3 slots + FIFO wait (slot-system.js); exclusive → `.task-slot--disabled` |
 | Status bar | `#shell-status-bar` / `#shell-status-message` | Live status line |
 | Clock / Pause | `#clock` / `#pause` | Timer module |
 | Modal | `#modal`… | Overlay; dims `#shell` |
@@ -78,7 +78,8 @@ Adding a doc: place under `docs/{devs,players,learning}/` **and** list it in `do
 
 - Base `[data-task-type]` transitions  
 - Status: `not-yet` (dim), `active`, `completed`, `overdue` (pulse)  
-- Type-specific / slot-label rules further down the file  
+- Type-specific / slot-label rules further down the file
+- `.task-slot--disabled` + `.task-queue-bar--exclusive` when an exclusive slot task is active  
 
 ---
 

@@ -107,6 +107,7 @@ rngame/
 │   │   ├── right-menu.js              # E10 Orders + Tools right rail
 │   │   ├── dynamic-tasks.js           # E3.M5 weighted dynamic/urgent spawn + incident tabs
 │   │   ├── slot-system.js             # 3 slots + FIFO waiting queue
+│   │   ├── slot-constraints.js        # Declarative slot concurrency (mutex / exclusive / blocksWith)
 │   │   ├── skill-focus.js             # Test skill: blank census + challenge → landing
 │   │   ├── docs.js                    # Help FAB + in-page docs viewer (ES module)
 │   │   ├── shell-chrome.js            # hour tabs + shift history log

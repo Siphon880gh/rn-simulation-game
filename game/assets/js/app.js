@@ -8,6 +8,7 @@ import PatientsModule from './patients.js';
 import { timemarkPlusMinutes } from './timer_utils.js';
 import ShellChromeModule from './shell-chrome.js';
 import SlotSystem from './slot-system.js';
+import { canEnterSlot } from './slot-constraints.js';
 import DebriefModule from './debrief.js';
 import ScenarioPackModule from './scenario-pack.js';
 import EventDripModule from './event-drip.js';
@@ -360,7 +361,10 @@ class GameApplication {
                 const slotState = SlotSystem.getTaskSlotState(taskId);
                 const occupied = Boolean(slotState);
                 const windowOk = taskSystem.isPerformAllowed(task, now);
-                const canPerform = windowOk && !occupied;
+                const slotGate = occupied
+                    ? { ok: true }
+                    : (SlotSystem.canAcceptTask?.(task) || canEnterSlot(task));
+                const canPerform = windowOk && !occupied && slotGate.ok !== false;
                 const phase = taskSystem.getWindowPhase(task, now);
                 const kind = String(task.type).toLowerCase();
                 const metaKind = String(task.metadata?.kind || '').toLowerCase();
@@ -401,6 +405,8 @@ class GameApplication {
                     performLabel = 'Perform (complete shift assessment first)';
                 } else if (!windowOk) {
                     performLabel = `Perform (outside window: ${phase})`;
+                } else if (slotGate.ok === false) {
+                    performLabel = `${performName} (blocked)`;
                 }
 
                 const items = {
@@ -520,7 +526,20 @@ class GameApplication {
             details: () => {
                 const durationMins = task.duration;
                 const expire = task.expire;
-                alert(`Task is ${durationMins} mins long. Expires at ${expire}.`);
+                let msg = `Task is ${durationMins} mins long. Expires at ${expire}.`;
+                const occupied = SlotSystem.getTaskSlotState(task?.id);
+                if (occupied === 'busy') {
+                    msg += ' Already in progress in a queue slot.';
+                } else if (occupied === 'queued') {
+                    msg += ' Already waiting in the queue.';
+                } else {
+                    const gate = SlotSystem.canAcceptTask?.(task) || canEnterSlot(task);
+                    if (gate?.ok === false && gate.message) {
+                        const reason = String(gate.message).trim().replace(/\.$/, '');
+                        msg += ` ${reason}.`;
+                    }
+                }
+                alert(msg);
             },
             fingerStickOdds: () => {
                 const diceBtn = element?.querySelector?.('[data-finger-stick-dice]');
@@ -554,7 +573,7 @@ class GameApplication {
         }
         const result = slotSystem?.requestSlot(task, gameState.getStateSlice('currentTime'));
         if (!result?.ok) {
-            alert('Could not start or queue that IV task.');
+            alert(result?.message || 'Could not start or queue that IV task.');
         }
     }
 
@@ -592,6 +611,11 @@ class GameApplication {
         }
         if (!taskSystem.isPerformAllowed(task, now)) {
             alert(`Cannot perform outside the availability window (${taskSystem.getWindowPhase(task, now)}).`);
+            return;
+        }
+        const slotGate = SlotSystem.canAcceptTask?.(task) || canEnterSlot(task);
+        if (slotGate?.ok === false) {
+            alert(slotGate.message || 'Cannot start that task in the queue slots right now.');
             return;
         }
 
@@ -653,7 +677,7 @@ class GameApplication {
         const slotSystem = this.modules.get('slots');
         const result = slotSystem?.requestSlot(workTask, now);
         if (!result?.ok) {
-            alert('Could not start or queue that task.');
+            alert(result?.message || 'Could not start or queue that task.');
         }
     }
 
@@ -698,7 +722,7 @@ class GameApplication {
             const slotSystem = this.modules.get('slots');
             const result = slotSystem?.requestSlot(task, now);
             if (!result?.ok) {
-                alert('Could not start or queue the admitting callback.');
+                alert(result?.message || 'Could not start or queue the admitting callback.');
             }
             return;
         }
@@ -758,7 +782,7 @@ class GameApplication {
         const slotSystem = this.modules.get('slots');
         const result = slotSystem?.requestSlot(task, now);
         if (!result?.ok) {
-            alert('Could not start or queue the doctor callback.');
+            alert(result?.message || 'Could not start or queue the doctor callback.');
         }
     }
 
@@ -802,7 +826,7 @@ class GameApplication {
 
             const result = slotSystem?.requestSlot(liveTask, gameState.getStateSlice('currentTime'));
             if (!result?.ok) {
-                alert('Could not start or queue that task.');
+                alert(result?.message || 'Could not start or queue that task.');
                 return;
             }
 

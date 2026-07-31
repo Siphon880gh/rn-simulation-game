@@ -406,6 +406,36 @@ li[data-status="active"] {
     letter-spacing: 0.04em;
 }
 
+/* Exclusive task active — remaining empty slots locked */
+.task-slot--disabled {
+    justify-content: center;
+    gap: 0.15rem;
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    border-style: dashed;
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.task-slot--disabled .task-slot-label {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    font-weight: 600;
+}
+
+.task-slot--disabled .task-slot-hint {
+    font-size: 0.6rem;
+    color: #9ca3af;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.task-queue-bar--exclusive .task-slot--busy {
+    border-color: #f59e0b;
+    background: #fffbeb;
+}
+
 .task-slot--busy {
     background: #eff6ff;
     border-color: #93c5fd;

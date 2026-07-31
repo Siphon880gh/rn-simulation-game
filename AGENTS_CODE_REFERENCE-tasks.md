@@ -17,10 +17,11 @@ Declarative tasks with availability windows: create from patient HTML attrs, act
 |------|--------|------|
 | `game/assets/js/task-system.js` | ~280 | Schema normalize, processors, create/process/complete |
 | `game/assets/js/availability-windows.js` | ~100 | E3.M3 phases + Perform gate + reveal CSS helpers |
-| `game/assets/js/game-config.js` | — | `tasks.schemaVersion`, `classes`, `types`, `statuses`, `availability` |
+| `game/assets/js/slot-constraints.js` | ~200 | Declarative queue-slot concurrency gates (`canEnterSlot`) |
+| `game/assets/js/game-config.js` | — | `tasks.*`, `slots`, `slotConstraints`, `availability` |
 | `game/assets/js/game-state.js` | — | `REGISTER_TASK`, `ACTIVATE_TASK`, `MARK_OVERDUE`, `COMPLETE_TASK` |
 | `game/assets/js/app.js` | — | Context menu + med perform path |
-| `game/assets/css/declarative-tasks.css` | ~150 | Status visuals + scheduled reveal opacity |
+| `game/assets/css/declarative-tasks.css` | ~150 | Status visuals + scheduled reveal opacity + disabled slots |
 
 ---
 
@@ -83,6 +84,18 @@ CSS classes: `task-status-*` in `declarative-tasks.css`.
 ## Slots (E3.M2)
 
 `slot-system.js` + `GameConfig.slots.count` (3). Perform → `requestSlot`: free slot → `ASSIGN_SLOT`; full → `ENQUEUE_SLOT_TASK` (FIFO `#slot-waiting-queue`). On release, `drainQueue` auto-assigns. Progress CSS + end timemark at bottom center; then `COMPLETE_TASK`. Context menu: `app.js` only (`jquery-contextmenu`).
+
+### Slot constraints (`slot-constraints.js`)
+
+`GameConfig.slotConstraints.rules` — evaluated by `canEnterSlot` before assign / enqueue / Perform / FIFO drain.
+
+| Rule type | Behavior |
+|-----------|----------|
+| `mutexSimilar` | Only one matching task (by `metadata.kind` / similarityKey / type) in busy slots |
+| `requiresEmptySlots` | Start only when all 3 slots empty; `exclusive:true` blocks other starts and renders remaining slots `.task-slot--disabled` |
+| `blocksWith` | Blocked while any busy-slot task matches `blocksWhen` |
+
+Default rules: shift-assessment mutex; chart-assessment mutex + exclusive empty-slots; chart blocked while any shift-assessment is in a slot. Details menu appends the block `message` to duration/expire copy. AUTO: `node scripts/verify-slot-constraints.mjs`.
 
 ---
 

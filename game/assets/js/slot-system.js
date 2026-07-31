@@ -9,6 +9,19 @@ import {
     setLastReleasedClass,
     resetClassInteractions
 } from './task-class-interactions.js';
+import {
+    canEnterSlot,
+    isExclusiveOccupancyActive,
+    matchSpec,
+    slotDisplayState
+} from './slot-constraints.js';
+
+function taskRequiresEmptySlots(task) {
+    return (GameConfig.slotConstraints?.rules || []).some((rule) => {
+        if (String(rule.type || '').toLowerCase() !== 'requiresemptyslots') return false;
+        return matchSpec(task, rule.match);
+    });
+}
 
 function hhmmToMinutes(hhmm) {
     const n = Number(hhmm) || 0;
@@ -56,7 +69,18 @@ function renderSlots(slots) {
     const bar = document.querySelector(GameConfig.selectors.taskQueueBar);
     if (!bar) return;
 
+    const exclusive = isExclusiveOccupancyActive();
+    bar.classList.toggle('task-queue-bar--exclusive', exclusive);
     bar.innerHTML = slots.map((slot) => {
+        const display = slotDisplayState(slot);
+        if (display === 'disabled') {
+            return `
+              <div class="task-slot task-slot--disabled" data-slot-id="${slot.id}" data-slot-disabled="1"
+                title="Disabled while a focused task occupies the queue" aria-disabled="true">
+                <span class="task-slot-label">Slot ${slot.id + 1}</span>
+                <span class="task-slot-hint">locked</span>
+              </div>`;
+        }
         if (!slot.taskId) {
             return `
               <div class="task-slot task-slot--empty" data-slot-id="${slot.id}" title="Click an active task → Perform to fill this slot">
@@ -203,18 +227,45 @@ const SlotSystem = {
     },
 
     /**
+     * Constraint gate for Perform / assign / drain.
+     * @returns {{ ok: boolean, reason?: string, message?: string, ruleId?: string }}
+     */
+    canAcceptTask(task) {
+        return canEnterSlot(task);
+    },
+
+    /**
      * Start task in a free slot, or enqueue FIFO when full.
-     * @returns {{ ok: boolean, queued?: boolean, reason?: string }}
+     * @returns {{ ok: boolean, queued?: boolean, reason?: string, message?: string }}
      */
     requestSlot(task, currentTime) {
         if (!task?.id) return { ok: false, reason: 'missing-task' };
         if (this.findSlotForTask(task.id)) return { ok: true };
         if (this.isQueued(task.id)) return { ok: true, queued: true };
 
+        const gate = canEnterSlot(task);
+        if (!gate.ok) {
+            return {
+                ok: false,
+                reason: gate.reason,
+                message: gate.message,
+                ruleId: gate.ruleId
+            };
+        }
+
         const now = resolveExecutionTime(currentTime);
         if (this.hasFreeSlot()) {
             this.assignTaskNow(task, now);
             return { ok: true };
+        }
+
+        // Empty-slot / exclusive tasks must not sit in the waiting queue behind others.
+        if (taskRequiresEmptySlots(task)) {
+            return {
+                ok: false,
+                reason: 'requires-empty-slots',
+                message: 'Clear all queue slots before starting this task'
+            };
         }
 
         gameState.dispatch('ENQUEUE_SLOT_TASK', {
@@ -234,6 +285,7 @@ const SlotSystem = {
         if (!task?.id) return false;
         if (this.findSlotForTask(task.id)) return true;
         if (!this.hasFreeSlot()) return false;
+        if (!canEnterSlot(task).ok) return false;
         this.assignTaskNow(task, resolveExecutionTime(currentTime));
         return true;
     },
@@ -278,6 +330,9 @@ const SlotSystem = {
                 gameState.dispatch('DEQUEUE_SLOT_TASK', { taskId: next.taskId });
                 continue;
             }
+
+            // FIFO: stop if head cannot enter yet (mutex / exclusive / empty-slots).
+            if (!canEnterSlot(task).ok) break;
 
             gameState.dispatch('DEQUEUE_SLOT_TASK', { taskId: next.taskId });
             this.assignTaskNow(task, now);
