@@ -1,0 +1,51 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Otis Greer</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Room 303-A</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 79</p>
+        <p class="text-sm text-gray-600">Sex: Male</p>
+        <p class="text-sm text-gray-600">Diagnosis: Hip ORIF — acute delirium, soft wrist restraints</p>
+        <p class="text-sm text-gray-600">Least-restrictive first; q15–q2h checks; release for ROM / toileting as ordered</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 96</div>
+        <div>BP: 132/78</div>
+        <div>Temp: 99.0°F</div>
+        <div>O<sub>2</sub>: 96% RA</div>
+        <div>Pain: 3/10 hip</div>
+        <div>RR: 18</div>
+        <div>Restraints: bilateral soft wrist</div>
+        <div>Order renew: due 2100</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-hand-paper text-xl mr-1 text-orange-700"></i>
+            Restraint safety
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="restraint-safety" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="12" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-hand-paper text-orange-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Restraint safety / least-restrictive review</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2100" data-expire="2200" data-duration-mins="8" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-clock text-orange-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Circulation / skin / ROM check under restraints</span>
+                <span class="ml-auto text-sm text-gray-500">2100</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-otis" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

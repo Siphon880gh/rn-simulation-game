@@ -1,0 +1,34 @@
+{
+  "id": "skill-iabp-icu",
+  "title": "Skill practice — IABP (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Verify IABP inflation in diastole and deflation before systole",
+    "Assess distal limb perfusion on the access side frequently"
+  ],
+  "patients": ["beau"],
+  "patientOverrides": {
+    "beau": {
+      "clinicalStatus": "critical",
+      "acuityScore": 5,
+      "clinicalStatusReason": "IABP 1:1"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

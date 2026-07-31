@@ -1,0 +1,34 @@
+{
+  "id": "skill-pressure-injury-medsurg",
+  "title": "Skill practice — Pressure injury prevention (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Prioritize scheduled repositioning and offloading for high-risk skin",
+    "Perform skin checks without harmful practices (e.g. massaging reddened areas)"
+  ],
+  "patients": ["ruth"],
+  "patientOverrides": {
+    "ruth": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "High pressure-injury risk / bedbound"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

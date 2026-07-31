@@ -1,0 +1,51 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Ida Cho</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Room 309-A</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 54</p>
+        <p class="text-sm text-gray-600">Sex: Female</p>
+        <p class="text-sm text-gray-600">Diagnosis: Osteomyelitis — right PICC; dressing due</p>
+        <p class="text-sm text-gray-600">Sterile dressing change; assess site; document external catheter length</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 84</div>
+        <div>BP: 126/78</div>
+        <div>Temp: 99.4°F</div>
+        <div>O<sub>2</sub>: 98% RA</div>
+        <div>Pain: leg 3/10</div>
+        <div>RR: 16</div>
+        <div>PICC: R basilic</div>
+        <div>Dressing: due / loose edge</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-band-aid text-xl mr-1 text-violet-700"></i>
+            Vascular access
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="picc-dressing" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="20" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-band-aid text-violet-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">PICC sterile dressing change</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2100" data-expire="2200" data-duration-mins="8" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-ruler text-violet-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">External length / site assessment</span>
+                <span class="ml-auto text-sm text-gray-500">2100</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-ida" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

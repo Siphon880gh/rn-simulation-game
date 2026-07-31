@@ -1,0 +1,35 @@
+{
+  "id": "skill-abg-icu",
+  "title": "Skill practice — ABG / Arterial blood gases (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recall normal ABG reference ranges (pH, pCO₂, HCO₃, pO₂, SaO₂)",
+    "Classify acid–base states and compensation (uncompensated / partial / full)",
+    "Identify hypoxemia from PaO₂ and SaO₂ values"
+  ],
+  "patients": ["vale"],
+  "patientOverrides": {
+    "vale": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Hypercapnic respiratory failure — serial ABGs"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

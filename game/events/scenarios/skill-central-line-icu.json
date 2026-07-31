@@ -1,0 +1,34 @@
+{
+  "id": "skill-central-line-icu",
+  "title": "Skill practice — Central line care (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Scrub the hub and use aseptic technique when accessing a CVC",
+    "Assess central line necessity and site/dressing integrity daily"
+  ],
+  "patients": ["lyle"],
+  "patientOverrides": {
+    "lyle": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Septic shock on pressors via CVC"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

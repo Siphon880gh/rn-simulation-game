@@ -222,11 +222,27 @@ export function buildTestChallengeTask(kind, patientId = null, opts = {}) {
         metadata: { challenge: 'icp' }
       };
     case 'skill-mcq': {
+      const requested = String(opts.skillId || '').trim();
+      // Landing Test skill always passes skillId — never silently swap to another bank
+      // (old bug: missing bank → bankIds[0] → seizure-precautions for every skill-mcq).
+      if (requested) {
+        if (!skillMcqBanks[requested]) {
+          console.warn(`skill-mcq: no question bank for skillId “${requested}”`);
+          return null;
+        }
+        const title = opts.skillLabel || skillMcqBanks[requested]?.title || requested;
+        return {
+          ...base,
+          name: `${title} (skill focus)`,
+          type: 'assessment',
+          metadata: { challenge: 'skill-mcq', skillId: requested }
+        };
+      }
+      // Dev test-spawn menu (no skillId): use first authored bank only.
       const bankIds = Object.keys(skillMcqBanks);
-      const skillId = opts.skillId && skillMcqBanks[opts.skillId]
-        ? opts.skillId
-        : bankIds[0] || 'seizure-precautions';
-      const title = opts.skillLabel || skillMcqBanks[skillId]?.title || skillId;
+      const skillId = bankIds[0] || '';
+      if (!skillId) return null;
+      const title = skillMcqBanks[skillId]?.title || skillId;
       return {
         ...base,
         name: `${title} (skill focus)`,

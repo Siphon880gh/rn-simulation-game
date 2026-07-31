@@ -1,0 +1,34 @@
+{
+  "id": "skill-ecmo-icu",
+  "title": "Skill practice — ECMO (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Prioritize circuit integrity, cannulation sites, and perfusion on ECMO",
+    "Respond to alarms and bleeding risk with the ECMO team"
+  ],
+  "patients": ["axel"],
+  "patientOverrides": {
+    "axel": {
+      "clinicalStatus": "critical",
+      "acuityScore": 5,
+      "clinicalStatusReason": "VA ECMO"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

@@ -1,0 +1,34 @@
+{
+  "id": "skill-ekg-12-lead-tele",
+  "title": "Skill practice — 12-lead EKG placement (Tele)",
+  "version": 1,
+  "department": "tele",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Place precordial leads V1–V6 at correct landmarks",
+    "Place limb leads with good contact for a diagnostic 12-lead"
+  ],
+  "patients": ["dex"],
+  "patientOverrides": {
+    "dex": {
+      "clinicalStatus": "watch",
+      "acuityScore": 3,
+      "clinicalStatusReason": "Chest pain — 12-lead EKG"
+    }
+  },
+  "scene": {
+    "theme": "tele",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

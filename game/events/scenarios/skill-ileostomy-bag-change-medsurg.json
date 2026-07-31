@@ -1,0 +1,34 @@
+{
+  "id": "skill-ileostomy-bag-change-medsurg",
+  "title": "Skill practice — Ileostomy bag replacement (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Measure the stoma and cut the wafer slightly larger than the diameter",
+    "Replace a leaking ileostomy appliance with skin protection"
+  ],
+  "patients": ["zane"],
+  "patientOverrides": {
+    "zane": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "Ileostomy wafer leak — bag change"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

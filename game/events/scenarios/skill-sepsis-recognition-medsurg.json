@@ -1,0 +1,34 @@
+{
+  "id": "skill-sepsis-recognition-medsurg",
+  "title": "Skill practice — Sepsis recognition (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize sepsis red flags after infection (confusion, fever, tachycardia, hypotension)",
+    "Escalate promptly with rapid assessment and provider notification"
+  ],
+  "patients": ["tessa"],
+  "patientOverrides": {
+    "tessa": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Possible sepsis — escalate now"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

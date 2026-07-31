@@ -1,0 +1,34 @@
+{
+  "id": "skill-ct-contrast-iv-medsurg",
+  "title": "Skill practice — CT with contrast / 18g IV (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Confirm patent large-bore IV suitable for power-injected contrast",
+    "Verify allergies and renal clearance per protocol before CT"
+  ],
+  "patients": ["kia"],
+  "patientOverrides": {
+    "kia": {
+      "clinicalStatus": "watch",
+      "acuityScore": 3,
+      "clinicalStatusReason": "CT contrast — need 18g IV"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

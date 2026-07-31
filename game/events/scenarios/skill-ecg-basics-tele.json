@@ -1,0 +1,34 @@
+{
+  "id": "skill-ecg-basics-tele",
+  "title": "Skill practice — ECG / telemetry basics (Tele)",
+  "version": 1,
+  "department": "tele",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize common telemetry rhythms including atrial fibrillation with RVR",
+    "Describe rate, regularity, P waves, and QRS on a strip"
+  ],
+  "patients": ["clyde"],
+  "patientOverrides": {
+    "clyde": {
+      "clinicalStatus": "watch",
+      "acuityScore": 3,
+      "clinicalStatusReason": "AFib with RVR on telemetry"
+    }
+  },
+  "scene": {
+    "theme": "tele",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

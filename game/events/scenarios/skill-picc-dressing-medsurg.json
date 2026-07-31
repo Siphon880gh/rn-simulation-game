@@ -1,0 +1,34 @@
+{
+  "id": "skill-picc-dressing-medsurg",
+  "title": "Skill practice — PICC dressing change (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Perform a sterile PICC dressing change with site assessment",
+    "Document external catheter length and securement"
+  ],
+  "patients": ["ida"],
+  "patientOverrides": {
+    "ida": {
+      "clinicalStatus": "stable",
+      "acuityScore": 2,
+      "clinicalStatusReason": "PICC dressing due"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

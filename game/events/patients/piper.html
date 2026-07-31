@@ -1,0 +1,43 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Piper Hale</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Room 302-A</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: —</p>
+        <p class="text-sm text-gray-600">Sex: —</p>
+        <p class="text-sm text-gray-600">Diagnosis: Incoming ED admit — bed not ready</p>
+        <p class="text-sm text-gray-600">Assignment: gather supplies and prepare the room before arrival</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>Status: empty bed</div>
+        <div>ETA: ~30 min</div>
+        <div>Isolation: none</div>
+        <div>O<sub>2</sub>: wall O<sub>2</sub> ready</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-bed text-xl mr-1 text-amber-700"></i>
+            Admission / bed prep
+        </h4>
+        <ul class="space-y-3">
+            <li id="piper-bed-prep" data-task-type="bedprep" data-challenge="bed-prep" data-task-class="urgent" data-status="not-yet"
+                data-scheduled="1900" data-expire="2000" data-duration-mins="15"
+                class="bg-amber-50 p-4 rounded-lg shadow flex items-center border border-amber-200">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-bed text-amber-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Prepare bed for admission</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-piper" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

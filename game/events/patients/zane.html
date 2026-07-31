@@ -1,0 +1,51 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Zane Ortiz</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Room 318-A</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 57</p>
+        <p class="text-sm text-gray-600">Sex: Male</p>
+        <p class="text-sm text-gray-600">Diagnosis: End ileostomy — wafer leaking; bag change due</p>
+        <p class="text-sm text-gray-600">Measure stoma; cut wafer ~⅛″ larger than diameter; seal skin</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 80</div>
+        <div>BP: 128/78</div>
+        <div>Temp: 98.4°F</div>
+        <div>O<sub>2</sub>: 98% RA</div>
+        <div>Pain: peristomal sting 4/10</div>
+        <div>RR: 16</div>
+        <div>Stoma Ø: ~32 mm</div>
+        <div>Wafer: undermines @ 6 o’clock</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-cut text-xl mr-1 text-amber-700"></i>
+            Ostomy appliance
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="ileostomy-bag-change" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="25" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-cut text-amber-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Ileostomy bag / wafer replacement</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="1930" data-expire="2000" data-duration-mins="8" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-ruler text-amber-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Stoma measure / cut diameter check</span>
+                <span class="ml-auto text-sm text-gray-500">1930</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-zane" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+{
+  "id": "skill-fall-precautions-medsurg",
+  "title": "Skill practice — Fall precautions (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Assist high fall-risk patients for toileting and keep a clear path",
+    "Keep bed alarm and call light within reach"
+  ],
+  "patients": ["iris"],
+  "patientOverrides": {
+    "iris": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "High fall risk after syncope"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

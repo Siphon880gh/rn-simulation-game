@@ -1,0 +1,34 @@
+{
+  "id": "skill-surgery-preop-medsurg",
+  "title": "Skill practice — Surgery preop checklist (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Complete typical preop checks: NPO, consents, site mark, allergies",
+    "Confirm blood thinners held per order before surgery"
+  ],
+  "patients": ["paige"],
+  "patientOverrides": {
+    "paige": {
+      "clinicalStatus": "stable",
+      "acuityScore": 2,
+      "clinicalStatusReason": "Preop checklist night before surgery"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

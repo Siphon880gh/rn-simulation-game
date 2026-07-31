@@ -1,0 +1,34 @@
+{
+  "id": "skill-suicide-precautions-medsurg",
+  "title": "Skill practice — Suicide precautions (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Remove environmental hazards and follow the ordered observation level",
+    "Stay with the patient during high-risk moments such as bathroom use"
+  ],
+  "patients": ["pearl"],
+  "patientOverrides": {
+    "pearl": {
+      "clinicalStatus": "watch",
+      "acuityScore": 3,
+      "clinicalStatusReason": "Suicide precautions — 1:1"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

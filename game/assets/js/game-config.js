@@ -415,6 +415,13 @@ export const GameConfig = {
         bpTarget: { systolicMin: 100, systolicMax: 150, diastolicMin: 60, diastolicMax: 95 },
         diagnosisHint: 'Post-op total hip'
       },
+      sloane: {
+        consult: 'Infectious Disease',
+        allergies: ['Penicillin — rash'],
+        homeMeds: ['ibuprofen', 'metformin'],
+        bpTarget: { systolicMin: 100, systolicMax: 150, diastolicMin: 60, diastolicMax: 95 },
+        diagnosisHint: 'Cellulitis — new floor admission'
+      },
       default: {
         consult: 'Hospitalist',
         allergies: ['NKDA'],

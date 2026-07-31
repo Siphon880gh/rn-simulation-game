@@ -1,0 +1,34 @@
+{
+  "id": "skill-hand-hygiene-medsurg",
+  "title": "Skill practice — Hand hygiene (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Choose soap-and-water when hands are visibly soiled or after C. difficile care",
+    "Use alcohol-based hand rub appropriately for other moments"
+  ],
+  "patients": ["ned"],
+  "patientOverrides": {
+    "ned": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "Diarrhea — C. diff pending"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

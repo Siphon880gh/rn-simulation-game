@@ -1,0 +1,34 @@
+{
+  "id": "skill-ng-tube-medsurg",
+  "title": "Skill practice — NG tube (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Verify NG placement by radiograph or facility-approved method before use",
+    "Maintain suction / patency and monitor NG output for SBO care"
+  ],
+  "patients": ["theo"],
+  "patientOverrides": {
+    "theo": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "SBO with NG suction"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

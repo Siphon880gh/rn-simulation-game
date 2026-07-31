@@ -1,0 +1,34 @@
+{
+  "id": "skill-evd-icu",
+  "title": "Skill practice — EVD management (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Level/zero the EVD transducer at the ordered landmark for a true ICP",
+    "Calculate CPP as MAP − ICP"
+  ],
+  "patients": ["uma"],
+  "patientOverrides": {
+    "uma": {
+      "clinicalStatus": "critical",
+      "acuityScore": 5,
+      "clinicalStatusReason": "SAH with EVD"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

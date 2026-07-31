@@ -82,6 +82,30 @@ export const codeBlueChallengeConfig = {
       correct: 'Hand off situation, stay to help / document as assigned'
     },
     {
+      id: 'twelve-lead',
+      type: 'choice',
+      prompt: 'After ROSC (or when the team requests a diagnostic ECG), 12-lead placement priority?',
+      choices: [
+        'Place limb + precordial leads correctly (V1–V6 landmarks) without interrupting essential resuscitation tasks when still coding',
+        'Skip leads and only use a finger pulse ox waveform',
+        'Put all 10 electrodes in a cluster on the abdomen',
+        'Wait until the next calendar day to obtain any ECG'
+      ],
+      correct: 'Place limb + precordial leads correctly (V1–V6 landmarks) without interrupting essential resuscitation tasks when still coding'
+    },
+    {
+      id: 'twelve-lead-v1',
+      type: 'choice',
+      prompt: 'During/after a code when obtaining a 12-lead, where is V1 placed?',
+      choices: [
+        '4th intercostal space, right sternal border',
+        '5th ICS midclavicular line only',
+        'On top of the defibrillator pad',
+        'Left lower quadrant of the abdomen'
+      ],
+      correct: '4th intercostal space, right sternal border'
+    },
+    {
       id: 'bls-order',
       type: 'order',
       prompt: 'Order the first response priorities (1 → 3):'

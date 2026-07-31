@@ -1,0 +1,34 @@
+{
+  "id": "skill-amiodarone-drip-icu",
+  "title": "Skill practice — Amiodarone drip (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize post-load amiodarone infusion phases (≈first 6h then ≈next 18h)",
+    "Monitor rhythm and blood pressure while titrating per order"
+  ],
+  "patients": ["tate"],
+  "patientOverrides": {
+    "tate": {
+      "clinicalStatus": "watch",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Amiodarone drip — AFib RVR"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

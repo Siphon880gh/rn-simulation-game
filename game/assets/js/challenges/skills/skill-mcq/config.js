@@ -2,8 +2,12 @@
  * Shared skill-library MCQ banks — AUTHOR CONTENT HERE.
  * Path: challenges/skills/skill-mcq/config.js
  * Keys match game/events/skills/library.json skill ids.
+ * Larger banks may live under ./banks/ and be merged below.
+ * Question types: choice (default) | sata | match | flash
  */
-/** @type {Record<string, { title: string, questions: { id: string, prompt: string, correct: string, choices: string[] }[] }>} */
+import { abgSkillBank } from './banks/abg.js';
+
+/** @type {Record<string, { title: string, questions: object[] }>} */
 export const skillMcqBanks = {
   'seizure-precautions': {
     title: 'Seizure precautions',
@@ -474,7 +478,599 @@ export const skillMcqBanks = {
         ]
       }
     ]
-  }
+  },
+  cbi: {
+    title: 'CBI / Continuous bladder irrigation',
+    questions: [
+      {
+        id: 'outflow',
+        prompt: 'CBI outflow suddenly slows and the patient has bladder spasms. Priority?',
+        correct: 'Check for clots/kinks; hand-irrigate per protocol; notify provider if obstructed',
+        choices: [
+          'Check for clots/kinks; hand-irrigate per protocol; notify provider if obstructed',
+          'Clamp inflow and ignore output',
+          'Increase inflow rate without assessing outflow',
+          'Remove the catheter immediately without an order'
+        ]
+      },
+      {
+        id: 'balance',
+        prompt: 'How do you calculate true urine output on CBI?',
+        correct: 'Total output minus irrigation fluid infused',
+        choices: [
+          'Total output minus irrigation fluid infused',
+          'Irrigation bag volume alone',
+          'Only the color of the drainage',
+          'Ignore I&O while on CBI'
+        ]
+      }
+    ]
+  },
+  ecmo: {
+    title: 'ECMO',
+    questions: [
+      {
+        id: 'circuit',
+        prompt: 'Priority nursing focus for a patient on ECMO?',
+        correct: 'Circuit integrity, cannulation site bleeding, perfusion/oxygenation, emergency readiness',
+        choices: [
+          'Circuit integrity, cannulation site bleeding, perfusion/oxygenation, emergency readiness',
+          'Ambulate freely without circuit precautions',
+          'Stop anticoagulation without notifying the team',
+          'Ignore alarms if SpO2 looks okay once'
+        ]
+      }
+    ]
+  },
+  iabp: {
+    title: 'IABP',
+    questions: [
+      {
+        id: 'timing',
+        prompt: 'Correct IABP inflation timing relative to the cardiac cycle?',
+        correct: 'Inflate in diastole; deflate just before systole',
+        choices: [
+          'Inflate in diastole; deflate just before systole',
+          'Inflate throughout systole only',
+          'Keep balloon inflated continuously',
+          'Deflate only during diastole'
+        ]
+      },
+      {
+        id: 'limb',
+        prompt: 'Priority distal assessment with femoral IABP?',
+        correct: 'Check limb pulses, color, temperature, and sensation frequently',
+        choices: [
+          'Check limb pulses, color, temperature, and sensation frequently',
+          'Ignore the access leg if the waveform looks good',
+          'Elevate HOB to 90° routinely',
+          'Ambulate in the hall with the balloon on'
+        ]
+      }
+    ]
+  },
+  crrt: {
+    title: 'CRRT',
+    questions: [
+      {
+        id: 'alarm',
+        prompt: 'CRRT filter pressure rising / clotting concern — nurse action?',
+        correct: 'Assess access, flush/replace per protocol, notify provider/team; do not ignore alarms',
+        choices: [
+          'Assess access, flush/replace per protocol, notify provider/team; do not ignore alarms',
+          'Silence alarms and leave the room',
+          'Bolus free water into the circuit randomly',
+          'Disconnect and discard the catheter without an order'
+        ]
+      }
+    ]
+  },
+  cgs: {
+    title: 'Cardiogenic shock (CGS)',
+    questions: [
+      {
+        id: 'signs',
+        prompt: 'Which pattern best fits cardiogenic shock?',
+        correct: 'Low cardiac output, cool clammy skin, elevated filling pressures, pulmonary congestion',
+        choices: [
+          'Low cardiac output, cool clammy skin, elevated filling pressures, pulmonary congestion',
+          'Warm flushed skin with bounding pulses only',
+          'Isolated fever without hemodynamic change',
+          'Hypertension with excellent urine output'
+        ]
+      }
+    ]
+  },
+  'tof-assessment': {
+    title: 'Paralytic assessment (TOF)',
+    questions: [
+      {
+        id: 'tof',
+        prompt: 'Train-of-four (TOF) assesses what?',
+        correct: 'Depth of neuromuscular blockade (twitch count/ratio)',
+        choices: [
+          'Depth of neuromuscular blockade (twitch count/ratio)',
+          'Only blood glucose',
+          'Only pupillary light reflex',
+          'Only skin temperature'
+        ]
+      },
+      {
+        id: 'site',
+        prompt: 'Common peripheral nerve sites for TOF?',
+        correct: 'Ulnar (adductor pollicis) or facial (orbicularis oculi)',
+        choices: [
+          'Ulnar (adductor pollicis) or facial (orbicularis oculi)',
+          'Only the Achilles tendon',
+          'Only the carotid pulse',
+          'Abdominal wall only'
+        ]
+      }
+    ]
+  },
+  'pacemaker-trans': {
+    title: 'Pacemaker assessment (trans)',
+    questions: [
+      {
+        id: 'capture',
+        prompt: 'Failure to capture on a temporary pacemaker means?',
+        correct: 'Pacing spikes without resulting QRS; check connections, output, and patient status',
+        choices: [
+          'Pacing spikes without resulting QRS; check connections, output, and patient status',
+          'Normal sensing with no further action needed',
+          'Always increase sensitivity only',
+          'Immediately remove the wire at the bedside'
+        ]
+      }
+    ]
+  },
+  'foley-insertion': {
+    title: 'Foley catheter insertion',
+    questions: [
+      {
+        id: 'sterile',
+        prompt: 'Key sterile step during Foley insertion?',
+        correct: 'Maintain sterile field; advance until urine returns; inflate balloon only when in bladder',
+        choices: [
+          'Maintain sterile field; advance until urine returns; inflate balloon only when in bladder',
+          'Inflate the balloon in the urethra if resistance is felt',
+          'Skip cleansing if the patient is NPO',
+          'Use the same gloves after contaminating them on the sheets'
+        ]
+      }
+    ]
+  },
+  'ngt-insertion': {
+    title: 'NGT insertion',
+    questions: [
+      {
+        id: 'confirm',
+        prompt: 'Best confirmation of NG tube placement before first use?',
+        correct: 'Radiographic confirmation (or facility-approved method) before feeding/meds',
+        choices: [
+          'Radiographic confirmation (or facility-approved method) before feeding/meds',
+          'Only ask the patient if it feels okay',
+          'Auscultate air once and always start feeds',
+          'Skip confirmation if the tube was easy to insert'
+        ]
+      }
+    ]
+  },
+  'picc-dressing': {
+    title: 'PICC dressing change',
+    questions: [
+      {
+        id: 'sterile',
+        prompt: 'PICC dressing change priority?',
+        correct: 'Aseptic/sterile technique; assess site; securement; document external length',
+        choices: [
+          'Aseptic/sterile technique; assess site; securement; document external length',
+          'Change only when dripping blood and skip site assessment',
+          'Soak the site in tap water daily',
+          'Pull the catheter back 2 cm each dressing change'
+        ]
+      }
+    ]
+  },
+  'iv-insertion': {
+    title: 'IV insertion',
+    questions: [
+      {
+        id: 'site',
+        prompt: 'Preferred approach for peripheral IV insertion?',
+        correct: 'Distal site first when appropriate; aseptic prep; stabilize and confirm flash/patency',
+        choices: [
+          'Distal site first when appropriate; aseptic prep; stabilize and confirm flash/patency',
+          'Always start in the foot of an adult without indication',
+          'Reuse the same needle after a failed stick',
+          'Skip tourniquet and skin prep to save time'
+        ]
+      }
+    ]
+  },
+  'ct-contrast-iv': {
+    title: 'CT with contrast (18g IV)',
+    questions: [
+      {
+        id: 'gauge',
+        prompt: 'Why does CT with power-injected contrast often need a large-bore IV (e.g. 18g)?',
+        correct: 'To tolerate high flow rates and reduce extravasation risk from inadequate access',
+        choices: [
+          'To tolerate high flow rates and reduce extravasation risk from inadequate access',
+          'Because contrast only works through pink catheters',
+          'So the patient can ambulate sooner',
+          '18g is required for every blood draw'
+        ]
+      },
+      {
+        id: 'site',
+        prompt: 'Before sending for contrast CT, you should?',
+        correct: 'Verify patent adequate IV, allergies/eGFR per protocol, and line location suitability',
+        choices: [
+          'Verify patent adequate IV, allergies/eGFR per protocol, and line location suitability',
+          'Send with any infiltrated IV',
+          'Ignore allergy history if the scanner is ready',
+          'Always use a 24g hand IV for power inject'
+        ]
+      }
+    ]
+  },
+  'wound-change': {
+    title: 'Wound dressing change',
+    questions: [
+      {
+        id: 'moisture',
+        prompt: 'Wet-to-dry dressings are most appropriate when?',
+        correct: 'For mechanical debridement of necrotic tissue when ordered — not for every moist healing wound',
+        choices: [
+          'For mechanical debridement of necrotic tissue when ordered — not for every moist healing wound',
+          'For every epithelializing wound to keep it dry',
+          'For moisture-associated skin damage (MASD) as first-line',
+          'Instead of assessing wound bed moisture'
+        ]
+      },
+      {
+        id: 'honey',
+        prompt: 'Medical-grade honey (e.g. TheraHoney) is typically used to?',
+        correct: 'Support moist wound healing / antimicrobial environment on appropriate partial-thickness wounds per order',
+        choices: [
+          'Support moist wound healing / antimicrobial environment on appropriate partial-thickness wounds per order',
+          'Dry out intact skin for MASD',
+          'Replace all surgical dry sterile dressings always',
+          'Be packed into every tunneling wound without assessment'
+        ]
+      },
+      {
+        id: 'masd',
+        prompt: 'Moisture-associated skin damage (MASD) care priority?',
+        correct: 'Gentle cleanse, protect skin, manage moisture source; avoid harsh wet-to-dry on intact damaged skin',
+        choices: [
+          'Gentle cleanse, protect skin, manage moisture source; avoid harsh wet-to-dry on intact damaged skin',
+          'Aggressive wet-to-dry on intact perineal skin',
+          'Ignore incontinence and only chart later',
+          'Apply honey to dry intact skin as a lotion'
+        ]
+      }
+    ]
+  },
+  nihss: {
+    title: 'NIHSS assessment',
+    questions: [
+      {
+        id: 'purpose',
+        prompt: 'NIHSS is primarily used to?',
+        correct: 'Quantify stroke deficit severity and trends for treatment decisions',
+        choices: [
+          'Quantify stroke deficit severity and trends for treatment decisions',
+          'Replace all vital signs',
+          'Diagnose MI only',
+          'Measure only blood glucose'
+        ]
+      }
+    ]
+  },
+  'peritoneal-dialysis': {
+    title: 'Peritoneal dialysis',
+    questions: [
+      {
+        id: 'sequence',
+        prompt: 'Typical PD exchange sequence?',
+        correct: 'Check BP/vitals → prime → drain first → fill → dwell',
+        choices: [
+          'Check BP/vitals → prime → drain first → fill → dwell',
+          'Fill first, never drain',
+          'Skip priming and force cold dialysate',
+          'Ignore cloudy effluent'
+        ]
+      },
+      {
+        id: 'cloudy',
+        prompt: 'Cloudy PD effluent may indicate?',
+        correct: 'Possible peritonitis — culture/notify per protocol',
+        choices: [
+          'Possible peritonitis — culture/notify per protocol',
+          'Normal finding every exchange',
+          'That the patient should eat more fiber only',
+          'That you should increase fill volume randomly'
+        ]
+      }
+    ]
+  },
+  'new-dialysis-start': {
+    title: 'New dialysis start',
+    questions: [
+      {
+        id: 'coord',
+        prompt: 'Before a new hemodialysis start, coordination often includes?',
+        correct: 'Hepatitis panel/serologies, access readiness, timing with dialysis team, consents/orders',
+        choices: [
+          'Hepatitis panel/serologies, access readiness, timing with dialysis team, consents/orders',
+          'Only a random glucose and no call to dialysis',
+          'Skipping labs if the patient is hungry',
+          'Starting without verifying access'
+        ]
+      }
+    ]
+  },
+  'surgery-preop': {
+    title: 'Surgery preop checklist',
+    questions: [
+      {
+        id: 'checklist',
+        prompt: 'Typical preop nursing checklist items include?',
+        correct: 'NPO status, consents, site marking, allergies, holding blood thinners per order',
+        choices: [
+          'NPO status, consents, site marking, allergies, holding blood thinners per order',
+          'Giving all home anticoagulants the morning of surgery without asking',
+          'Skipping ID band if the patient knows their name',
+          'Ignoring last food/drink time'
+        ]
+      }
+    ]
+  },
+  'heparin-drip': {
+    title: 'Heparin drip',
+    questions: [
+      {
+        id: 'ptt',
+        prompt: 'Heparin drip protocols commonly require aPTT/PTT checks how often after changes?',
+        correct: 'At protocol intervals (often q6h) and after dose changes',
+        choices: [
+          'At protocol intervals (often q6h) and after dose changes',
+          'Only once at discharge',
+          'Never — titrate by blood pressure alone',
+          'Only if the patient requests it'
+        ]
+      }
+    ]
+  },
+  'bladder-scan': {
+    title: 'Bladder scan',
+    questions: [
+      {
+        id: 'pvr',
+        prompt: 'Bladder scan after void measures?',
+        correct: 'Post-void residual (PVR) volume',
+        choices: [
+          'Post-void residual (PVR) volume',
+          'Serum creatinine only',
+          'Only blood pressure',
+          'CSF pressure'
+        ]
+      },
+      {
+        id: 'timing',
+        prompt: 'Ordered “bladder scan q6h” means?',
+        correct: 'Perform bladder volume assessment every 6 hours (and PRN per protocol)',
+        choices: [
+          'Perform bladder volume assessment every 6 hours (and PRN per protocol)',
+          'Scan once then discontinue forever',
+          'Only scan if the patient asks',
+          'Replace the Foley every 6 hours'
+        ]
+      }
+    ]
+  },
+  'insulin-drip': {
+    title: 'Insulin drip (ICU)',
+    questions: [
+      {
+        id: 'monitor',
+        prompt: 'ICU insulin infusion priority monitoring?',
+        correct: 'Frequent glucose checks per protocol; titrate rate; watch for hypoglycemia',
+        choices: [
+          'Frequent glucose checks per protocol; titrate rate; watch for hypoglycemia',
+          'Check glucose once daily only',
+          'Stop all dextrose sources always',
+          'Bolus SQ insulin without assessing the drip'
+        ]
+      }
+    ]
+  },
+  'amiodarone-drip': {
+    title: 'Amiodarone drip',
+    questions: [
+      {
+        id: 'phases',
+        prompt: 'Common IV amiodarone dosing phases after a load include?',
+        correct: 'Higher infusion for first ~6 hours, then lower rate for next ~18 hours (per order/protocol)',
+        choices: [
+          'Higher infusion for first ~6 hours, then lower rate for next ~18 hours (per order/protocol)',
+          'Same rate forever with no load',
+          'Only oral tablets crushed into the IV',
+          'Stop after one minute regardless of rhythm'
+        ]
+      }
+    ]
+  },
+  evd: {
+    title: 'EVD management',
+    questions: [
+      {
+        id: 'zero',
+        prompt: 'To obtain a true ICP from an EVD/monitor setup you must?',
+        correct: 'Level/zero the transducer at the ordered landmark (e.g. tragus/external auditory canal)',
+        choices: [
+          'Level/zero the transducer at the ordered landmark (e.g. tragus/external auditory canal)',
+          'Zero at the patient’s ankle',
+          'Never zero — estimate from SpO2',
+          'Open the drain to air continuously without leveling'
+        ]
+      },
+      {
+        id: 'cpp',
+        prompt: 'CPP is calculated as?',
+        correct: 'MAP − ICP',
+        choices: [
+          'MAP − ICP',
+          'ICP − MAP',
+          'HR × SV only',
+          'SpO2 − EtCO2'
+        ]
+      }
+    ]
+  },
+  'cardiac-index': {
+    title: 'Cardiac index (thermodilution)',
+    questions: [
+      {
+        id: 'inject',
+        prompt: 'Thermodilution cardiac output technique key point?',
+        correct: 'Inject the correct iced/room-temp saline volume rapidly/smoothly (“slam”) per protocol, then calculate CI = CO/BSA',
+        choices: [
+          'Inject the correct iced/room-temp saline volume rapidly/smoothly (“slam”) per protocol, then calculate CI = CO/BSA',
+          'Drip saline slowly over 10 minutes into the PA catheter',
+          'Use any random fluid volume without a computer constant',
+          'Cardiac index equals only the heart rate'
+        ]
+      }
+    ]
+  },
+  'ileostomy-emptying': {
+    title: 'Ileostomy emptying',
+    questions: [
+      {
+        id: 'setup',
+        prompt: 'Best setup to empty an ileostomy pouch?',
+        correct: 'Towel/barrier, basin or toilet, gloves; empty when 1/3–1/2 full; clean spout',
+        choices: [
+          'Towel/barrier, basin or toilet, gloves; empty when 1/3–1/2 full; clean spout',
+          'Wait until the bag bursts',
+          'Cut the wafer every time you empty',
+          'Irrigate forcefully into the stoma with a bulb syringe each empty'
+        ]
+      }
+    ]
+  },
+  'ileostomy-bag-change': {
+    title: 'Ileostomy bag replacement',
+    questions: [
+      {
+        id: 'cut',
+        prompt: 'When cutting an ileostomy wafer, the opening should be?',
+        correct: 'About 1/8 inch (≈2–3 mm) larger than the stoma diameter — not cutting into the stoma',
+        choices: [
+          'About 1/8 inch (≈2–3 mm) larger than the stoma diameter — not cutting into the stoma',
+          'Twice the stoma size with large exposed skin',
+          'Smaller than the stoma so it squeezes tightly',
+          'Any random shape without measuring'
+        ]
+      }
+    ]
+  },
+  'skeletal-traction': {
+    title: 'Skeletal traction (weights / pins)',
+    questions: [
+      {
+        id: 'weights',
+        prompt: 'Skeletal traction with hanging weights — correct setup?',
+        correct: 'Weights hang freely off the floor/bed; ropes in pulley grooves; ordered amount maintained',
+        choices: [
+          'Weights hang freely off the floor/bed; ropes in pulley grooves; ordered amount maintained',
+          'Rest the weights on the floor to “stabilize” the pull',
+          'Remove weights whenever the patient turns without an order',
+          'Tie weights to the siderail so they do not swing'
+        ]
+      },
+      {
+        id: 'alignment',
+        prompt: 'Priority nursing check for a patient in skeletal traction?',
+        correct: 'Maintain body alignment and continuous ordered traction; CMS of the extremity',
+        choices: [
+          'Maintain body alignment and continuous ordered traction; CMS of the extremity',
+          'Elevate the weights onto the mattress each shift',
+          'Allow the patient to sit fully upright with slack ropes',
+          'Ignore pin sites because traction replaces skin care'
+        ]
+      }
+    ]
+  },
+  'pin-care': {
+    title: 'Pin care',
+    questions: [
+      {
+        id: 'clean',
+        prompt: 'Pin-site care priority?',
+        correct: 'Clean each pin site per protocol; assess for redness, drainage, loosening; keep sites dry',
+        choices: [
+          'Clean each pin site per protocol; assess for redness, drainage, loosening; keep sites dry',
+          'Soak the entire limb in tap water daily',
+          'Ignore crusting and never clean around pins',
+          'Apply thick occlusive cream that buries the pin hubs'
+        ]
+      },
+      {
+        id: 'infection',
+        prompt: 'Sign that needs prompt reporting at a pin site?',
+        correct: 'Increasing redness, purulent drainage, pin looseness, or fever',
+        choices: [
+          'Increasing redness, purulent drainage, pin looseness, or fever',
+          'Mild dried serous crust only on day one with no other change',
+          'Intact skin far from the pins',
+          'Patient asking for a snack'
+        ]
+      }
+    ]
+  },
+  'ekg-12-lead': {
+    title: '12-lead EKG placement',
+    questions: [
+      {
+        id: 'v1',
+        prompt: 'Correct placement for V1?',
+        correct: '4th intercostal space, right sternal border',
+        choices: [
+          '4th intercostal space, right sternal border',
+          '5th intercostal space, midclavicular line',
+          '2nd intercostal space, left midaxillary line',
+          'Over the umbilicus'
+        ]
+      },
+      {
+        id: 'v4',
+        prompt: 'Correct placement for V4?',
+        correct: '5th intercostal space, midclavicular line',
+        choices: [
+          '5th intercostal space, midclavicular line',
+          '4th intercostal space, right sternal border',
+          'Directly on the clavicle',
+          'Lower abdomen midline'
+        ]
+      },
+      {
+        id: 'limbs',
+        prompt: 'Limb lead placement tip for a clean 12-lead?',
+        correct: 'Place limb electrodes on limbs (or torso per protocol) with good skin contact; avoid bony prominences when possible',
+        choices: [
+          'Place limb electrodes on limbs (or torso per protocol) with good skin contact; avoid bony prominences when possible',
+          'Stack all limb leads on one ankle',
+          'Skip limb leads if precordial leads look fine',
+          'Put limb leads only on the forehead'
+        ]
+      }
+    ]
+  },
+  abg: abgSkillBank
 };
 
 export const skillMcqChallengeConfig = {

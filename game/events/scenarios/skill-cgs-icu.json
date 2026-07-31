@@ -1,0 +1,34 @@
+{
+  "id": "skill-cgs-icu",
+  "title": "Skill practice — Cardiogenic shock / CGS (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize the cardiogenic shock pattern (low output, congestion, cool periphery)",
+    "Prioritize oxygenation, perfusion, and rapid escalation"
+  ],
+  "patients": ["drew"],
+  "patientOverrides": {
+    "drew": {
+      "clinicalStatus": "critical",
+      "acuityScore": 5,
+      "clinicalStatusReason": "Cardiogenic shock"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

@@ -1,0 +1,51 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Axel Moreau</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">ICU-5</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 48</p>
+        <p class="text-sm text-gray-600">Sex: Male</p>
+        <p class="text-sm text-gray-600">Diagnosis: Refractory cardiogenic shock — VA ECMO</p>
+        <p class="text-sm text-gray-600">Circuit integrity, cannulation sites, perfusion, emergency readiness</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: paced / supported</div>
+        <div>MAP: 68 (supported)</div>
+        <div>Temp: 36.8°C</div>
+        <div>O<sub>2</sub>: on vent + ECMO</div>
+        <div>Pain: sedated</div>
+        <div>RR: vent</div>
+        <div>ECMO: VA</div>
+        <div>Flow: target per team</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-heart text-xl mr-1 text-red-700"></i>
+            ECMO / advanced support
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="ecmo" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="15" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-heart text-red-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">ECMO circuit / cannulation safety check</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2100" data-expire="2200" data-duration-mins="10" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-tint text-red-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Site bleeding / limb perfusion check</span>
+                <span class="ml-auto text-sm text-gray-500">2100</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-axel" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

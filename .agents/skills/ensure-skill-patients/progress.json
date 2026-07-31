@@ -1,7 +1,7 @@
 {
   "skill": "ensure-skill-patients",
   "shiftDefault": "night",
-  "milestone": "S1",
+  "milestone": "done",
   "skills": [
     {
       "id": "icp",
@@ -85,229 +85,461 @@
     },
     {
       "id": "wound-care",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "clara",
+      "packFile": "game/events/scenarios/skill-wound-care-medsurg.json",
+      "notes": ""
     },
     {
       "id": "pressure-injury",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "ruth",
+      "packFile": "game/events/scenarios/skill-pressure-injury-medsurg.json",
+      "notes": ""
     },
     {
       "id": "pca-pump",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "jade",
+      "packFile": "game/events/scenarios/skill-pca-pump-medsurg.json",
+      "notes": ""
     },
     {
       "id": "pain-assessment",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "cole",
+      "packFile": "game/events/scenarios/skill-pain-assessment-medsurg.json",
+      "notes": ""
     },
     {
       "id": "foley-care",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "inez",
+      "packFile": "game/events/scenarios/skill-foley-care-medsurg.json",
+      "notes": ""
     },
     {
       "id": "ng-tube",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "theo",
+      "packFile": "game/events/scenarios/skill-ng-tube-medsurg.json",
+      "notes": ""
     },
     {
       "id": "ostomy-care",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "gina",
+      "packFile": "game/events/scenarios/skill-ostomy-care-medsurg.json",
+      "notes": ""
     },
     {
       "id": "central-line",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "icu",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "lyle",
+      "packFile": "game/events/scenarios/skill-central-line-icu.json",
+      "notes": ""
     },
     {
       "id": "ivpb-hang",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "quinn",
+      "packFile": "game/events/scenarios/skill-ivpb-hang-medsurg.json",
+      "notes": ""
     },
     {
       "id": "med-identity",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "wes",
+      "packFile": "game/events/scenarios/skill-med-identity-medsurg.json",
+      "notes": ""
     },
     {
       "id": "bed-prep",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "piper",
+      "packFile": "game/events/scenarios/skill-bed-prep-medsurg.json",
+      "notes": ""
     },
     {
       "id": "accucheck",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "mira",
+      "packFile": "game/events/scenarios/skill-accucheck-medsurg.json",
+      "notes": ""
     },
     {
       "id": "iv-check",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "reed",
+      "packFile": "game/events/scenarios/skill-iv-check-medsurg.json",
+      "notes": ""
     },
     {
       "id": "admission",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "sloane",
+      "packFile": "game/events/scenarios/skill-admission-medsurg.json",
+      "notes": ""
     },
     {
       "id": "isolation-ppe",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "opal",
+      "packFile": "game/events/scenarios/skill-isolation-ppe-medsurg.json",
+      "notes": ""
     },
     {
       "id": "hand-hygiene",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "ned",
+      "packFile": "game/events/scenarios/skill-hand-hygiene-medsurg.json",
+      "notes": ""
     },
     {
       "id": "fall-precautions",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "iris",
+      "packFile": "game/events/scenarios/skill-fall-precautions-medsurg.json",
+      "notes": ""
     },
     {
       "id": "sepsis-recognition",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "tessa",
+      "packFile": "game/events/scenarios/skill-sepsis-recognition-medsurg.json",
+      "notes": ""
     },
     {
       "id": "code-blue-response",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "icu",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "knox",
+      "packFile": "game/events/scenarios/skill-code-blue-response-icu.json",
+      "notes": ""
     },
     {
       "id": "sbar",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "blair",
+      "packFile": "game/events/scenarios/skill-sbar-medsurg.json",
+      "notes": ""
     },
     {
       "id": "ecg-basics",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "tele",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "clyde",
+      "packFile": "game/events/scenarios/skill-ecg-basics-tele.json",
+      "notes": ""
     },
     {
       "id": "dvt-prophylaxis",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "vera",
+      "packFile": "game/events/scenarios/skill-dvt-prophylaxis-medsurg.json",
+      "notes": ""
     },
     {
       "id": "fluid-balance",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "hugh",
+      "packFile": "game/events/scenarios/skill-fluid-balance-medsurg.json",
+      "notes": ""
     },
     {
       "id": "dialysis-access",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "dolly",
+      "packFile": "game/events/scenarios/skill-dialysis-access-medsurg.json",
+      "notes": ""
     },
     {
       "id": "suicide-precautions",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "pearl",
+      "packFile": "game/events/scenarios/skill-suicide-precautions-medsurg.json",
+      "notes": ""
     },
     {
       "id": "restraint-safety",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "otis",
+      "packFile": "game/events/scenarios/skill-restraint-safety-medsurg.json",
+      "notes": ""
     },
     {
       "id": "medication-rights",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "nina",
+      "packFile": "game/events/scenarios/skill-medication-rights-medsurg.json",
+      "notes": ""
     },
     {
       "id": "critical-labs",
-      "status": "uncovered",
+      "status": "covered",
       "unitHint": "medsurg",
-      "patientId": null,
-      "packFile": null,
-      "notes": "no patientConfigs.skills / library.patients"
+      "patientId": "lane",
+      "packFile": "game/events/scenarios/skill-critical-labs-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "cbi",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "roy",
+      "packFile": "game/events/scenarios/skill-cbi-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "ecmo",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "axel",
+      "packFile": "game/events/scenarios/skill-ecmo-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "iabp",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "beau",
+      "packFile": "game/events/scenarios/skill-iabp-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "crrt",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "cade",
+      "packFile": "game/events/scenarios/skill-crrt-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "cgs",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "drew",
+      "packFile": "game/events/scenarios/skill-cgs-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "tof-assessment",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "elio",
+      "packFile": "game/events/scenarios/skill-tof-assessment-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "pacemaker-trans",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "finn",
+      "packFile": "game/events/scenarios/skill-pacemaker-trans-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "foley-insertion",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "gwen",
+      "packFile": "game/events/scenarios/skill-foley-insertion-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "ngt-insertion",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "harp",
+      "packFile": "game/events/scenarios/skill-ngt-insertion-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "picc-dressing",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "ida",
+      "packFile": "game/events/scenarios/skill-picc-dressing-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "iv-insertion",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "joss",
+      "packFile": "game/events/scenarios/skill-iv-insertion-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "ct-contrast-iv",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "kia",
+      "packFile": "game/events/scenarios/skill-ct-contrast-iv-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "wound-change",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "lita",
+      "packFile": "game/events/scenarios/skill-wound-change-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "nihss",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "milo",
+      "packFile": "game/events/scenarios/skill-nihss-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "peritoneal-dialysis",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "noa",
+      "packFile": "game/events/scenarios/skill-peritoneal-dialysis-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "new-dialysis-start",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "orin",
+      "packFile": "game/events/scenarios/skill-new-dialysis-start-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "surgery-preop",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "paige",
+      "packFile": "game/events/scenarios/skill-surgery-preop-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "heparin-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "quin",
+      "packFile": "game/events/scenarios/skill-heparin-drip-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "bladder-scan",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "rhea",
+      "packFile": "game/events/scenarios/skill-bladder-scan-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "insulin-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "sage",
+      "packFile": "game/events/scenarios/skill-insulin-drip-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "amiodarone-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "tate",
+      "packFile": "game/events/scenarios/skill-amiodarone-drip-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "evd",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "uma",
+      "packFile": "game/events/scenarios/skill-evd-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "cardiac-index",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "wynn",
+      "packFile": "game/events/scenarios/skill-cardiac-index-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "ileostomy-emptying",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "yara",
+      "packFile": "game/events/scenarios/skill-ileostomy-emptying-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "ileostomy-bag-change",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "zane",
+      "packFile": "game/events/scenarios/skill-ileostomy-bag-change-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "skeletal-traction",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "bron",
+      "packFile": "game/events/scenarios/skill-skeletal-traction-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "pin-care",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "cory",
+      "packFile": "game/events/scenarios/skill-pin-care-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "ekg-12-lead",
+      "status": "covered",
+      "unitHint": "tele",
+      "patientId": "dex",
+      "packFile": "game/events/scenarios/skill-ekg-12-lead-tele.json",
+      "notes": ""
+    },
+    {
+      "id": "abg",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "vale",
+      "packFile": "game/events/scenarios/skill-abg-icu.json",
+      "notes": ""
     }
   ],
   "blocked": null,
-  "updatedAt": "2026-07-30T12:24:43.044Z"
+  "updatedAt": "2026-07-31T10:14:20.086Z"
 }

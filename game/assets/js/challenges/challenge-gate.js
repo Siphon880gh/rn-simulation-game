@@ -56,7 +56,8 @@ import {
 import {
     buildSkillMcqQuiz,
     renderSkillMcqHtml,
-    getSkillMcqPoolSize
+    getSkillMcqPoolSize,
+    wireSkillMcqInteractions
 } from './skills/skill-mcq/challenge.js';
 import {
     renderChallengeLevelControl,
@@ -434,40 +435,52 @@ function wirePoolChoiceQuiz(cfg) {
 
     initQuizChallengeLevel(poolSize);
 
+    const handleGrade = ({ ok, empty }) => {
+        if (activeSession?.closing) return;
+        const expected = activeSession?.quizExpected;
+        if (empty) {
+            setChallengeFeedback('Select at least one option, then check your answer.');
+            return;
+        }
+        if (!ok) {
+            finishAttempt(false, `${kind}-incorrect`, expected, { allowRetry: true });
+            return;
+        }
+        noteQuizCorrectAndMaybeContinue({
+            onComplete: () => {
+                finishAttempt(true, `${kind}-correct`, expected, { allowRetry: true });
+            },
+            onNeedNext: () => {
+                const seen = [...(activeSession?.quizSeenIds || [])];
+                const next = rebuild({
+                    excludeId: activeSession?.currentQuestionId,
+                    excludeIds: seen
+                });
+                if (!next?.quiz) {
+                    finishAttempt(true, `${kind}-correct`, expected, { allowRetry: true });
+                    return;
+                }
+                mountPoolChoiceQuiz(next, task, poolSize, kind);
+                setChallengeFeedback(
+                    `Correct — ${activeSession.quizCorrect} / ${activeSession.quizTarget}. Next question…`,
+                    { ok: true }
+                );
+                bindChoices();
+            }
+        });
+    };
+
     const bindChoices = () => {
         const gate = document.querySelector('.challenge-gate');
         if (!gate) return;
+        if (kind === 'skill-mcq') {
+            wireSkillMcqInteractions(handleGrade);
+            return;
+        }
         gate.querySelectorAll('.challenge-choice').forEach((btn) => {
             btn.addEventListener('click', () => {
-                if (activeSession?.closing) return;
                 const ok = btn.getAttribute('data-challenge-correct') === '1';
-                const expected = activeSession?.quizExpected;
-                if (!ok) {
-                    finishAttempt(false, `${kind}-incorrect`, expected, { allowRetry: true });
-                    return;
-                }
-                noteQuizCorrectAndMaybeContinue({
-                    onComplete: () => {
-                        finishAttempt(true, `${kind}-correct`, expected, { allowRetry: true });
-                    },
-                    onNeedNext: () => {
-                        const seen = [...(activeSession?.quizSeenIds || [])];
-                        const next = rebuild({
-                            excludeId: activeSession?.currentQuestionId,
-                            excludeIds: seen
-                        });
-                        if (!next?.quiz) {
-                            finishAttempt(true, `${kind}-correct`, expected, { allowRetry: true });
-                            return;
-                        }
-                        mountPoolChoiceQuiz(next, task, poolSize, kind);
-                        setChallengeFeedback(
-                            `Correct — ${activeSession.quizCorrect} / ${activeSession.quizTarget}. Next question…`,
-                            { ok: true }
-                        );
-                        bindChoices();
-                    }
-                });
+                handleGrade({ ok });
             });
         });
     };

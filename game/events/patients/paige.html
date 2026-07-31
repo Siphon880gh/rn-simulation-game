@@ -1,0 +1,51 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Paige Rourke</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Room 315-A</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 49</p>
+        <p class="text-sm text-gray-600">Sex: Female</p>
+        <p class="text-sm text-gray-600">Diagnosis: Cholecystectomy AM — preop checklist</p>
+        <p class="text-sm text-gray-600">NPO, consents, site mark, allergies, hold blood thinners per order</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 76</div>
+        <div>BP: 124/72</div>
+        <div>Temp: 98.2°F</div>
+        <div>O<sub>2</sub>: 99% RA</div>
+        <div>Pain: RUQ 3/10</div>
+        <div>RR: 14</div>
+        <div>NPO since: 0000</div>
+        <div>Home med: apixaban — held</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-clipboard-check text-xl mr-1 text-green-700"></i>
+            Perioperative
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="surgery-preop" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="15" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-clipboard-check text-green-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Surgery preop checklist</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2100" data-expire="2200" data-duration-mins="8" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-id-card text-green-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Consent / site mark / ID band verify</span>
+                <span class="ml-auto text-sm text-gray-500">2100</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-paige" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

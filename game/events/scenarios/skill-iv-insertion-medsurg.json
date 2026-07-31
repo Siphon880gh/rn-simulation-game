@@ -1,0 +1,34 @@
+{
+  "id": "skill-iv-insertion-medsurg",
+  "title": "Skill practice — IV insertion (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Select an appropriate peripheral site and use aseptic technique",
+    "Confirm flashback/patency before securing and using the line"
+  ],
+  "patients": ["joss"],
+  "patientOverrides": {
+    "joss": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "Needs PIV for fluids"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

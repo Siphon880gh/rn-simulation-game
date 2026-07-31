@@ -1,0 +1,34 @@
+{
+  "id": "skill-nihss-icu",
+  "title": "Skill practice — NIHSS assessment (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Use NIHSS to quantify stroke deficit severity",
+    "Trend scores to support treatment decisions"
+  ],
+  "patients": ["milo"],
+  "patientOverrides": {
+    "milo": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Acute stroke — NIHSS"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

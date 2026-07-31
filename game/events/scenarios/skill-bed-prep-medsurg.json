@@ -1,0 +1,34 @@
+{
+  "id": "skill-bed-prep-medsurg",
+  "title": "Skill practice — Bed prep for admission (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Gather the correct supplies before an admission arrives",
+    "Prepare a clean, ready bed for a new patient"
+  ],
+  "patients": ["piper"],
+  "patientOverrides": {
+    "piper": {
+      "clinicalStatus": "stable",
+      "acuityScore": 1,
+      "clinicalStatusReason": "Empty bed — prep for ED admit"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

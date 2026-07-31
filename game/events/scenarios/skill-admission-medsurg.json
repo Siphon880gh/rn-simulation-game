@@ -1,0 +1,34 @@
+{
+  "id": "skill-admission-medsurg",
+  "title": "Skill practice — Admission quizzes (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Complete admission safety checks (allergies, code status, belongings)",
+    "Reconcile home medications on a new floor admit"
+  ],
+  "patients": ["sloane"],
+  "patientOverrides": {
+    "sloane": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "New admission — checklist incomplete"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

@@ -1,0 +1,34 @@
+{
+  "id": "skill-ivpb-hang-medsurg",
+  "title": "Skill practice — IVPB hang sequence (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Hang a secondary IVPB in the correct clinical sequence",
+    "Keep the primary infusion running appropriately during piggyback therapy"
+  ],
+  "patients": ["quinn"],
+  "patientOverrides": {
+    "quinn": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "CAP with IVPB antibiotic due"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

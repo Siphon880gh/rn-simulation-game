@@ -273,6 +273,1084 @@ const PatientsModule = (() => {
             },
             htmlFile: 'events/patients/vito.html',
             pastHxFile: 'events/patients/vito-past-hx.json'
+        },
+        clara: {
+            id: 'clara',
+            name: 'Clara Nguyen',
+            room: 'Room 315-A',
+            age: 52,
+            sex: 'Female',
+            diagnosis: 'Post-op laparotomy incision — sterile dressing change',
+            skills: ['wound-care'],
+            vitals: {
+                hr: 88,
+                bp: '118/72',
+                temp: '99.1°F',
+                o2: '98% RA',
+                pain: '5/10 incision',
+                rr: 16
+            },
+            htmlFile: 'events/patients/clara.html',
+            pastHxFile: 'events/patients/clara-past-hx.json'
+        },
+        ruth: {
+            id: 'ruth',
+            name: 'Ruth Alvarez',
+            room: 'Room 312-B',
+            age: 79,
+            sex: 'Female',
+            diagnosis: 'Failure to thrive — high pressure-injury risk (bedbound)',
+            skills: ['pressure-injury'],
+            vitals: {
+                hr: 78,
+                bp: '110/64',
+                temp: '98.2°F',
+                o2: '96% RA',
+                pain: '2/10 sacrum',
+                rr: 16
+            },
+            htmlFile: 'events/patients/ruth.html',
+            pastHxFile: 'events/patients/ruth-past-hx.json'
+        },
+        jade: {
+            id: 'jade',
+            name: 'Jade Ortiz',
+            room: 'Room 311-A',
+            age: 44,
+            sex: 'Female',
+            diagnosis: 'Post-op TKA — morphine PCA',
+            skills: ['pca-pump'],
+            vitals: {
+                hr: 84,
+                bp: '128/76',
+                temp: '98.8°F',
+                o2: '97% RA',
+                pain: '6/10 knee (PCA)',
+                rr: 14
+            },
+            htmlFile: 'events/patients/jade.html',
+            pastHxFile: 'events/patients/jade-past-hx.json'
+        },
+        cole: {
+            id: 'cole',
+            name: 'Cole Brennan',
+            room: 'Room 309-C',
+            age: 57,
+            sex: 'Male',
+            diagnosis: 'Post-op open cholecystectomy — acute pain',
+            skills: ['pain-assessment'],
+            vitals: {
+                hr: 96,
+                bp: '142/88',
+                temp: '99.0°F',
+                o2: '97% RA',
+                pain: '8/10 RUQ incision',
+                rr: 18
+            },
+            htmlFile: 'events/patients/cole.html',
+            pastHxFile: 'events/patients/cole-past-hx.json'
+        },
+        inez: {
+            id: 'inez',
+            name: 'Inez Delgado',
+            room: 'Room 307-A',
+            age: 68,
+            sex: 'Female',
+            diagnosis: 'Post-op hip ORIF — indwelling Foley',
+            skills: ['foley-care'],
+            vitals: {
+                hr: 82,
+                bp: '132/78',
+                temp: '98.6°F',
+                o2: '97% RA',
+                pain: '4/10 hip',
+                rr: 16
+            },
+            htmlFile: 'events/patients/inez.html',
+            pastHxFile: 'events/patients/inez-past-hx.json'
+        },
+        theo: {
+            id: 'theo',
+            name: 'Theo Park',
+            room: 'Room 306-B',
+            age: 63,
+            sex: 'Male',
+            diagnosis: 'Small bowel obstruction — NG to low intermittent suction',
+            skills: ['ng-tube'],
+            vitals: {
+                hr: 92,
+                bp: '118/70',
+                temp: '98.9°F',
+                o2: '97% RA',
+                pain: '5/10 abdomen',
+                rr: 18
+            },
+            htmlFile: 'events/patients/theo.html',
+            pastHxFile: 'events/patients/theo-past-hx.json'
+        },
+        gina: {
+            id: 'gina',
+            name: 'Gina Rossi',
+            room: 'Room 305-A',
+            age: 59,
+            sex: 'Female',
+            diagnosis: 'New end colostomy — POD 1 pouch change',
+            skills: ['ostomy-care'],
+            vitals: {
+                hr: 86,
+                bp: '124/74',
+                temp: '99.0°F',
+                o2: '98% RA',
+                pain: '4/10 abdomen',
+                rr: 16
+            },
+            htmlFile: 'events/patients/gina.html',
+            pastHxFile: 'events/patients/gina-past-hx.json'
+        },
+        lyle: {
+            id: 'lyle',
+            name: 'Lyle Okonkwo',
+            room: 'ICU-3',
+            age: 55,
+            sex: 'Male',
+            diagnosis: 'Septic shock — triple-lumen central line',
+            skills: ['central-line'],
+            vitals: {
+                hr: 112,
+                bp: '88/52',
+                temp: '101.2°F',
+                o2: '94% on 4L NC',
+                pain: '2/10',
+                rr: 24
+            },
+            htmlFile: 'events/patients/lyle.html',
+            pastHxFile: 'events/patients/lyle-past-hx.json'
+        },
+        quinn: {
+            id: 'quinn',
+            name: 'Quinn Adler',
+            room: 'Room 304-B',
+            age: 51,
+            sex: 'Non-binary',
+            diagnosis: 'Community-acquired pneumonia — ceftriaxone IVPB due',
+            skills: ['ivpb-hang'],
+            vitals: {
+                hr: 98,
+                bp: '128/78',
+                temp: '100.6°F',
+                o2: '94% on 2L NC',
+                pain: '1/10',
+                rr: 22
+            },
+            htmlFile: 'events/patients/quinn.html',
+            pastHxFile: 'events/patients/quinn-past-hx.json'
+        },
+        wes: {
+            id: 'wes',
+            name: 'Wes Callahan',
+            room: 'Room 303-A',
+            age: 66,
+            sex: 'Male',
+            diagnosis: 'CAD / hyperlipidemia — evening meds due',
+            skills: ['med-identity'],
+            vitals: {
+                hr: 76,
+                bp: '136/82',
+                temp: '98.4°F',
+                o2: '98% RA',
+                pain: '0/10',
+                rr: 14
+            },
+            htmlFile: 'events/patients/wes.html',
+            pastHxFile: 'events/patients/wes-past-hx.json'
+        },
+        piper: {
+            id: 'piper',
+            name: 'Piper Hale',
+            room: 'Room 302-A',
+            age: 0,
+            sex: 'Unknown',
+            diagnosis: 'Incoming ED admit — bed not ready',
+            skills: ['bed-prep'],
+            vitals: {},
+            htmlFile: 'events/patients/piper.html',
+            pastHxFile: 'events/patients/piper-past-hx.json'
+        },
+        mira: {
+            id: 'mira',
+            name: 'Mira Shah',
+            room: 'Room 301-B',
+            age: 58,
+            sex: 'Female',
+            diagnosis: 'Type 2 DM — ACHS accucheck + sliding-scale insulin',
+            skills: ['accucheck'],
+            vitals: {
+                hr: 88,
+                bp: '134/80',
+                temp: '98.6°F',
+                o2: '98% RA',
+                pain: '0/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/mira.html',
+            pastHxFile: 'events/patients/mira-past-hx.json'
+        },
+        reed: {
+            id: 'reed',
+            name: 'Reed Vargas',
+            room: 'Room 300-A',
+            age: 64,
+            sex: 'Male',
+            diagnosis: 'NSTEMI — heparin drip titration',
+            skills: ['iv-check'],
+            vitals: {
+                hr: 90,
+                bp: '128/76',
+                temp: '98.4°F',
+                o2: '97% RA',
+                pain: '2/10 chest',
+                rr: 16
+            },
+            htmlFile: 'events/patients/reed.html',
+            pastHxFile: 'events/patients/reed-past-hx.json'
+        },
+        sloane: {
+            id: 'sloane',
+            name: 'Sloane Rivera',
+            room: 'Room 299-A',
+            age: 47,
+            sex: 'Female',
+            diagnosis: 'New admission — cellulitis (ED transfer)',
+            skills: ['admission'],
+            vitals: {
+                hr: 94,
+                bp: '138/86',
+                temp: '100.2°F',
+                o2: '97% RA',
+                pain: '5/10 leg',
+                rr: 18
+            },
+            htmlFile: 'events/patients/sloane.html',
+            pastHxFile: 'events/patients/sloane-past-hx.json'
+        },
+        opal: {
+            id: 'opal',
+            name: 'Opal Finch',
+            room: 'Room 298-B',
+            age: 72,
+            sex: 'Female',
+            diagnosis: 'C. difficile colitis — contact precautions',
+            skills: ['isolation-ppe'],
+            vitals: {
+                hr: 96,
+                bp: '118/70',
+                temp: '100.4°F',
+                o2: '97% RA',
+                pain: '3/10 abdomen',
+                rr: 18
+            },
+            htmlFile: 'events/patients/opal.html',
+            pastHxFile: 'events/patients/opal-past-hx.json'
+        },
+        ned: {
+            id: 'ned',
+            name: 'Ned Brooks',
+            room: 'Room 297-A',
+            age: 69,
+            sex: 'Male',
+            diagnosis: 'Acute diarrhea — C. diff PCR pending',
+            skills: ['hand-hygiene'],
+            vitals: {
+                hr: 90,
+                bp: '122/74',
+                temp: '99.6°F',
+                o2: '98% RA',
+                pain: '2/10 abdomen',
+                rr: 16
+            },
+            htmlFile: 'events/patients/ned.html',
+            pastHxFile: 'events/patients/ned-past-hx.json'
+        },
+        iris: {
+            id: 'iris',
+            name: 'Iris Patel',
+            room: 'Room 296-B',
+            age: 84,
+            sex: 'Female',
+            diagnosis: 'Syncope workup — high fall risk',
+            skills: ['fall-precautions'],
+            vitals: {
+                hr: 72,
+                bp: '108/62',
+                temp: '98.2°F',
+                o2: '97% RA',
+                pain: '1/10',
+                rr: 14
+            },
+            htmlFile: 'events/patients/iris.html',
+            pastHxFile: 'events/patients/iris-past-hx.json'
+        },
+        tessa: {
+            id: 'tessa',
+            name: 'Tessa Quinn',
+            room: 'Room 295-A',
+            age: 76,
+            sex: 'Female',
+            diagnosis: 'UTI with new confusion — possible sepsis',
+            skills: ['sepsis-recognition'],
+            vitals: {
+                hr: 118,
+                bp: '88/54',
+                temp: '101.8°F',
+                o2: '94% RA',
+                pain: '2/10',
+                rr: 24
+            },
+            htmlFile: 'events/patients/tessa.html',
+            pastHxFile: 'events/patients/tessa-past-hx.json'
+        },
+        knox: {
+            id: 'knox',
+            name: 'Knox Hale',
+            room: 'ICU-4',
+            age: 67,
+            sex: 'Male',
+            diagnosis: 'Post-MI — unstable VT / Code Blue risk',
+            skills: ['code-blue-response'],
+            vitals: {
+                hr: 140,
+                bp: '78/46',
+                temp: '98.6°F',
+                o2: '92% on NRB',
+                pain: 'chest pressure',
+                rr: 28
+            },
+            htmlFile: 'events/patients/knox.html',
+            pastHxFile: 'events/patients/knox-past-hx.json'
+        },
+        blair: {
+            id: 'blair',
+            name: 'Blair Estes',
+            room: 'Room 298-A',
+            age: 58,
+            sex: 'Female',
+            diagnosis: 'Post-op day 1 colectomy — new O2 need',
+            skills: ['sbar'],
+            vitals: {
+                hr: 108,
+                bp: '98/62',
+                temp: '100.4°F',
+                o2: '91% → 2 L NC',
+                pain: '5/10 abdomen',
+                rr: 22
+            },
+            htmlFile: 'events/patients/blair.html',
+            pastHxFile: 'events/patients/blair-past-hx.json'
+        },
+        clyde: {
+            id: 'clyde',
+            name: 'Clyde Mercer',
+            room: 'Tele-3',
+            age: 71,
+            sex: 'Male',
+            diagnosis: 'New AFib with RVR — telemetry',
+            skills: ['ecg-basics'],
+            vitals: {
+                hr: 128,
+                bp: '108/70',
+                temp: '98.4°F',
+                o2: '96% RA',
+                pain: '0/10',
+                rr: 18
+            },
+            htmlFile: 'events/patients/clyde.html',
+            pastHxFile: 'events/patients/clyde-past-hx.json'
+        },
+        vera: {
+            id: 'vera',
+            name: 'Vera Holcomb',
+            room: 'Room 299-A',
+            age: 64,
+            sex: 'Female',
+            diagnosis: 'POD 2 total knee — VTE risk high',
+            skills: ['dvt-prophylaxis'],
+            vitals: {
+                hr: 86,
+                bp: '128/78',
+                temp: '98.8°F',
+                o2: '97% RA',
+                pain: '4/10 knee',
+                rr: 16
+            },
+            htmlFile: 'events/patients/vera.html',
+            pastHxFile: 'events/patients/vera-past-hx.json'
+        },
+        hugh: {
+            id: 'hugh',
+            name: 'Hugh Prater',
+            room: 'Room 300-A',
+            age: 72,
+            sex: 'Male',
+            diagnosis: 'CHF exacerbation — strict I&O',
+            skills: ['fluid-balance'],
+            vitals: {
+                hr: 94,
+                bp: '142/86',
+                temp: '98.2°F',
+                o2: '93% 2 L NC',
+                pain: '1/10',
+                rr: 22
+            },
+            htmlFile: 'events/patients/hugh.html',
+            pastHxFile: 'events/patients/hugh-past-hx.json'
+        },
+        dolly: {
+            id: 'dolly',
+            name: 'Dolly Raines',
+            room: 'Room 301-A',
+            age: 66,
+            sex: 'Female',
+            diagnosis: 'ESRD — left AV fistula, HD M/W/F',
+            skills: ['dialysis-access'],
+            vitals: {
+                hr: 82,
+                bp: '148/88',
+                temp: '98.4°F',
+                o2: '98% RA',
+                pain: '0/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/dolly.html',
+            pastHxFile: 'events/patients/dolly-past-hx.json'
+        },
+        pearl: {
+            id: 'pearl',
+            name: 'Pearl Voss',
+            room: 'Room 302-A',
+            age: 41,
+            sex: 'Female',
+            diagnosis: 'Major depressive episode — suicide precautions',
+            skills: ['suicide-precautions'],
+            vitals: {
+                hr: 88,
+                bp: '118/72',
+                temp: '98.2°F',
+                o2: '99% RA',
+                pain: '2/10 headache',
+                rr: 16
+            },
+            htmlFile: 'events/patients/pearl.html',
+            pastHxFile: 'events/patients/pearl-past-hx.json'
+        },
+        otis: {
+            id: 'otis',
+            name: 'Otis Greer',
+            room: 'Room 303-A',
+            age: 79,
+            sex: 'Male',
+            diagnosis: 'Hip ORIF — acute delirium, soft wrist restraints',
+            skills: ['restraint-safety'],
+            vitals: {
+                hr: 96,
+                bp: '132/78',
+                temp: '99.0°F',
+                o2: '96% RA',
+                pain: '3/10 hip',
+                rr: 18
+            },
+            htmlFile: 'events/patients/otis.html',
+            pastHxFile: 'events/patients/otis-past-hx.json'
+        },
+        nina: {
+            id: 'nina',
+            name: 'Nina Corbett',
+            room: 'Room 304-A',
+            age: 55,
+            sex: 'Female',
+            diagnosis: 'HTN / diabetes — scheduled evening meds',
+            skills: ['medication-rights'],
+            vitals: {
+                hr: 78,
+                bp: '148/90',
+                temp: '98.6°F',
+                o2: '98% RA',
+                pain: '0/10',
+                rr: 14
+            },
+            htmlFile: 'events/patients/nina.html',
+            pastHxFile: 'events/patients/nina-past-hx.json'
+        },
+        lane: {
+            id: 'lane',
+            name: 'Lane Broussard',
+            room: 'Room 305-A',
+            age: 63,
+            sex: 'Male',
+            diagnosis: 'Digoxin therapy — critical K+ called',
+            skills: ['critical-labs'],
+            vitals: {
+                hr: 52,
+                bp: '108/64',
+                temp: '98.4°F',
+                o2: '97% RA',
+                pain: '0/10',
+                rr: 14
+            },
+            htmlFile: 'events/patients/lane.html',
+            pastHxFile: 'events/patients/lane-past-hx.json'
+        },
+        roy: {
+            id: 'roy',
+            name: 'Roy Haskins',
+            room: 'Room 306-A',
+            age: 74,
+            sex: 'Male',
+            diagnosis: 'TURP — continuous bladder irrigation (CBI)',
+            skills: ['cbi'],
+            vitals: {
+                hr: 88,
+                bp: '128/76',
+                temp: '98.6°F',
+                o2: '97% RA',
+                pain: 'bladder spasms 4/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/roy.html',
+            pastHxFile: 'events/patients/roy-past-hx.json'
+        },
+        axel: {
+            id: 'axel',
+            name: 'Axel Moreau',
+            room: 'ICU-5',
+            age: 48,
+            sex: 'Male',
+            diagnosis: 'Refractory cardiogenic shock — VA ECMO',
+            skills: ['ecmo'],
+            vitals: {
+                hr: 90,
+                bp: 'MAP 68',
+                temp: '36.8°C',
+                o2: 'vent + ECMO',
+                pain: 'sedated',
+                rr: 'vent'
+            },
+            htmlFile: 'events/patients/axel.html',
+            pastHxFile: 'events/patients/axel-past-hx.json'
+        },
+        beau: {
+            id: 'beau',
+            name: 'Beau Langford',
+            room: 'ICU-6',
+            age: 61,
+            sex: 'Male',
+            diagnosis: 'Cardiogenic shock — femoral IABP 1:1',
+            skills: ['iabp'],
+            vitals: {
+                hr: 102,
+                bp: '86/54',
+                temp: '98.2°F',
+                o2: '94% 4 L NC',
+                pain: 'chest pressure 3/10',
+                rr: 22
+            },
+            htmlFile: 'events/patients/beau.html',
+            pastHxFile: 'events/patients/beau-past-hx.json'
+        },
+        cade: {
+            id: 'cade',
+            name: 'Cade Orman',
+            room: 'ICU-7',
+            age: 58,
+            sex: 'Male',
+            diagnosis: 'Septic AKI — CRRT (CVVHDF)',
+            skills: ['crrt'],
+            vitals: {
+                hr: 112,
+                bp: '92/54',
+                temp: '100.8°F',
+                o2: 'vent',
+                pain: 'sedated',
+                rr: 'vent'
+            },
+            htmlFile: 'events/patients/cade.html',
+            pastHxFile: 'events/patients/cade-past-hx.json'
+        },
+        drew: {
+            id: 'drew',
+            name: 'Drew Pell',
+            room: 'ICU-8',
+            age: 69,
+            sex: 'Male',
+            diagnosis: 'Acute MI — cardiogenic shock (CGS)',
+            skills: ['cgs'],
+            vitals: {
+                hr: 118,
+                bp: '78/50',
+                temp: '97.8°F',
+                o2: '90% NRB',
+                pain: 'chest 5/10',
+                rr: 28
+            },
+            htmlFile: 'events/patients/drew.html',
+            pastHxFile: 'events/patients/drew-past-hx.json'
+        },
+        elio: {
+            id: 'elio',
+            name: 'Elio Varga',
+            room: 'ICU-9',
+            age: 52,
+            sex: 'Male',
+            diagnosis: 'ARDS — cisatracurium drip; TOF monitoring',
+            skills: ['tof-assessment'],
+            vitals: {
+                hr: 96,
+                bp: '108/62',
+                temp: '99.1°F',
+                o2: 'vent',
+                pain: 'sedated / NMB',
+                rr: 'vent'
+            },
+            htmlFile: 'events/patients/elio.html',
+            pastHxFile: 'events/patients/elio-past-hx.json'
+        },
+        finn: {
+            id: 'finn',
+            name: 'Finn Okada',
+            room: 'ICU-10',
+            age: 71,
+            sex: 'Male',
+            diagnosis: 'Symptomatic bradycardia — temporary transvenous pacemaker',
+            skills: ['pacemaker-trans'],
+            vitals: {
+                hr: 70,
+                bp: '102/64',
+                temp: '98.4°F',
+                o2: '96% 2 L NC',
+                pain: 'insertion site 2/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/finn.html',
+            pastHxFile: 'events/patients/finn-past-hx.json'
+        },
+        gwen: {
+            id: 'gwen',
+            name: 'Gwen Ibarra',
+            room: 'Room 307-A',
+            age: 68,
+            sex: 'Female',
+            diagnosis: 'Urinary retention — Foley insertion ordered',
+            skills: ['foley-insertion'],
+            vitals: {
+                hr: 92,
+                bp: '138/84',
+                temp: '99.0°F',
+                o2: '98% RA',
+                pain: 'bladder pressure 6/10',
+                rr: 18
+            },
+            htmlFile: 'events/patients/gwen.html',
+            pastHxFile: 'events/patients/gwen-past-hx.json'
+        },
+        harp: {
+            id: 'harp',
+            name: 'Harp Delgado',
+            room: 'Room 308-A',
+            age: 59,
+            sex: 'Male',
+            diagnosis: 'Small bowel obstruction — NGT insertion ordered',
+            skills: ['ngt-insertion'],
+            vitals: {
+                hr: 104,
+                bp: '118/70',
+                temp: '99.2°F',
+                o2: '97% RA',
+                pain: 'abdomen 7/10',
+                rr: 20
+            },
+            htmlFile: 'events/patients/harp.html',
+            pastHxFile: 'events/patients/harp-past-hx.json'
+        },
+        ida: {
+            id: 'ida',
+            name: 'Ida Cho',
+            room: 'Room 309-A',
+            age: 54,
+            sex: 'Female',
+            diagnosis: 'Osteomyelitis — right PICC; dressing due',
+            skills: ['picc-dressing'],
+            vitals: {
+                hr: 84,
+                bp: '126/78',
+                temp: '99.4°F',
+                o2: '98% RA',
+                pain: 'leg 3/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/ida.html',
+            pastHxFile: 'events/patients/ida-past-hx.json'
+        },
+        joss: {
+            id: 'joss',
+            name: 'Joss Kearney',
+            room: 'Room 310-A',
+            age: 45,
+            sex: 'Female',
+            diagnosis: 'Dehydration / gastroenteritis — PIV needed',
+            skills: ['iv-insertion'],
+            vitals: {
+                hr: 108,
+                bp: '98/60',
+                temp: '100.2°F',
+                o2: '98% RA',
+                pain: 'abdomen 4/10',
+                rr: 18
+            },
+            htmlFile: 'events/patients/joss.html',
+            pastHxFile: 'events/patients/joss-past-hx.json'
+        },
+        kia: {
+            id: 'kia',
+            name: 'Kia Brennan',
+            room: 'Room 311-A',
+            age: 62,
+            sex: 'Female',
+            diagnosis: 'Rule-out PE — CT angio with IV contrast scheduled',
+            skills: ['ct-contrast-iv'],
+            vitals: {
+                hr: 110,
+                bp: '128/80',
+                temp: '98.8°F',
+                o2: '93% 3 L NC',
+                pain: 'chest 4/10',
+                rr: 24
+            },
+            htmlFile: 'events/patients/kia.html',
+            pastHxFile: 'events/patients/kia-past-hx.json'
+        },
+        lita: {
+            id: 'lita',
+            name: 'Lita Moreno',
+            room: 'Room 312-A',
+            age: 70,
+            sex: 'Female',
+            diagnosis: 'Mixed wounds — partial-thickness ulcer + perineal MASD',
+            skills: ['wound-change'],
+            vitals: {
+                hr: 86,
+                bp: '132/78',
+                temp: '98.6°F',
+                o2: '97% RA',
+                pain: 'wound 5/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/lita.html',
+            pastHxFile: 'events/patients/lita-past-hx.json'
+        },
+        milo: {
+            id: 'milo',
+            name: 'Milo Trent',
+            room: 'ICU-11',
+            age: 67,
+            sex: 'Male',
+            diagnosis: 'Acute ischemic stroke — NIHSS serial exams',
+            skills: ['nihss'],
+            vitals: {
+                hr: 88,
+                bp: '168/94',
+                temp: '98.4°F',
+                o2: '97% RA',
+                pain: '0/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/milo.html',
+            pastHxFile: 'events/patients/milo-past-hx.json'
+        },
+        noa: {
+            id: 'noa',
+            name: 'Noa Ellison',
+            room: 'Room 313-A',
+            age: 56,
+            sex: 'Female',
+            diagnosis: 'ESRD — CAPD exchange due',
+            skills: ['peritoneal-dialysis'],
+            vitals: {
+                hr: 78,
+                bp: '152/90',
+                temp: '98.8°F',
+                o2: '98% RA',
+                pain: '0/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/noa.html',
+            pastHxFile: 'events/patients/noa-past-hx.json'
+        },
+        orin: {
+            id: 'orin',
+            name: 'Orin Vale',
+            room: 'Room 314-A',
+            age: 61,
+            sex: 'Male',
+            diagnosis: 'New ESRD — first hemodialysis pending',
+            skills: ['new-dialysis-start'],
+            vitals: {
+                hr: 94,
+                bp: '168/96',
+                temp: '98.6°F',
+                o2: '96% RA',
+                pain: '1/10',
+                rr: 18
+            },
+            htmlFile: 'events/patients/orin.html',
+            pastHxFile: 'events/patients/orin-past-hx.json'
+        },
+        paige: {
+            id: 'paige',
+            name: 'Paige Rourke',
+            room: 'Room 315-A',
+            age: 49,
+            sex: 'Female',
+            diagnosis: 'Cholecystectomy AM — preop checklist',
+            skills: ['surgery-preop'],
+            vitals: {
+                hr: 76,
+                bp: '124/72',
+                temp: '98.2°F',
+                o2: '99% RA',
+                pain: 'RUQ 3/10',
+                rr: 14
+            },
+            htmlFile: 'events/patients/paige.html',
+            pastHxFile: 'events/patients/paige-past-hx.json'
+        },
+        quin: {
+            id: 'quin',
+            name: 'Quin Asher',
+            room: 'ICU-12',
+            age: 58,
+            sex: 'Male',
+            diagnosis: 'PE — heparin drip with aPTT protocol',
+            skills: ['heparin-drip'],
+            vitals: {
+                hr: 102,
+                bp: '118/72',
+                temp: '98.6°F',
+                o2: '94% 2 L NC',
+                pain: '2/10',
+                rr: 20
+            },
+            htmlFile: 'events/patients/quin.html',
+            pastHxFile: 'events/patients/quin-past-hx.json'
+        },
+        rhea: {
+            id: 'rhea',
+            name: 'Rhea Santos',
+            room: 'Room 316-A',
+            age: 73,
+            sex: 'Female',
+            diagnosis: 'Post-op urinary retention — bladder scan q6h',
+            skills: ['bladder-scan'],
+            vitals: {
+                hr: 84,
+                bp: '130/76',
+                temp: '98.6°F',
+                o2: '98% RA',
+                pain: 'incision 3/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/rhea.html',
+            pastHxFile: 'events/patients/rhea-past-hx.json'
+        },
+        sage: {
+            id: 'sage',
+            name: 'Sage Whitfield',
+            room: 'ICU-13',
+            age: 44,
+            sex: 'Female',
+            diagnosis: 'DKA — IV insulin drip',
+            skills: ['insulin-drip'],
+            vitals: {
+                hr: 118,
+                bp: '108/64',
+                temp: '99.0°F',
+                o2: '97% RA',
+                pain: '1/10',
+                rr: 26
+            },
+            htmlFile: 'events/patients/sage.html',
+            pastHxFile: 'events/patients/sage-past-hx.json'
+        },
+        tate: {
+            id: 'tate',
+            name: 'Tate Brennan',
+            room: 'ICU-14',
+            age: 66,
+            sex: 'Male',
+            diagnosis: 'AFib with RVR — IV amiodarone drip',
+            skills: ['amiodarone-drip'],
+            vitals: {
+                hr: 142,
+                bp: '98/60',
+                temp: '98.4°F',
+                o2: '95% 2 L NC',
+                pain: '0/10',
+                rr: 20
+            },
+            htmlFile: 'events/patients/tate.html',
+            pastHxFile: 'events/patients/tate-past-hx.json'
+        },
+        uma: {
+            id: 'uma',
+            name: 'Uma Kessler',
+            room: 'ICU-15',
+            age: 39,
+            sex: 'Female',
+            diagnosis: 'SAH — EVD in place',
+            skills: ['evd'],
+            vitals: {
+                hr: 78,
+                bp: 'MAP 90',
+                temp: '37.2°C',
+                o2: 'vent',
+                pain: 'sedated',
+                rr: 'vent'
+            },
+            htmlFile: 'events/patients/uma.html',
+            pastHxFile: 'events/patients/uma-past-hx.json'
+        },
+        wynn: {
+            id: 'wynn',
+            name: 'Wynn Calder',
+            room: 'ICU-16',
+            age: 62,
+            sex: 'Male',
+            diagnosis: 'Cardiogenic shock — PA catheter / thermodilution CI',
+            skills: ['cardiac-index'],
+            vitals: {
+                hr: 108,
+                bp: '86/52',
+                temp: '36.9°C',
+                o2: 'vent',
+                pain: 'sedated',
+                rr: 'vent'
+            },
+            htmlFile: 'events/patients/wynn.html',
+            pastHxFile: 'events/patients/wynn-past-hx.json'
+        },
+        yara: {
+            id: 'yara',
+            name: 'Yara Mendel',
+            room: 'Room 317-A',
+            age: 51,
+            sex: 'Female',
+            diagnosis: 'New end ileostomy — pouch ⅓–½ full',
+            skills: ['ileostomy-emptying'],
+            vitals: {
+                hr: 82,
+                bp: '122/74',
+                temp: '98.6°F',
+                o2: '98% RA',
+                pain: 'incision 3/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/yara.html',
+            pastHxFile: 'events/patients/yara-past-hx.json'
+        },
+        zane: {
+            id: 'zane',
+            name: 'Zane Ortiz',
+            room: 'Room 318-A',
+            age: 57,
+            sex: 'Male',
+            diagnosis: 'End ileostomy — wafer leaking; bag change due',
+            skills: ['ileostomy-bag-change'],
+            vitals: {
+                hr: 80,
+                bp: '128/78',
+                temp: '98.4°F',
+                o2: '98% RA',
+                pain: 'peristomal sting 4/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/zane.html',
+            pastHxFile: 'events/patients/zane-past-hx.json'
+        },
+        bron: {
+            id: 'bron',
+            name: 'Bron Yates',
+            room: 'Room 319-A',
+            age: 34,
+            sex: 'Male',
+            diagnosis: 'Femur fracture — skeletal traction with pin & hanging weights',
+            skills: ['skeletal-traction'],
+            vitals: {
+                hr: 88,
+                bp: '128/76',
+                temp: '98.6°F',
+                o2: '98% RA',
+                pain: 'leg 5/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/bron.html',
+            pastHxFile: 'events/patients/bron-past-hx.json'
+        },
+        cory: {
+            id: 'cory',
+            name: 'Cory Lam',
+            room: 'Room 320-A',
+            age: 29,
+            sex: 'Male',
+            diagnosis: 'Tibial fracture — external fixator; pin care due',
+            skills: ['pin-care'],
+            vitals: {
+                hr: 86,
+                bp: '122/74',
+                temp: '99.0°F',
+                o2: '98% RA',
+                pain: 'leg 4/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/cory.html',
+            pastHxFile: 'events/patients/cory-past-hx.json'
+        },
+        dex: {
+            id: 'dex',
+            name: 'Dex Harlan',
+            room: 'Tele-4',
+            age: 58,
+            sex: 'Male',
+            diagnosis: 'Chest pain — 12-lead EKG ordered',
+            skills: ['ekg-12-lead'],
+            vitals: {
+                hr: 96,
+                bp: '148/88',
+                temp: '98.4°F',
+                o2: '97% RA',
+                pain: 'chest 4/10',
+                rr: 18
+            },
+            htmlFile: 'events/patients/dex.html',
+            pastHxFile: 'events/patients/dex-past-hx.json'
+        },
+        vale: {
+            id: 'vale',
+            name: 'Vale Ortiz',
+            room: 'ICU-17',
+            age: 64,
+            sex: 'Female',
+            diagnosis: 'COPD exacerbation — hypercapnic respiratory failure; serial ABGs',
+            skills: ['abg'],
+            careSchedules: ['turnQ2h'],
+            careReason: 'Fatigued on BiPAP — limited self-repositioning',
+            vitals: {
+                hr: 108,
+                bp: '142/86',
+                temp: '99.1°F',
+                o2: '91% BiPAP',
+                pain: '2/10',
+                rr: 28
+            },
+            htmlFile: 'events/patients/vale.html',
+            pastHxFile: 'events/patients/vale-past-hx.json'
         }
     };
 

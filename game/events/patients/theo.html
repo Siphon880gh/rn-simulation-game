@@ -1,0 +1,78 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Theo Park</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Room 306-B</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 63</p>
+        <p class="text-sm text-gray-600">Sex: Male</p>
+        <p class="text-sm text-gray-600">Diagnosis: Small bowel obstruction — NG to low intermittent suction</p>
+        <p class="text-sm text-gray-600">NG: verify placement before use; NPO; output monitoring</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 92</div>
+        <div>BP: 118/70</div>
+        <div>Temp: 98.9°F</div>
+        <div>O<sub>2</sub>: 97% RA</div>
+        <div>Pain: 5/10 abdomen</div>
+        <div>RR: 18</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-stream text-xl mr-1 text-cyan-700"></i>
+            NG tube
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="ng-tube" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="15" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-stethoscope text-cyan-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">NG placement / suction check</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2100" data-expire="2200" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-flask text-cyan-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">NG output / patency</span>
+                <span class="ml-auto text-sm text-gray-500">2100</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-pills text-xl mr-1"></i>
+            Medications
+        </h4>
+        <ul class="meds-list space-y-3 hidden">
+            <li data-task-type="med" data-status="not-yet" data-scheduled="1930" data-expire="2030" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-pills text-blue-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Ondansetron</span>
+                <span class="ml-auto text-sm text-gray-500">1930</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-hands-helping text-xl mr-1 text-purple-600"></i>
+            Patient requests (CNA)
+        </h4>
+        <p class="text-xs text-gray-500 mb-1">Delegate: they do this · instant (bathroom, water, bed position, pillow, linen)</p>
+        <ul class="patient-requests-list space-y-3 hidden">
+            <li data-task-type="patient-request" data-status="not-yet" data-scheduled="2040" data-expire="2140" data-duration-mins="5" data-delegate="aide" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-arrows-alt-v text-purple-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Bed position request</span>
+                <span class="ml-auto text-sm text-gray-500">20:40</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-theo" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

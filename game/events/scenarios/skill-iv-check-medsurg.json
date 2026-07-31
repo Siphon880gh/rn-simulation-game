@@ -1,0 +1,34 @@
+{
+  "id": "skill-iv-check-medsurg",
+  "title": "Skill practice — IV rate check (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Verify a running IV drip rate against the order",
+    "Apply protocol adjustments when titration is indicated"
+  ],
+  "patients": ["reed"],
+  "patientOverrides": {
+    "reed": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "NSTEMI on heparin drip"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

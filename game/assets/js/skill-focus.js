@@ -221,9 +221,13 @@ async function launchGame(kind, skillEntry, { testMode = false } = {}) {
       skillLabel
     });
     if (!task) {
-      statusMessage(`Test skill: could not build game “${kind}”`);
+      statusMessage(
+        kind === 'skill-mcq'
+          ? `Test skill: no MCQ bank for “${skillEntry?.id || skillLabel}” (hard-refresh if you just added it)`
+          : `Test skill: could not build game “${kind}”`
+      );
       if (testMode) {
-        await delay(1600);
+        await delay(2200);
         returnToLanding();
       }
       return;

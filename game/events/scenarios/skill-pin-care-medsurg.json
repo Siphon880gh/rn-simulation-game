@@ -1,0 +1,34 @@
+{
+  "id": "skill-pin-care-medsurg",
+  "title": "Skill practice — Pin care (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Clean and assess external-fixator or traction pin sites per protocol",
+    "Recognize and report signs of pin-site infection or loosening"
+  ],
+  "patients": ["cory"],
+  "patientOverrides": {
+    "cory": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "External fixator — pin care"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

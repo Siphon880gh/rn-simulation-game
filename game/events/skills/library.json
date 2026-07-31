@@ -241,7 +241,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-wound-care-medsurg.json",
+      "patients": [
+        "clara"
+      ]
     },
     {
       "id": "pressure-injury",
@@ -259,7 +264,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-pressure-injury-medsurg.json",
+      "patients": [
+        "ruth"
+      ]
     },
     {
       "id": "pca-pump",
@@ -276,7 +286,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-pca-pump-medsurg.json",
+      "patients": [
+        "jade"
+      ]
     },
     {
       "id": "pain-assessment",
@@ -293,7 +308,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-pain-assessment-medsurg.json",
+      "patients": [
+        "cole"
+      ]
     },
     {
       "id": "foley-care",
@@ -310,7 +330,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-foley-care-medsurg.json",
+      "patients": [
+        "inez"
+      ]
     },
     {
       "id": "ng-tube",
@@ -328,7 +353,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-ng-tube-medsurg.json",
+      "patients": [
+        "theo"
+      ]
     },
     {
       "id": "ostomy-care",
@@ -346,7 +376,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-ostomy-care-medsurg.json",
+      "patients": [
+        "gina"
+      ]
     },
     {
       "id": "central-line",
@@ -365,7 +400,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-central-line-icu.json",
+      "patients": [
+        "lyle"
+      ]
     },
     {
       "id": "ivpb-hang",
@@ -382,7 +422,12 @@
       "games": [
         "ivpb-hang"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-ivpb-hang-medsurg.json",
+      "patients": [
+        "quinn"
+      ]
     },
     {
       "id": "med-identity",
@@ -398,7 +443,12 @@
       "games": [
         "med-identity"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-med-identity-medsurg.json",
+      "patients": [
+        "wes"
+      ]
     },
     {
       "id": "bed-prep",
@@ -414,7 +464,12 @@
       "games": [
         "bed-prep"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-bed-prep-medsurg.json",
+      "patients": [
+        "piper"
+      ]
     },
     {
       "id": "accucheck",
@@ -431,7 +486,12 @@
       "games": [
         "accucheck"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-accucheck-medsurg.json",
+      "patients": [
+        "mira"
+      ]
     },
     {
       "id": "iv-check",
@@ -449,7 +509,12 @@
         "heparin-ptt",
         "iv-titration"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-iv-check-medsurg.json",
+      "patients": [
+        "reed"
+      ]
     },
     {
       "id": "admission",
@@ -473,7 +538,12 @@
         "admission-flu-shot",
         "admission-call-admitting"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-admission-medsurg.json",
+      "patients": [
+        "sloane"
+      ]
     },
     {
       "id": "isolation-ppe",
@@ -491,7 +561,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-isolation-ppe-medsurg.json",
+      "patients": [
+        "opal"
+      ]
     },
     {
       "id": "hand-hygiene",
@@ -508,7 +583,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-hand-hygiene-medsurg.json",
+      "patients": [
+        "ned"
+      ]
     },
     {
       "id": "fall-precautions",
@@ -524,7 +604,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-fall-precautions-medsurg.json",
+      "patients": [
+        "iris"
+      ]
     },
     {
       "id": "sepsis-recognition",
@@ -542,7 +627,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-sepsis-recognition-medsurg.json",
+      "patients": [
+        "tessa"
+      ]
     },
     {
       "id": "code-blue-response",
@@ -559,7 +649,12 @@
       "games": [
         "code-blue"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-code-blue-response-icu.json",
+      "patients": [
+        "knox"
+      ]
     },
     {
       "id": "sbar",
@@ -576,7 +671,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-sbar-medsurg.json",
+      "patients": [
+        "blair"
+      ]
     },
     {
       "id": "ecg-basics",
@@ -594,7 +694,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "tele",
+      "pack": "events/scenarios/skill-ecg-basics-tele.json",
+      "patients": [
+        "clyde"
+      ]
     },
     {
       "id": "dvt-prophylaxis",
@@ -612,7 +717,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-dvt-prophylaxis-medsurg.json",
+      "patients": [
+        "vera"
+      ]
     },
     {
       "id": "fluid-balance",
@@ -629,7 +739,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-fluid-balance-medsurg.json",
+      "patients": [
+        "hugh"
+      ]
     },
     {
       "id": "dialysis-access",
@@ -647,7 +762,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-dialysis-access-medsurg.json",
+      "patients": [
+        "dolly"
+      ]
     },
     {
       "id": "suicide-precautions",
@@ -665,7 +785,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-suicide-precautions-medsurg.json",
+      "patients": [
+        "pearl"
+      ]
     },
     {
       "id": "restraint-safety",
@@ -681,7 +806,12 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-restraint-safety-medsurg.json",
+      "patients": [
+        "otis"
+      ]
     },
     {
       "id": "medication-rights",
@@ -699,7 +829,12 @@
       "games": [
         "med-identity"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-medication-rights-medsurg.json",
+      "patients": [
+        "nina"
+      ]
     },
     {
       "id": "critical-labs",
@@ -717,7 +852,699 @@
       "games": [
         "skill-mcq"
       ],
-      "status": "active"
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-critical-labs-medsurg.json",
+      "patients": [
+        "lane"
+      ]
+    },
+    {
+      "id": "cbi",
+      "label": "CBI / Continuous bladder irrigation",
+      "aliases": [
+        "continuous bladder irrigation",
+        "CBI",
+        "bladder irrigation"
+      ],
+      "tags": [
+        "urology",
+        "postop"
+      ],
+      "blurb": "Manage continuous bladder irrigation and catheter outflow.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-cbi-medsurg.json",
+      "patients": [
+        "roy"
+      ]
+    },
+    {
+      "id": "ecmo",
+      "label": "ECMO",
+      "aliases": [
+        "extracorporeal membrane oxygenation",
+        "VA ECMO",
+        "VV ECMO"
+      ],
+      "tags": [
+        "icu",
+        "cardiac",
+        "respiratory"
+      ],
+      "blurb": "Priority assessments and safety for ECMO patients.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-ecmo-icu.json",
+      "patients": [
+        "axel"
+      ]
+    },
+    {
+      "id": "iabp",
+      "label": "IABP",
+      "aliases": [
+        "intra-aortic balloon pump",
+        "balloon pump"
+      ],
+      "tags": [
+        "icu",
+        "cardiac"
+      ],
+      "blurb": "Timing, waveform, and limb checks for IABP.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-iabp-icu.json",
+      "patients": [
+        "beau"
+      ]
+    },
+    {
+      "id": "crrt",
+      "label": "CRRT",
+      "aliases": [
+        "continuous renal replacement",
+        "CVVH",
+        "CVVHD"
+      ],
+      "tags": [
+        "icu",
+        "renal"
+      ],
+      "blurb": "Continuous renal replacement therapy basics and alarms.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-crrt-icu.json",
+      "patients": [
+        "cade"
+      ]
+    },
+    {
+      "id": "cgs",
+      "label": "Cardiogenic shock (CGS)",
+      "aliases": [
+        "CGS",
+        "cardiogenic shock"
+      ],
+      "tags": [
+        "icu",
+        "cardiac"
+      ],
+      "blurb": "Recognize and prioritize cardiogenic shock care.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-cgs-icu.json",
+      "patients": [
+        "drew"
+      ]
+    },
+    {
+      "id": "tof-assessment",
+      "label": "Paralytic assessment (TOF)",
+      "aliases": [
+        "train of four",
+        "TOF",
+        "neuromuscular blockade",
+        "paralytic assessment"
+      ],
+      "tags": [
+        "icu",
+        "assessment"
+      ],
+      "blurb": "Train-of-four monitoring for neuromuscular blockade.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-tof-assessment-icu.json",
+      "patients": [
+        "elio"
+      ]
+    },
+    {
+      "id": "pacemaker-trans",
+      "label": "Pacemaker assessment (trans)",
+      "aliases": [
+        "transvenous pacemaker",
+        "temporary pacemaker",
+        "transcutaneous pacing"
+      ],
+      "tags": [
+        "icu",
+        "cardiac",
+        "tele"
+      ],
+      "blurb": "Assess temporary/transvenous pacemaker capture and sensing.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-pacemaker-trans-icu.json",
+      "patients": [
+        "finn"
+      ]
+    },
+    {
+      "id": "foley-insertion",
+      "label": "Foley catheter insertion",
+      "aliases": [
+        "catheter insertion",
+        "indwelling catheter insert",
+        "urinary catheter insertion"
+      ],
+      "tags": [
+        "procedures",
+        "urology"
+      ],
+      "blurb": "Sterile technique for Foley catheter insertion.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-foley-insertion-medsurg.json",
+      "patients": [
+        "gwen"
+      ]
+    },
+    {
+      "id": "ngt-insertion",
+      "label": "NGT insertion",
+      "aliases": [
+        "NG tube insertion",
+        "nasogastric insertion",
+        "NGT"
+      ],
+      "tags": [
+        "procedures",
+        "GI"
+      ],
+      "blurb": "Safe NG tube insertion and placement confirmation.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-ngt-insertion-medsurg.json",
+      "patients": [
+        "harp"
+      ]
+    },
+    {
+      "id": "picc-dressing",
+      "label": "PICC dressing change",
+      "aliases": [
+        "PICC dressing",
+        "PICC line dressing"
+      ],
+      "tags": [
+        "vascular",
+        "procedures"
+      ],
+      "blurb": "Sterile PICC dressing change and site assessment.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-picc-dressing-medsurg.json",
+      "patients": [
+        "ida"
+      ]
+    },
+    {
+      "id": "iv-insertion",
+      "label": "IV insertion",
+      "aliases": [
+        "peripheral IV",
+        "PIV insertion",
+        "start IV"
+      ],
+      "tags": [
+        "vascular",
+        "procedures"
+      ],
+      "blurb": "Peripheral IV insertion technique and site selection.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-iv-insertion-medsurg.json",
+      "patients": [
+        "joss"
+      ]
+    },
+    {
+      "id": "ct-contrast-iv",
+      "label": "CT with contrast (18g IV)",
+      "aliases": [
+        "CT contrast",
+        "18 gauge",
+        "power inject",
+        "contrast CT"
+      ],
+      "tags": [
+        "procedures",
+        "radiology"
+      ],
+      "blurb": "Confirm adequate IV access (often 18g) for CT contrast.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-ct-contrast-iv-medsurg.json",
+      "patients": [
+        "kia"
+      ]
+    },
+    {
+      "id": "wound-change",
+      "label": "Wound dressing change",
+      "aliases": [
+        "wet to dry",
+        "TheraHoney",
+        "partial thickness",
+        "MASD",
+        "moisture associated"
+      ],
+      "tags": [
+        "wound",
+        "procedures"
+      ],
+      "blurb": "Choose dressings by wound moisture, depth, and etiology (incl. wet-to-dry, honey, MASD).",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-wound-change-medsurg.json",
+      "patients": [
+        "lita"
+      ]
+    },
+    {
+      "id": "nihss",
+      "label": "NIHSS assessment",
+      "aliases": [
+        "NIH Stroke Scale",
+        "stroke scale"
+      ],
+      "tags": [
+        "neuro",
+        "assessment"
+      ],
+      "blurb": "Perform and interpret NIH Stroke Scale elements.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-nihss-icu.json",
+      "patients": [
+        "milo"
+      ]
+    },
+    {
+      "id": "peritoneal-dialysis",
+      "label": "Peritoneal dialysis",
+      "aliases": [
+        "PD",
+        "CAPD",
+        "PD exchange"
+      ],
+      "tags": [
+        "renal",
+        "procedures"
+      ],
+      "blurb": "PD exchange: BP check, prime, drain first, fill, dwell.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-peritoneal-dialysis-medsurg.json",
+      "patients": [
+        "noa"
+      ]
+    },
+    {
+      "id": "new-dialysis-start",
+      "label": "New dialysis start",
+      "aliases": [
+        "new HD",
+        "dialysis initiation",
+        "hepatitis panel",
+        "dialysis coordination"
+      ],
+      "tags": [
+        "renal",
+        "communication"
+      ],
+      "blurb": "Coordinate new dialysis: labs (hep panel), access, timing calls.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-new-dialysis-start-medsurg.json",
+      "patients": [
+        "orin"
+      ]
+    },
+    {
+      "id": "surgery-preop",
+      "label": "Surgery preop checklist",
+      "aliases": [
+        "preop",
+        "pre-op checklist",
+        "blood thinner hold",
+        "NPO"
+      ],
+      "tags": [
+        "perioperative",
+        "safety"
+      ],
+      "blurb": "Typical preop checks: NPO, consents, blood thinners, site mark.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-surgery-preop-medsurg.json",
+      "patients": [
+        "paige"
+      ]
+    },
+    {
+      "id": "heparin-drip",
+      "label": "Heparin drip",
+      "aliases": [
+        "heparin infusion",
+        "PTT protocol",
+        "aPTT"
+      ],
+      "tags": [
+        "meds",
+        "icu",
+        "tele"
+      ],
+      "blurb": "Heparin drip titration and PTT checks (e.g. q6h).",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-heparin-drip-icu.json",
+      "patients": [
+        "quin"
+      ]
+    },
+    {
+      "id": "bladder-scan",
+      "label": "Bladder scan",
+      "aliases": [
+        "bladder scanning",
+        "PVR",
+        "post-void residual"
+      ],
+      "tags": [
+        "assessment",
+        "urology"
+      ],
+      "blurb": "Timed bladder scans and PVR interpretation.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-bladder-scan-medsurg.json",
+      "patients": [
+        "rhea"
+      ]
+    },
+    {
+      "id": "insulin-drip",
+      "label": "Insulin drip (ICU)",
+      "aliases": [
+        "insulin infusion",
+        "IV insulin",
+        "DKA drip"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "endocrine"
+      ],
+      "blurb": "ICU insulin infusion monitoring and titration.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-insulin-drip-icu.json",
+      "patients": [
+        "sage"
+      ]
+    },
+    {
+      "id": "amiodarone-drip",
+      "label": "Amiodarone drip",
+      "aliases": [
+        "amiodarone infusion",
+        "amiodarone load"
+      ],
+      "tags": [
+        "icu",
+        "cardiac",
+        "meds"
+      ],
+      "blurb": "Amiodarone loading then first 6h / next 18h rates.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-amiodarone-drip-icu.json",
+      "patients": [
+        "tate"
+      ]
+    },
+    {
+      "id": "evd",
+      "label": "EVD management",
+      "aliases": [
+        "external ventricular drain",
+        "EVD zero",
+        "CPP",
+        "true ICP"
+      ],
+      "tags": [
+        "icu",
+        "neuro"
+      ],
+      "blurb": "Zero EVD, read true ICP, calculate CPP from monitor.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-evd-icu.json",
+      "patients": [
+        "uma"
+      ]
+    },
+    {
+      "id": "cardiac-index",
+      "label": "Cardiac index (thermodilution)",
+      "aliases": [
+        "cardiac output",
+        "CI",
+        "slam saline",
+        "Swan-Ganz"
+      ],
+      "tags": [
+        "icu",
+        "cardiac"
+      ],
+      "blurb": "Thermodilution: injectate technique and cardiac index.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-cardiac-index-icu.json",
+      "patients": [
+        "wynn"
+      ]
+    },
+    {
+      "id": "ileostomy-emptying",
+      "label": "Ileostomy emptying",
+      "aliases": [
+        "ileostomy empty",
+        "ostomy empty",
+        "basin towel"
+      ],
+      "tags": [
+        "ostomy",
+        "procedures"
+      ],
+      "blurb": "Empty ileostomy pouch with basin, towel, and odor control.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-ileostomy-emptying-medsurg.json",
+      "patients": [
+        "yara"
+      ]
+    },
+    {
+      "id": "ileostomy-bag-change",
+      "label": "Ileostomy bag replacement",
+      "aliases": [
+        "ileostomy wafer",
+        "cutting diameter",
+        "ostomy change"
+      ],
+      "tags": [
+        "ostomy",
+        "procedures"
+      ],
+      "blurb": "Change ileostomy appliance; measure and cut wafer diameter.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-ileostomy-bag-change-medsurg.json",
+      "patients": [
+        "zane"
+      ]
+    },
+    {
+      "id": "skeletal-traction",
+      "label": "Skeletal traction (weights / pins)",
+      "aliases": [
+        "traction weights",
+        "weights on pins",
+        "balanced traction",
+        "skeletal pins"
+      ],
+      "tags": [
+        "medsurg",
+        "ortho",
+        "safety"
+      ],
+      "blurb": "Keep traction weights hanging freely; maintain alignment and pin setup.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-skeletal-traction-medsurg.json",
+      "patients": [
+        "bron"
+      ]
+    },
+    {
+      "id": "pin-care",
+      "label": "Pin care",
+      "aliases": [
+        "external fixator pin care",
+        "traction pin care",
+        "ortho pin site"
+      ],
+      "tags": [
+        "medsurg",
+        "ortho",
+        "infection"
+      ],
+      "blurb": "Clean and assess skeletal/external-fixator pin sites.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-pin-care-medsurg.json",
+      "patients": [
+        "cory"
+      ]
+    },
+    {
+      "id": "ekg-12-lead",
+      "label": "12-lead EKG placement",
+      "aliases": [
+        "12 lead ECG",
+        "12-lead ECG",
+        "ECG lead placement",
+        "EKG leads"
+      ],
+      "tags": [
+        "cardiac",
+        "procedures",
+        "assessment"
+      ],
+      "blurb": "Place precordial and limb leads correctly for a 12-lead EKG.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "tele",
+      "pack": "events/scenarios/skill-ekg-12-lead-tele.json",
+      "patients": [
+        "dex"
+      ]
+    },
+    {
+      "id": "abg",
+      "label": "ABG / Arterial blood gases",
+      "aliases": [
+        "arterial blood gas",
+        "ABGs",
+        "blood gas interpretation",
+        "acid base",
+        "acid-base balance",
+        "PaO2",
+        "PaCO2",
+        "HCO3"
+      ],
+      "tags": [
+        "icu",
+        "respiratory",
+        "labs",
+        "assessment"
+      ],
+      "blurb": "Interpret ABG values: pH, pCO₂, HCO₃, oxygenation, and compensation states.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-abg-icu.json",
+      "patients": [
+        "vale"
+      ]
     }
   ]
 }

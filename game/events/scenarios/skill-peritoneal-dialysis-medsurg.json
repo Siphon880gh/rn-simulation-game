@@ -1,0 +1,34 @@
+{
+  "id": "skill-peritoneal-dialysis-medsurg",
+  "title": "Skill practice — Peritoneal dialysis (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Perform PD exchange sequence: BP check, prime, drain first, fill, dwell",
+    "Recognize cloudy effluent as a peritonitis warning"
+  ],
+  "patients": ["noa"],
+  "patientOverrides": {
+    "noa": {
+      "clinicalStatus": "stable",
+      "acuityScore": 2,
+      "clinicalStatusReason": "CAPD exchange due"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

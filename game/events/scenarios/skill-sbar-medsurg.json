@@ -1,0 +1,34 @@
+{
+  "id": "skill-sbar-medsurg",
+  "title": "Skill practice — SBAR communication (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Structure a provider call as Situation, Background, Assessment, Recommendation",
+    "Include concise vitals and what you need from the listener"
+  ],
+  "patients": ["blair"],
+  "patientOverrides": {
+    "blair": {
+      "clinicalStatus": "watch",
+      "acuityScore": 3,
+      "clinicalStatusReason": "New O2 need — SBAR to provider"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

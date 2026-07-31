@@ -1,0 +1,34 @@
+{
+  "id": "skill-insulin-drip-icu",
+  "title": "Skill practice — Insulin drip / ICU (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Monitor glucose frequently and titrate IV insulin per protocol",
+    "Recognize and treat hypoglycemia risk on an insulin drip"
+  ],
+  "patients": ["sage"],
+  "patientOverrides": {
+    "sage": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "DKA — insulin drip"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

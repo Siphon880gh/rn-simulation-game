@@ -1,0 +1,34 @@
+{
+  "id": "skill-bladder-scan-medsurg",
+  "title": "Skill practice — Bladder scan (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Perform timed bladder scans and interpret post-void residual",
+    "Follow q6h (or ordered interval) scanning and catheterization thresholds"
+  ],
+  "patients": ["rhea"],
+  "patientOverrides": {
+    "rhea": {
+      "clinicalStatus": "watch",
+      "acuityScore": 2,
+      "clinicalStatusReason": "Bladder scan q6h"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

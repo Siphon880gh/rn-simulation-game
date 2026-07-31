@@ -1,0 +1,34 @@
+{
+  "id": "skill-new-dialysis-start-medsurg",
+  "title": "Skill practice — New dialysis start (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Coordinate hepatitis panel/serologies, access readiness, and dialysis timing",
+    "Confirm consents/orders before a first HD session"
+  ],
+  "patients": ["orin"],
+  "patientOverrides": {
+    "orin": {
+      "clinicalStatus": "watch",
+      "acuityScore": 3,
+      "clinicalStatusReason": "New HD start pending"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

@@ -1,0 +1,34 @@
+{
+  "id": "skill-foley-care-medsurg",
+  "title": "Skill practice — Foley / catheter care (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Maintain a closed catheter system with the bag below the bladder",
+    "Review Foley necessity daily to reduce CAUTI risk"
+  ],
+  "patients": ["inez"],
+  "patientOverrides": {
+    "inez": {
+      "clinicalStatus": "stable",
+      "acuityScore": 1,
+      "clinicalStatusReason": "Indwelling Foley post-op"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

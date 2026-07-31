@@ -1,0 +1,34 @@
+{
+  "id": "skill-pacemaker-trans-icu",
+  "title": "Skill practice — Pacemaker assessment / trans (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize failure to capture on a temporary pacemaker",
+    "Verify connections, output, and sensing settings"
+  ],
+  "patients": ["finn"],
+  "patientOverrides": {
+    "finn": {
+      "clinicalStatus": "watch",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Temporary transvenous pacemaker"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

@@ -1,0 +1,34 @@
+{
+  "id": "skill-code-blue-response-icu",
+  "title": "Skill practice — Code Blue response (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize pulseless arrest and start Code Blue / ACLS priorities",
+    "Keep crash cart and defibrillator ready for high-risk cardiac patients"
+  ],
+  "patients": ["knox"],
+  "patientOverrides": {
+    "knox": {
+      "clinicalStatus": "critical",
+      "acuityScore": 5,
+      "clinicalStatusReason": "Unstable VT — Code Blue risk"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}
