@@ -1403,14 +1403,17 @@ const PatientsModule = (() => {
         return Math.floor(day / 60) * 100 + (day % 60);
     }
 
-    /** Chevron + aria for collapsible patient panel sections (▸ / ▾). */
+    /** Chevron after the section title (not leading) — FA caret, rotated when collapsed. */
     function ensureSectionChevron(heading) {
         if (!heading || heading.querySelector(':scope > .task-section-chevron')) return;
         heading.classList.add('task-section-heading');
         const chevron = document.createElement('span');
         chevron.className = 'task-section-chevron';
         chevron.setAttribute('aria-hidden', 'true');
-        heading.insertBefore(chevron, heading.firstChild);
+        chevron.innerHTML = '<i class="fas fa-chevron-down"></i>';
+        const before = heading.querySelector(':scope > .task-section-help, :scope > .task-fallout-toggle');
+        if (before) heading.insertBefore(chevron, before);
+        else heading.appendChild(chevron);
     }
 
     function syncSectionExpanded(heading, bodyEl) {

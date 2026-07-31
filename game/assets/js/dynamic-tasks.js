@@ -233,7 +233,7 @@ export function mountTaskDom(task) {
         block.className = 'space-y-2 mb-4 dynamic-tasks-block';
         const heading = document.createElement('h4');
         heading.className = 'font-semibold flex items-center gap-2 text-amber-800 w-full task-section-heading cursor-pointer hover:bg-amber-50';
-        heading.innerHTML = '<span class="task-section-chevron" aria-hidden="true"></span><i class="fas fa-bell text-amber-600 text-xl mr-1"></i><span>Urgent / dynamic</span>';
+        heading.innerHTML = '<i class="fas fa-bell text-amber-600 text-xl mr-1"></i><span>Urgent / dynamic</span><span class="task-section-chevron" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>';
         list = document.createElement('ul');
         list.className = 'dynamic-tasks-list space-y-3';
         heading.setAttribute('aria-expanded', 'true');
