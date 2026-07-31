@@ -43,9 +43,22 @@ export function getCodeBluePoolSize() {
     return getCodeBlueQuestions().length;
 }
 
-/** Pick a random question; optionally exclude id(s) so Random / multi-q advances change the prompt. */
+/** Question ids in config order (caller should shuffle for a run). */
+export function getCodeBlueQuestionIds() {
+    return getCodeBlueQuestions()
+        .map((q) => q?.id)
+        .filter((id) => id != null && id !== '')
+        .map(String);
+}
+
+/** Pick a question by id, or random; optionally exclude id(s) so Random / multi-q advances change the prompt. */
 export function pickCodeBlueQuestion(opts = {}) {
     const pool = getCodeBlueQuestions();
+    if (opts.questionId != null && opts.questionId !== '') {
+        const wanted = String(opts.questionId);
+        const exact = pool.find((q) => String(q.id) === wanted);
+        if (exact) return exact;
+    }
     const exclude = new Set(
         [opts.excludeId, ...(Array.isArray(opts.excludeIds) ? opts.excludeIds : [])]
             .filter((id) => id != null && id !== '')
@@ -185,7 +198,8 @@ export function wireCodeBlueHandlers({
     patientName = 'patient',
     initialQuestion,
     excludeIds = [],
-    onAdvanceQuestion
+    onAdvanceQuestion,
+    questionDeck = null
 } = {}) {
     const root = document.querySelector('.code-blue-challenge');
     let question = initialQuestion || pickCodeBlueQuestion();
@@ -194,6 +208,12 @@ export function wireCodeBlueHandlers({
     const seenIds = new Set(
         [...excludeIds, question?.id].filter((id) => id != null && id !== '').map(String)
     );
+    const deck = Array.isArray(questionDeck) && questionDeck.length
+        ? questionDeck.map(String)
+        : null;
+    let deckIndex = question?.id != null && deck
+        ? Math.max(0, deck.indexOf(String(question.id)))
+        : 0;
 
     const answerKey = () => document.querySelector('#code-blue-answer-key');
 
@@ -377,10 +397,36 @@ export function wireCodeBlueHandlers({
     };
 
     function loadNextQuestion({ excludeCurrentOnly = false } = {}) {
-        const next = pickCodeBlueQuestion({
-            excludeId: question.id,
-            excludeIds: excludeCurrentOnly ? [] : [...seenIds]
-        });
+        let next = null;
+        if (deck?.length) {
+            if (excludeCurrentOnly) {
+                const cur = String(question?.id || '');
+                const others = deck.filter((id) => id !== cur);
+                if (others.length) {
+                    const pick = others[Math.floor(Math.random() * others.length)];
+                    next = pickCodeBlueQuestion({ questionId: pick });
+                    const idx = deck.indexOf(String(pick));
+                    if (idx >= 0) deckIndex = idx;
+                }
+            } else {
+                let i = deckIndex + 1;
+                while (i < deck.length) {
+                    const candidate = pickCodeBlueQuestion({ questionId: deck[i] });
+                    deckIndex = i;
+                    if (candidate) {
+                        next = candidate;
+                        break;
+                    }
+                    i += 1;
+                }
+            }
+        }
+        if (!next) {
+            next = pickCodeBlueQuestion({
+                excludeId: question.id,
+                excludeIds: excludeCurrentOnly ? [] : [...seenIds]
+            });
+        }
         if (next?.id) seenIds.add(String(next.id));
         mountQuestion(next);
         onAdvanceQuestion?.(next);

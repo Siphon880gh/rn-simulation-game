@@ -1351,6 +1351,44 @@ const PatientsModule = (() => {
             },
             htmlFile: 'events/patients/vale.html',
             pastHxFile: 'events/patients/vale-past-hx.json'
+        },
+        remy: {
+            id: 'remy',
+            name: 'Remy Castillo',
+            room: 'ICU-18',
+            age: 57,
+            sex: 'Male',
+            diagnosis: 'Septic shock — left radial arterial line for continuous BP / ABG access',
+            skills: ['arterial-line'],
+            vitals: {
+                hr: 118,
+                bp: '86/48 MAP 61',
+                temp: '101.4°F',
+                o2: '93% 6L NC',
+                pain: '3/10',
+                rr: 26
+            },
+            htmlFile: 'events/patients/remy.html',
+            pastHxFile: 'events/patients/remy-past-hx.json'
+        },
+        nell: {
+            id: 'nell',
+            name: 'Nell Parkhurst',
+            room: 'Room 322-A',
+            age: 71,
+            sex: 'Female',
+            diagnosis: 'CHF exacerbation — bilateral edema; full shift physical assessment',
+            skills: ['heart-sounds', 'lung-sounds', 'capillary-refill', 'swelling'],
+            vitals: {
+                hr: 94,
+                bp: '152/88',
+                temp: '98.4°F',
+                o2: '94% 2L NC',
+                pain: '3/10',
+                rr: 22
+            },
+            htmlFile: 'events/patients/nell.html',
+            pastHxFile: 'events/patients/nell-past-hx.json'
         }
     };
 
@@ -1424,6 +1462,139 @@ const PatientsModule = (() => {
             });
         }
         return tasks;
+    }
+
+    /** Bedside shift assessment (first 4h) + chart assessment (after assess, 15 min). */
+    function buildShiftAssessmentTasks(patientId) {
+        const cfg = GameConfig.shiftAssessment || {};
+        const shiftStart = shiftStartHhmm();
+        const assessId = `${patientId}-shift-assessment`;
+        const chartId = `${patientId}-chart-assessment`;
+        const skillPool = Array.isArray(cfg.assessmentSkillIds)
+            ? [...cfg.assessmentSkillIds]
+            : ['heart-sounds', 'lung-sounds', 'capillary-refill', 'swelling'];
+        return [
+            {
+                id: assessId,
+                name: cfg.assessTaskName || 'Shift assessment',
+                type: 'assessment',
+                taskClass: GameConfig.tasks.classes.URGENT,
+                scheduled: shiftStart,
+                expire: `+${Number(cfg.assessWithinMins) || 240}`,
+                durationMins: Number(cfg.assessDurationMins) || 12,
+                status: GameConfig.tasks.statuses.NOT_YET,
+                metadata: {
+                    kind: 'shift-assessment',
+                    challenge: 'skill-mcq',
+                    skillPool,
+                    icon: 'fas fa-stethoscope'
+                }
+            },
+            {
+                id: chartId,
+                name: cfg.chartTaskName || 'Chart assessment',
+                type: 'assessment',
+                taskClass: GameConfig.tasks.classes.ROUTINE,
+                scheduled: shiftStart,
+                expire: `+${Number(cfg.chartExpireMins) || 480}`,
+                durationMins: Number(cfg.chartDurationMins) || 15,
+                status: GameConfig.tasks.statuses.NOT_YET,
+                metadata: {
+                    kind: 'chart-assessment',
+                    requiresCompletedTaskId: assessId,
+                    icon: 'fas fa-notes-medical'
+                }
+            }
+        ];
+    }
+
+    function syncShiftAssessmentLockAttrs(patientId) {
+        const assessId = `${patientId}-shift-assessment`;
+        const chartEl = document.getElementById(`${patientId}-chart-assessment`);
+        if (!chartEl) return;
+        const assess = gameState.getStateSlice('tasks')?.get(assessId);
+        const unlocked = assess?.status === GameConfig.tasks.statuses.COMPLETED;
+        chartEl.setAttribute('data-task-locked', unlocked ? '0' : '1');
+        chartEl.title = unlocked
+            ? 'Click for Perform / Details menu'
+            : 'Locked — complete shift assessment first';
+    }
+
+    function mountShiftAssessmentTasks(patientId, shiftTasks) {
+        if (!shiftTasks.length) return;
+        const panel = document.querySelector(`.patient-panel-host[data-patient-id="${patientId}"]`);
+        if (!panel) return;
+
+        let list = panel.querySelector('.shift-assessment-list');
+        if (!list) {
+            const block = document.createElement('div');
+            block.className = 'space-y-2 mb-4 shift-assessment-block';
+            const heading = document.createElement('h4');
+            heading.className = 'font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100';
+            heading.innerHTML = '<i class="fas fa-stethoscope text-xl mr-1 text-sky-700"></i> Shift assessment / charting';
+            list = document.createElement('ul');
+            list.className = 'shift-assessment-list space-y-3';
+            heading.addEventListener('click', () => list.classList.toggle('hidden'));
+            block.appendChild(heading);
+            const note = document.createElement('p');
+            note.className = 'text-xs text-gray-600 mb-2';
+            note.textContent = 'Assess within first 4 hours (skill check). Chart unlocks after assess (~15 min).';
+            block.appendChild(note);
+            block.appendChild(list);
+            const patientRoot = panel.querySelector('.patient') || panel;
+            const vitalsGrid = patientRoot.querySelector('.grid.grid-cols-2');
+            if (vitalsGrid?.nextSibling) {
+                patientRoot.insertBefore(block, vitalsGrid.nextSibling);
+            } else {
+                const medsBlock = patientRoot.querySelector('.meds-list')?.closest('.space-y-2.mb-4, .space-y-2');
+                if (medsBlock) patientRoot.insertBefore(block, medsBlock);
+                else patientRoot.appendChild(block);
+            }
+        } else {
+            list.replaceChildren();
+        }
+
+        shiftTasks.forEach((task) => {
+            if (document.getElementById(task.id)) return;
+            const live = gameState.getStateSlice('tasks').get(task.id) || task;
+            const li = document.createElement('li');
+            li.id = live.id;
+            li.setAttribute('data-task-type', live.type);
+            li.setAttribute('data-task-class', live.taskClass || 'routine');
+            li.setAttribute('data-status', live.status);
+            li.setAttribute('data-scheduled', String(live.scheduled).padStart(4, '0'));
+            if (live.metadata?.kind) li.setAttribute('data-task-kind', live.metadata.kind);
+            if (live.metadata?.challenge) li.setAttribute('data-challenge', live.metadata.challenge);
+            if (live.expire != null) {
+                li.setAttribute(
+                    'data-expire',
+                    typeof live.expire === 'number'
+                        ? String(live.expire).padStart(4, '0')
+                        : String(live.expire)
+                );
+            }
+            li.setAttribute('data-duration-mins', String(live.duration || 15));
+            const locked = live.metadata?.requiresCompletedTaskId
+                && gameState.getStateSlice('tasks')?.get(live.metadata.requiresCompletedTaskId)?.status
+                    !== GameConfig.tasks.statuses.COMPLETED;
+            li.setAttribute('data-task-locked', locked ? '1' : '0');
+            li.setAttribute(
+                'title',
+                locked ? 'Locked — complete shift assessment first' : 'Click for Perform / Details menu'
+            );
+            li.className = `bg-sky-50 p-4 rounded-lg shadow flex items-center task-status-${live.status} border border-sky-200`;
+            const timeLabel = String(live.scheduled).padStart(4, '0');
+            const icon = live.metadata?.icon || 'fas fa-stethoscope';
+            li.innerHTML = `
+              <data class="slot-label" value="1"></data>
+              <i class="${icon} text-sky-700 text-xl mr-3"></i>
+              <span class="font-medium text-gray-900">${live.name}</span>
+              <span class="ml-auto text-sm text-gray-500">${timeLabel.slice(0, 2)}:${timeLabel.slice(2)}</span>
+            `;
+            list.appendChild(li);
+            taskSystem.syncTaskWindowDomAttrs?.(li, live);
+        });
+        syncShiftAssessmentLockAttrs(patientId);
     }
 
     /** CNA/CCT solo requests — bathroom, water, bed position, pillow, linen (instant delegate). */
@@ -1641,12 +1812,15 @@ const PatientsModule = (() => {
             const soloTasks = skipPackTasks
                 ? []
                 : buildSoloRequestTasks(patientConfig.id, patientIndex);
+            const shiftTasks = buildShiftAssessmentTasks(patientConfig.id);
 
             // Create patient data model
             const patient = {
                 ...patientConfig,
                 careReason,
-                tasks: skipPackTasks ? [] : [...packTasks, ...careTasks, ...soloTasks],
+                tasks: skipPackTasks
+                    ? [...shiftTasks]
+                    : [...packTasks, ...careTasks, ...soloTasks, ...shiftTasks],
                 pastHx: pastHxPack.pastHx || [],
                 pastHxPack,
                 status: 'active',
@@ -1660,16 +1834,14 @@ const PatientsModule = (() => {
 
             // Register patient in game state
             gameState.dispatch('REGISTER_PATIENT', { patient });
-            
-            // Register patient tasks in task system (skipped for mid-shift admits)
-            if (!skipPackTasks) {
-                patient.tasks.forEach((taskData) => {
-                    taskSystem.createTask({
-                        ...taskData,
-                        patientId: patient.id
-                    });
+
+            // Register tasks (shift assessment always; pack/care/solo skipped for mid-shift admits)
+            patient.tasks.forEach((taskData) => {
+                taskSystem.createTask({
+                    ...taskData,
+                    patientId: patient.id
                 });
-            }
+            });
 
             // Render patient in UI (all packs stay mounted; swap via activePatientId)
             renderPatient(patient, html);
@@ -1691,6 +1863,9 @@ const PatientsModule = (() => {
                     host?.querySelectorAll('.care-solo-list [data-delegate-mode="solo"]').forEach((el) => el.remove());
                     mountSoloRequestTasks(patient.id, soloTasks);
                 }
+            }
+            if (shiftTasks.length) {
+                mountShiftAssessmentTasks(patient.id, shiftTasks);
             }
 
             // E3.M3: write absolute expire (+ resolved) onto DOM for reveal rules / window phase
@@ -2086,6 +2261,8 @@ const PatientsModule = (() => {
     // Challenge wins can COMPLETE_TASK while paused — sync without waiting for a clock tick
     gameState.subscribe('tasks', () => {
         updatePatientTaskStatuses();
+        const patients = gameState.getStateSlice('patients');
+        patients?.forEach((p) => syncShiftAssessmentLockAttrs(p.id));
     });
 
     gameState.subscribe('activePatientId', () => {

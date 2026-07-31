@@ -3,9 +3,16 @@
  * Path: challenges/skills/skill-mcq/config.js
  * Keys match game/events/skills/library.json skill ids.
  * Larger banks may live under ./banks/ and be merged below.
- * Question types: choice (default) | sata | match | flash
+ * Question types: choice (default) | sata | match | flash | audio (sheet "Video")
  */
 import { abgSkillBank } from './banks/abg.js';
+import { arterialLineSkillBank } from './banks/arterial-line.js';
+import {
+  heartSoundsSkillBank,
+  lungSoundsSkillBank,
+  capillaryRefillSkillBank,
+  swellingSkillBank
+} from './banks/physical-assessment.js';
 
 /** @type {Record<string, { title: string, questions: object[] }>} */
 export const skillMcqBanks = {
@@ -1070,7 +1077,12 @@ export const skillMcqBanks = {
       }
     ]
   },
-  abg: abgSkillBank
+  abg: abgSkillBank,
+  'arterial-line': arterialLineSkillBank,
+  'heart-sounds': heartSoundsSkillBank,
+  'lung-sounds': lungSoundsSkillBank,
+  'capillary-refill': capillaryRefillSkillBank,
+  swelling: swellingSkillBank
 };
 
 export const skillMcqChallengeConfig = {

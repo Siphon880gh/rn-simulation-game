@@ -76,6 +76,19 @@
     border-left-color: #10b981;
 }
 
+/* Chart assessment locked until bedside shift assessment completes */
+[data-task-kind="chart-assessment"][data-task-locked="1"] {
+    opacity: 0.55;
+    filter: grayscale(0.15);
+}
+
+[data-task-kind="chart-assessment"][data-task-locked="1"].task-status-active::after,
+[data-task-type="assessment"][data-task-locked="1"].task-status-active::after {
+    content: "Locked · assess first";
+    color: #92400e;
+    background: #fffbeb;
+}
+
 [data-task-type="procedure"].task-status-active {
     border-left-color: #8b5cf6;
 }

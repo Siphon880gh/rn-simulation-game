@@ -338,9 +338,13 @@ class GameApplication {
                 };
 
                 const now = gameState.getStateSlice('currentTime');
+                const prereqMet = taskSystem.isPrerequisiteMet
+                    ? taskSystem.isPrerequisiteMet(task)
+                    : true;
                 const canPerform = taskSystem.isPerformAllowed(task, now);
                 const phase = taskSystem.getWindowPhase(task, now);
                 const kind = String(task.type).toLowerCase();
+                const metaKind = String(task.metadata?.kind || '').toLowerCase();
                 const isOrders = kind === 'orders';
                 const isCritCall = kind === 'criticallab'
                     && (task.metadata?.phase === 'call' || task.metadata?.phase === 'recall'
@@ -366,12 +370,16 @@ class GameApplication {
                 if (isAdmitCall) performName = 'Call admitting';
                 if (isAdmitRecall) performName = 'Call admitting again';
                 if (isAdmitCb) performName = 'Take admitting callback';
+                if (metaKind === 'shift-assessment') performName = 'Assess (skill check)';
+                if (metaKind === 'chart-assessment') performName = 'Chart assessment';
 
                 const items = {
                     perform: {
-                        name: !canPerform
-                            ? `Perform (outside window: ${phase})`
-                            : performName,
+                        name: !prereqMet
+                            ? 'Perform (complete shift assessment first)'
+                            : !canPerform
+                                ? `Perform (outside window: ${phase})`
+                                : performName,
                         icon: 'add',
                         disabled: !canPerform
                     },
@@ -515,14 +523,56 @@ class GameApplication {
         });
     }
 
-    // E3.M5: assessment/dynamic perform — window gate → short slot (no med quiz)
+    // E3.M5: assessment/dynamic perform — window gate → optional challenge → slot
+    // Shift assessment: random physical-assessment skill-mcq, then slot.
+    // Chart assessment: unlocked only after shift assessment completes (15 min slot).
     // E13: opts.assist → team effort with CCT/CNA at half duration
     async performAssessmentTask(task, opts = {}) {
         const now = gameState.getStateSlice('currentTime');
+        if (!taskSystem.isPrerequisiteMet?.(task)) {
+            alert('Complete the bedside shift assessment first, then chart.');
+            return;
+        }
         if (!taskSystem.isPerformAllowed(task, now)) {
             alert(`Cannot perform outside the availability window (${taskSystem.getWindowPhase(task, now)}).`);
             return;
         }
+
+        const kind = String(task.metadata?.kind || '').toLowerCase();
+        const challengeId = String(task.metadata?.challenge || '').toLowerCase();
+        const needsChallenge = kind === 'shift-assessment'
+            || Boolean(challengeId);
+
+        if (needsChallenge && !opts.assist) {
+            let gateTask = task;
+            if (kind === 'shift-assessment') {
+                const pool = Array.isArray(task.metadata?.skillPool) && task.metadata.skillPool.length
+                    ? task.metadata.skillPool
+                    : (GameConfig.shiftAssessment?.assessmentSkillIds || []);
+                const skillId = pool[Math.floor(Math.random() * pool.length)] || pool[0];
+                if (!skillId) {
+                    alert('No assessment skills configured.');
+                    return;
+                }
+                gateTask = {
+                    ...task,
+                    metadata: {
+                        ...task.metadata,
+                        challenge: 'skill-mcq',
+                        skillId
+                    }
+                };
+            }
+            const challengeGate = this.modules.get('challengeGate');
+            const outcome = challengeGate?.runChallengeGate
+                ? await challengeGate.runChallengeGate(gateTask)
+                : { passed: false, reason: 'no-gate' };
+            if (!outcome?.passed) {
+                console.log(`Assessment challenge not passed (${outcome?.reason || 'fail'})`);
+                return;
+            }
+        }
+
         let workTask = task;
         if (opts.assist && isTurnCareTask(task) && task.patientId) {
             const aide = opts.aide || findAvailableAideForPatient(task.patientId, now);

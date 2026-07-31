@@ -1,0 +1,63 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Nell Parkhurst</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Room 322-A</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 71</p>
+        <p class="text-sm text-gray-600">Sex: Female</p>
+        <p class="text-sm text-gray-600">Diagnosis: CHF exacerbation — bilateral edema; full shift physical assessment</p>
+        <p class="text-sm text-gray-600">Practice heart/lung sounds, capillary refill, and pitting edema grading</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 94</div>
+        <div>BP: 152/88</div>
+        <div>Temp: 98.4°F</div>
+        <div>O<sub>2</sub>: 94% 2L NC</div>
+        <div>Pain: 3/10</div>
+        <div>RR: 22</div>
+        <div>Edema: ankles 2+</div>
+        <div>Weight: +1.8 kg from baseline</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-stethoscope text-xl mr-1 text-sky-700"></i>
+            Physical assessment skills
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="heart-sounds" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="12" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-heartbeat text-sky-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Heart sounds practice</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="lung-sounds" data-status="not-yet" data-scheduled="1915" data-expire="2015" data-duration-mins="12" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-lungs text-sky-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Lung sounds practice</span>
+                <span class="ml-auto text-sm text-gray-500">1915</span>
+            </li>
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="capillary-refill" data-status="not-yet" data-scheduled="1930" data-expire="2030" data-duration-mins="8" data-task-class="routine" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-hand-holding-medical text-sky-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Capillary refill practice</span>
+                <span class="ml-auto text-sm text-gray-500">1930</span>
+            </li>
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="swelling" data-status="not-yet" data-scheduled="1945" data-expire="2045" data-duration-mins="10" data-task-class="routine" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-tint text-sky-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Swelling / pitting edema practice</span>
+                <span class="ml-auto text-sm text-gray-500">1945</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-nell" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

@@ -23,8 +23,21 @@ export function getIcpPoolSize() {
   return getIcpQuestions().length;
 }
 
+/** Question ids in config order (caller should shuffle for a run). */
+export function getIcpQuestionIds() {
+  return getIcpQuestions()
+    .map((q) => q?.id)
+    .filter((id) => id != null && id !== '')
+    .map(String);
+}
+
 export function pickIcpQuestion(opts = {}) {
   const pool = getIcpQuestions();
+  if (opts.questionId != null && opts.questionId !== '') {
+    const wanted = String(opts.questionId);
+    const exact = pool.find((q) => String(q.id) === wanted);
+    if (exact) return exact;
+  }
   const exclude = new Set(
     [opts.excludeId, ...(Array.isArray(opts.excludeIds) ? opts.excludeIds : [])]
       .filter((id) => id != null && id !== '')

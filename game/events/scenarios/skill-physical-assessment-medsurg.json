@@ -1,0 +1,35 @@
+{
+  "id": "skill-physical-assessment-medsurg",
+  "title": "Skill practice — Physical assessment (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Auscultate heart and lung sounds with correct landmarks and descriptions",
+    "Measure and interpret capillary refill",
+    "Grade pitting edema (1+–4+) and document location"
+  ],
+  "patients": ["nell"],
+  "patientOverrides": {
+    "nell": {
+      "clinicalStatus": "watch",
+      "acuityScore": 3,
+      "clinicalStatusReason": "CHF exacerbation — physical assessment focus"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

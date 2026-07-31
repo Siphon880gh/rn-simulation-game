@@ -504,6 +504,8 @@ function applyClockFloatPos(left, top) {
     cluster.style.left = `${next.left}px`;
     cluster.style.top = `${next.top}px`;
     cluster.style.right = 'auto';
+    cluster.style.bottom = 'auto';
+    cluster.classList.remove('is-docked-default');
     return next;
 }
 
@@ -513,6 +515,25 @@ function clearClockFloatPosStyles() {
     cluster.style.left = '';
     cluster.style.top = '';
     cluster.style.right = '';
+    cluster.style.bottom = '';
+    cluster.classList.remove('is-docked-default');
+}
+
+/**
+ * Pin bottom-right above the slot queue (#shell-bottom).
+ * Clears inline offsets so CSS (right + --shell-bottom-height) owns the dock.
+ */
+function dockClockFloatDefault(cluster = document.getElementById('shell-clock-cluster')) {
+    if (!cluster) return null;
+    cluster.style.left = '';
+    cluster.style.top = '';
+    cluster.style.right = '';
+    cluster.style.bottom = '';
+    cluster.classList.add('is-docked-default');
+    const rect = cluster.getBoundingClientRect();
+    const next = { left: rect.left, top: rect.top };
+    storeClockFloatPos(next.left, next.top);
+    return next;
 }
 
 function syncTopCollapseChrome(collapsed) {
@@ -533,40 +554,43 @@ function syncTopCollapseChrome(collapsed) {
     if (expandIcon) expandIcon.classList.toggle('hidden', !collapsed);
 }
 
-function placeFloatingClockCluster() {
+function placeFloatingClockCluster({ forceDefault = false } = {}) {
     const cluster = document.getElementById('shell-clock-cluster');
     if (!cluster) return;
 
-    const stored = readStoredClockFloatPos();
-    if (stored) {
-        applyClockFloatPos(stored.left, stored.top);
-        return;
+    if (!forceDefault) {
+        const stored = readStoredClockFloatPos();
+        if (stored) {
+            applyClockFloatPos(stored.left, stored.top);
+            return;
+        }
     }
 
-    const rect = cluster.getBoundingClientRect();
-    const next = applyClockFloatPos(rect.left, rect.top);
-    if (next) storeClockFloatPos(next.left, next.top);
+    dockClockFloatDefault(cluster);
 }
 
-function setTopCollapsed(collapsed) {
+function setTopCollapsed(collapsed, { forceDefault = false } = {}) {
     const header = document.querySelector(GameConfig.selectors.topPrimary);
     if (!header) return;
 
     if (collapsed) {
-        // Capture on-screen position before fixed positioning takes over.
-        placeFloatingClockCluster();
         syncTopCollapseChrome(true);
-        // Re-clamp after layout settles (padding/border change size).
+        placeFloatingClockCluster({ forceDefault });
+        // Re-dock after floating styles settle (cluster size changes when collapsed).
         requestAnimationFrame(() => {
             const cluster = document.getElementById('shell-clock-cluster');
             if (!cluster) return;
+            if (forceDefault || cluster.classList.contains('is-docked-default')) {
+                dockClockFloatDefault(cluster);
+                return;
+            }
             const left = Number.parseFloat(cluster.style.left);
             const top = Number.parseFloat(cluster.style.top);
             if (Number.isFinite(left) && Number.isFinite(top)) {
                 const next = applyClockFloatPos(left, top);
                 if (next) storeClockFloatPos(next.left, next.top);
             } else {
-                placeFloatingClockCluster();
+                placeFloatingClockCluster({ forceDefault });
             }
         });
     } else {
@@ -634,6 +658,8 @@ function initTopCollapse() {
 
     window.addEventListener('resize', () => {
         if (!header.classList.contains('is-collapsed')) return;
+        // right/bottom default dock tracks the viewport without JS.
+        if (cluster.classList.contains('is-docked-default')) return;
         const left = Number.parseFloat(cluster.style.left);
         const top = Number.parseFloat(cluster.style.top);
         if (Number.isFinite(left) && Number.isFinite(top)) {
@@ -643,7 +669,8 @@ function initTopCollapse() {
     });
 
     if (readStoredTopCollapsed()) {
-        setTopCollapsed(true);
+        // Game start with persisted collapse: dock at right sidebar / page bottom.
+        setTopCollapsed(true, { forceDefault: true });
     } else {
         syncTopCollapseChrome(false);
     }

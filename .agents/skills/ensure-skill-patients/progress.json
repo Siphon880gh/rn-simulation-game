@@ -538,8 +538,48 @@
       "patientId": "vale",
       "packFile": "game/events/scenarios/skill-abg-icu.json",
       "notes": ""
+    },
+    {
+      "id": "arterial-line",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "remy",
+      "packFile": "game/events/scenarios/skill-arterial-line-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "heart-sounds",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "nell",
+      "packFile": "game/events/scenarios/skill-physical-assessment-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "lung-sounds",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "nell",
+      "packFile": "game/events/scenarios/skill-physical-assessment-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "capillary-refill",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "nell",
+      "packFile": "game/events/scenarios/skill-physical-assessment-medsurg.json",
+      "notes": ""
+    },
+    {
+      "id": "swelling",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "nell",
+      "packFile": "game/events/scenarios/skill-physical-assessment-medsurg.json",
+      "notes": ""
     }
   ],
   "blocked": null,
-  "updatedAt": "2026-07-31T10:14:20.086Z"
+  "updatedAt": "2026-07-31T11:11:35.347Z"
 }

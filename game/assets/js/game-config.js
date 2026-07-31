@@ -246,6 +246,27 @@ export const GameConfig = {
     }
   },
 
+  /**
+   * Per-patient shift assessment → chart flow (injected for every census patient).
+   * Bedside assess must finish in the first N game-hours; chart unlocks after assess
+   * and occupies a slot (~15 game minutes). Perform assess → random skill from pool.
+   */
+  shiftAssessment: {
+    assessWithinMins: 240,
+    assessDurationMins: 12,
+    assessTaskName: 'Shift assessment',
+    chartDurationMins: 15,
+    /** Chart due window from shift start (longer than assess so charting can finish). */
+    chartExpireMins: 480,
+    chartTaskName: 'Chart assessment',
+    assessmentSkillIds: [
+      'heart-sounds',
+      'lung-sounds',
+      'capillary-refill',
+      'swelling'
+    ]
+  },
+
   // Scene presence (E7.M1 Later) — CSS themes; optional authored image URLs
   scene: {
     defaultTheme: 'medsurg',

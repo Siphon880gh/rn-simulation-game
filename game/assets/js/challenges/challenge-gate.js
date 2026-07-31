@@ -42,22 +42,28 @@ import {
     wireCodeBlueHandlers,
     pickCodeBlueQuestion,
     getCodeBlueExpectedCite as citeCodeBlueQuestion,
-    getCodeBluePoolSize
+    getCodeBluePoolSize,
+    getCodeBlueQuestionIds
 } from './emergencies/code-blue/challenge.js';
 import {
     buildAdmissionQuiz,
     renderAdmissionQuizHtml
 } from './skills/admission/challenge.js';
 import {
+    isIcpTask,
     buildIcpQuiz,
     renderIcpQuizHtml,
-    getIcpPoolSize
+    getIcpPoolSize,
+    getIcpQuestionIds
 } from './skills/icp/challenge.js';
 import {
+    isSkillMcqTask,
     buildSkillMcqQuiz,
     renderSkillMcqHtml,
     getSkillMcqPoolSize,
-    wireSkillMcqInteractions
+    getSkillMcqQuestionIds,
+    wireSkillMcqInteractions,
+    applySkillMcqCheat
 } from './skills/skill-mcq/challenge.js';
 import {
     renderChallengeLevelControl,
@@ -141,6 +147,63 @@ function endSession(result) {
     if (session?.resolve) {
         session.resolve(result);
     }
+}
+
+/** Fisher–Yates shuffle — fresh order each challenge run. */
+function shuffleIds(ids) {
+    const arr = [...(ids || [])].map(String).filter(Boolean);
+    for (let i = arr.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+/**
+ * Start a per-run shuffled question deck (used when “I want to feel challenged” > 1).
+ * Returns the deck; first id is the opening question.
+ */
+function beginShuffledQuizDeck(poolIds) {
+    const deck = shuffleIds(poolIds);
+    if (activeSession) {
+        activeSession.quizDeck = deck;
+        activeSession.quizDeckIndex = 0;
+    }
+    return deck;
+}
+
+/** Draw next / random question from the session deck (falls back to exclude-based pick). */
+function drawFromQuizDeck(rebuild, { excludeCurrentOnly = false } = {}) {
+    if (typeof rebuild !== 'function' || !activeSession) return null;
+    const deck = Array.isArray(activeSession.quizDeck) ? activeSession.quizDeck : null;
+    const seen = activeSession.quizSeenIds || new Set();
+
+    if (deck?.length) {
+        if (excludeCurrentOnly) {
+            const cur = String(activeSession.currentQuestionId || '');
+            const others = deck.filter((id) => id !== cur);
+            if (others.length) {
+                const pick = others[Math.floor(Math.random() * others.length)];
+                const next = rebuild({ questionId: pick });
+                const idx = deck.indexOf(String(pick));
+                if (idx >= 0) activeSession.quizDeckIndex = idx;
+                return next;
+            }
+        } else {
+            let i = (Number(activeSession.quizDeckIndex) || 0) + 1;
+            while (i < deck.length) {
+                const next = rebuild({ questionId: deck[i] });
+                activeSession.quizDeckIndex = i;
+                if (next?.quiz) return next;
+                i += 1;
+            }
+        }
+    }
+
+    return rebuild({
+        excludeId: activeSession.currentQuestionId,
+        excludeIds: excludeCurrentOnly ? [] : [...seen]
+    });
 }
 
 function initQuizChallengeLevel(poolSize) {
@@ -238,7 +301,9 @@ export function runCodeBlueChallenge(hook) {
     codeBlueOpenPending = true;
     return new Promise((resolve) => {
         const poolSize = getCodeBluePoolSize();
-        const initialQuestion = pickCodeBlueQuestion();
+        const questionDeck = beginShuffledQuizDeck(getCodeBlueQuestionIds());
+        const initialQuestion = pickCodeBlueQuestion({ questionId: questionDeck[0] })
+            || pickCodeBlueQuestion();
         activeSession = {
             resolve,
             taskId: null,
@@ -249,6 +314,8 @@ export function runCodeBlueChallenge(hook) {
             quizPoolSize: poolSize,
             quizTarget: 1,
             quizCorrect: 0,
+            quizDeck: questionDeck,
+            quizDeckIndex: 0,
             quizSeenIds: new Set(
                 initialQuestion?.id != null ? [String(initialQuestion.id)] : []
             )
@@ -281,6 +348,7 @@ export function runCodeBlueChallenge(hook) {
                 patientName: name,
                 initialQuestion,
                 excludeIds: [...(activeSession.quizSeenIds || [])],
+                questionDeck: activeSession.quizDeck,
                 onAdvanceQuestion: (q) => {
                     if (!activeSession) return;
                     activeSession.codeBlueQuestion = q;
@@ -451,11 +519,7 @@ function wirePoolChoiceQuiz(cfg) {
                 finishAttempt(true, `${kind}-correct`, expected, { allowRetry: true });
             },
             onNeedNext: () => {
-                const seen = [...(activeSession?.quizSeenIds || [])];
-                const next = rebuild({
-                    excludeId: activeSession?.currentQuestionId,
-                    excludeIds: seen
-                });
+                const next = drawFromQuizDeck(rebuild, { excludeCurrentOnly: false });
                 if (!next?.quiz) {
                     finishAttempt(true, `${kind}-correct`, expected, { allowRetry: true });
                     return;
@@ -490,9 +554,7 @@ function wirePoolChoiceQuiz(cfg) {
     if (poolSize > 1) {
         window.poolQuizRandom = () => {
             if (!activeSession || activeSession.closing) return;
-            const next = rebuild({
-                excludeId: activeSession.currentQuestionId
-            });
+            const next = drawFromQuizDeck(rebuild, { excludeCurrentOnly: true });
             if (!next?.quiz) return;
             mountPoolChoiceQuiz(next, task, poolSize, kind);
             setChallengeFeedback('New question loaded — pick an answer.', { ok: true });
@@ -723,9 +785,15 @@ export function cheatChallenge() {
         }
         return;
     }
+    if (activeSession.skillMcq) {
+        const filled = applySkillMcqCheat();
+        if (filled.ok) {
+            setChallengeFeedback(filled.message, { ok: true });
+        }
+        return;
+    }
     if (
         activeSession.safety
-        || activeSession.skillMcq
         || activeSession.icpQuiz
         || activeSession.admissionQuiz
     ) {
@@ -796,8 +864,20 @@ export function runChallengeGate(task) {
         const liveTask = isIvTask(task) ? syncIvTaskMetadata(task) : task;
         const bedPrep = isBedPrepTask(liveTask);
         const ivpbHang = !bedPrep && isIvpbTask(liveTask);
-        const icpQuiz = !bedPrep && !ivpbHang ? buildIcpQuiz(liveTask) : null;
-        const skillMcq = !bedPrep && !ivpbHang && !icpQuiz ? buildSkillMcqQuiz(liveTask) : null;
+
+        // Per-run shuffled decks so multi-question challenge levels are not bank order.
+        let icpQuiz = null;
+        let skillMcq = null;
+        let quizDeck = null;
+        if (!bedPrep && !ivpbHang && isIcpTask(liveTask)) {
+            quizDeck = beginShuffledQuizDeck(getIcpQuestionIds());
+            icpQuiz = buildIcpQuiz(liveTask, { questionId: quizDeck[0] });
+        } else if (!bedPrep && !ivpbHang && isSkillMcqTask(liveTask)) {
+            const skillId = String(liveTask?.metadata?.skillId || '').trim();
+            quizDeck = beginShuffledQuizDeck(getSkillMcqQuestionIds(skillId));
+            skillMcq = buildSkillMcqQuiz(liveTask, { questionId: quizDeck[0] });
+        }
+
         const admissionQuiz = !bedPrep && !ivpbHang && !icpQuiz && !skillMcq
             ? buildAdmissionQuiz(liveTask)
             : null;
@@ -823,6 +903,8 @@ export function runChallengeGate(task) {
             icpQuiz: Boolean(icpQuiz),
             skillMcq: Boolean(skillMcq),
             admissionQuiz: Boolean(admissionQuiz),
+            quizDeck,
+            quizDeckIndex: 0,
             safety: !bedPrep && !ivpbHang && !icpQuiz && !skillMcq && !admissionQuiz
                 && !useIv && !accucheckPrompt && !useMedQuiz
         };

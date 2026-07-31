@@ -1,0 +1,35 @@
+{
+  "id": "skill-arterial-line-icu",
+  "title": "Skill practice — Arterial line / A-line (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Level and zero an arterial-line transducer at the phlebostatic axis",
+    "Recognize normal vs dampened arterial waveforms",
+    "Apply A-line safety, site perfusion checks, and sampling basics"
+  ],
+  "patients": ["remy"],
+  "patientOverrides": {
+    "remy": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Septic shock — arterial line monitoring"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

@@ -1545,6 +1545,131 @@
       "patients": [
         "vale"
       ]
+    },
+    {
+      "id": "arterial-line",
+      "label": "Arterial line / A-line",
+      "aliases": [
+        "A-line",
+        "aline",
+        "art line",
+        "arterial catheter",
+        "zero arterial line",
+        "arterial transducer"
+      ],
+      "tags": [
+        "icu",
+        "cardiac",
+        "procedures",
+        "assessment"
+      ],
+      "blurb": "Level/zero the transducer at the phlebostatic axis, read the waveform, and keep the A-line safe.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-arterial-line-icu.json",
+      "patients": [
+        "remy"
+      ]
+    },
+    {
+      "id": "heart-sounds",
+      "label": "Heart sounds",
+      "aliases": [
+        "cardiac auscultation",
+        "S1 S2",
+        "heart auscultation",
+        "murmur landmarks"
+      ],
+      "tags": [
+        "assessment",
+        "cardiac"
+      ],
+      "blurb": "Auscultate S₁/S₂ and valve landmarks; recognize common murmur patterns.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-physical-assessment-medsurg.json",
+      "patients": [
+        "nell"
+      ]
+    },
+    {
+      "id": "lung-sounds",
+      "label": "Lung sounds",
+      "aliases": [
+        "breath sounds",
+        "pulmonary auscultation",
+        "crackles wheezes",
+        "lung auscultation"
+      ],
+      "tags": [
+        "assessment",
+        "respiratory"
+      ],
+      "blurb": "Identify vesicular sounds, crackles, wheezes, and stridor; document location and timing.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-physical-assessment-medsurg.json",
+      "patients": [
+        "nell"
+      ]
+    },
+    {
+      "id": "capillary-refill",
+      "label": "Capillary refill",
+      "aliases": [
+        "cap refill",
+        "CRT",
+        "peripheral perfusion",
+        "blanch test"
+      ],
+      "tags": [
+        "assessment",
+        "cardiac"
+      ],
+      "blurb": "Measure and interpret capillary refill as a peripheral perfusion cue.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-physical-assessment-medsurg.json",
+      "patients": [
+        "nell"
+      ]
+    },
+    {
+      "id": "swelling",
+      "label": "Swelling / pitting edema",
+      "aliases": [
+        "edema",
+        "pitting edema",
+        "1+ pitting",
+        "4+ pitting",
+        "fluid overload swelling"
+      ],
+      "tags": [
+        "assessment",
+        "skin"
+      ],
+      "blurb": "Grade pitting edema (1+–4+) and chart location, symmetry, and skin changes.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-physical-assessment-medsurg.json",
+      "patients": [
+        "nell"
+      ]
     }
   ]
 }

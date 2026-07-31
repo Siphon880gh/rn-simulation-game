@@ -34,10 +34,23 @@ export function getSkillMcqPoolSize(skillId) {
   return visibleQuestions(getSkillMcqBank(skillId)).length;
 }
 
+/** Visible question ids in bank order (caller should shuffle for a run). */
+export function getSkillMcqQuestionIds(skillId) {
+  return visibleQuestions(getSkillMcqBank(skillId))
+    .map((q) => q?.id)
+    .filter((id) => id != null && id !== '')
+    .map(String);
+}
+
 export function pickSkillMcqQuestion(skillId, opts = {}) {
   const bank = getSkillMcqBank(skillId);
   const pool = visibleQuestions(bank);
   if (!pool.length) return null;
+  if (opts.questionId != null && opts.questionId !== '') {
+    const wanted = String(opts.questionId);
+    const exact = pool.find((q) => String(q.id) === wanted);
+    if (exact) return { bank, question: exact };
+  }
   const exclude = new Set(
     [opts.excludeId, ...(Array.isArray(opts.excludeIds) ? opts.excludeIds : [])]
       .filter((id) => id != null && id !== '')
@@ -73,7 +86,17 @@ function escapeHtml(str) {
 function questionType(question) {
   const t = String(question?.type || 'choice').toLowerCase();
   if (t === 'sata' || t === 'match' || t === 'flash') return t;
+  // Sheet "Video" rows that are MP3/audio identify prompts
+  if (t === 'audio' || t === 'video') return 'audio';
   return 'choice';
+}
+
+function resolveMediaSrc(src) {
+  const raw = String(src || '').trim();
+  if (!raw) return '';
+  if (/^https?:\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('/')) return raw;
+  // Authored paths are relative to game/ (e.g. assets/audio/heart-sounds/normal.mp3)
+  return raw;
 }
 
 function expectedLabelForChoice(question) {
@@ -104,11 +127,15 @@ export function buildSkillMcqQuiz(task, opts = {}) {
     type
   };
 
-  if (type === 'choice') {
+  if (type === 'choice' || type === 'audio') {
     const correctLabel = String(expectedLabelForChoice(question) ?? '').trim();
     const labels = shuffle(question.choices || [], opts.random);
     return {
       ...base,
+      type: type === 'audio' ? 'audio' : 'choice',
+      audioSrc: type === 'audio'
+        ? resolveMediaSrc(question.audio || question.media || question.video)
+        : '',
       choices: labels.map((label) => ({
         label,
         correct: String(label).trim() === correctLabel
@@ -179,6 +206,32 @@ function renderChoiceHtml(quiz) {
     `).join('');
 }
 
+function renderAudioHtml(quiz) {
+  const src = escapeHtml(quiz.audioSrc || '');
+  const listenHint = escapeHtml(quiz.instruction || 'Listen, then identify the sound');
+  const player = src
+    ? `<div class="rounded border border-rose-200 bg-rose-50/50 p-3 space-y-2" data-skill-audio>
+        <p class="text-xs text-rose-900 font-medium">${listenHint}</p>
+        <audio class="w-full skill-audio-player" controls preload="auto" src="${src}">
+          Your browser does not support audio playback.
+        </audio>
+      </div>`
+    : '<p class="text-sm text-rose-700">Audio file missing for this prompt.</p>';
+  return `
+      ${player}
+      <div class="flex flex-col gap-2" data-quiz-choices>${renderChoiceHtml(quiz)}</div>
+    `;
+}
+
+function stopSkillMcqAudio(root = document) {
+  root.querySelectorAll?.('audio.skill-audio-player')?.forEach((el) => {
+    try {
+      el.pause();
+      el.currentTime = 0;
+    } catch (_) { /* ignore */ }
+  });
+}
+
 function renderSataHtml(quiz) {
   const opts = (quiz.choices || []).map((c, i) => `
       <label class="flex items-start gap-2 px-3 py-2 rounded border border-gray-200 text-sm cursor-pointer hover:bg-gray-50">
@@ -246,6 +299,7 @@ export function renderSkillMcqHtml(quiz, taskName, opts = {}) {
   if (type === 'sata') body = renderSataHtml(quiz);
   else if (type === 'match') body = renderMatchHtml(quiz);
   else if (type === 'flash') body = renderFlashHtml(quiz);
+  else if (type === 'audio') body = renderAudioHtml(quiz);
   else {
     body = `<div class="flex flex-col gap-2" data-quiz-choices>${renderChoiceHtml(quiz)}</div>`;
   }
@@ -267,6 +321,88 @@ export function renderSkillMcqHtml(quiz, taskName, opts = {}) {
 }
 
 /**
+ * Fill / highlight the correct answer without grading or submitting.
+ * @returns {{ ok: boolean, message: string }}
+ */
+export function applySkillMcqCheat() {
+  const gate = document.querySelector('.challenge-gate[data-challenge="skill-mcq"]');
+  if (!gate) return { ok: false, message: '' };
+  const type = gate.getAttribute('data-quiz-type') || 'choice';
+
+  if (type === 'choice' || type === 'audio') {
+    let found = false;
+    gate.querySelectorAll('.challenge-choice').forEach((btn) => {
+      btn.classList.remove('ring-2', 'ring-amber-400', 'bg-amber-50');
+      if (btn.getAttribute('data-challenge-correct') === '1') {
+        btn.classList.add('ring-2', 'ring-amber-400', 'bg-amber-50');
+        btn.focus();
+        found = true;
+      }
+    });
+    return {
+      ok: found,
+      message: found
+        ? 'Cheat highlighted the correct choice — click it to submit.'
+        : ''
+    };
+  }
+
+  if (type === 'sata') {
+    const boxes = [...gate.querySelectorAll('.skill-sata-choice')];
+    if (!boxes.length) return { ok: false, message: '' };
+    boxes.forEach((b) => {
+      const correct = b.getAttribute('data-challenge-correct') === '1';
+      b.checked = correct;
+      const label = b.closest('label');
+      label?.classList.remove('ring-2', 'ring-amber-400', 'bg-amber-50');
+      if (correct) label?.classList.add('ring-2', 'ring-amber-400', 'bg-amber-50');
+    });
+    return {
+      ok: true,
+      message: 'Cheat checked the correct options — press Check answer when ready.'
+    };
+  }
+
+  if (type === 'match') {
+    const terms = [...gate.querySelectorAll('.skill-match-term')];
+    const defs = [...gate.querySelectorAll('.skill-match-def')];
+    if (!terms.length || !defs.length) return { ok: false, message: '' };
+    terms.forEach((termBtn) => {
+      const pairIndex = termBtn.getAttribute('data-pair-index');
+      const defBtn = defs.find((d) => d.getAttribute('data-pair-index') === pairIndex);
+      if (!defBtn) return;
+      termBtn.disabled = true;
+      defBtn.disabled = true;
+      termBtn.classList.remove('ring-2', 'ring-indigo-500');
+      termBtn.classList.add('opacity-60', 'line-through', 'ring-2', 'ring-amber-400');
+      defBtn.classList.add('opacity-60', 'bg-amber-50', 'border-amber-300', 'ring-2', 'ring-amber-400');
+    });
+    const status = gate.querySelector('[data-match-status]');
+    if (status) status.textContent = `${terms.length} / ${terms.length} matched`;
+    return {
+      ok: true,
+      message: 'Cheat matched all pairs — press Check matches when ready.'
+    };
+  }
+
+  if (type === 'flash') {
+    const reveal = gate.querySelector('.skill-flash-reveal');
+    const back = gate.querySelector('[data-flash-back]');
+    const grade = gate.querySelector('[data-flash-grade]');
+    back?.classList.remove('hidden');
+    grade?.classList.remove('hidden');
+    grade?.classList.add('flex');
+    reveal?.classList.add('hidden');
+    return {
+      ok: true,
+      message: 'Cheat revealed the answer — tap Yes or No to continue.'
+    };
+  }
+
+  return { ok: false, message: '' };
+}
+
+/**
  * Bind interactions for choice / sata / match / flash after mount.
  * onGraded({ ok, expected }) — caller continues pool or finishes.
  */
@@ -275,9 +411,10 @@ export function wireSkillMcqInteractions(onGraded) {
   if (!gate || typeof onGraded !== 'function') return;
   const type = gate.getAttribute('data-quiz-type') || 'choice';
 
-  if (type === 'choice') {
+  if (type === 'choice' || type === 'audio') {
     gate.querySelectorAll('.challenge-choice').forEach((btn) => {
       btn.addEventListener('click', () => {
+        stopSkillMcqAudio(gate);
         const ok = btn.getAttribute('data-challenge-correct') === '1';
         onGraded({ ok });
       });
@@ -302,12 +439,13 @@ export function wireSkillMcqInteractions(onGraded) {
 
   if (type === 'match') {
     let selectedTerm = null;
-    const matched = new Set();
     const status = gate.querySelector('[data-match-status]');
-    const total = gate.querySelectorAll('.skill-match-term').length;
+    const terms = () => [...gate.querySelectorAll('.skill-match-term')];
+    const total = () => terms().length;
+    const matchedCount = () => terms().filter((t) => t.disabled).length;
 
     const refreshStatus = () => {
-      if (status) status.textContent = `${matched.size} / ${total} matched`;
+      if (status) status.textContent = `${matchedCount()} / ${total()} matched`;
     };
 
     gate.querySelectorAll('.skill-match-term').forEach((btn) => {
@@ -325,7 +463,6 @@ export function wireSkillMcqInteractions(onGraded) {
         const termIdx = selectedTerm.getAttribute('data-pair-index');
         const defIdx = btn.getAttribute('data-pair-index');
         if (termIdx === defIdx) {
-          matched.add(termIdx);
           selectedTerm.disabled = true;
           btn.disabled = true;
           selectedTerm.classList.add('opacity-60', 'line-through');
@@ -343,7 +480,8 @@ export function wireSkillMcqInteractions(onGraded) {
     });
 
     gate.querySelector('.skill-quiz-check')?.addEventListener('click', () => {
-      const ok = matched.size === total && total > 0;
+      const n = total();
+      const ok = n > 0 && matchedCount() === n;
       onGraded({ ok });
     });
     return;
@@ -369,7 +507,9 @@ export default {
   buildSkillMcqQuiz,
   renderSkillMcqHtml,
   wireSkillMcqInteractions,
+  applySkillMcqCheat,
   getSkillMcqBank,
   getSkillMcqPoolSize,
+  getSkillMcqQuestionIds,
   pickSkillMcqQuestion
 };

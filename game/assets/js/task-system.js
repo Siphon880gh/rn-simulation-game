@@ -180,7 +180,15 @@ class TaskSystem {
     return getWindowPhase(task, currentTime);
   }
 
+  isPrerequisiteMet(task) {
+    const reqId = task?.metadata?.requiresCompletedTaskId;
+    if (!reqId) return true;
+    const req = gameState.getStateSlice('tasks')?.get(reqId);
+    return req?.status === GameConfig.tasks.statuses.COMPLETED;
+  }
+
   isPerformAllowed(task, currentTime = gameState.getStateSlice('currentTime')) {
+    if (!this.isPrerequisiteMet(task)) return false;
     if (GameConfig.tasks.availability?.gatePerform === false) {
       return task?.status === GameConfig.tasks.statuses.ACTIVE;
     }

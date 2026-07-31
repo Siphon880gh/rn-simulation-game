@@ -331,6 +331,14 @@ body.is-test-mode #shell-brand-title::after {
     box-shadow: 0 10px 28px rgba(15, 23, 42, 0.16);
 }
 
+/* Default dock: bottom-right, above the slot queue / #shell-bottom. */
+#shell-top-primary.is-collapsed .shell-clock-cluster.is-docked-default {
+    left: auto;
+    top: auto;
+    right: 8px;
+    bottom: calc(var(--shell-bottom-height, 11rem) + 8px);
+}
+
 #shell-top-primary.is-collapsed .shell-clock-cluster__chrome {
     width: 100%;
 }
