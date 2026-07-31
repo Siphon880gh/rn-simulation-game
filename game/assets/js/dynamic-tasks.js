@@ -11,6 +11,8 @@ import { decorateAccucheckDice } from './challenges/skills/accucheck/challenge.j
 const spawnedCadenceKeys = new Set();
 let spawnCount = 0;
 let shiftStart = GameConfig.timer.defaultShiftStart;
+/** @type {{ showPatientPanel?: Function } | null} */
+let patientsApi = null;
 
 function hhmmToMinutes(hhmm) {
     const n = Number(hhmm) || 0;
@@ -162,6 +164,30 @@ function ensureIncidentHost() {
     return wrap.querySelector('#incident-tabs');
 }
 
+function focusIncidentTask(taskId) {
+    const live = gameState.getStateSlice('tasks')?.get(taskId);
+    if (!live) return;
+
+    if (live.patientId) {
+        if (typeof patientsApi?.showPatientPanel === 'function') {
+            patientsApi.showPatientPanel(live.patientId, {
+                logMessage: `Opened from incident: ${live.name}`
+            });
+        } else {
+            gameState.dispatch('SET_ACTIVE_PATIENT', { patientId: live.patientId });
+        }
+    }
+
+    if (typeof document === 'undefined' || typeof requestAnimationFrame !== 'function') return;
+    requestAnimationFrame(() => {
+        const el = document.getElementById(live.id);
+        if (!el) return;
+        el.classList.add('rail-focus-pulse');
+        el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        window.setTimeout(() => el.classList.remove('rail-focus-pulse'), 1200);
+    });
+}
+
 function renderIncidentTab(task) {
     const host = ensureIncidentHost();
     if (!host) return;
@@ -173,9 +199,7 @@ function renderIncidentTab(task) {
         tab.setAttribute('data-incident-task', task.id);
         tab.setAttribute('role', 'listitem');
         tab.addEventListener('click', () => {
-            if (task.patientId) {
-                gameState.dispatch('SET_ACTIVE_PATIENT', { patientId: task.patientId });
-            }
+            focusIncidentTask(task.id);
         });
         host.appendChild(tab);
     }
@@ -367,6 +391,7 @@ const DynamicTasksModule = {
     init(config = {}) {
         resetDynamicTasks();
         shiftStart = config.shiftStarts ?? GameConfig.timer.defaultShiftStart;
+        patientsApi = config.patients || patientsApi;
         ensureIncidentHost();
         gameState.subscribe('currentTime', (t) => processDynamicTasksTime(t));
         gameState.subscribe('tasks', () => refreshIncidentTabs());

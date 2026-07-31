@@ -900,7 +900,10 @@ class GameApplication {
         // E3.M5: thin dynamic/urgent spawn (game-time cadence)
         const dynamicTasks = this.modules.get('dynamicTasks');
         if (dynamicTasks && dynamicTasks.init) {
-            dynamicTasks.init(gameConfig);
+            dynamicTasks.init({
+                ...gameConfig,
+                patients: this.modules.get('patients')
+            });
         }
 
         // Call lights + bed near-fall alarms (own cadence + sound)
