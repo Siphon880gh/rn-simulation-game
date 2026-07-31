@@ -19,10 +19,21 @@ export function getIcpQuestions() {
   return Array.isArray(list) && list.length ? list : icpChallengeConfig.questions;
 }
 
+export function getIcpPoolSize() {
+  return getIcpQuestions().length;
+}
+
 export function pickIcpQuestion(opts = {}) {
   const pool = getIcpQuestions();
-  const excludeId = opts.excludeId;
-  let candidates = excludeId ? pool.filter((q) => q.id !== excludeId) : pool;
+  const exclude = new Set(
+    [opts.excludeId, ...(Array.isArray(opts.excludeIds) ? opts.excludeIds : [])]
+      .filter((id) => id != null && id !== '')
+      .map(String)
+  );
+  let candidates = exclude.size ? pool.filter((q) => !exclude.has(String(q.id))) : pool;
+  if (!candidates.length && opts.excludeId != null) {
+    candidates = pool.filter((q) => String(q.id) !== String(opts.excludeId));
+  }
   if (!candidates.length) candidates = pool;
   const roll = typeof opts.random === 'function' ? opts.random() : Math.random();
   const idx = Math.min(candidates.length - 1, Math.floor(roll * candidates.length));
@@ -58,19 +69,26 @@ export function buildIcpQuiz(task, opts = {}) {
   };
 }
 
-export function renderIcpQuizHtml(quiz, taskName) {
+export function renderIcpQuizHtml(quiz, taskName, opts = {}) {
   if (!quiz) return '';
+  const poolSize = Number(opts.poolSize) || getIcpPoolSize() || 1;
+  const levelHtml = poolSize > 1 ? (opts.levelHtml || '') : '';
   const choices = (quiz.choices || []).map((c, i) => `
       <button type="button" class="challenge-choice px-3 py-2 rounded border border-gray-200 text-left text-sm hover:bg-gray-50"
         data-challenge-correct="${c.correct ? '1' : '0'}" data-choice-index="${i}">${c.label}</button>
     `).join('');
+  const randomHint = poolSize > 1
+    ? '<p class="text-xs text-gray-500">Give up on this prompt? Use <strong>Random</strong> for another question.</p>'
+    : '';
   return `
-      <div class="challenge-gate space-y-3 text-left" data-challenge="icp">
-        <p class="text-sm text-gray-900 font-semibold">${quiz.prompt}</p>
+      <div class="challenge-gate space-y-3 text-left" data-challenge="icp" data-question-id="${quiz.questionId || ''}" data-pool-size="${poolSize}">
+        ${levelHtml}
+        <p class="text-sm text-gray-900 font-semibold" data-quiz-prompt>${quiz.prompt}</p>
         <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
           || 'Timer is paused. Complete this game/quiz.'}</p>
         <p class="text-xs text-gray-500">Skill focus: ${taskName || 'ICP monitoring'}.</p>
-        <div class="flex flex-col gap-2">${choices}</div>
+        ${randomHint}
+        <div class="flex flex-col gap-2" data-quiz-choices>${choices}</div>
         <p id="challenge-feedback" class="text-sm font-medium rounded px-3 py-2 hidden" role="status" aria-live="polite"></p>
       </div>
     `;
@@ -80,5 +98,6 @@ export default {
   isIcpTask,
   buildIcpQuiz,
   renderIcpQuizHtml,
-  pickIcpQuestion
+  pickIcpQuestion,
+  getIcpPoolSize
 };

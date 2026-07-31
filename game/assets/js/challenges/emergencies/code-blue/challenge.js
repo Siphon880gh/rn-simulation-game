@@ -5,6 +5,7 @@
  */
 import { GameConfig } from '../../../game-config.js';
 import { codeBlueChallengeConfig } from './config.js';
+import { renderChallengeLevelControl } from '../../shared/copy-config.js';
 
 function cfg() {
     return GameConfig.codeBlueChallenge || codeBlueChallengeConfig || {};
@@ -38,13 +39,24 @@ export function shuffle(list, random = Math.random) {
     return arr;
 }
 
-/** Pick a random question; optionally exclude an id so Random changes the prompt. */
+export function getCodeBluePoolSize() {
+    return getCodeBlueQuestions().length;
+}
+
+/** Pick a random question; optionally exclude id(s) so Random / multi-q advances change the prompt. */
 export function pickCodeBlueQuestion(opts = {}) {
     const pool = getCodeBlueQuestions();
-    const excludeId = opts.excludeId;
-    let candidates = excludeId
-        ? pool.filter((q) => q.id !== excludeId)
+    const exclude = new Set(
+        [opts.excludeId, ...(Array.isArray(opts.excludeIds) ? opts.excludeIds : [])]
+            .filter((id) => id != null && id !== '')
+            .map(String)
+    );
+    let candidates = exclude.size
+        ? pool.filter((q) => !exclude.has(String(q.id)))
         : pool;
+    if (!candidates.length && opts.excludeId != null) {
+        candidates = pool.filter((q) => String(q.id) !== String(opts.excludeId));
+    }
     if (!candidates.length) candidates = pool;
     const roll = typeof opts.random === 'function' ? opts.random() : Math.random();
     const idx = Math.min(candidates.length - 1, Math.floor(roll * candidates.length));
@@ -113,11 +125,16 @@ function renderOrderBody(question) {
     `;
 }
 
-export function renderCodeBlueHtml(patientName, question) {
+export function renderCodeBlueHtml(patientName, question, opts = {}) {
     const q = question || pickCodeBlueQuestion();
+    const poolSize = Number(opts.poolSize) || getCodeBluePoolSize() || 1;
+    const levelHtml = poolSize > 1
+        ? (opts.levelHtml || renderChallengeLevelControl(poolSize, opts.selectedLevel || 1))
+        : '';
     const body = q.type === 'order' ? renderOrderBody(q) : renderChoiceBody(q);
     return `
-      <div class="challenge-gate code-blue-challenge space-y-3 text-left" data-challenge="code-blue" data-question-id="${escapeHtml(q.id)}">
+      <div class="challenge-gate code-blue-challenge space-y-3 text-left" data-challenge="code-blue" data-question-id="${escapeHtml(q.id)}" data-pool-size="${poolSize}">
+        ${levelHtml}
         <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
           || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
         <p class="text-sm text-sky-800 font-medium">Code Blue — ${escapeHtml(patientName || 'patient')}</p>
@@ -155,13 +172,28 @@ function setFeedback(message, { ok = false } = {}) {
 
 /**
  * Wire pick/undo/submit/random/cheat. Returns cleanup fn.
- * @param {{ onDone: (r: object) => void, patientName?: string, initialQuestion?: object }} opts
+ * @param {{
+ *   onDone: (r: object) => void,
+ *   patientName?: string,
+ *   initialQuestion?: object,
+ *   excludeIds?: string[],
+ *   onAdvanceQuestion?: (q: object) => void
+ * }} opts
  */
-export function wireCodeBlueHandlers({ onDone, patientName = 'patient', initialQuestion } = {}) {
+export function wireCodeBlueHandlers({
+    onDone,
+    patientName = 'patient',
+    initialQuestion,
+    excludeIds = [],
+    onAdvanceQuestion
+} = {}) {
     const root = document.querySelector('.code-blue-challenge');
     let question = initialQuestion || pickCodeBlueQuestion();
     let chosen = [];
     let selectedChoice = null;
+    const seenIds = new Set(
+        [...excludeIds, question?.id].filter((id) => id != null && id !== '').map(String)
+    );
 
     const answerKey = () => document.querySelector('#code-blue-answer-key');
 
@@ -344,17 +376,34 @@ export function wireCodeBlueHandlers({ onDone, patientName = 'patient', initialQ
         setFeedback('Cheat selected the correct answer — press Submit when ready.', { ok: true });
     };
 
+    function loadNextQuestion({ excludeCurrentOnly = false } = {}) {
+        const next = pickCodeBlueQuestion({
+            excludeId: question.id,
+            excludeIds: excludeCurrentOnly ? [] : [...seenIds]
+        });
+        if (next?.id) seenIds.add(String(next.id));
+        mountQuestion(next);
+        onAdvanceQuestion?.(next);
+        return next;
+    }
+
     /** Give up on current prompt; draw another Code Blue question. */
     window.codeBlueRandom = () => {
-        const next = pickCodeBlueQuestion({ excludeId: question.id });
-        mountQuestion(next);
+        loadNextQuestion({ excludeCurrentOnly: true });
         setFeedback('New Code Blue question loaded — answer and Submit when ready.', { ok: true });
+    };
+
+    /** Advance to another prompt after a correct answer (multi-question challenge). */
+    window.codeBlueNextQuestion = () => {
+        loadNextQuestion({ excludeCurrentOnly: false });
+        setFeedback('Next Code Blue question — answer and Submit when ready.', { ok: true });
     };
 
     return () => {
         delete window.codeBlueSubmit;
         delete window.codeBlueCheat;
         delete window.codeBlueRandom;
+        delete window.codeBlueNextQuestion;
     };
 }
 

@@ -41,7 +41,8 @@ import {
     renderCodeBlueHtml,
     wireCodeBlueHandlers,
     pickCodeBlueQuestion,
-    getCodeBlueExpectedCite as citeCodeBlueQuestion
+    getCodeBlueExpectedCite as citeCodeBlueQuestion,
+    getCodeBluePoolSize
 } from './emergencies/code-blue/challenge.js';
 import {
     buildAdmissionQuiz,
@@ -49,12 +50,21 @@ import {
 } from './skills/admission/challenge.js';
 import {
     buildIcpQuiz,
-    renderIcpQuizHtml
+    renderIcpQuizHtml,
+    getIcpPoolSize
 } from './skills/icp/challenge.js';
 import {
     buildSkillMcqQuiz,
-    renderSkillMcqHtml
+    renderSkillMcqHtml,
+    getSkillMcqPoolSize
 } from './skills/skill-mcq/challenge.js';
+import {
+    renderChallengeLevelControl,
+    readChallengeLevel,
+    updateChallengeLevelProgress,
+    lockChallengeLevelControl,
+    wireChallengeLevelControl
+} from './shared/copy-config.js';
 import { applySituationStill, clearSituationStill } from '../scene-backdrop.js';
 import { recordChallengeOutcome } from '../scoring.js';
 import { applyIvChallengeResult, syncIvTaskMetadata } from '../iv-system.js';
@@ -92,7 +102,20 @@ let activeSession = null;
 let cleanupBedPrep = null;
 let cleanupIvpbHang = null;
 let cleanupCodeBlue = null;
+let cleanupChallengeLevel = null;
+let cleanupPoolQuizRandom = null;
 let codeBlueOpenPending = false;
+
+function clearChallengeLevelWire() {
+    if (typeof cleanupChallengeLevel === 'function') {
+        cleanupChallengeLevel();
+        cleanupChallengeLevel = null;
+    }
+    if (typeof cleanupPoolQuizRandom === 'function') {
+        cleanupPoolQuizRandom();
+        cleanupPoolQuizRandom = null;
+    }
+}
 
 function endSession(result) {
     const session = activeSession;
@@ -109,12 +132,46 @@ function endSession(result) {
         cleanupCodeBlue();
         cleanupCodeBlue = null;
     }
+    clearChallengeLevelWire();
     clearSituationStill();
     gameState.dispatch('SET_PAUSE', { paused: false, source: CHALLENGE });
     ModalModule.closeModal();
     if (session?.resolve) {
         session.resolve(result);
     }
+}
+
+function initQuizChallengeLevel(poolSize) {
+    clearChallengeLevelWire();
+    if (!activeSession || poolSize <= 1) return;
+    activeSession.quizPoolSize = poolSize;
+    activeSession.quizTarget = 1;
+    activeSession.quizCorrect = 0;
+    activeSession.quizSeenIds = new Set(
+        activeSession.currentQuestionId != null && activeSession.currentQuestionId !== ''
+            ? [String(activeSession.currentQuestionId)]
+            : []
+    );
+    cleanupChallengeLevel = wireChallengeLevelControl({
+        onChange: (n) => {
+            if (!activeSession) return;
+            activeSession.quizTarget = n;
+        }
+    });
+}
+
+function noteQuizCorrectAndMaybeContinue({ onNeedNext, onComplete }) {
+    if (!activeSession) return;
+    const target = Math.max(1, Number(activeSession.quizTarget) || readChallengeLevel() || 1);
+    activeSession.quizTarget = target;
+    activeSession.quizCorrect = (Number(activeSession.quizCorrect) || 0) + 1;
+    lockChallengeLevelControl();
+    updateChallengeLevelProgress(activeSession.quizCorrect, target);
+    if (activeSession.quizCorrect >= target) {
+        onComplete?.();
+        return;
+    }
+    onNeedNext?.();
 }
 
 function finishCodeBlue(passed, reason, expected, patientId) {
@@ -177,13 +234,21 @@ export function runCodeBlueChallenge(hook) {
 
     codeBlueOpenPending = true;
     return new Promise((resolve) => {
+        const poolSize = getCodeBluePoolSize();
         const initialQuestion = pickCodeBlueQuestion();
         activeSession = {
             resolve,
             taskId: null,
             taskName: `Code Blue — ${name}`,
             codeBluePatientId: patientId,
-            codeBlueQuestion: initialQuestion
+            codeBlueQuestion: initialQuestion,
+            currentQuestionId: initialQuestion?.id || null,
+            quizPoolSize: poolSize,
+            quizTarget: 1,
+            quizCorrect: 0,
+            quizSeenIds: new Set(
+                initialQuestion?.id != null ? [String(initialQuestion.id)] : []
+            )
         };
         codeBlueOpenPending = false;
 
@@ -192,11 +257,14 @@ export function runCodeBlueChallenge(hook) {
 
         ModalModule.openModal({
             title: 'Code Blue',
-            content: renderCodeBlueHtml(name, initialQuestion),
+            content: renderCodeBlueHtml(name, initialQuestion, {
+                poolSize,
+                levelHtml: renderChallengeLevelControl(poolSize, 1)
+            }),
             footer: challengeModalFooter({
                 submitLabel: 'Submit',
                 submitHandler: 'codeBlueSubmit',
-                showRandom: true,
+                showRandom: poolSize > 1,
                 randomHandler: 'codeBlueRandom',
                 randomLabel: 'Random'
             }),
@@ -205,11 +273,30 @@ export function runCodeBlueChallenge(hook) {
         });
 
         setTimeout(() => {
+            initQuizChallengeLevel(poolSize);
             cleanupCodeBlue = wireCodeBlueHandlers({
                 patientName: name,
                 initialQuestion,
+                excludeIds: [...(activeSession.quizSeenIds || [])],
+                onAdvanceQuestion: (q) => {
+                    if (!activeSession) return;
+                    activeSession.codeBlueQuestion = q;
+                    activeSession.currentQuestionId = q?.id || null;
+                    if (q?.id != null) activeSession.quizSeenIds?.add(String(q.id));
+                },
                 onDone: ({ passed, reason, expected }) => {
-                    finishCodeBlue(passed, reason, expected, patientId);
+                    if (!passed) {
+                        finishCodeBlue(false, reason, expected, patientId);
+                        return;
+                    }
+                    noteQuizCorrectAndMaybeContinue({
+                        onComplete: () => finishCodeBlue(true, reason, expected, patientId),
+                        onNeedNext: () => {
+                            if (typeof window.codeBlueNextQuestion === 'function') {
+                                window.codeBlueNextQuestion();
+                            }
+                        }
+                    });
                 }
             });
         }, 0);
@@ -327,6 +414,120 @@ function wireSafetyHandlers() {
             finishAttempt(ok, ok ? 'correct' : 'incorrect', undefined, { allowRetry: true });
         });
     });
+}
+
+/**
+ * Choice quizzes with a randomizable pool: optional challenge-level + Random + multi-q.
+ * @param {{
+ *   kind: 'icp'|'skill-mcq',
+ *   task: object,
+ *   poolSize: number,
+ *   rebuild: (opts: object) => { quiz: object, html: string }|null
+ * }} cfg
+ */
+function wirePoolChoiceQuiz(cfg) {
+    const { kind, task, poolSize, rebuild } = cfg;
+    const root = document.querySelector('.challenge-gate');
+    if (!root) return;
+
+    initQuizChallengeLevel(poolSize);
+
+    const bindChoices = () => {
+        const gate = document.querySelector('.challenge-gate');
+        if (!gate) return;
+        gate.querySelectorAll('.challenge-choice').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                if (activeSession?.closing) return;
+                const ok = btn.getAttribute('data-challenge-correct') === '1';
+                const expected = activeSession?.quizExpected;
+                if (!ok) {
+                    finishAttempt(false, `${kind}-incorrect`, expected, { allowRetry: true });
+                    return;
+                }
+                noteQuizCorrectAndMaybeContinue({
+                    onComplete: () => {
+                        finishAttempt(true, `${kind}-correct`, expected, { allowRetry: true });
+                    },
+                    onNeedNext: () => {
+                        const seen = [...(activeSession?.quizSeenIds || [])];
+                        const next = rebuild({
+                            excludeId: activeSession?.currentQuestionId,
+                            excludeIds: seen
+                        });
+                        if (!next?.quiz) {
+                            finishAttempt(true, `${kind}-correct`, expected, { allowRetry: true });
+                            return;
+                        }
+                        mountPoolChoiceQuiz(next, task, poolSize, kind);
+                        setChallengeFeedback(
+                            `Correct — ${activeSession.quizCorrect} / ${activeSession.quizTarget}. Next question…`,
+                            { ok: true }
+                        );
+                        bindChoices();
+                    }
+                });
+            });
+        });
+    };
+
+    bindChoices();
+
+    if (poolSize > 1) {
+        window.poolQuizRandom = () => {
+            if (!activeSession || activeSession.closing) return;
+            const next = rebuild({
+                excludeId: activeSession.currentQuestionId
+            });
+            if (!next?.quiz) return;
+            mountPoolChoiceQuiz(next, task, poolSize, kind);
+            setChallengeFeedback('New question loaded — pick an answer.', { ok: true });
+            bindChoices();
+        };
+        cleanupPoolQuizRandom = () => {
+            delete window.poolQuizRandom;
+        };
+    }
+}
+
+function mountPoolChoiceQuiz(next, task, poolSize, kind) {
+    if (!activeSession || !next?.quiz) return;
+    activeSession.quizExpected = next.quiz.expected;
+    activeSession.currentQuestionId = next.quiz.questionId || null;
+    if (next.quiz.questionId != null) {
+        activeSession.quizSeenIds?.add(String(next.quiz.questionId));
+    }
+
+    const content = document.querySelector(GameConfig.selectors.modalContent || '#modal-content');
+    if (!content) return;
+    const levelHost = content.querySelector('[data-challenge-level-root]');
+    const selectedLevel = activeSession.quizTarget || readChallengeLevel() || 1;
+    const levelHtml = levelHost
+        ? levelHost.outerHTML
+        : renderChallengeLevelControl(poolSize, selectedLevel);
+    content.innerHTML = kind === 'icp'
+        ? renderIcpQuizHtml(next.quiz, task?.name, { poolSize, levelHtml })
+        : renderSkillMcqHtml(next.quiz, task?.name, { poolSize, levelHtml });
+
+    // Fresh DOM: re-bind or re-lock the challenge-level control
+    if (typeof cleanupChallengeLevel === 'function') {
+        cleanupChallengeLevel();
+        cleanupChallengeLevel = null;
+    }
+    if ((Number(activeSession.quizCorrect) || 0) > 0) {
+        lockChallengeLevelControl();
+    } else if (poolSize > 1) {
+        cleanupChallengeLevel = wireChallengeLevelControl({
+            onChange: (n) => {
+                if (!activeSession) return;
+                activeSession.quizTarget = n;
+            }
+        });
+        activeSession.quizTarget = readChallengeLevel() || selectedLevel;
+    }
+    updateChallengeLevelProgress(activeSession.quizCorrect || 0, activeSession.quizTarget || selectedLevel);
+
+    const titleEl = document.querySelector(GameConfig.selectors.modalTitle || '#modal-title');
+    if (titleEl && next.quiz.title) titleEl.textContent = next.quiz.title;
 }
 
 function finishAttempt(passed, reason, expected, opts = {}) {
@@ -453,16 +654,18 @@ export function submitAccucheck() {
 }
 
 function cheatSafetyHighlight() {
-    const root = document.querySelector('.challenge-gate[data-challenge="safety-first"]');
+    const root = document.querySelector('.challenge-gate');
     if (!root) return false;
+    let found = false;
     root.querySelectorAll('.challenge-choice').forEach((btn) => {
         btn.classList.remove('ring-2', 'ring-amber-400', 'bg-amber-50');
         if (btn.getAttribute('data-challenge-correct') === '1') {
             btn.classList.add('ring-2', 'ring-amber-400', 'bg-amber-50');
             btn.focus();
+            found = true;
         }
     });
-    return true;
+    return found;
 }
 
 /**
@@ -505,9 +708,15 @@ export function cheatChallenge() {
         }
         return;
     }
-    if (activeSession.safety) {
-        cheatSafetyHighlight();
-        setChallengeFeedback('Cheat highlighted the correct choice — click it to submit.', { ok: true });
+    if (
+        activeSession.safety
+        || activeSession.skillMcq
+        || activeSession.icpQuiz
+        || activeSession.admissionQuiz
+    ) {
+        if (cheatSafetyHighlight()) {
+            setChallengeFeedback('Cheat highlighted the correct choice — click it to submit.', { ok: true });
+        }
     }
 }
 
@@ -646,23 +855,66 @@ export function runChallengeGate(task) {
                 });
             }, 0);
         } else if (icpQuiz) {
+            const poolSize = getIcpPoolSize();
+            activeSession.quizExpected = icpQuiz.expected;
+            activeSession.currentQuestionId = icpQuiz.questionId || null;
             ModalModule.openModal({
                 title: icpQuiz.title || 'ICP monitoring',
-                content: renderIcpQuizHtml(icpQuiz, liveTask?.name),
-                footer: challengeModalFooter({ showSubmit: false }),
+                content: renderIcpQuizHtml(icpQuiz, liveTask?.name, {
+                    poolSize,
+                    levelHtml: renderChallengeLevelControl(poolSize, 1)
+                }),
+                footer: challengeModalFooter({
+                    showSubmit: false,
+                    showRandom: poolSize > 1,
+                    randomHandler: 'poolQuizRandom',
+                    randomLabel: 'Random'
+                }),
                 overlay: true,
                 persistent: false
             });
-            setTimeout(wireSafetyHandlers, 0);
+            setTimeout(() => {
+                wirePoolChoiceQuiz({
+                    kind: 'icp',
+                    task: liveTask,
+                    poolSize,
+                    rebuild: (opts) => {
+                        const quiz = buildIcpQuiz(liveTask, opts);
+                        return quiz ? { quiz } : null;
+                    }
+                });
+            }, 0);
         } else if (skillMcq) {
+            const skillId = String(liveTask?.metadata?.skillId || '').trim();
+            const poolSize = getSkillMcqPoolSize(skillId);
+            activeSession.quizExpected = skillMcq.expected;
+            activeSession.currentQuestionId = skillMcq.questionId || null;
             ModalModule.openModal({
                 title: skillMcq.title || 'Skill practice',
-                content: renderSkillMcqHtml(skillMcq, liveTask?.name),
-                footer: challengeModalFooter({ showSubmit: false }),
+                content: renderSkillMcqHtml(skillMcq, liveTask?.name, {
+                    poolSize,
+                    levelHtml: renderChallengeLevelControl(poolSize, 1)
+                }),
+                footer: challengeModalFooter({
+                    showSubmit: false,
+                    showRandom: poolSize > 1,
+                    randomHandler: 'poolQuizRandom',
+                    randomLabel: 'Random'
+                }),
                 overlay: true,
                 persistent: false
             });
-            setTimeout(wireSafetyHandlers, 0);
+            setTimeout(() => {
+                wirePoolChoiceQuiz({
+                    kind: 'skill-mcq',
+                    task: liveTask,
+                    poolSize,
+                    rebuild: (opts) => {
+                        const quiz = buildSkillMcqQuiz(liveTask, opts);
+                        return quiz ? { quiz } : null;
+                    }
+                });
+            }, 0);
         } else if (admissionQuiz) {
             ModalModule.openModal({
                 title: admissionQuiz.title || 'Admission challenge',
