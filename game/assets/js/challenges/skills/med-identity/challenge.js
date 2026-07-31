@@ -6,6 +6,7 @@
  */
 import { GameConfig } from '../../../game-config.js';
 import { medIdentityPairs } from './config.js';
+import { challengeMediaHtml } from '../../../media-placeholders.js';
 
 /** @type {{ generic: string, brand?: string, brands?: string[], aliases?: string[], brandAliases?: string[] }[]} */
 export const MED_PAIRS = medIdentityPairs;
@@ -290,6 +291,7 @@ export function renderMedIdentityHtml(prompt, taskName) {
     return `
       <div class="challenge-gate med-identity-quiz space-y-3 text-left" data-challenge="med-identity"
         data-quiz-mode="${escapeHtml(prompt?.mode || 'typed')}">
+        ${challengeMediaHtml('med-identity')}
         <p class="text-sm text-gray-900 font-semibold">
           Complete this challenge to perform the task.
         </p>

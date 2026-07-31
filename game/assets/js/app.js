@@ -17,6 +17,7 @@ import DoctorOrdersModule from './doctor-orders.js';
 import DynamicTasksModule from './dynamic-tasks.js';
 import ScoringModule from './scoring.js';
 import SceneBackdropModule from './scene-backdrop.js';
+import MediaPlaceholdersModule from './media-placeholders.js';
 import IvSystemModule from './iv-system.js';
 import CriticalLabsModule from './critical-labs.js';
 import TestModeModule from './test-mode.js';
@@ -60,6 +61,7 @@ const AppConfig = {
         doctorOrders: DoctorOrdersModule,
         dynamicTasks: DynamicTasksModule,
         scoring: ScoringModule,
+        mediaPlaceholders: MediaPlaceholdersModule,
         scene: SceneBackdropModule,
         iv: IvSystemModule,
         criticalLabs: CriticalLabsModule,
@@ -136,7 +138,7 @@ class GameApplication {
 
     // Initialize modules with dependency management
     async initializeModules() {
-        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, scene, iv, criticalLabs, testMode, sound, nurseAlerts, admission, rightMenu, delegation, skillFocus, boosters } = this.config.modules;
+        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, mediaPlaceholders, scene, iv, criticalLabs, testMode, sound, nurseAlerts, admission, rightMenu, delegation, skillFocus, boosters } = this.config.modules;
         
         // Register modules
         this.modules.set('modal', modal);
@@ -152,6 +154,7 @@ class GameApplication {
         this.modules.set('doctorOrders', doctorOrders);
         this.modules.set('dynamicTasks', dynamicTasks);
         this.modules.set('scoring', scoring);
+        this.modules.set('mediaPlaceholders', mediaPlaceholders);
         this.modules.set('scene', scene);
         this.modules.set('iv', iv);
         this.modules.set('criticalLabs', criticalLabs);
@@ -192,6 +195,11 @@ class GameApplication {
         // E4.M1: load scenario pack before census so patient order comes from pack
         if (scenario && scenario.init) {
             await scenario.init();
+        }
+
+        // Placeholder media catalog → situation still URLs before scene/challenges
+        if (mediaPlaceholders && mediaPlaceholders.init) {
+            await mediaPlaceholders.init();
         }
 
         // E7.M1: unit backdrop after pack (theme / optional image URL)

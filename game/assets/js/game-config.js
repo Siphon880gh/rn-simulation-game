@@ -321,12 +321,72 @@ export const GameConfig = {
     unitBackground: null,
     situationStills: {
       'code-blue': null,
-      'bed-prep': null
+      'bed-prep': null,
+      'critical-lab': null
     },
     motion: {
       panelSwap: true,
       statusPulse: true
     }
+  },
+
+  /**
+   * Image/video placeholders (titled SVG via PHP or client data-url).
+   * Catalog + inventory: media-placeholder-catalog.json, PLACEHOLDER_ASSETS.md
+   * PHP: /placeholders/image.php|video.php + partials/media-tag.php
+   * Set assets.<id>.replaceWith to a real URL to swap a placeholder.
+   * Disable: enabled:false, or ?placeholders=0
+   */
+  mediaPlaceholders: {
+    enabled: true,
+    /** data-url works on static servers; php needs `php -S` (or Apache) at repo root */
+    source: 'data-url',
+    phpBase: '/placeholders',
+    catalogUrl: 'assets/js/media-placeholder-catalog.json',
+    /**
+     * Appended to every image/video creation prompt (data-asset-prompt, PHP X-Asset-Prompt).
+     * Keep in sync with placeholders/lib/render.php → ph_prompt_style_appendix().
+     */
+    promptStyleAppendix:
+      'Style (fun medical simulation): approachable educational game art for an RN shift sim — '
+      + 'clear readable shapes, lightly playful personality without cartoon stickers, horror, or gore; '
+      + 'bright but clinical hospital palette; panels-first UI friendly; fictional patients/signage only '
+      + '(no real faces, no PHI); readable at small sizes; include any requested title as subtle in-frame caption.',
+    mounts: {
+      landingDepartments: true,
+      situations: true,
+      criticalLab: true,
+      slots: true,
+      /** In-modal hero media for perform games/quizzes */
+      challenges: true
+    },
+    /** Prefer slot-perform-video when true */
+    slotPreferVideo: false,
+    criticalLabHost: '#shell-critical-lab-media',
+    criticalLabAutoHideMs: 12000,
+    /**
+     * Challenge key → catalog asset ids for in-modal hero (see challengeMediaHtml).
+     * preferVideo: show videoId when set (Code Blue default).
+     */
+    challenges: {
+      'code-blue': {
+        imageId: 'challenge-code-blue',
+        videoId: 'challenge-code-blue-video',
+        preferVideo: true
+      },
+      'bed-prep': { imageId: 'challenge-bed-prep' },
+      'med-identity': { imageId: 'challenge-med-identity' },
+      'ivpb-hang': { imageId: 'challenge-ivpb-hang' },
+      'iv-check': { imageId: 'challenge-iv-check' },
+      accucheck: { imageId: 'challenge-accucheck' },
+      admission: { imageId: 'challenge-admission' },
+      icp: { imageId: 'challenge-icp' }
+    },
+    /**
+     * Optional per-id overrides merged onto the JSON catalog
+     * (e.g. { 'dept-tele': { replaceWith: 'assets/media/dept-tele.webp' } }).
+     */
+    assets: {}
   },
 
   // Challenge configs — authored under challenges/{skills|emergencies}/<id>/config.js

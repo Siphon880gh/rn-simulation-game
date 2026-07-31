@@ -23,6 +23,8 @@ Prefer **@ skill** or a pasted `/loop` prompt when you want a specific workflow.
 | **scan-game-skill-library** | [`.agents/skills/scan-game-skill-library/`](.agents/skills/scan-game-skill-library/) | Propose new landing skill-library entries; confirm; exclude on “no” |
 | **ensure-skill-patients** | [`.agents/skills/ensure-skill-patients/`](.agents/skills/ensure-skill-patients/) | Every library skill has a tagged patient + pack; author gaps via add-shift-patient-pack |
 | **game-development-sickn33-rn** | [`.agents/skills/game-development-sickn33-rn/`](.agents/skills/game-development-sickn33-rn/) | Orchestrator for RN shift-sim / engine fit / guest mini-games (sub-skills below) |
+| **replace-placeholder-assets** | [`.agents/skills/replace-placeholder-assets/`](.agents/skills/replace-placeholder-assets/) | Swap titled image/video placeholders for real files (`PLACEHOLDER_ASSETS.md`) |
+| **scan-placeholder-assets** | [`.agents/skills/scan-placeholder-assets/`](.agents/skills/scan-placeholder-assets/) | Find UI/game spots needing image/video placeholders; propose with dimensions + fun-medical style |
 
 ### Sub-skills (game-development-sickn33-rn)
 
@@ -143,7 +145,45 @@ Honor `.agents/state.json` → `decisions.main_constraints` and `AGENTS_POSSIBLE
 
 ---
 
-### 6. Milestone continue (product backlog)
+### 6. Find or replace image/video placeholders
+
+**Need (scan):** Surfaces that should show media but have no catalog mount yet (challenges, landing, situations, slots).
+
+**Skill:** `scan-placeholder-assets` — proposes ids with **subject + Dimensions (w×h) + Style (fun medical simulation)**; confirm before wiring.
+
+```text
+@scan-placeholder-assets Scan for challenge/quiz media placeholder gaps.
+```
+
+```text
+/loop 2m Read AGENTS_LOOP-Scan-Placeholder-Assets.md and execute one tick. Stop on STOP_* labels.
+```
+
+**AUTO audit:** `node .agents/skills/scan-placeholder-assets/scripts/audit.mjs`
+
+**Need (replace):** Final stills/clips for existing catalog ids.
+
+**Skill:** `replace-placeholder-assets`
+
+**Inventory:** [`PLACEHOLDER_ASSETS.md`](PLACEHOLDER_ASSETS.md) · catalog [`game/assets/js/media-placeholder-catalog.json`](game/assets/js/media-placeholder-catalog.json)
+
+**PHP placeholders (no build):** [`placeholders/`](placeholders/) — `image.php?title=&prompt=`, `video.php`, partial `ph_media_tag()`. Tags expose `data-asset-prompt` (subject → dimensions → style).
+
+**Invoke replace:**
+
+```text
+@replace-placeholder-assets Replace dept-icu with the attached image.
+```
+
+```text
+/loop 2m Read AGENTS_LOOP-Replace-Placeholder-Assets.md and execute one tick. Stop on STOP_* labels.
+```
+
+**AUTO:** `node scripts/verify-placeholder-assets.mjs`
+
+---
+
+### 7. Milestone continue (product backlog)
 
 **Need:** Advance `EPIC_MAP` / `IMPLEMENTATION_STORIES` / `.agents/state.json` — not a local content skill.
 
@@ -155,7 +195,7 @@ Honor `.agents/state.json` → `decisions.main_constraints` and `AGENTS_POSSIBLE
 
 ---
 
-### 7. Stop a content `/loop`
+### 8. Stop a content `/loop`
 
 Say **stop** (or abort the loop terminals). For ensure-skill-patients / add-shift-patient-pack, also leave `progress.json` as-is so the next run can resume.
 
@@ -179,6 +219,12 @@ New skill + patient together?
 Clock / slots / panels / challenge runtime?
   → game-development-sickn33-rn (+ shift-simulation / web-games / …)
 
+Looking for places that need image/video placeholders?
+  → scan-placeholder-assets (dimensions + fun-medical style in prompts)
+
+Supplying final images/videos for titled placeholders?
+  → replace-placeholder-assets (+ PLACEHOLDER_ASSETS.md)
+
 Advancing MVP milestones?
   → AGENTS continue / milestone loop (not these content skills)
 ```
@@ -191,5 +237,8 @@ Advancing MVP milestones?
 |-----|------|
 | [`AGENTS.md`](AGENTS.md) | Agent entry, maps, continue rules |
 | [`AGENTS_LOOP-Continue-Milestone.md`](AGENTS_LOOP-Continue-Milestone.md) | Milestone `/loop` |
+| [`AGENTS_LOOP-Replace-Placeholder-Assets.md`](AGENTS_LOOP-Replace-Placeholder-Assets.md) | Replace placeholder media `/loop` |
+| [`AGENTS_LOOP-Scan-Placeholder-Assets.md`](AGENTS_LOOP-Scan-Placeholder-Assets.md) | Scan for new placeholder mounts `/loop` |
+| [`PLACEHOLDER_ASSETS.md`](PLACEHOLDER_ASSETS.md) | Placeholder inventory for art handoff |
 | [`game/events/skills/library.json`](game/events/skills/library.json) | Player-facing skill catalog |
 | [`game/assets/js/challenges/README.md`](game/assets/js/challenges/README.md) | Challenge authoring map |

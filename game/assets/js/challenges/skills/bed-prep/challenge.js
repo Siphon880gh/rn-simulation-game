@@ -5,6 +5,7 @@
  */
 import { GameConfig } from '../../../game-config.js';
 import { bedPrepChallengeConfig } from './config.js';
+import { challengeMediaHtml } from '../../../media-placeholders.js';
 
 function cfg() {
     return GameConfig.bedPrepChallenge || bedPrepChallengeConfig || {};
@@ -112,6 +113,7 @@ export function renderBedPrepHtml(taskName, round) {
 
     return `
       <div class="challenge-gate bed-prep-challenge space-y-3 text-left" data-challenge="bed-prep">
+        ${challengeMediaHtml('bed-prep')}
         <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
           || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
         <p class="text-sm text-gray-800">Get a bed ready for admission: <strong>${escapeHtml(taskName || 'Bed prep')}</strong></p>

@@ -4,6 +4,7 @@
  */
 
 import { GameConfig } from '../../../game-config.js';
+import { challengeMediaHtml } from '../../../media-placeholders.js';
 
 export function isIvTask(task) {
     if (!task) return false;
@@ -146,9 +147,11 @@ function escapeHtml(text) {
 }
 
 export function renderIvChallengeHtml(prompt, taskName) {
+    const mediaHtml = challengeMediaHtml('iv-check');
     if (prompt.kind === 'iv-check') {
         return `
       <div class="challenge-gate iv-challenge space-y-3 text-left" data-challenge="iv-check">
+        ${mediaHtml}
         <p class="text-sm text-gray-900 font-semibold">IV drip check</p>
         <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
           || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
@@ -170,6 +173,7 @@ export function renderIvChallengeHtml(prompt, taskName) {
     if (prompt.kind === 'heparin-ptt') {
         return `
       <div class="challenge-gate iv-challenge space-y-3 text-left" data-challenge="heparin-ptt">
+        ${mediaHtml}
         <p class="text-sm text-gray-900 font-semibold">Heparin drip — PTT result</p>
         <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
           || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
@@ -200,6 +204,7 @@ export function renderIvChallengeHtml(prompt, taskName) {
     const dirLabel = prompt.direction === 'increase' ? 'increase' : 'decrease';
     return `
       <div class="challenge-gate iv-challenge space-y-3 text-left" data-challenge="iv-titration">
+        ${mediaHtml}
         <p class="text-sm text-gray-900 font-semibold">IV drip titration</p>
         <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
           || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>

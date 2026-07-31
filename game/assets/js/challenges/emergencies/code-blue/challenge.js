@@ -6,6 +6,7 @@
 import { GameConfig } from '../../../game-config.js';
 import { codeBlueChallengeConfig } from './config.js';
 import { renderChallengeLevelControl } from '../../shared/copy-config.js';
+import { challengeMediaHtml } from '../../../media-placeholders.js';
 
 function cfg() {
     return GameConfig.codeBlueChallenge || codeBlueChallengeConfig || {};
@@ -145,9 +146,11 @@ export function renderCodeBlueHtml(patientName, question, opts = {}) {
         ? (opts.levelHtml || renderChallengeLevelControl(poolSize, opts.selectedLevel || 1))
         : '';
     const body = q.type === 'order' ? renderOrderBody(q) : renderChoiceBody(q);
+    const mediaHtml = challengeMediaHtml('code-blue');
     return `
       <div class="challenge-gate code-blue-challenge space-y-3 text-left" data-challenge="code-blue" data-question-id="${escapeHtml(q.id)}" data-pool-size="${poolSize}">
         ${levelHtml}
+        ${mediaHtml}
         <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
           || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
         <p class="text-sm text-sky-800 font-medium">Code Blue — ${escapeHtml(patientName || 'patient')}</p>

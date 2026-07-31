@@ -1,0 +1,91 @@
+{
+  "status": "idle",
+  "updatedAt": "2026-07-31T13:10:36Z",
+  "queue": [
+    {
+      "id": "dept-tele",
+      "status": "done",
+      "file": "game/assets/media/dept-tele.webp"
+    },
+    {
+      "id": "dept-medsurg",
+      "status": "done",
+      "file": "game/assets/media/dept-medsurg.webp"
+    },
+    {
+      "id": "dept-icu",
+      "status": "done",
+      "file": "game/assets/media/dept-icu.webp"
+    },
+    {
+      "id": "situation-code-blue",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-code-blue",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-code-blue-video",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "situation-critical-lab",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "situation-bed-prep",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-bed-prep",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-med-identity",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-ivpb-hang",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-accucheck",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-admission",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-icp",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-iv-check",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "slot-perform",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "slot-perform-video",
+      "status": "pending",
+      "file": null
+    }
+  ]
+}

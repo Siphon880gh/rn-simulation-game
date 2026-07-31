@@ -821,6 +821,149 @@ body.shell-bottom-resizing {
     flex-shrink: 0;
 }
 
+/* Slot / media placeholder preview (slide-up, dismissible) */
+.media-ph-preview {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.media-ph-preview[hidden] {
+    display: none !important;
+}
+
+.media-ph-preview.is-open {
+    pointer-events: auto;
+}
+
+.media-ph-preview__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    opacity: 0;
+    transition: opacity 0.28s ease;
+}
+
+.media-ph-preview.is-open .media-ph-preview__backdrop {
+    opacity: 1;
+}
+
+.media-ph-preview__panel {
+    position: relative;
+    z-index: 1;
+    width: min(32rem, calc(100vw - 1.5rem));
+    max-height: min(78vh, 28rem);
+    margin-bottom: 0.75rem;
+    padding: 0.85rem 1rem 0.75rem;
+    border-radius: 0.75rem 0.75rem 0.5rem 0.5rem;
+    background: #0f172a;
+    color: #e2e8f0;
+    box-shadow: 0 -8px 32px rgba(15, 23, 42, 0.35);
+    transform: translateY(110%);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    outline: none;
+}
+
+.media-ph-preview.is-open .media-ph-preview__panel {
+    transform: translateY(0);
+}
+
+.media-ph-preview__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.media-ph-preview__title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.media-ph-preview__close {
+    border: 0;
+    background: rgba(148, 163, 184, 0.2);
+    color: #f8fafc;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.media-ph-preview__close:hover,
+.media-ph-preview__close:focus-visible {
+    background: rgba(148, 163, 184, 0.35);
+    outline: none;
+}
+
+.media-ph-preview__body {
+    border-radius: 0.45rem;
+    overflow: hidden;
+    background: #1e293b;
+    min-height: 8rem;
+}
+
+.media-ph-preview__media {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: min(55vh, 20rem);
+    object-fit: contain;
+    margin: 0 auto;
+}
+
+.media-ph-preview__hint {
+    margin: 0;
+    font-size: 0.7rem;
+    color: #94a3b8;
+}
+
+/* Critical lab placeholder still (mediaPlaceholders.mounts.criticalLab) */
+.shell-critical-lab-media {
+    position: fixed;
+    right: 1rem;
+    bottom: 5.5rem;
+    z-index: 35;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: min(14rem, calc(100vw - 2rem));
+    padding: 0.4rem;
+    border-radius: 0.5rem;
+    background: rgba(15, 23, 42, 0.88);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.35);
+    color: #e2e8f0;
+}
+
+.shell-critical-lab-media[hidden] {
+    display: none !important;
+}
+
+.shell-critical-lab-media__img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.35rem;
+    display: block;
+}
+
+.shell-critical-lab-media__caption {
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.25;
+    padding: 0 0.15rem 0.1rem;
+}
+
 /* Temporary “Dr will call back” after paging MD on a critical lab */
 .shell-awaiting-toast {
     position: fixed;

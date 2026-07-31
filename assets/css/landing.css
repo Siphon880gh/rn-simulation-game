@@ -373,6 +373,22 @@ body.landing {
 .unit-tile--medsurg { --tile-accent: var(--medsurg); --glow: rgba(44, 90, 122, 0.2); }
 .unit-tile--icu { --tile-accent: var(--icu); --glow: rgba(107, 58, 58, 0.22); }
 
+.unit-tile__media-wrap {
+    width: 100%;
+    margin: -0.15rem 0 0.35rem;
+    border-radius: 0.4rem;
+    overflow: hidden;
+    background: #1a2332;
+    aspect-ratio: 16 / 9;
+}
+
+.unit-tile__media {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .unit-tile__dept {
     font-family: var(--font-display);
     font-size: 1.55rem;

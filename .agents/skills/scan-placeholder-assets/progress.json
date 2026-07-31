@@ -1,0 +1,15 @@
+{
+  "status": "idle",
+  "updatedAt": "2026-07-31T13:09:00.000Z",
+  "queue": [
+    {
+      "id": "challenge-iv-check",
+      "status": "done",
+      "kind": "image",
+      "mount": "challenge.iv-check",
+      "w": 720,
+      "h": 280,
+      "reason": "wired — yes to all"
+    }
+  ]
+}

@@ -20,7 +20,7 @@ Also: [`AGENTS.md`](AGENTS.md) (entry), [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](A
 
 **RN Simulation Game** — browser sim of a fast-paced ~12-hour nursing shift. Player manages patients (vitals, meds, tasks) under an accelerated military clock. Goal: complete the shift without overtime by prioritizing timed work.
 
-Multi-patient census (6 packs), declarative tasks + 3-slot execution with FIFO waiting queue, shell chrome, TimelineJS past hx, markdown Help. Challenges: med identity, bed-prep gather (win-to-complete), IVPB hang sequence, Code Blue (E4 escalate). Scenario + optional chaos incident packs; CSS unit scene themes; scoring/debrief at shift end.
+Multi-patient census (6 packs), declarative tasks + 3-slot execution with FIFO waiting queue, shell chrome, TimelineJS past hx, markdown Help. Challenges: med identity, bed-prep gather (win-to-complete), IVPB hang sequence, Code Blue (E4 escalate). Scenario + optional chaos incident packs; CSS unit scene themes; scoring/debrief at shift end. Titled image/video placeholders (`mediaPlaceholders` + catalog) on landing departments, busy slots, challenge modals, and critical-lab toast — swap via `replaceWith` / `game/assets/media/`.
 
 ---
 
@@ -58,9 +58,9 @@ URL params (?speed-factor=&shift-starts=&shift-duration=)
 ```
 
 **Config sources (do not confuse):**
-- `game/assets/js/game-config.js` — **used** by modules (selectors, statuses, defaults)
+- `game/assets/js/game-config.js` — **used** by modules (selectors, statuses, defaults, `mediaPlaceholders`)
 - `game/app.config.js` — alternate preset/speed helper; **not wired** into `app.js` today
-- URL query params override defaults in `AppConfig` inside `app.js`
+- URL query params override defaults in `AppConfig` inside `app.js` (`?placeholders=0` disables media placeholders)
 
 ---
 
@@ -106,8 +106,10 @@ rngame/
 │   │   ├── doctor-orders.js           # E4.M3 hourly check + E11 carryover / ≤1 procedure
 │   │   ├── right-menu.js              # E10 Orders + Tools right rail
 │   │   ├── dynamic-tasks.js           # E3.M5 weighted dynamic/urgent spawn + incident tabs
-│   │   ├── slot-system.js             # 3 slots + FIFO waiting queue
+│   │   ├── slot-system.js             # 3 slots + FIFO waiting queue (+ slot media thumbs)
 │   │   ├── slot-constraints.js        # Declarative slot concurrency (mutex / exclusive / blocksWith)
+│   │   ├── media-placeholders.js      # catalog load, SVG/data-url or PHP tags, mounts helpers
+│   │   ├── media-placeholder-catalog.json  # asset ids / titles / prompts / replaceWith
 │   │   ├── skill-focus.js             # Test skill: blank census + challenge → landing
 │   │   ├── docs.js                    # Help FAB + in-page docs viewer (ES module)
 │   │   ├── shell-chrome.js            # hour tabs + shift history log
@@ -115,12 +117,17 @@ rngame/
 │   │   ├── link-popover.js            # internal-link hover Preview + Contents
 │   │   └── events.js                  # legacy Signal reveal (~23)
 │   ├── assets/css/                    # shell / scene / app / patients / declarative-tasks / markdown / link-popover
+│   ├── assets/media/                  # final stills/clips (dept-*.webp when replaced)
 │   └── events/
 │       ├── scenarios/*.json           # night + day packs (census, scene, incidentPackUrl)
 │       ├── incidents/*.json           # E7.M2 chaos templates + events (merged into pack)
 │       └── patients/*.html            # six census packs (+ optional *-past-hx.json)
 ├── assets/js/landing-census.js        # root picker census −1 / open-to-admit modal
 ├── assets/js/landing-skill.js         # skill library: start shift pack OR Test skill (?skill=&skillMode=test)
+├── assets/js/landing-media.js         # root picker department tile placeholders
+├── placeholders/                      # optional PHP titled SVG image/video (image.php|video.php)
+├── PLACEHOLDER_ASSETS.md              # inventory for art handoff / replace skill
+├── scripts/verify-placeholder-assets.mjs
 ├── docs/{devs,players,learning}/      # markdown shown in docs dropdown (ABOUT.md = disclaimer + objectives)
 └── prompts/                           # milestone authoring (not runtime)
 ```

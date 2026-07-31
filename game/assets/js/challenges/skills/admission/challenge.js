@@ -3,6 +3,7 @@
  */
 import { GameConfig } from '../../../game-config.js';
 import gameState from '../../../game-state.js';
+import { challengeMediaHtml } from '../../../media-placeholders.js';
 
 export function getAdmissionProfile(patientId) {
     const profiles = GameConfig.admission?.profiles || {};
@@ -174,6 +175,7 @@ export function renderAdmissionQuizHtml(quiz, taskName) {
     `).join('');
     return `
       <div class="challenge-gate space-y-3 text-left" data-challenge="admission-quiz">
+        ${challengeMediaHtml('admission')}
         <p class="text-sm text-gray-900 font-semibold">${quiz.prompt}</p>
         <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
           || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>

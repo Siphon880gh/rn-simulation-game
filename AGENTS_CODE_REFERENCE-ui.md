@@ -24,8 +24,12 @@ Browser chrome around the sim: locked shell regions (E1.M2), patient main mount,
 | `game/assets/css/shell.css` | ~180 | Shell grid / chrome layout |
 | `game/assets/css/scene.css` | ~80 | E7.M1 unit themes + situation still + light motion |
 | `game/assets/js/scene-backdrop.js` | ~80 | Apply theme/image; situation stills on modal |
-| `game/assets/css/declarative-tasks.css` | ~150 | Task status + type styles |
-| `game/assets/css/app.css` | ~8 | App-level CSS |
+| `game/assets/js/media-placeholders.js` | ~ESM | Catalog + titled placeholders (data-url or PHP); challenge/slot/critical-lab mounts |
+| `game/assets/js/media-placeholder-catalog.json` | — | Asset ids, dimensions, prompts, `replaceWith` |
+| `assets/js/landing-media.js` | ~classic | Landing department tile media (`dept-*`) |
+| `placeholders/` | PHP | Optional `image.php` / `video.php` titled SVG service |
+| `game/assets/css/declarative-tasks.css` | ~150 | Task status + type styles (+ `.task-slot-media*`) |
+| `game/assets/css/app.css` | — | App-level + `.challenge-media-wrap` |
 | `game/assets/css/patients.css` | — | Patient + clinical-status badge CSS |
 
 ---
@@ -42,10 +46,11 @@ Browser chrome around the sim: locked shell regions (E1.M2), patient main mount,
 | Right menu | `#shell-right-menu` | E10 Orders (`#orders-rail`) + Tools (`#tools-rail`) + E13 Delegate (`#delegate-rail`); `right-menu.js` |
 | Bottom | `#shell-bottom` | History + slots + status |
 | History log | `#shift-history-log` | Append-only via `APPEND_SHIFT_LOG` |
-| Task queue | `#task-queue-bar` / `#slot-waiting-queue` | 3 slots + FIFO wait (slot-system.js); exclusive → `.task-slot--disabled` |
+| Task queue | `#task-queue-bar` / `#slot-waiting-queue` | 3 slots + FIFO wait (slot-system.js); exclusive → `.task-slot--disabled`; busy slots may show media thumbs |
+| Critical lab media | `#shell-critical-lab-media` | Placeholder host for critical-lab spawn still |
 | Status bar | `#shell-status-bar` / `#shell-status-message` | Live status line |
 | Clock / Pause | `#clock` / `#pause` | Timer module |
-| Modal | `#modal`… | Overlay; dims `#shell` |
+| Modal | `#modal`… | Overlay; dims `#shell`; challenge heroes via `challengeMediaHtml` |
 | Docs FAB | `#docs-container` | Fixed bottom-right |
 | Reveal style | `#reveal-scheduled-tasks` | Empty `<style>` filled by timer |
 
@@ -80,6 +85,18 @@ Adding a doc: place under `docs/{devs,players,learning}/` **and** list it in `do
 - Status: `not-yet` (dim), `active`, `completed`, `overdue` (pulse)  
 - Type-specific / slot-label rules further down the file
 - `.task-slot--disabled` + `.task-queue-bar--exclusive` when an exclusive slot task is active  
+- `.task-slot-media-btn` / `.task-slot-media` for busy-slot placeholder thumbs  
+
+---
+
+## Media placeholders
+
+- Config: `GameConfig.mediaPlaceholders` (`enabled`, `source: data-url|php`, `mounts.*`, `challenges` map, optional `assets` overrides).
+- Catalog: `media-placeholder-catalog.json`; inventory doc: `PLACEHOLDER_ASSETS.md`.
+- Default source is client **data-url** SVG (works on static servers); PHP under `placeholders/` when `source: 'php'`.
+- Mounts: landing departments, situation stills, critical-lab toast, busy slots, in-modal challenge heroes.
+- Final art: set catalog/`assets.<id>.replaceWith` (e.g. `assets/media/dept-tele.webp`); agent skills `scan-placeholder-assets` / `replace-placeholder-assets`.
+- Disable: `enabled: false` or `?placeholders=0`.
 
 ---
 
@@ -88,4 +105,5 @@ Adding a doc: place under `docs/{devs,players,learning}/` **and** list it in `do
 - Prefer Tailwind utility classes already used in shell; keep clinical panels readable (product constraint: panels-first).  
 - Do not remove `#reveal-scheduled-tasks` or modal footer hooks without updating timer/modal callers.  
 - Keep shell region ids stable — E2/E4/E6 mount into these landmarks.  
+- Keep `#shell-critical-lab-media` when touching critical-lab UI.  
 - CDN Tailwind in production is acceptable for current MVP; bundling would be a stack decision.

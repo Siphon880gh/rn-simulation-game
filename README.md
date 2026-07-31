@@ -26,7 +26,13 @@ Serve the repo root over HTTP — ES modules need a static server, not `file://`
 python3 -m http.server 8765
 # open http://localhost:8765/  → choose Tele / Med-Surg / ICU
 # (opening /game/ without ?scenario= redirects back to the picker)
+
+# Optional: PHP for /placeholders/image.php|video.php (titled SVG placeholders)
+# php -S localhost:8765 -t .
+# Then set GameConfig.mediaPlaceholders.source = 'php' (default is client data-url)
 ```
+
+Placeholder art inventory: [`PLACEHOLDER_ASSETS.md`](PLACEHOLDER_ASSETS.md).
 
 
 ## Choose your assignment (front page)

@@ -4,6 +4,7 @@
  */
 import { GameConfig } from '../../../game-config.js';
 import { icpChallengeConfig } from './config.js';
+import { challengeMediaHtml } from '../../../media-placeholders.js';
 
 function cfg() {
   return GameConfig.icpChallenge || icpChallengeConfig || {};
@@ -96,6 +97,7 @@ export function renderIcpQuizHtml(quiz, taskName, opts = {}) {
   return `
       <div class="challenge-gate space-y-3 text-left" data-challenge="icp" data-question-id="${quiz.questionId || ''}" data-pool-size="${poolSize}">
         ${levelHtml}
+        ${challengeMediaHtml('icp')}
         <p class="text-sm text-gray-900 font-semibold" data-quiz-prompt>${quiz.prompt}</p>
         <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
           || 'Timer is paused. Complete this game/quiz.'}</p>

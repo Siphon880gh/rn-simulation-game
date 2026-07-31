@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "description": "Canonical list of image/video placeholders. Subject prompts only — runtime appends Style (fun medical simulation) via promptStyleAppendix. Set replaceWith to swap. Keep PLACEHOLDER_ASSETS.md in sync.",
+  "assets": [
+    {
+      "id": "dept-tele",
+      "kind": "image",
+      "title": "Telemetry unit",
+      "mount": "landing.unit.tele",
+      "w": 640,
+      "h": 360,
+      "prompt": "Subject: RN shift-sim landing tile for Telemetry — nursing station with central monitor bank showing multiple rhythm strips, mid-size census feel. Caption text \"Telemetry unit\".",
+      "replaceWith": "game/assets/media/dept-tele.webp"
+    },
+    {
+      "id": "dept-medsurg",
+      "kind": "image",
+      "title": "Med-Surg unit",
+      "mount": "landing.unit.medsurg",
+      "w": 640,
+      "h": 360,
+      "prompt": "Subject: RN shift-sim landing tile for Med-Surg — floor hallway / nurses station with med cart and patient room doors, busy but orderly. Caption text \"Med-Surg unit\".",
+      "replaceWith": "game/assets/media/dept-medsurg.webp"
+    },
+    {
+      "id": "dept-icu",
+      "kind": "image",
+      "title": "ICU unit",
+      "mount": "landing.unit.icu",
+      "w": 640,
+      "h": 360,
+      "prompt": "Subject: RN shift-sim landing tile for ICU — bay with ventilator, multiple IV pumps, and overhead monitor; higher acuity, quieter intensity. Caption text \"ICU unit\".",
+      "replaceWith": "game/assets/media/dept-icu.webp"
+    },
+    {
+      "id": "situation-code-blue",
+      "kind": "image",
+      "title": "Code Blue",
+      "mount": "situation.code-blue",
+      "w": 960,
+      "h": 540,
+      "prompt": "Subject: Code Blue challenge backdrop — crash cart open, defibrillator pads ready, tense ICU/bedside emergency lighting. Caption \"Code Blue\".",
+      "replaceWith": null
+    },
+    {
+      "id": "situation-critical-lab",
+      "kind": "image",
+      "title": "Critical lab",
+      "mount": "situation.critical-lab",
+      "w": 640,
+      "h": 360,
+      "prompt": "Subject: critical lab call moment — lab result printout / phone at nurses station with urgent red-flag styling, call-the-doctor urgency. Caption \"Critical lab\".",
+      "replaceWith": null
+    },
+    {
+      "id": "situation-bed-prep",
+      "kind": "image",
+      "title": "Bed prep",
+      "mount": "situation.bed-prep",
+      "w": 960,
+      "h": 540,
+      "prompt": "Subject: bed-prep admission challenge — empty hospital bed being made with clean linens, suction/O2 wall setup visible. Caption \"Bed prep\".",
+      "replaceWith": null
+    },
+    {
+      "id": "slot-perform",
+      "kind": "image",
+      "title": "Performing care",
+      "mount": "slot.busy",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: small task-slot thumb (~160×120) while care is being performed — bedside care silhouette / gloved hands at bedside. Caption \"Performing care\".",
+      "replaceWith": null
+    },
+    {
+      "id": "slot-perform-video",
+      "kind": "video",
+      "title": "Performing care",
+      "mount": "slot.busy.video",
+      "w": 320,
+      "h": 180,
+      "prompt": "Subject: short looping silent video (3–6s) for a busy task slot — gentle bedside care motion (adjusting IV line / taking vitals), muted. Caption feel \"Performing care\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-code-blue",
+      "kind": "image",
+      "title": "Code Blue",
+      "mount": "challenge.code-blue",
+      "w": 720,
+      "h": 320,
+      "prompt": "Subject: wide hero still for Code Blue quiz modal — open crash cart, defibrillator, tense bedside team silhouettes; readable above quiz choices. Caption \"Code Blue\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-code-blue-video",
+      "kind": "video",
+      "title": "Code Blue",
+      "mount": "challenge.code-blue.video",
+      "w": 720,
+      "h": 320,
+      "prompt": "Subject: short silent looping video (4–8s) for Code Blue challenge hero — crash cart drawer opening / defibrillator charge lights pulse / urgent bedside motion, muted. Caption feel \"Code Blue\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-bed-prep",
+      "kind": "image",
+      "title": "Bed prep",
+      "mount": "challenge.bed-prep",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: wide still for bed-prep admission mini-game modal — clean hospital bed mid-make, linen stack, wall O2/suction. Caption \"Bed prep\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-med-identity",
+      "kind": "image",
+      "title": "Med identity",
+      "mount": "challenge.med-identity",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: wide still for medication identity quiz — labeled med vials / unit-dose packages on a clean med cart (fictional drug names OK). Caption \"Med identity\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-ivpb-hang",
+      "kind": "image",
+      "title": "IVPB hang",
+      "mount": "challenge.ivpb-hang",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: wide still for IVPB hang sequence game — secondary IV bag on pump pole with primary line. Caption \"IVPB hang\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-accucheck",
+      "kind": "image",
+      "title": "Accucheck",
+      "mount": "challenge.accucheck",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: wide still for blood glucose / accucheck quiz — glucometer and test strip, gloved hands (no face). Caption \"Accucheck\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-admission",
+      "kind": "image",
+      "title": "Admission",
+      "mount": "challenge.admission",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: wide still for admission quiz — clipboard admission checklist and hospital wristband on bedside table. Caption \"Admission\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-icp",
+      "kind": "image",
+      "title": "ICP",
+      "mount": "challenge.icp",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: wide still for ICP monitoring quiz — ICU monitor waveform labeled ICP (schematic), EVD setup silhouette. Caption \"ICP\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-iv-check",
+      "kind": "image",
+      "title": "IV check",
+      "mount": "challenge.iv-check",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: wide still for IV drip check / titration / heparin-PTT quiz — IV catheter dressing and infusion pump screen at bedside (no face). Caption \"IV check\".",
+      "replaceWith": null
+    }
+  ]
+}

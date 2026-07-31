@@ -7,6 +7,7 @@ import { GameConfig } from '../../../game-config.js';
 import gameState from '../../../game-state.js';
 import taskSystem from '../../../task-system.js';
 import { showShellToast, spawnCriticalLabNow } from '../../../critical-labs.js';
+import { challengeMediaHtml } from '../../../media-placeholders.js';
 
 export const INSULIN_TYPES = ['regular', 'aspart', 'lispro'];
 
@@ -284,6 +285,7 @@ export function renderAccucheckHtml(prompt) {
     const taskName = escapeHtml(prompt.taskName);
     return `
       <div class="challenge-gate accucheck-challenge space-y-3 text-left" data-challenge="accucheck">
+        ${challengeMediaHtml('accucheck')}
         <p class="text-sm text-gray-900 font-semibold">
           Accucheck / sliding scale / finger stick
         </p>

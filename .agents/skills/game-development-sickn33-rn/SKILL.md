@@ -53,6 +53,8 @@ Default runtime intent: **`keep_modular_app`** (custom vanilla shell).
 | DOM pass/fail challenge (quiz) | Primary thin | `web-games` (plugin path) |
 | 2D canvas skill-check (guest only) | Optional guest | `web-games` → `2d-games` |
 | Scoring / teaching debrief | Primary | `game-design` + E6 stories |
+| Placeholder → final image/video | Primary | [`../replace-placeholder-assets/`](../replace-placeholder-assets/) + `PLACEHOLDER_ASSETS.md` |
+| Find new image/video placeholder mounts | Primary | [`../scan-placeholder-assets/`](../scan-placeholder-assets/) (dimensions + fun-medical style) |
 | Branching dialogue / case vignette | Side slice | `engine-selection` (Ink/Twine — approval) |
 | Classic platformer / top-down as product | Out of scope | Refuse as shell; patterns only inside guest mini-game |
 | 3D ward / XR / Godot-Unity shell | Poor fit | `engine-selection` poor-fit; Later guest at most |

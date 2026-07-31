@@ -441,6 +441,46 @@ li[data-status="active"] {
     border-color: #93c5fd;
 }
 
+.task-slot-media-btn {
+    display: block;
+    width: 100%;
+    max-width: 4.75rem;
+    margin: 0 auto 0.15rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0.3rem;
+    background: #1e293b;
+    cursor: pointer;
+    line-height: 0;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.task-slot-media-btn:hover,
+.task-slot-media-btn:focus-visible {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.45);
+    outline: none;
+}
+
+.task-slot-media {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 0.25rem;
+    display: block;
+    background: #1e293b;
+    pointer-events: none;
+}
+
+.task-slot-media.media-ph--video {
+    aspect-ratio: 16 / 9;
+}
+
 .task-slot-name {
     font-size: 0.65rem;
     font-weight: 700;

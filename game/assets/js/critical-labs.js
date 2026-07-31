@@ -9,6 +9,7 @@ import gameState from './game-state.js';
 import taskSystem from './task-system.js';
 import { isAtOrAfterInShift, hhmmToMinutes, minutesFromShiftAnchor } from './availability-windows.js';
 import { mountTaskDom, presentSpawnedTask } from './dynamic-tasks.js';
+import { showCriticalLabMedia } from './media-placeholders.js';
 
 const spawnedLabKeys = new Set();
 /**
@@ -241,6 +242,7 @@ function createCallTask(spec) {
         timeLabel: formatHHMM(spec.at)
     });
     statusMessage(`Critical ${lab.shortName} — call doctor`);
+    showCriticalLabMedia({ labShort: lab.shortName, patientId: spec.patientId });
     return live;
 }
 

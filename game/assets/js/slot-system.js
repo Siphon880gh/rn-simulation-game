@@ -15,6 +15,15 @@ import {
     matchSpec,
     slotDisplayState
 } from './slot-constraints.js';
+import { slotMediaHtml, loadCatalog, wireMediaPreviewClicks } from './media-placeholders.js';
+
+/** Populated async; renderSlots uses cache when ready. */
+let mediaCatalog = null;
+loadCatalog().then((c) => {
+    mediaCatalog = c;
+}).catch(() => {
+    mediaCatalog = { assets: [] };
+});
 
 function taskRequiresEmptySlots(task) {
     return (GameConfig.slotConstraints?.rules || []).some((rule) => {
@@ -89,8 +98,20 @@ function renderSlots(slots) {
               </div>`;
         }
         const progress = Number(slot.progress) || 0;
+        const task = gameState.getStateSlice('tasks')?.get(slot.taskId);
+        const media = mediaCatalog
+            ? slotMediaHtml(
+                {
+                    patientId: task?.patientId || slot.patientId,
+                    taskName: slot.taskName || task?.name
+                },
+                mediaCatalog
+            )
+            : '';
         return `
-          <div class="task-slot task-slot--busy" data-slot-id="${slot.id}" data-task-id="${slot.taskId}">
+          <div class="task-slot task-slot--busy" data-slot-id="${slot.id}" data-task-id="${slot.taskId}"
+            data-patient-id="${task?.patientId || ''}">
+            ${media}
             <span class="task-slot-name">${slot.taskName || 'Task'}</span>
             <div class="task-slot-progress" aria-hidden="true">
               <div class="task-slot-progress-fill" style="width:${progress}%"></div>
@@ -98,6 +119,7 @@ function renderSlots(slots) {
             <span class="task-slot-timemark">${formatHhmm(slot.endsAt)}</span>
           </div>`;
     }).join('');
+    wireMediaPreviewClicks(bar);
 }
 
 function renderQueue(queue) {

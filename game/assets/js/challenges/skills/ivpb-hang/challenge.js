@@ -4,6 +4,7 @@
  */
 import { GameConfig } from '../../../game-config.js';
 import { ivpbHangChallengeConfig } from './config.js';
+import { challengeMediaHtml } from '../../../media-placeholders.js';
 
 function cfg() {
     return GameConfig.ivpbHangChallenge || ivpbHangChallengeConfig || {};
@@ -76,6 +77,7 @@ export function renderIvpbHangHtml(taskName) {
 
     return `
       <div class="challenge-gate ivpb-hang-challenge space-y-3 text-left" data-challenge="ivpb-hang">
+        ${challengeMediaHtml('ivpb-hang')}
         <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
           || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
         <p class="text-sm text-gray-800">Hang IVPB: <strong>${escapeHtml(taskName || 'IVPB')}</strong></p>
