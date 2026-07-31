@@ -276,6 +276,15 @@ class GameApplication {
             showDelegateHint('Task not ready');
             return;
         }
+        const slotState = SlotSystem.getTaskSlotState(taskId);
+        if (slotState === 'busy') {
+            showDelegateHint('That task is already in a slot');
+            return;
+        }
+        if (slotState === 'queued') {
+            showDelegateHint('That task is already waiting in the queue');
+            return;
+        }
         const now = gameState.getStateSlice('currentTime');
         const check = canAidePerformTask(aide, task, now);
         if (!check.ok) {
@@ -283,6 +292,7 @@ class GameApplication {
             const hints = {
                 'wrong-patient': `${who} is not assigned to this patient`,
                 'not-active': 'That task is not available yet',
+                'in-progress': 'That task is already in a slot or queue',
                 'not-delegable': `${who} can't perform this task`,
                 'wrong-type': `${who} can't perform this task`,
                 'aide-unavailable': `${who} is not available right now`
@@ -348,7 +358,10 @@ class GameApplication {
                 const prereqMet = taskSystem.isPrerequisiteMet
                     ? taskSystem.isPrerequisiteMet(task)
                     : true;
-                const canPerform = taskSystem.isPerformAllowed(task, now);
+                const slotState = SlotSystem.getTaskSlotState(taskId);
+                const occupied = Boolean(slotState);
+                const windowOk = taskSystem.isPerformAllowed(task, now);
+                const canPerform = windowOk && !occupied;
                 const phase = taskSystem.getWindowPhase(task, now);
                 const kind = String(task.type).toLowerCase();
                 const metaKind = String(task.metadata?.kind || '').toLowerCase();
@@ -380,13 +393,20 @@ class GameApplication {
                 if (metaKind === 'shift-assessment') performName = 'Assess (skill check)';
                 if (metaKind === 'chart-assessment') performName = 'Chart assessment';
 
+                let performLabel = performName;
+                if (occupied) {
+                    performLabel = slotState === 'queued'
+                        ? `${performName} (already queued)`
+                        : `${performName} (in progress)`;
+                } else if (!prereqMet) {
+                    performLabel = 'Perform (complete shift assessment first)';
+                } else if (!windowOk) {
+                    performLabel = `Perform (outside window: ${phase})`;
+                }
+
                 const items = {
                     perform: {
-                        name: !prereqMet
-                            ? 'Perform (complete shift assessment first)'
-                            : !canPerform
-                                ? `Perform (outside window: ${phase})`
-                                : performName,
+                        name: performLabel,
                         icon: 'add',
                         disabled: !canPerform
                     },
@@ -437,8 +457,19 @@ class GameApplication {
 
     // Handle task actions declaratively
     handleTaskAction(action, task, element) {
+        const occupiedBlock = () => {
+            const slotState = SlotSystem.getTaskSlotState(task?.id);
+            if (!slotState) return false;
+            const msg = slotState === 'queued'
+                ? 'That task is already waiting in the queue.'
+                : 'That task is already in progress in a slot.';
+            alert(msg);
+            return true;
+        };
+
         const actionHandlers = {
             perform: () => {
+                if (occupiedBlock()) return;
                 const kind = String(task.type).toLowerCase();
                 if (kind === 'orders') {
                     this.performOrdersCheck(task);
@@ -468,9 +499,11 @@ class GameApplication {
                 this.performMedicationTask(task);
             },
             assistTurn: () => {
+                if (occupiedBlock()) return;
                 this.performAssessmentTask(task, { assist: true });
             },
             delegateSolo: () => {
+                if (occupiedBlock()) return;
                 const aide = findAvailableAideForPatient(task.patientId);
                 if (!aide) {
                     showDelegateHint('No aide available for this patient right now');

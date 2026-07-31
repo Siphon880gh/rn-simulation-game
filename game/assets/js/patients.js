@@ -2,6 +2,7 @@
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
+import SlotSystem from './slot-system.js';
 import { registerPatientIv } from './iv-system.js';
 import { loadPastHxPack, ensurePastHxTimeline } from './past-hx-timeline.js';
 
@@ -1981,6 +1982,7 @@ const PatientsModule = (() => {
                 taskSystem.syncTaskWindowDomAttrs(el, task);
             }
         });
+        SlotSystem.refreshOccupancyMarkers?.();
     };
 
     const updateCensusMeta = () => {
@@ -2252,6 +2254,7 @@ const PatientsModule = (() => {
                 }
             });
         });
+        SlotSystem.refreshOccupancyMarkers?.();
     };
 
     // Subscribe to game state changes

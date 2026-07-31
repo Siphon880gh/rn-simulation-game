@@ -35,11 +35,16 @@ const c = make('q-c', 'Queue C');
 const d = make('q-d', 'Queue D');
 
 assert(SlotSystem.requestSlot(a, 1900).ok && !SlotSystem.requestSlot(a, 1900).queued, 'A starts');
+assert(SlotSystem.getTaskSlotState('q-a') === 'busy', 'A marked busy');
+assert(SlotSystem.isOccupied('q-a') === true, 'A occupied');
 assert(SlotSystem.requestSlot(b, 1900).ok, 'B starts');
 assert(SlotSystem.requestSlot(c, 1900).ok, 'C starts');
 const queued = SlotSystem.requestSlot(d, 1900);
 assert(queued.ok && queued.queued, 'D queued when full');
 assert(gameState.getStateSlice('slotQueue').some((i) => i.taskId === 'q-d'), 'D in slotQueue');
+assert(SlotSystem.getTaskSlotState('q-d') === 'queued', 'D marked queued');
+assert(appSrc.includes('getTaskSlotState'), 'menu checks slot occupancy');
+assert(appSrc.includes('already queued') || appSrc.includes('in progress'), 'menu labels occupied tasks');
 
 SlotSystem.processSlots(1910); // finishes A/B/C if all started 1900 for 10 min
 assert(

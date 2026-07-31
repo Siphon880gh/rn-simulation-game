@@ -76,6 +76,83 @@
     border-left-color: #10b981;
 }
 
+/* In a slot or waiting queue — Perform disabled until finished */
+[data-slot-state="busy"].task-status-active,
+[data-slot-state="queued"].task-status-active {
+    opacity: 0.85;
+    cursor: default;
+    box-shadow: none;
+    padding-right: 5.5rem;
+}
+
+[data-slot-state="busy"].task-status-active:hover,
+[data-slot-state="queued"].task-status-active:hover {
+    transform: none;
+    background-color: #f3f4f6;
+    box-shadow: none;
+}
+
+/* Centered spinning sprite while task occupies a slot / queue */
+.task-occupancy-spin {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.16);
+    font-size: 1.15rem;
+    line-height: 1;
+    color: #2563eb;
+}
+
+.task-occupancy-spin[data-state="queued"] {
+    color: #7c3aed;
+}
+
+.task-occupancy-spin .fa-spinner {
+    display: block;
+}
+
+[data-slot-state="busy"][data-task-type].task-status-active::after,
+[data-slot-state="queued"][data-task-type].task-status-active::after {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    border: 1px solid;
+    border-radius: 0.25rem;
+    padding: 0.15rem 0.4rem;
+    opacity: 1;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+[data-slot-state="busy"][data-task-type].task-status-active::after {
+    content: "In progress";
+    color: #1e40af;
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+[data-slot-state="queued"][data-task-type].task-status-active::after {
+    content: "Queued";
+    color: #6b21a8;
+    background: #f3e8ff;
+    border-color: #d8b4fe;
+}
+
 /* Chart assessment locked until bedside shift assessment completes */
 [data-task-kind="chart-assessment"][data-task-locked="1"] {
     opacity: 0.55;

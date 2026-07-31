@@ -9,6 +9,7 @@
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
+import SlotSystem from './slot-system.js';
 
 let hintTimer = null;
 
@@ -291,6 +292,9 @@ export function canAidePerformTask(aide, task, now = gameState.getStateSlice('cu
     const status = task.status || GameConfig.tasks.statuses.NOT_YET;
     if (status !== GameConfig.tasks.statuses.ACTIVE) {
         return { ok: false, mode: getDelegateMode(task), reason: 'not-active' };
+    }
+    if (SlotSystem.isOccupied(task.id)) {
+        return { ok: false, mode: getDelegateMode(task), reason: 'in-progress' };
     }
     const mode = getDelegateMode(task);
     if (!mode) return { ok: false, mode: null, reason: 'not-delegable' };

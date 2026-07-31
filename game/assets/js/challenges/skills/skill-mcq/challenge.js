@@ -248,20 +248,119 @@ function renderSataHtml(quiz) {
     `;
 }
 
+/** Distinct colors so each locked pair is easy to tell apart. */
+const MATCH_PAIR_PALETTE = [
+  { letter: 'A', btn: 'bg-sky-100 border-sky-400 text-sky-950', badge: 'bg-sky-600 text-white' },
+  { letter: 'B', btn: 'bg-violet-100 border-violet-400 text-violet-950', badge: 'bg-violet-600 text-white' },
+  { letter: 'C', btn: 'bg-amber-100 border-amber-400 text-amber-950', badge: 'bg-amber-600 text-white' },
+  { letter: 'D', btn: 'bg-emerald-100 border-emerald-400 text-emerald-950', badge: 'bg-emerald-600 text-white' },
+  { letter: 'E', btn: 'bg-rose-100 border-rose-400 text-rose-950', badge: 'bg-rose-600 text-white' },
+  { letter: 'F', btn: 'bg-teal-100 border-teal-400 text-teal-950', badge: 'bg-teal-600 text-white' },
+  { letter: 'G', btn: 'bg-orange-100 border-orange-400 text-orange-950', badge: 'bg-orange-600 text-white' },
+  { letter: 'H', btn: 'bg-fuchsia-100 border-fuchsia-400 text-fuchsia-950', badge: 'bg-fuchsia-600 text-white' }
+];
+
+const MATCH_TERM_BASE = 'skill-match-term w-full px-3 py-2 rounded border border-indigo-200 bg-indigo-50 text-left text-sm flex items-start gap-2';
+const MATCH_DEF_BASE = 'skill-match-def w-full px-3 py-2 rounded border border-gray-200 text-left text-sm hover:bg-gray-50 flex items-start gap-2';
+const MATCH_PAIR_BTN_CLASSES = MATCH_PAIR_PALETTE.flatMap((p) => p.btn.split(/\s+/));
+const MATCH_PAIR_BADGE_CLASSES = MATCH_PAIR_PALETTE.flatMap((p) => p.badge.split(/\s+/));
+
+function matchPalette(slot) {
+  return MATCH_PAIR_PALETTE[Number(slot) % MATCH_PAIR_PALETTE.length];
+}
+
+function clearMatchPairClasses(btn) {
+  if (!btn) return;
+  btn.classList.remove(...MATCH_PAIR_BTN_CLASSES, 'ring-2', 'ring-indigo-500', 'ring-amber-400', 'opacity-60', 'line-through', 'bg-amber-50', 'border-amber-300');
+  const badge = btn.querySelector('.skill-match-badge');
+  if (badge) {
+    badge.classList.add('hidden');
+    badge.classList.remove(...MATCH_PAIR_BADGE_CLASSES);
+    badge.textContent = '';
+  }
+  btn.removeAttribute('data-match-slot');
+  btn.removeAttribute('data-matched-with');
+  btn.removeAttribute('aria-pressed');
+  btn.removeAttribute('title');
+}
+
+function applyMatchPairStyle(termBtn, defBtn, slot) {
+  const style = matchPalette(slot);
+  [termBtn, defBtn].forEach((btn) => {
+    clearMatchPairClasses(btn);
+    btn.classList.add(...style.btn.split(/\s+/));
+    btn.setAttribute('data-match-slot', String(slot));
+    btn.setAttribute('aria-pressed', 'true');
+    btn.title = 'Click to undo this match';
+    const badge = btn.querySelector('.skill-match-badge');
+    if (badge) {
+      badge.textContent = style.letter;
+      badge.classList.remove('hidden', ...MATCH_PAIR_BADGE_CLASSES);
+      badge.classList.add(...style.badge.split(/\s+/));
+    }
+  });
+  termBtn.setAttribute('data-matched-with', defBtn.getAttribute('data-def-id') || '');
+  defBtn.setAttribute('data-matched-with', termBtn.getAttribute('data-term-id') || '');
+}
+
+function renderMatchPairList(gate) {
+  const list = gate.querySelector('[data-match-pair-list]');
+  if (!list) return;
+  const terms = [...gate.querySelectorAll('.skill-match-term[data-match-slot]')]
+    .sort((a, b) => Number(a.getAttribute('data-match-slot')) - Number(b.getAttribute('data-match-slot')));
+  if (!terms.length) {
+    list.innerHTML = '<li class="text-xs text-slate-400" data-match-empty>None yet — pick a term, then a definition.</li>';
+    return;
+  }
+  const defs = [...gate.querySelectorAll('.skill-match-def')];
+  list.innerHTML = terms.map((termBtn) => {
+    const slot = termBtn.getAttribute('data-match-slot');
+    const style = matchPalette(slot);
+    const defBtn = defs.find((d) => d.getAttribute('data-match-slot') === slot);
+    const termText = termBtn.querySelector('.skill-match-label')?.textContent || termBtn.textContent;
+    const defText = defBtn?.querySelector('.skill-match-label')?.textContent || defBtn?.textContent || '?';
+    return `<li class="flex items-start gap-2 rounded border px-2 py-1.5 ${style.btn}">
+      <span class="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded text-[10px] font-bold ${style.badge}">${style.letter}</span>
+      <span class="text-sm leading-snug"><span class="font-medium">${escapeHtml(termText.trim())}</span>
+        <span class="text-slate-500"> → </span>${escapeHtml(String(defText).trim())}</span>
+    </li>`;
+  }).join('');
+}
+
 function renderMatchHtml(quiz) {
   const terms = (quiz.terms || []).map((t) => `
-      <button type="button" class="skill-match-term w-full px-3 py-2 rounded border border-indigo-200 bg-indigo-50 text-left text-sm"
-        data-pair-index="${t.pairIndex}" data-term-id="${escapeHtml(t.id)}">${escapeHtml(t.term)}</button>
+      <button type="button" class="${MATCH_TERM_BASE}"
+        data-pair-index="${t.pairIndex}" data-term-id="${escapeHtml(t.id)}"
+        aria-label="Term: ${escapeHtml(t.term)}">
+        <span class="skill-match-badge hidden inline-flex h-5 min-w-[1.25rem] shrink-0 items-center justify-center rounded text-[10px] font-bold" aria-hidden="true"></span>
+        <span class="skill-match-label flex-1">${escapeHtml(t.term)}</span>
+      </button>
     `).join('');
   const defs = (quiz.definitions || []).map((d) => `
-      <button type="button" class="skill-match-def w-full px-3 py-2 rounded border border-gray-200 text-left text-sm hover:bg-gray-50"
-        data-pair-index="${d.pairIndex}" data-def-id="${escapeHtml(d.id)}">${escapeHtml(d.definition)}</button>
+      <button type="button" class="${MATCH_DEF_BASE}"
+        data-pair-index="${d.pairIndex}" data-def-id="${escapeHtml(d.id)}"
+        aria-label="Definition: ${escapeHtml(d.definition)}">
+        <span class="skill-match-badge hidden inline-flex h-5 min-w-[1.25rem] shrink-0 items-center justify-center rounded text-[10px] font-bold" aria-hidden="true"></span>
+        <span class="skill-match-label flex-1">${escapeHtml(d.definition)}</span>
+      </button>
     `).join('');
   return `
-      <p class="text-xs text-gray-500">Click a term, then its matching definition. Matched pairs lock in.</p>
+      <p class="text-xs text-gray-500">Click a term, then its matching definition. Matched pairs share a letter and color. Click a matched item to undo.</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-match-board>
-        <div class="space-y-2" data-match-terms>${terms}</div>
-        <div class="space-y-2" data-match-defs>${defs}</div>
+        <div class="space-y-2">
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Terms</p>
+          <div class="space-y-2" data-match-terms>${terms}</div>
+        </div>
+        <div class="space-y-2">
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Definitions</p>
+          <div class="space-y-2" data-match-defs>${defs}</div>
+        </div>
+      </div>
+      <div class="rounded border border-slate-200 bg-slate-50/80 p-2 space-y-1.5" data-match-pairs>
+        <p class="text-xs font-semibold text-slate-700">Your matches</p>
+        <ul class="space-y-1" data-match-pair-list>
+          <li class="text-xs text-slate-400" data-match-empty>None yet — pick a term, then a definition.</li>
+        </ul>
       </div>
       <p class="text-xs text-slate-600" data-match-status>0 / ${(quiz.terms || []).length} matched</p>
       <button type="button" class="skill-quiz-check mt-1 px-3 py-2 rounded bg-slate-800 text-white text-sm hover:bg-slate-700">
@@ -367,16 +466,15 @@ export function applySkillMcqCheat() {
     const terms = [...gate.querySelectorAll('.skill-match-term')];
     const defs = [...gate.querySelectorAll('.skill-match-def')];
     if (!terms.length || !defs.length) return { ok: false, message: '' };
-    terms.forEach((termBtn) => {
+    terms.forEach((termBtn, slot) => {
       const pairIndex = termBtn.getAttribute('data-pair-index');
       const defBtn = defs.find((d) => d.getAttribute('data-pair-index') === pairIndex);
       if (!defBtn) return;
-      termBtn.disabled = true;
-      defBtn.disabled = true;
-      termBtn.classList.remove('ring-2', 'ring-indigo-500');
-      termBtn.classList.add('opacity-60', 'line-through', 'ring-2', 'ring-amber-400');
-      defBtn.classList.add('opacity-60', 'bg-amber-50', 'border-amber-300', 'ring-2', 'ring-amber-400');
+      applyMatchPairStyle(termBtn, defBtn, slot);
+      termBtn.classList.add('ring-2', 'ring-amber-400');
+      defBtn.classList.add('ring-2', 'ring-amber-400');
     });
+    renderMatchPairList(gate);
     const status = gate.querySelector('[data-match-status]');
     if (status) status.textContent = `${terms.length} / ${terms.length} matched`;
     return {
@@ -441,17 +539,51 @@ export function wireSkillMcqInteractions(onGraded) {
     let selectedTerm = null;
     const status = gate.querySelector('[data-match-status]');
     const terms = () => [...gate.querySelectorAll('.skill-match-term')];
+    const defs = () => [...gate.querySelectorAll('.skill-match-def')];
     const total = () => terms().length;
-    const matchedCount = () => terms().filter((t) => t.disabled).length;
+    const matchedCount = () => terms().filter((t) => t.hasAttribute('data-match-slot')).length;
+
+    const allocSlot = () => {
+      const used = new Set(
+        terms().map((t) => t.getAttribute('data-match-slot')).filter((s) => s != null && s !== '')
+      );
+      let slot = 0;
+      while (used.has(String(slot))) slot += 1;
+      return slot;
+    };
 
     const refreshStatus = () => {
       if (status) status.textContent = `${matchedCount()} / ${total()} matched`;
+      renderMatchPairList(gate);
+    };
+
+    const clearSelection = () => {
+      terms().forEach((b) => b.classList.remove('ring-2', 'ring-indigo-500'));
+      selectedTerm = null;
+    };
+
+    const unmatchBySlot = (slot) => {
+      if (slot == null || slot === '') return;
+      [...terms(), ...defs()]
+        .filter((b) => b.getAttribute('data-match-slot') === String(slot))
+        .forEach((b) => {
+          const isTerm = b.classList.contains('skill-match-term');
+          clearMatchPairClasses(b);
+          b.className = isTerm ? MATCH_TERM_BASE : MATCH_DEF_BASE;
+          b.removeAttribute('aria-pressed');
+          b.removeAttribute('title');
+        });
+      refreshStatus();
     };
 
     gate.querySelectorAll('.skill-match-term').forEach((btn) => {
       btn.addEventListener('click', () => {
-        if (btn.disabled) return;
-        gate.querySelectorAll('.skill-match-term').forEach((b) => b.classList.remove('ring-2', 'ring-indigo-500'));
+        if (btn.hasAttribute('data-match-slot')) {
+          unmatchBySlot(btn.getAttribute('data-match-slot'));
+          clearSelection();
+          return;
+        }
+        clearSelection();
         selectedTerm = btn;
         btn.classList.add('ring-2', 'ring-indigo-500');
       });
@@ -459,22 +591,22 @@ export function wireSkillMcqInteractions(onGraded) {
 
     gate.querySelectorAll('.skill-match-def').forEach((btn) => {
       btn.addEventListener('click', () => {
-        if (!selectedTerm || btn.disabled) return;
+        if (btn.hasAttribute('data-match-slot')) {
+          unmatchBySlot(btn.getAttribute('data-match-slot'));
+          clearSelection();
+          return;
+        }
+        if (!selectedTerm) return;
         const termIdx = selectedTerm.getAttribute('data-pair-index');
         const defIdx = btn.getAttribute('data-pair-index');
         if (termIdx === defIdx) {
-          selectedTerm.disabled = true;
-          btn.disabled = true;
-          selectedTerm.classList.add('opacity-60', 'line-through');
-          btn.classList.add('opacity-60', 'bg-emerald-50', 'border-emerald-300');
-          selectedTerm.classList.remove('ring-2', 'ring-indigo-500');
-          selectedTerm = null;
+          applyMatchPairStyle(selectedTerm, btn, allocSlot());
+          clearSelection();
           refreshStatus();
         } else {
-          btn.classList.add('bg-rose-50');
-          setTimeout(() => btn.classList.remove('bg-rose-50'), 350);
-          selectedTerm.classList.remove('ring-2', 'ring-indigo-500');
-          selectedTerm = null;
+          btn.classList.add('bg-rose-50', 'border-rose-300');
+          setTimeout(() => btn.classList.remove('bg-rose-50', 'border-rose-300'), 350);
+          clearSelection();
         }
       });
     });

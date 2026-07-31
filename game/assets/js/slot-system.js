@@ -76,16 +76,72 @@ function renderQueue(queue) {
       </ol>`;
 }
 
+function ensureOccupancySpinner(el, state) {
+    if (!el) return;
+    let spin = el.querySelector(':scope > .task-occupancy-spin');
+    if (!spin) {
+        spin = document.createElement('span');
+        spin.className = 'task-occupancy-spin';
+        spin.setAttribute('aria-hidden', 'true');
+        spin.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        el.appendChild(spin);
+    }
+    spin.dataset.state = state;
+}
+
+/** Mark patient-panel tasks that already occupy a slot or waiting-queue entry. */
+function syncTaskOccupancyMarkers() {
+    const busyIds = new Set(
+        (gameState.getStateSlice('slots') || [])
+            .map((s) => s.taskId)
+            .filter(Boolean)
+    );
+    const queuedIds = new Set(
+        (gameState.getStateSlice('slotQueue') || [])
+            .map((item) => item.taskId)
+            .filter(Boolean)
+    );
+    const occupiedIds = new Set([...busyIds, ...queuedIds]);
+
+    document.querySelectorAll('[data-slot-state]').forEach((el) => {
+        if (!occupiedIds.has(el.id)) {
+            el.removeAttribute('data-slot-state');
+            el.querySelector(':scope > .task-occupancy-spin')?.remove();
+        }
+    });
+    document.querySelectorAll('.task-occupancy-spin').forEach((spin) => {
+        const host = spin.parentElement;
+        if (!host?.id || !occupiedIds.has(host.id)) spin.remove();
+    });
+
+    busyIds.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.setAttribute('data-slot-state', 'busy');
+        ensureOccupancySpinner(el, 'busy');
+    });
+    queuedIds.forEach((id) => {
+        if (busyIds.has(id)) return;
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.setAttribute('data-slot-state', 'queued');
+        ensureOccupancySpinner(el, 'queued');
+    });
+}
+
 const SlotSystem = {
     init() {
         resetClassInteractions();
         renderSlots(gameState.getStateSlice('slots') || []);
         renderQueue(gameState.getStateSlice('slotQueue') || []);
+        syncTaskOccupancyMarkers();
         gameState.subscribe('slots', (slots) => {
             renderSlots(slots || []);
+            syncTaskOccupancyMarkers();
         });
         gameState.subscribe('slotQueue', (queue) => {
             renderQueue(queue || []);
+            syncTaskOccupancyMarkers();
         });
         gameState.subscribe('currentTime', (currentTime) => {
             if (currentTime != null) {
@@ -105,6 +161,23 @@ const SlotSystem = {
 
     isQueued(taskId) {
         return (gameState.getStateSlice('slotQueue') || []).some((item) => item.taskId === taskId);
+    },
+
+    /** @returns {'busy'|'queued'|null} */
+    getTaskSlotState(taskId) {
+        if (!taskId) return null;
+        if (this.findSlotForTask(taskId)) return 'busy';
+        if (this.isQueued(taskId)) return 'queued';
+        return null;
+    },
+
+    isOccupied(taskId) {
+        return this.getTaskSlotState(taskId) != null;
+    },
+
+    /** Re-apply data-slot-state after patient panel re-renders. */
+    refreshOccupancyMarkers() {
+        syncTaskOccupancyMarkers();
     },
 
     /**
