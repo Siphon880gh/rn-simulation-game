@@ -85,6 +85,7 @@ export function pickCallbackAt(nowHhmm, windowEndHhmm, random = Math.random) {
 }
 
 function statusMessage(text) {
+    if (typeof document === 'undefined') return;
     const el = document.querySelector(GameConfig.selectors.statusMessage);
     if (el) el.textContent = text;
 }
@@ -113,21 +114,21 @@ function ensureToastEl() {
 }
 
 /**
- * Temporary, polished banner after paging MD (delayed callback path).
- * @param {{ labShort?: string, patientId?: string }} [detail]
+ * Temporary top banner (same widget as “Dr will call back”).
+ * @param {{ title?: string, detail?: string, iconClass?: string, hideAfterMs?: number }} [opts]
  */
-export function showAwaitingCallbackToast(detail = {}) {
+export function showShellToast(opts = {}) {
     if (typeof document === 'undefined') return;
     const el = ensureToastEl();
-    const title = cfg().awaitingToastMessage || 'Dr will call back';
     const titleEl = el.querySelector('.shell-awaiting-toast__title');
     const detailEl = el.querySelector('.shell-awaiting-toast__detail');
-    if (titleEl) titleEl.textContent = title;
-    if (detailEl) {
-        const bits = [];
-        if (detail.labShort) bits.push(`Critical ${detail.labShort}`);
-        if (detail.patientId) bits.push(detail.patientId);
-        detailEl.textContent = bits.length ? bits.join(' · ') : '';
+    const iconEl = el.querySelector('.shell-awaiting-toast__icon i');
+    if (titleEl) titleEl.textContent = opts.title || cfg().awaitingToastMessage || 'Dr will call back';
+    if (detailEl) detailEl.textContent = opts.detail || '';
+    if (iconEl && opts.iconClass) {
+        iconEl.className = opts.iconClass;
+    } else if (iconEl && !opts.iconClass) {
+        iconEl.className = 'fas fa-phone-alt';
     }
     el.hidden = false;
     // Force reflow so the enter transition runs when re-shown
@@ -135,7 +136,7 @@ export function showAwaitingCallbackToast(detail = {}) {
     el.classList.add('is-visible');
 
     if (toastHideTimer) clearTimeout(toastHideTimer);
-    const ms = Number(cfg().awaitingToastMs);
+    const ms = Number(opts.hideAfterMs ?? cfg().awaitingToastMs);
     const hideAfter = Number.isFinite(ms) && ms > 0 ? ms : 4200;
     toastHideTimer = setTimeout(() => {
         el.classList.remove('is-visible');
@@ -144,6 +145,21 @@ export function showAwaitingCallbackToast(detail = {}) {
             toastHideTimer = null;
         }, 300);
     }, hideAfter);
+}
+
+/**
+ * Temporary, polished banner after paging MD (delayed callback path).
+ * @param {{ labShort?: string, patientId?: string }} [detail]
+ */
+export function showAwaitingCallbackToast(detail = {}) {
+    const bits = [];
+    if (detail.labShort) bits.push(`Critical ${detail.labShort}`);
+    if (detail.patientId) bits.push(detail.patientId);
+    showShellToast({
+        title: cfg().awaitingToastMessage || 'Dr will call back',
+        detail: bits.length ? bits.join(' · ') : '',
+        iconClass: 'fas fa-phone-alt'
+    });
 }
 
 function hideAwaitingCallbackToast() {
@@ -420,7 +436,7 @@ function processPendingCallbacks(currentTime) {
 
 /**
  * Force-spawn a critical lab call at current (or given) game time — for test mode / QA.
- * @param {{ labId?: string, patientId?: string, at?: number, random?: () => number }} [opts]
+ * @param {{ labId?: string, patientId?: string, at?: number, random?: () => number, result?: string, lab?: object }} [opts]
  */
 export function spawnCriticalLabNow(opts = {}) {
     const random = opts.random || Math.random;
@@ -428,10 +444,19 @@ export function spawnCriticalLabNow(opts = {}) {
         ?? GameConfig.timer.defaultShiftStart;
     const labs = cfg().labs || [];
     let lab = opts.labId ? labById(opts.labId) : null;
+    if (!lab && opts.lab) lab = opts.lab;
     if (!lab && labs.length) {
         lab = labs[Math.floor(random() * labs.length)];
     }
     if (!lab) return null;
+
+    if (opts.result || opts.lab) {
+        lab = {
+            ...lab,
+            ...(opts.lab || {}),
+            ...(opts.result ? { result: opts.result } : {})
+        };
+    }
 
     const patientId = pickPatientId(opts.patientId, random);
     if (!patientId) return null;
@@ -649,6 +674,7 @@ const CriticalLabsModule = {
     handleCriticalLabCallComplete,
     handleCriticalLabRecallComplete,
     handleCriticalLabCallbackComplete,
+    showShellToast,
     showAwaitingCallbackToast,
     spawnCriticalLabNow,
     pickCallbackAt,

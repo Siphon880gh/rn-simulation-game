@@ -6,6 +6,7 @@ import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
 import { isAtOrAfterInShift } from './availability-windows.js';
+import { decorateAccucheckDice } from './challenges/skills/accucheck/challenge.js';
 
 const spawnedCadenceKeys = new Set();
 let spawnCount = 0;
@@ -71,6 +72,7 @@ function injectRevealForTask(task) {
 }
 
 function syncSpawnedTaskDom(task) {
+    if (typeof document === 'undefined') return;
     const el = document.getElementById(task.id);
     if (!el) return;
     el.setAttribute('data-status', task.status);
@@ -108,15 +110,17 @@ export function presentSpawnedTask(task, opts = {}) {
         live = gameState.getStateSlice('tasks')?.get(live.id) || live;
     }
 
-    mountTaskDom(live);
-    syncSpawnedTaskDom(live);
-    injectRevealForTask(live);
-    if (live.metadata?.incident) renderIncidentTab(live);
+    if (typeof document !== 'undefined') {
+        mountTaskDom(live);
+        syncSpawnedTaskDom(live);
+        injectRevealForTask(live);
+        if (live.metadata?.incident) renderIncidentTab(live);
+    }
 
     if (opts.focusPatient && live.patientId) {
         gameState.dispatch('SET_ACTIVE_PATIENT', { patientId: live.patientId });
     }
-    if (opts.scrollIntoView !== false) {
+    if (opts.scrollIntoView !== false && typeof document !== 'undefined' && typeof requestAnimationFrame === 'function') {
         requestAnimationFrame(() => {
             document.getElementById(live.id)?.scrollIntoView({
                 block: 'nearest',
@@ -195,6 +199,7 @@ function renderIncidentTab(task) {
 /** Mount an injected/dynamic task tile on the patient panel (used by event-drip too). */
 export function mountTaskDom(task) {
     if (!task.patientId) return;
+    if (typeof document === 'undefined') return;
     const panel = document.querySelector(`.patient-panel-host[data-patient-id="${task.patientId}"]`);
     if (!panel) return;
 
@@ -225,6 +230,9 @@ export function mountTaskDom(task) {
     }
     li.setAttribute('data-duration-mins', String(task.duration || 10));
     li.setAttribute('data-task-class', task.taskClass || 'urgent');
+    if (task.metadata?.challenge) {
+        li.setAttribute('data-challenge', task.metadata.challenge);
+    }
     li.setAttribute('title', 'Click for Perform / Details menu');
     const isCrit = task.type === 'criticallab' || task.metadata?.criticalLab;
     li.className = isCrit
@@ -247,6 +255,7 @@ export function mountTaskDom(task) {
       <span class="ml-auto text-xs uppercase tracking-wide ${badgeClass}">${badge}</span>
     `;
     list.appendChild(li);
+    decorateAccucheckDice(li.parentElement || list);
 }
 
 export function spawnFromTemplate(template, currentTime, opts = {}) {

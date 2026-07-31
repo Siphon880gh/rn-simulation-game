@@ -1,12 +1,13 @@
 {
   "id": "skill-accucheck-medsurg",
-  "title": "Skill practice — Accucheck / sliding scale (Med-Surg)",
+  "title": "Skill practice — Accucheck / sliding scale / finger stick (Med-Surg)",
   "version": 1,
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
   "learningObjectives": [
-    "Obtain a point-of-care glucose and apply the ordered sliding scale",
+    "Obtain a finger-stick / point-of-care glucose and apply the ordered sliding scale",
+    "Recognize critical hyperglycemia and escalate as a critical lab",
     "Hold insulin appropriately for hypoglycemia-range results"
   ],
   "patients": ["mira"],

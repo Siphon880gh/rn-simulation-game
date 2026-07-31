@@ -660,6 +660,50 @@ export const GameConfig = {
   },
 
   /**
+   * Accucheck / finger-stick POC glucose — weighted outcomes shown via dice on the task.
+   * Critical hyperglycemia spawns a critical-lab Call MD; other bands show a top toast.
+   */
+  accucheckFingerStick: {
+    toastMs: 4200,
+    outcomes: [
+      {
+        id: 'normal',
+        label: 'Normal blood glucose',
+        weight: 50,
+        minBg: 70,
+        maxBg: 140,
+        toastTitle: 'Accucheck normal'
+      },
+      {
+        id: 'hypoglycemia',
+        label: 'Hypoglycemia',
+        weight: 15,
+        minBg: 40,
+        maxBg: 69,
+        toastTitle: 'Accucheck — hypoglycemia'
+      },
+      {
+        id: 'hyperglycemia',
+        label: 'Hyperglycemia',
+        weight: 25,
+        minBg: 180,
+        maxBg: 299,
+        toastTitle: 'Accucheck — hyperglycemia'
+      },
+      {
+        id: 'hyperglycemia-critical',
+        label: 'Hyperglycemia — critical lab',
+        weight: 10,
+        minBg: 400,
+        maxBg: 600,
+        criticalLab: true,
+        labId: 'glucose-critical',
+        toastTitle: 'Accucheck — critical high'
+      }
+    ]
+  },
+
+  /**
    * Critical lab incidents — call MD within callWindowMins; callback always lands
    * inside that same window (immediate or delayed after the call).
    * After a delayed page: temporary “Dr will call back” toast; every recallEveryMins
@@ -851,6 +895,29 @@ export const GameConfig = {
             durationMins: 10,
             expire: '+75',
             taskClass: 'urgent'
+          }
+        ]
+      },
+      {
+        id: 'glucose-critical',
+        shortName: 'Glucose',
+        fullName: 'Point-of-care / serum glucose',
+        result: 'Glucose ≥400 mg/dL (critical high — hyperglycemic crisis risk)',
+        ordersHint: 'Confirm with lab, assess for DKA/HHS, IVF + insulin per MD, notify provider STAT',
+        callbackEffects: [
+          {
+            type: 'assessment',
+            name: 'STAT BMP / ABG — hyperglycemic crisis workup',
+            durationMins: 12,
+            expire: '+45',
+            taskClass: 'stat'
+          },
+          {
+            type: 'med',
+            name: 'Insulin regular IV (MD-ordered — critical glucose)',
+            durationMins: 20,
+            expire: '+90',
+            taskClass: 'stat'
           }
         ]
       }

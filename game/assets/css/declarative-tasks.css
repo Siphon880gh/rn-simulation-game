@@ -371,3 +371,85 @@ li[data-status="active"] {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+/* Accucheck / finger-stick outcome dice on task rows */
+.finger-stick-dice {
+    flex-shrink: 0;
+    margin-left: 0.35rem;
+    margin-right: 0.35rem;
+    width: 1.85rem;
+    height: 1.85rem;
+    border: 1px solid #fda4af;
+    border-radius: 0.4rem;
+    background: #fff1f2;
+    color: #be123c;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    font-size: 0.9rem;
+}
+
+.finger-stick-dice:hover {
+    background: #ffe4e6;
+    border-color: #fb7185;
+}
+
+.finger-stick-dice:focus-visible {
+    outline: 2px solid #e11d48;
+    outline-offset: 2px;
+}
+
+.finger-stick-odds-popover {
+    position: fixed;
+    z-index: 60;
+    min-width: 15rem;
+    max-width: min(20rem, calc(100vw - 1rem));
+    padding: 0.75rem 0.85rem;
+    border-radius: 0.55rem;
+    background: #fff;
+    border: 1px solid #fecdd3;
+    box-shadow: 0 10px 28px rgba(190, 18, 60, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+}
+
+.finger-stick-odds-popover[hidden] {
+    display: none !important;
+}
+
+.finger-stick-odds__title {
+    margin: 0 0 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #9f1239;
+}
+
+.finger-stick-odds__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.finger-stick-odds__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.78rem;
+    color: #374151;
+}
+
+.finger-stick-odds__row--critical {
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+.finger-stick-odds__pct {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: #881337;
+}

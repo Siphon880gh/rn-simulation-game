@@ -156,7 +156,7 @@ export function buildTestChallengeTask(kind, patientId = null, opts = {}) {
     case 'accucheck':
       return {
         ...base,
-        name: 'Accucheck / sliding scale (test)',
+        name: 'Accucheck / sliding scale / finger stick (test)',
         type: 'med',
         metadata: { challenge: 'accucheck' }
       };

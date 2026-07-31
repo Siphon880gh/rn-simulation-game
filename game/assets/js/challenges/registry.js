@@ -37,7 +37,7 @@ export const CHALLENGE_REGISTRY = {
   accucheck: {
     id: 'accucheck',
     category: 'skills',
-    label: 'Accucheck / sliding scale',
+    label: 'Accucheck / sliding scale / finger stick',
     configPath: null,
     modulePath: 'challenges/skills/accucheck/challenge.js',
     testSpawnKind: 'accucheck'

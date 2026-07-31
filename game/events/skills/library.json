@@ -473,16 +473,18 @@
     },
     {
       "id": "accucheck",
-      "label": "Accucheck / sliding scale",
+      "label": "Accucheck / sliding scale / finger stick",
       "aliases": [
         "blood glucose",
-        "insulin scale"
+        "insulin scale",
+        "finger stick",
+        "fingerstick"
       ],
       "tags": [
         "meds",
         "diabetes"
       ],
-      "blurb": "Read a glucose result and apply the sliding scale.",
+      "blurb": "Finger-stick glucose with weighted outcomes; apply the sliding scale.",
       "games": [
         "accucheck"
       ],

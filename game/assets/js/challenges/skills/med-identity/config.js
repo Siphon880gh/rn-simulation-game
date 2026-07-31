@@ -3,27 +3,64 @@
  * Path: challenges/skills/med-identity/config.js
  *
  * Matching is case-insensitive. Optional:
+ * - brands — all accepted brand names (SATA when length > 1); first is primary
+ * - brand — single brand (legacy; used when brands omitted)
  * - aliases — extra accepted generics
- * - brandAliases — extra accepted brand spellings
+ * - brandAliases — extra accepted brand spellings (typed single-brand only)
+ *
+ * Scanned from patient med tasks (game/events/patients/*.html).
  */
-/** @type {{ generic: string, brand: string, aliases?: string[], brandAliases?: string[] }[]} */
+/** @type {{ generic: string, brand?: string, brands?: string[], aliases?: string[], brandAliases?: string[] }[]} */
 export const medIdentityPairs = [
   { generic: 'atorvastatin', brand: 'Lipitor' },
-  { generic: 'acetaminophen', brand: 'Tylenol', aliases: ['paracetamol'] },
-  { generic: 'aspirin', brand: 'Bayer', aliases: ['asa', 'acetylsalicylic acid'] },
+  {
+    generic: 'acetaminophen',
+    brands: ['Tylenol', 'Ofirmev', 'Panadol'],
+    aliases: ['paracetamol']
+  },
+  {
+    generic: 'aspirin',
+    brands: ['Bayer', 'Ecotrin', 'Bufferin'],
+    aliases: ['asa', 'acetylsalicylic acid']
+  },
   { generic: 'heparin', brand: 'Hep-Lock', brandAliases: ['heplock', 'hep lock'] },
-  { generic: 'gabapentin', brand: 'Neurontin' },
+  {
+    generic: 'gabapentin',
+    brands: ['Neurontin', 'Gralise', 'Horizant']
+  },
   { generic: 'melatonin', brand: 'Circadin' },
-  { generic: 'trazodone', brand: 'Desyrel' },
+  { generic: 'trazodone', brands: ['Desyrel', 'Oleptro'] },
   { generic: 'doxazosin', brand: 'Cardura' },
   { generic: 'mirtazapine', brand: 'Remeron' },
   { generic: 'ceftriaxone', brand: 'Rocephin' },
-  { generic: 'albuterol', brand: 'ProAir', aliases: ['salbutamol'] },
-  { generic: 'prednisone', brand: 'Deltasone' },
+  {
+    generic: 'albuterol',
+    brands: ['ProAir', 'Ventolin', 'Proventil'],
+    aliases: ['salbutamol']
+  },
+  { generic: 'prednisone', brands: ['Deltasone', 'Rayos'] },
   { generic: 'ondansetron', brand: 'Zofran' },
-  { generic: 'oxycodone', brand: 'OxyContin' },
-  { generic: 'potassium chloride', brand: 'Klor-Con', aliases: ['kcl'] },
-  { generic: 'insulin', brand: 'Humulin' }
+  {
+    generic: 'oxycodone',
+    brands: ['OxyContin', 'Roxicodone', 'Oxaydo']
+  },
+  {
+    generic: 'potassium chloride',
+    brands: ['Klor-Con', 'K-Dur', 'Micro-K'],
+    aliases: ['kcl']
+  },
+  { generic: 'insulin', brands: ['Humulin', 'Novolin'] },
+  { generic: 'hydromorphone', brand: 'Dilaudid' },
+  { generic: 'levetiracetam', brand: 'Keppra' },
+  { generic: 'vancomycin', brand: 'Vancocin', aliases: ['oral vancomycin'] },
+  {
+    generic: 'metformin',
+    brands: ['Glucophage', 'Glumetza', 'Fortamet']
+  },
+  {
+    generic: 'lisinopril',
+    brands: ['Zestril', 'Prinivil']
+  }
 ];
 
 export const medIdentityChallengeConfig = {

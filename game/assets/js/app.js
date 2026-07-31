@@ -37,6 +37,12 @@ import DelegationModule, {
 import SkillFocusModule from './skill-focus.js';
 import BoostersModule from './boosters.js';
 import { setShiftAnchor } from './availability-windows.js';
+import {
+    isAccucheckTask,
+    applyFingerStickResult,
+    showFingerStickOddsPopover,
+    initFingerStickDiceUi
+} from './challenges/skills/accucheck/challenge.js';
 
 // Declarative Application Configuration
 const AppConfig = {
@@ -195,6 +201,7 @@ class GameApplication {
 
         // Initialize patients (loads tasks)
         await patients.init();
+        initFingerStickDiceUi();
 
         // E4.M2: game-time drip after census (subscribes to currentTime)
         if (eventDrip && eventDrip.init) {
@@ -386,6 +393,13 @@ class GameApplication {
                     details: { name: 'Details', icon: 'question' }
                 };
 
+                if (isAccucheckTask(task)) {
+                    items.fingerStickOdds = {
+                        name: 'Finger-stick odds',
+                        icon: 'dice'
+                    };
+                }
+
                 // E13: clear mode labels when aide available (no selection required)
                 if (canPerform && task.patientId) {
                     const aide = findAvailableAideForPatient(task.patientId, now);
@@ -468,6 +482,10 @@ class GameApplication {
                 const durationMins = task.duration;
                 const expire = task.expire;
                 alert(`Task is ${durationMins} mins long. Expires at ${expire}.`);
+            },
+            fingerStickOdds: () => {
+                const diceBtn = element?.querySelector?.('[data-finger-stick-dice]');
+                showFingerStickOddsPopover(diceBtn || element);
             }
         };
 
@@ -719,26 +737,40 @@ class GameApplication {
                 return;
             }
 
+            let liveTask = gameState.getStateSlice('tasks')?.get(task.id) || task;
+            let skipChallenge = false;
+            if (isAccucheckTask(liveTask)) {
+                const stick = applyFingerStickResult(liveTask);
+                liveTask = gameState.getStateSlice('tasks')?.get(task.id) || liveTask;
+                skipChallenge = Boolean(stick?.skipSlidingScale);
+            }
+
             // E5.M1: modal challenge freezes shift timer; fail → no slot
-            const outcome = challengeGate?.runChallengeGate
-                ? await challengeGate.runChallengeGate(task)
-                : { passed: true, reason: 'no-gate' };
+            // Critical finger-stick skips sliding scale (Call MD task already spawned).
+            let outcome = { passed: true, reason: 'no-gate' };
+            if (!skipChallenge) {
+                outcome = challengeGate?.runChallengeGate
+                    ? await challengeGate.runChallengeGate(liveTask)
+                    : { passed: true, reason: 'no-gate' };
+            } else {
+                outcome = { passed: true, reason: 'finger-stick-critical' };
+            }
 
             if (!outcome?.passed) {
                 console.log(`Challenge not passed (${outcome?.reason || 'fail'}); task not slotted`);
                 return;
             }
 
-            const result = slotSystem?.requestSlot(task, gameState.getStateSlice('currentTime'));
+            const result = slotSystem?.requestSlot(liveTask, gameState.getStateSlice('currentTime'));
             if (!result?.ok) {
                 alert('Could not start or queue that task.');
                 return;
             }
 
             if (result.queued) {
-                console.log(`Medication ${task.name} queued (slots full)`);
+                console.log(`Medication ${liveTask.name} queued (slots full)`);
             } else {
-                console.log(`Medication ${task.name} started in a slot`);
+                console.log(`Medication ${liveTask.name} started in a slot`);
             }
         } catch (error) {
             console.log('Medication administration cancelled');

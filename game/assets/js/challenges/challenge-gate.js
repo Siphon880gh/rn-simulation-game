@@ -10,7 +10,8 @@ import {
     buildMedIdentityPrompt,
     checkMedIdentityAnswer,
     renderMedIdentityHtml,
-    applyMedIdentityCheat
+    applyMedIdentityCheat,
+    readMedIdentitySataSelection
 } from './skills/med-identity/challenge.js';
 import {
     isAccucheckTask,
@@ -683,6 +684,24 @@ function wireMedIdentityHandlers() {
 
 export function submitMedIdentity() {
     if (!activeSession?.medPrompt || activeSession.closing) return;
+    const prompt = activeSession.medPrompt;
+
+    if (prompt.mode === 'sata') {
+        const selected = readMedIdentitySataSelection();
+        if (!selected.length) {
+            setChallengeFeedback('Select all that apply, then press Submit.');
+            return;
+        }
+        const ok = checkMedIdentityAnswer(selected, prompt);
+        finishAttempt(
+            ok,
+            ok ? 'med-identity-correct' : 'med-identity-incorrect',
+            prompt.expected,
+            { allowRetry: true }
+        );
+        return;
+    }
+
     const input = document.querySelector('#med-identity-answer');
     const answer = input?.value || '';
     if (!String(answer).trim()) {
@@ -690,11 +709,11 @@ export function submitMedIdentity() {
         input?.focus();
         return;
     }
-    const ok = checkMedIdentityAnswer(answer, activeSession.medPrompt);
+    const ok = checkMedIdentityAnswer(answer, prompt);
     finishAttempt(
         ok,
         ok ? 'med-identity-correct' : 'med-identity-incorrect',
-        activeSession.medPrompt.expected,
+        prompt.expected,
         { allowRetry: true }
     );
 }
@@ -764,7 +783,13 @@ export function cheatChallenge() {
     }
     if (activeSession.medPrompt) {
         applyMedIdentityCheat(activeSession.medPrompt);
-        setChallengeFeedback('Cheat filled the correct answer — press Submit when ready.', { ok: true });
+        const sata = activeSession.medPrompt.mode === 'sata';
+        setChallengeFeedback(
+            sata
+                ? 'Cheat checked the correct brand names — press Submit when ready.'
+                : 'Cheat filled the correct answer — press Submit when ready.',
+            { ok: true }
+        );
         return;
     }
     if (activeSession.bedPrep) {
@@ -1036,7 +1061,7 @@ export function runChallengeGate(task) {
             setTimeout(wireIvHandlers, 0);
         } else if (accucheckPrompt) {
             ModalModule.openModal({
-                title: 'Accucheck / sliding scale',
+                title: 'Accucheck / sliding scale / finger stick',
                 content: renderAccucheckHtml(accucheckPrompt),
                 footer: challengeModalFooter(),
                 overlay: true,
