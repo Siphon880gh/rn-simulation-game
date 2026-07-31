@@ -393,17 +393,35 @@ class TaskSystem {
     this.showModal(details);
   }
 
+  /** Human phrase for med early/late minutes (e.g. 60 → "1 hour"). */
+  formatMedWindowSpan(mins) {
+    const n = Number(mins);
+    if (!Number.isFinite(n) || n <= 0) return '0 minutes';
+    if (n === 60) return '1 hour';
+    if (n % 60 === 0) {
+      const h = n / 60;
+      return h === 1 ? '1 hour' : `${h} hours`;
+    }
+    return n === 1 ? '1 minute' : `${n} minutes`;
+  }
+
   /** Player-facing copy for the Medications section “?” control. */
   getMedicationWindowHelpHtml() {
     const early = Number(GameConfig.tasks.availability?.medEarlyMins) || 60;
     const late = Number(GameConfig.tasks.availability?.medLateMins) || 60;
+    const earlyLabel = this.formatMedWindowSpan(early);
+    const lateLabel = this.formatMedWindowSpan(late);
     return `
       <div class="space-y-3 text-left text-sm text-gray-700">
         <p>Each medication lists a <strong>due time</strong> (the time on the right of the row).</p>
-        <p>You may give it up to <strong>${early} minutes before</strong> or
-           <strong>${late} minutes after</strong> that due time
-           (not before the shift starts).</p>
-        <p>When the clock is inside that window, the med becomes selectable — click it and choose
+        <p><strong>Perform window:</strong> you can give the med starting
+           <strong>${earlyLabel} before</strong> the due time, through
+           <strong>${lateLabel} after</strong> the due time
+           (never earlier than the start of the shift).</p>
+        <p>Example: due at <strong>19:30</strong> → available from about
+           <strong>18:30</strong> until <strong>20:30</strong>
+           (night shift clamps the early edge to shift start when needed).</p>
+        <p>Inside that window the med is selectable — click it and choose
            <strong>Perform</strong> / Administer.</p>
         <p class="text-xs text-gray-500">Outside the window, Perform stays disabled.</p>
       </div>
@@ -491,10 +509,14 @@ class TaskSystem {
   }
 
   showModal(details) {
-    // This would integrate with your modal system
-    if (window.modifyModal && window.openModal) {
-      window.modifyModal(details.title, details.content, details.footer);
-      window.openModal();
+    // openModal(config) — do not modifyModal-then-open (update no-ops when closed)
+    if (typeof window.openModal === 'function') {
+      window.openModal({
+        title: details.title || '',
+        content: details.content || '',
+        footer: details.footer || '',
+        overlay: true
+      });
     }
   }
 
