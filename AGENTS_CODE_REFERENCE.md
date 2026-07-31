@@ -107,6 +107,7 @@ rngame/
 │   │   ├── right-menu.js              # E10 Orders + Tools right rail
 │   │   ├── dynamic-tasks.js           # E3.M5 weighted dynamic/urgent spawn + incident tabs
 │   │   ├── slot-system.js             # 3 slots + FIFO waiting queue
+│   │   ├── skill-focus.js             # Test skill: blank census + challenge → landing
 │   │   ├── docs.js                    # Help FAB + in-page docs viewer (ES module)
 │   │   ├── shell-chrome.js            # hour tabs + shift history log
 │   │   ├── markdown-renderer.js       # shared markdown-it / Mermaid / KaTeX
@@ -118,6 +119,7 @@ rngame/
 │       ├── incidents/*.json           # E7.M2 chaos templates + events (merged into pack)
 │       └── patients/*.html            # six census packs (+ optional *-past-hx.json)
 ├── assets/js/landing-census.js        # root picker census −1 / open-to-admit modal
+├── assets/js/landing-skill.js         # skill library: start shift pack OR Test skill (?skill=&skillMode=test)
 ├── docs/{devs,players,learning}/      # markdown shown in docs dropdown (ABOUT.md = disclaimer + objectives)
 └── prompts/                           # milestone authoring (not runtime)
 ```

@@ -42,6 +42,14 @@
     font-variant-numeric: tabular-nums;
 }
 
+.census-tabs-empty {
+    margin: 0.15rem 0 0;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #9ca3af;
+    line-height: 1.35;
+}
+
 .patient-tab {
     text-align: left;
     border: 1px solid #d1d5db;

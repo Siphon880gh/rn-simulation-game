@@ -5,12 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RN Shift Simulator</title>
-    <!-- No unit chosen → assignment picker (repo root). Unit tiles always pass ?scenario=. -->
+    <!-- No unit chosen → assignment picker (repo root). Unit tiles pass ?scenario=; Test skill uses ?skill=&skillMode=test. -->
     <script>
         (function () {
             try {
                 var params = new URLSearchParams(window.location.search);
-                if (!params.get('scenario')) {
+                var hasScenario = !!params.get('scenario');
+                var isSkillTest = !!params.get('skill')
+                    && (params.get('skillMode') === 'test' || !params.get('skillMode'));
+                if (!hasScenario && !isSkillTest) {
                     window.location.replace('../index.html');
                 }
             } catch (e) { /* keep loading if redirect fails */ }

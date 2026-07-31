@@ -250,13 +250,16 @@ export const GameConfig = {
   skillMcqChallenge: skillMcqChallengeConfig,
 
   /**
-   * Landing skill library (search → pick one → assign a mini-game).
+   * Landing skill library (search → pick one → shift or Test skill).
    * Catalog: game/events/skills/library.json
+   * Test skill: ?skill=&skillMode=test → blank census + modal → landing.
    */
   skillLibrary: {
     url: 'events/skills/library.json',
     /** Delay after boot before opening the assigned skill game */
-    launchDelayMs: 900
+    launchDelayMs: 900,
+    /** After Test skill challenge ends, return to repo landing */
+    returnToLandingUrl: '../index.html'
   },
 
   // Task class interactions (E3.M4 Later) — adjust slot duration
@@ -312,7 +315,9 @@ export const GameConfig = {
     /** E9: full (omit) | minus1 | admitStart | admitMiddle | openAdmit (legacy random) */
     census: 'census',
     /** Skill library: single skill id from events/skills/library.json */
-    skill: 'skill'
+    skill: 'skill',
+    /** Skill library mode: omit | test (blank census + modal → landing) */
+    skillMode: 'skillMode'
   },
 
   /**

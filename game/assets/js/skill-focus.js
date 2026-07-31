@@ -1,5 +1,6 @@
 /**
- * Skill library focus — URL ?skill=<id> picks one mini-game from the skill’s games[].
+ * Skill library focus — URL ?skill=<id>&skillMode=test picks one mini-game
+ * from the skill’s games[], opens it on a blank census, then returns to landing.
  * Catalog: game/events/skills/library.json
  */
 import { GameConfig } from './game-config.js';
@@ -11,8 +12,13 @@ import {
   isCodeBlueTestSpawn
 } from './challenges/test-spawn.js';
 
+/** Same entry as app.js / test-mode.js so challenge session state is shared. */
 async function getChallengeGate() {
-  return import('./challenges/challenge-gate.js');
+  return import('./challenge-gate.js');
+}
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function libraryUrl() {
@@ -21,6 +27,26 @@ function libraryUrl() {
 
 function skillParamName() {
   return GameConfig.urlParams?.skill || 'skill';
+}
+
+function skillModeParamName() {
+  return GameConfig.urlParams?.skillMode || 'skillMode';
+}
+
+/** Landing “Test skill”: ?skill=…&skillMode=test (or bare ?skill=). */
+export function isSkillTestMode() {
+  const params = new URLSearchParams(window.location.search);
+  if (!params.get(skillParamName())) return false;
+  const mode = params.get(skillModeParamName());
+  return mode === 'test' || mode == null;
+}
+
+function returnToLandingUrl() {
+  return GameConfig.skillLibrary?.returnToLandingUrl || '../index.html';
+}
+
+function returnToLanding() {
+  window.location.href = returnToLandingUrl();
 }
 
 export async function loadSkillLibrary() {
@@ -143,62 +169,117 @@ function focusSkillPatient(patientId) {
   PatientsModule.applyPanelVisibility?.();
 }
 
-async function launchGame(kind, skillEntry) {
+async function runGateWithBusyRetry(runFn) {
+  let outcome = await runFn();
+  if (outcome?.reason === 'busy') {
+    await delay(250);
+    outcome = await runFn();
+  }
+  return outcome;
+}
+
+async function launchGame(kind, skillEntry, { testMode = false } = {}) {
   const skillLabel = skillEntry?.label || skillEntry?.id || 'Skill';
-  const patientId = resolvePatientId(skillEntry?.id);
-  focusSkillPatient(patientId);
-  await waitForPatientPanel(patientId);
+  const patientId = testMode ? null : resolvePatientId(skillEntry?.id);
+  if (!testMode) {
+    focusSkillPatient(patientId);
+    await waitForPatientPanel(patientId);
+  }
   await nextPaint();
 
-  if (isCodeBlueTestSpawn(kind)) {
-    const { runCodeBlueChallenge } = await getChallengeGate();
-    statusMessage(`Skill focus: ${skillLabel} → Code Blue`);
-    await runCodeBlueChallenge({ patientId });
-    return;
+  /** Only bounce after a challenge modal actually ran (not on setup / busy failures). */
+  let returnAfterChallenge = false;
+
+  try {
+    if (isCodeBlueTestSpawn(kind)) {
+      const { runCodeBlueChallenge } = await getChallengeGate();
+      statusMessage(testMode ? `Test skill: ${skillLabel}` : `Skill focus: ${skillLabel} → Code Blue`);
+      const outcome = await runGateWithBusyRetry(() => runCodeBlueChallenge({ patientId }));
+      if (outcome?.reason === 'busy') {
+        statusMessage('Test skill: challenge could not open (busy)');
+        if (testMode) {
+          await delay(1600);
+          returnToLanding();
+        }
+        return;
+      }
+      returnAfterChallenge = testMode;
+      return;
+    }
+
+    if (!isChallengeTestSpawnKind(kind)) {
+      statusMessage(`Test skill: no playable game for “${kind}”`);
+      if (testMode) {
+        await delay(1600);
+        returnToLanding();
+      }
+      return;
+    }
+
+    const task = buildTestChallengeTask(kind, patientId, {
+      skillId: skillEntry?.id,
+      skillLabel
+    });
+    if (!task) {
+      statusMessage(`Test skill: could not build game “${kind}”`);
+      if (testMode) {
+        await delay(1600);
+        returnToLanding();
+      }
+      return;
+    }
+
+    gameState.dispatch('APPEND_SHIFT_LOG', {
+      message: `${testMode ? 'Test skill' : 'Skill focus'}: ${skillLabel} → ${task.name}`,
+      timeLabel: String(gameState.getStateSlice('currentTime') ?? '')
+    });
+    statusMessage(testMode ? `Test skill: ${skillLabel}` : `Skill focus: ${skillLabel}`);
+
+    const { runChallengeGate } = await getChallengeGate();
+    const outcome = await runGateWithBusyRetry(() => runChallengeGate(task));
+    if (outcome?.reason === 'busy') {
+      statusMessage('Test skill: challenge could not open (busy)');
+      if (testMode) {
+        await delay(1600);
+        returnToLanding();
+      }
+      return;
+    }
+    returnAfterChallenge = testMode;
+  } finally {
+    if (returnAfterChallenge) {
+      returnToLanding();
+    }
   }
-
-  if (!isChallengeTestSpawnKind(kind)) {
-    statusMessage(`Skill focus: no playable game for “${kind}”`);
-    return;
-  }
-
-  const task = buildTestChallengeTask(kind, patientId, {
-    skillId: skillEntry?.id,
-    skillLabel
-  });
-  if (!task) {
-    statusMessage(`Skill focus: could not build game “${kind}”`);
-    return;
-  }
-
-  gameState.dispatch('APPEND_SHIFT_LOG', {
-    message: `Skill focus: ${skillLabel} → ${task.name}`,
-    timeLabel: String(gameState.getStateSlice('currentTime') ?? '')
-  });
-  statusMessage(`Skill focus: ${skillLabel}`);
-
-  const { runChallengeGate } = await getChallengeGate();
-  await runChallengeGate(task);
 }
 
 /**
- * If URL has skill=, load library, pick one game, open challenge after patients exist.
+ * If URL has skill= (Test skill / skillMode=test), load library, pick one game,
+ * open challenge on blank census, then return to landing when done.
  */
 export async function initSkillFocus() {
   const params = new URLSearchParams(window.location.search);
   const skillId = params.get(skillParamName());
   if (!skillId) return null;
 
+  const testMode = isSkillTestMode();
+
   const library = await loadSkillLibrary();
   const entry = findSkillEntry(library, skillId);
   if (!entry) {
     statusMessage(`Unknown skill “${skillId}”`);
+    if (testMode) {
+      setTimeout(returnToLanding, 1200);
+    }
     return null;
   }
 
   const gameKind = pickGameForSkill(entry);
   if (!gameKind) {
     statusMessage(`Skill “${entry.label || skillId}” has no playable games yet`);
+    if (testMode) {
+      setTimeout(returnToLanding, 1200);
+    }
     return { skillId, gameKind: null };
   }
 
@@ -212,24 +293,28 @@ export async function initSkillFocus() {
   const waitMs = Number.isFinite(delay) ? Math.max(0, delay) : 900;
 
   const tryLaunch = () => {
-    if (!resolvePatientId(entry.id)) {
+    if (!testMode && !resolvePatientId(entry.id)) {
       setTimeout(tryLaunch, 200);
       return;
     }
-    launchGame(gameKind, entry).catch((err) => {
+    launchGame(gameKind, entry, { testMode }).catch((err) => {
       console.warn('Skill focus launch failed', err);
+      if (testMode) {
+        returnToLanding();
+      }
     });
   };
 
   setTimeout(tryLaunch, waitMs);
-  return { skillId: entry.id, gameKind };
+  return { skillId: entry.id, gameKind, testMode };
 }
 
 const SkillFocusModule = {
   init: initSkillFocus,
   loadSkillLibrary,
   findSkillEntry,
-  pickGameForSkill
+  pickGameForSkill,
+  isSkillTestMode
 };
 
 export default SkillFocusModule;

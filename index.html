@@ -16,7 +16,7 @@
         <header class="landing-brand">
             <p class="landing-kicker">Clinical training practice</p>
             <h1 class="landing-title">RN Simulation</h1>
-            <p class="landing-lede">Choose a unit for a full shift, or pick one skill to practice — the sim assigns a game.</p>
+            <p class="landing-lede">Choose a unit for a full shift, or pick a skill — start a shift that has it, or Test skill alone.</p>
             <p class="landing-disclaimer">
                 Names and scenarios are fictional. Educational training use only —
                 not a substitute for supervised clinical practice.
@@ -64,7 +64,7 @@
         <section class="landing-path landing-path--skills" aria-labelledby="landing-skills-title">
             <div class="landing-path__intro">
                 <h2 id="landing-skills-title" class="landing-path__title">Skill practice</h2>
-                <p class="landing-path__lede">Skip the full unit assignment and drill one skill from the library.</p>
+                <p class="landing-path__lede">Pick a skill, then start a shift that includes it—or open a quick Test skill drill.</p>
             </div>
             <button type="button"
                class="skills-panel"
@@ -73,8 +73,8 @@
                aria-controls="skill-choice-dialog">
                 <span class="skills-panel__eyebrow">Library</span>
                 <span class="skills-panel__name">Browse skills</span>
-                <span class="skills-panel__blurb">Search and pick one skill — the sim assigns a practice game.</span>
-                <span class="skills-panel__warning">Opens the skill’s patient pack when authored; otherwise a unit assignment.</span>
+                <span class="skills-panel__blurb">Search and pick one skill — start its shift, or test the skill alone.</span>
+                <span class="skills-panel__warning">Shift opens the skill’s patient pack when authored; Test skill runs the practice modal only.</span>
                 <span class="skills-panel__cta">Open skill library</span>
             </button>
         </section>
@@ -121,20 +121,30 @@
         <div class="skill-choice-card">
             <h2 id="skill-choice-title" class="skill-choice-title">Skill library</h2>
             <p class="skill-choice-warning" role="status">
-                Skill practice places you on a random department (Tele, Med-Surg, or ICU).
-                Pick a unit on the landing page if you need a specific assignment.
+                Start a shift uses the skill’s patient pack when authored; otherwise a unit that can host the skill.
+                Test skill opens a blank census and the practice modal only.
             </p>
-            <p class="skill-choice-blurb">Search and pick <strong>one</strong> skill. The sim assigns a practice game for it.</p>
-            <label class="skill-choice-search-label" for="skill-choice-search">Search skills</label>
-            <input type="search" id="skill-choice-search" class="skill-choice-search"
-                   placeholder="e.g. ICP, IVPB, admission…" autocomplete="off">
+            <p class="skill-choice-blurb">Search and pick <strong>one</strong> skill, then choose how to practice.</p>
+            <div class="skill-choice-toolbar">
+                <label class="skill-choice-search-label" for="skill-choice-search">Search skills</label>
+                <input type="search" id="skill-choice-search" class="skill-choice-search"
+                       placeholder="e.g. ICP, IVPB, admission…" autocomplete="off">
+                <label class="skill-choice-filter-label" for="skill-choice-filter">Filter</label>
+                <select id="skill-choice-filter" class="skill-choice-filter" aria-label="Filter skills by unit or topic">
+                    <option value="">All skills</option>
+                </select>
+            </div>
             <div id="skill-choice-list" class="skill-choice-list" role="listbox" aria-label="Skills"></div>
             <p id="skill-choice-empty" class="skill-choice-empty" hidden>No skills match that search.</p>
             <p id="skill-choice-picked" class="skill-choice-picked" aria-live="polite"></p>
             <div class="skill-choice-actions">
-                <button type="button" id="skill-choice-start" class="census-choice-btn census-choice-btn--primary" disabled>
-                    Start with this skill
-                    <span class="census-choice-btn__hint">Random unit + assigned practice game</span>
+                <button type="button" id="skill-choice-start-shift" class="census-choice-btn census-choice-btn--primary" disabled>
+                    Start a shift that has the skill
+                    <span class="census-choice-btn__hint">Patient pack or unit assignment — full shift</span>
+                </button>
+                <button type="button" id="skill-choice-test" class="census-choice-btn census-choice-btn--accent" disabled>
+                    Test skill
+                    <span class="census-choice-btn__hint">Blank census + practice modal, then back here</span>
                 </button>
                 <button type="button" id="skill-choice-cancel" class="census-choice-btn census-choice-btn--ghost">
                     Cancel

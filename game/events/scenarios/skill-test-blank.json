@@ -1,0 +1,17 @@
+{
+  "id": "skill-test-blank",
+  "title": "Skill test",
+  "version": 1,
+  "fictionalOnly": true,
+  "allowEmptyCensus": true,
+  "disclaimer": "Skill test drill — blank census; practice modal only.",
+  "learningObjectives": [],
+  "patients": [],
+  "patientOverrides": {},
+  "scene": null,
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "default": []
+  },
+  "events": []
+}

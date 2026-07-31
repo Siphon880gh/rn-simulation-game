@@ -15,7 +15,8 @@ export function normalizePack(raw, sourceUrl) {
     const patients = Array.isArray(raw.patients)
         ? raw.patients.map(String).filter(Boolean)
         : [];
-    if (!patients.length) {
+    const allowEmptyCensus = raw.allowEmptyCensus === true || raw.id === 'skill-test-blank';
+    if (!patients.length && !allowEmptyCensus) {
         throw new Error('Scenario pack requires a non-empty patients array');
     }
     const patientOverrides = raw.patientOverrides && typeof raw.patientOverrides === 'object'
@@ -173,6 +174,39 @@ function applyPackChrome(pack) {
     }
 }
 
+/** Landing “Test skill”: ?skill=…&skillMode=test (or bare ?skill=). */
+function isSkillTestMode() {
+    const params = new URLSearchParams(window.location.search);
+    const skillKey = GameConfig.urlParams?.skill || 'skill';
+    const modeKey = GameConfig.urlParams?.skillMode || 'skillMode';
+    if (!params.get(skillKey)) return false;
+    const mode = params.get(modeKey);
+    return mode === 'test' || mode == null;
+}
+
+/** In-memory empty pack for landing “Test skill” (no census patients). */
+function buildSkillTestBlankPack() {
+    return {
+        id: 'skill-test-blank',
+        title: 'Skill test',
+        version: 1,
+        department: null,
+        fictionalOnly: true,
+        disclaimer: '',
+        learningObjectives: [],
+        patients: [],
+        patientOverrides: {},
+        events: [],
+        orderInjections: {},
+        dynamicTemplates: [],
+        scene: null,
+        incidentPackUrl: null,
+        shiftStart: null,
+        shiftDurationHours: null,
+        sourceUrl: null
+    };
+}
+
 const ScenarioPackModule = {
     DEFAULT_PACK_URL,
     loadScenarioPack,
@@ -180,7 +214,16 @@ const ScenarioPackModule = {
     mergeIncidentPack,
     normalizePack,
     applyPackChrome,
+    isSkillTestMode,
     async init(url) {
+        // Test skill always uses a blank census, even if ?scenario= is present
+        // (landing passes skill-test-blank so the no-scenario HTML guard never fires).
+        if (isSkillTestMode()) {
+            const pack = buildSkillTestBlankPack();
+            gameState.dispatch('SET_SCENARIO_PACK', { pack });
+            applyPackChrome(pack);
+            return pack;
+        }
         const packUrl = url
             || new URLSearchParams(window.location.search).get(GameConfig.urlParams?.scenarioPack || 'scenario')
             || DEFAULT_PACK_URL;

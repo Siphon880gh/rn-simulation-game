@@ -1,6 +1,7 @@
 /**
  * Landing skill library — parallel start path (not after department).
- * Prefers library.pack / unitHint when set; else random unit + ?skill=<id>.
+ * - Start a shift: library.pack / unitHint / random unit (no auto challenge).
+ * - Test skill: blank census + ?skill=&skillMode=test → practice modal → return here.
  * Catalog: game/events/skills/library.json
  */
 (function () {
@@ -16,18 +17,68 @@
         `game/index.html?speed-factor=48&scenario=${UNIT_SCENARIO.icu}`
     ];
 
+    /** Fixed unit filters (unitHint and/or matching tag). Sorted alphabetically by label. */
+    const UNIT_FILTERS = [
+        { value: 'unit:icu', label: 'ICU', unit: 'icu' },
+        { value: 'unit:medsurg', label: 'Med-Surg', unit: 'medsurg' },
+        { value: 'unit:tele', label: 'Telemetry', unit: 'tele' }
+    ].sort((a, b) => a.label.localeCompare(b.label));
+
+    /**
+     * Topic tags split into groups. Options within each group are sorted A–Z by label.
+     * Unknown library tags fall into “Other”.
+     */
+    const TOPIC_GROUPS = [
+        {
+            label: 'Care practices',
+            tags: ['admission', 'assessment', 'emergency', 'infection', 'iv', 'meds', 'procedure', 'safety']
+        },
+        {
+            label: 'Communication',
+            tags: ['communication']
+        },
+        {
+            label: 'Systems',
+            tags: ['cardiac', 'diabetes', 'GI', 'neuro', 'pain', 'psych', 'renal', 'respiratory', 'skin', 'wound']
+        }
+    ];
+
+    const TOPIC_LABELS = {
+        neuro: 'Neuro',
+        respiratory: 'Respiratory',
+        cardiac: 'Cardiac',
+        meds: 'Meds',
+        iv: 'IV / drips',
+        assessment: 'Assessment',
+        procedure: 'Procedures',
+        safety: 'Safety',
+        admission: 'Admission',
+        infection: 'Infection',
+        wound: 'Wound',
+        skin: 'Skin',
+        pain: 'Pain',
+        diabetes: 'Diabetes',
+        renal: 'Renal',
+        GI: 'GI',
+        psych: 'Psych',
+        emergency: 'Emergency',
+        communication: 'Communication'
+    };
+
     const dialog = document.getElementById('skill-choice-dialog');
     const openBtn = document.getElementById('landing-skill-open');
     const searchEl = document.getElementById('skill-choice-search');
+    const filterEl = document.getElementById('skill-choice-filter');
     const listEl = document.getElementById('skill-choice-list');
     const emptyEl = document.getElementById('skill-choice-empty');
     const pickedEl = document.getElementById('skill-choice-picked');
-    const btnStart = document.getElementById('skill-choice-start');
+    const btnStartShift = document.getElementById('skill-choice-start-shift');
+    const btnTest = document.getElementById('skill-choice-test');
     const btnCancel = document.getElementById('skill-choice-cancel');
 
     if (!dialog || !listEl) return;
 
-    /** @type {{ id: string, label: string, aliases?: string[], tags?: string[], blurb?: string, games?: string[], status?: string }[]} */
+    /** @type {{ id: string, label: string, aliases?: string[], tags?: string[], blurb?: string, games?: string[], status?: string, pack?: string, unitHint?: string, patients?: string[] }[]} */
     let skills = [];
     /** @type {string|null} */
     let selectedId = null;
@@ -40,6 +91,7 @@
             searchEl.value = '';
             searchEl.focus();
         }
+        if (filterEl) filterEl.value = '';
         renderList();
     }
 
@@ -52,25 +104,142 @@
         return String(s || '').toLowerCase().trim();
     }
 
+    function skillTags(skill) {
+        return Array.isArray(skill?.tags) ? skill.tags.map(normalize) : [];
+    }
+
+    function skillUnit(skill) {
+        return normalize(skill?.unitHint);
+    }
+
     function matchesQuery(skill, q) {
         if (!q) return true;
         const hay = [
             skill.id,
             skill.label,
             skill.blurb,
+            skill.unitHint,
             ...(skill.aliases || []),
             ...(skill.tags || [])
         ].map(normalize).join(' ');
         return hay.includes(q);
     }
 
+    function matchesFilter(skill, filterValue) {
+        if (!filterValue) return true;
+        if (filterValue.startsWith('unit:')) {
+            const unit = filterValue.slice(5);
+            return skillUnit(skill) === unit || skillTags(skill).includes(unit);
+        }
+        if (filterValue.startsWith('tag:')) {
+            const tag = filterValue.slice(4);
+            return skillTags(skill).includes(tag);
+        }
+        return true;
+    }
+
+    function skillHasGames(skill) {
+        return Array.isArray(skill?.games) && skill.games.some((g) => typeof g === 'string' && g.trim());
+    }
+
+    function topicLabel(tag) {
+        const key = String(tag || '');
+        if (TOPIC_LABELS[key]) return TOPIC_LABELS[key];
+        const lower = normalize(key);
+        const alias = Object.keys(TOPIC_LABELS).find((k) => normalize(k) === lower);
+        if (alias) return TOPIC_LABELS[alias];
+        return key.charAt(0).toUpperCase() + key.slice(1);
+    }
+
+    function appendOptGroup(label, options) {
+        if (!options.length) return;
+        const group = document.createElement('optgroup');
+        group.label = label;
+        options
+            .slice()
+            .sort((a, b) => a.label.localeCompare(b.label))
+            .forEach((entry) => {
+                const opt = document.createElement('option');
+                opt.value = entry.value;
+                opt.textContent = entry.label;
+                group.appendChild(opt);
+            });
+        filterEl.appendChild(group);
+    }
+
+    function buildFilterOptions() {
+        if (!filterEl) return;
+
+        const presentUnits = new Set();
+        const presentTags = new Set();
+        skills.forEach((skill) => {
+            const unit = skillUnit(skill);
+            if (unit) presentUnits.add(unit);
+            skillTags(skill).forEach((t) => {
+                if (UNIT_FILTERS.some((u) => u.unit === t)) presentUnits.add(t);
+                else presentTags.add(t);
+            });
+        });
+
+        const prev = filterEl.value;
+        filterEl.innerHTML = '';
+
+        const allOpt = document.createElement('option');
+        allOpt.value = '';
+        allOpt.textContent = 'All skills';
+        filterEl.appendChild(allOpt);
+
+        appendOptGroup(
+            'Unit',
+            UNIT_FILTERS
+                .filter((entry) => presentUnits.has(entry.unit))
+                .map((entry) => ({ value: entry.value, label: entry.label }))
+        );
+
+        const claimed = new Set();
+        const groupSpecs = TOPIC_GROUPS
+            .map((group) => {
+                const options = group.tags
+                    .map((tag) => normalize(tag))
+                    .filter((tag) => presentTags.has(tag))
+                    .map((tag) => {
+                        claimed.add(tag);
+                        return { value: `tag:${tag}`, label: topicLabel(tag) };
+                    });
+                return { label: group.label, options };
+            })
+            .filter((g) => g.options.length)
+            .sort((a, b) => a.label.localeCompare(b.label));
+
+        groupSpecs.forEach((g) => appendOptGroup(g.label, g.options));
+
+        const otherTags = [...presentTags]
+            .filter((tag) => !claimed.has(tag))
+            .map((tag) => ({ value: `tag:${tag}`, label: topicLabel(tag) }));
+        appendOptGroup('Other', otherTags);
+
+        if ([...filterEl.options].some((o) => o.value === prev)) {
+            filterEl.value = prev;
+        } else {
+            filterEl.value = '';
+        }
+    }
+
     function renderList() {
         const q = normalize(searchEl?.value);
-        const filtered = skills.filter((s) => matchesQuery(s, q));
+        const filterValue = filterEl?.value || '';
+        const filtered = skills.filter((s) => matchesQuery(s, q) && matchesFilter(s, filterValue));
         listEl.innerHTML = '';
 
         if (emptyEl) {
             emptyEl.hidden = filtered.length > 0;
+            emptyEl.textContent = filterValue || q
+                ? 'No skills match that search or filter.'
+                : 'No skills match that search.';
+        }
+
+        if (selectedId && !filtered.some((s) => s.id === selectedId)) {
+            selectedId = null;
         }
 
         filtered.forEach((skill) => {
@@ -116,13 +285,16 @@
             if (!skill) {
                 pickedEl.textContent = 'Select one skill to continue.';
             } else if (skill.pack || skill.patients?.length) {
-                pickedEl.textContent = `Selected: ${skill.label} — opens the skill’s patient pack + practice game.`;
+                pickedEl.textContent = `Selected: ${skill.label} — shift opens its patient pack; Test skill drills the practice game.`;
             } else {
-                pickedEl.textContent = `Selected: ${skill.label} — unit + practice game (no dedicated patient pack yet).`;
+                pickedEl.textContent = `Selected: ${skill.label} — shift uses a unit assignment; Test skill drills the practice game.`;
             }
         }
-        if (btnStart) {
-            btnStart.disabled = !selectedId;
+        if (btnStartShift) {
+            btnStartShift.disabled = !selectedId;
+        }
+        if (btnTest) {
+            btnTest.disabled = !selectedId || !skillHasGames(skill);
         }
     }
 
@@ -131,7 +303,7 @@
         return RANDOM_UNIT_HREFS[idx] || RANDOM_UNIT_HREFS[0];
     }
 
-    function hrefForSkill(skill) {
+    function hrefForSkillShift(skill) {
         if (skill?.pack) {
             return `game/index.html?speed-factor=48&scenario=${encodeURIComponent(skill.pack)}`;
         }
@@ -142,18 +314,22 @@
         return pickRandomUnitHref();
     }
 
-    function navigate(skillId) {
+    function navigateShift(skillId) {
         if (!skillId) return;
         const skill = skills.find((s) => s.id === skillId);
-        const baseHref = hrefForSkill(skill);
-        try {
-            const url = new URL(baseHref, window.location.href);
-            url.searchParams.set('skill', skillId);
-            window.location.href = url.pathname + url.search + url.hash;
-        } catch {
-            const join = baseHref.includes('?') ? '&' : '?';
-            window.location.href = `${baseHref}${join}skill=${encodeURIComponent(skillId)}`;
-        }
+        window.location.href = hrefForSkillShift(skill);
+    }
+
+    function navigateTest(skillId) {
+        if (!skillId) return;
+        const url = new URL('game/index.html', window.location.href);
+        url.searchParams.set('speed-factor', '48');
+        // Include scenario so game/index.html’s no-scenario redirect never fires
+        // (cached HTML or otherwise). skillMode=test still forces blank census.
+        url.searchParams.set('scenario', 'events/scenarios/skill-test-blank.json');
+        url.searchParams.set('skill', skillId);
+        url.searchParams.set('skillMode', 'test');
+        window.location.href = url.pathname + url.search + url.hash;
     }
 
     async function ensureLibrary() {
@@ -170,6 +346,7 @@
             skills = [];
         }
         libraryLoaded = true;
+        buildFilterOptions();
     }
 
     async function openSkillChoice() {
@@ -183,10 +360,16 @@
     });
 
     searchEl?.addEventListener('input', () => renderList());
+    filterEl?.addEventListener('change', () => renderList());
 
-    btnStart?.addEventListener('click', () => {
+    btnStartShift?.addEventListener('click', () => {
         if (!selectedId) return;
-        navigate(selectedId);
+        navigateShift(selectedId);
+    });
+
+    btnTest?.addEventListener('click', () => {
+        if (!selectedId) return;
+        navigateTest(selectedId);
     });
 
     btnCancel?.addEventListener('click', () => {

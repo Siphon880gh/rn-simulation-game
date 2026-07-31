@@ -422,21 +422,22 @@ body.landing {
 /* Skill library picker (parallel start path) */
 .skill-choice-warning {
     margin: 0;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     font-weight: 600;
-    line-height: 1.4;
+    line-height: 1.35;
     color: #7a3b12;
     background: rgba(180, 95, 30, 0.12);
     border: 1px solid rgba(180, 95, 30, 0.28);
-    padding: 0.55rem 0.65rem;
+    padding: 0.45rem 0.6rem;
     border-radius: 0.35rem;
+    flex-shrink: 0;
 }
 
 .skill-choice-dialog {
     border: none;
     border-radius: 0.65rem;
     padding: 0;
-    max-width: min(28rem, calc(100vw - 2rem));
+    max-width: min(44rem, calc(100vw - 2rem));
     width: 100%;
     background: transparent;
     color: var(--ink);
@@ -454,7 +455,9 @@ body.landing {
     display: flex;
     flex-direction: column;
     gap: 0.65rem;
-    max-height: min(85vh, 36rem);
+    max-height: min(92vh, 52rem);
+    min-height: min(70vh, 36rem);
+    overflow: hidden;
 }
 
 .skill-choice-title {
@@ -471,7 +474,8 @@ body.landing {
     line-height: 1.4;
 }
 
-.skill-choice-search-label {
+.skill-choice-search-label,
+.skill-choice-filter-label {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -482,16 +486,37 @@ body.landing {
     border: 0;
 }
 
-.skill-choice-search {
+.skill-choice-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(9.5rem, 11.5rem);
+    gap: 0.5rem;
+    align-items: stretch;
+    flex-shrink: 0;
+}
+
+.skill-choice-search,
+.skill-choice-filter {
     width: 100%;
     padding: 0.65rem 0.75rem;
     border-radius: 0.4rem;
     border: 1px solid rgba(20, 33, 43, 0.18);
     font: inherit;
     font-size: 0.95rem;
+    background: #fff;
+    color: var(--ink);
 }
 
-.skill-choice-search:focus {
+.skill-choice-filter {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%233d4f5f' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2rem;
+}
+
+.skill-choice-search:focus,
+.skill-choice-filter:focus {
     outline: 2px solid var(--accent);
     outline-offset: 1px;
     border-color: var(--accent);
@@ -502,18 +527,19 @@ body.landing {
     flex-direction: column;
     gap: 0.35rem;
     overflow-y: auto;
-    min-height: 8rem;
-    max-height: 14rem;
-    padding-right: 0.15rem;
+    flex: 1 1 auto;
+    min-height: 14rem;
+    max-height: none;
+    padding-right: 0.25rem;
 }
 
 .skill-choice-item {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.15rem;
+    gap: 0.1rem;
     width: 100%;
-    padding: 0.65rem 0.75rem;
+    padding: 0.5rem 0.7rem;
     border-radius: 0.4rem;
     border: 1px solid rgba(20, 33, 43, 0.12);
     background: #fff;
@@ -554,10 +580,48 @@ body.landing {
 }
 
 .skill-choice-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.55rem;
-    margin-top: 0.25rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.skill-choice-actions .census-choice-btn {
+    padding: 0.55rem 0.7rem;
+    font-size: 0.88rem;
+}
+
+.skill-choice-actions .census-choice-btn__hint {
+    font-size: 0.72rem;
+}
+
+.skill-choice-actions #skill-choice-cancel {
+    grid-column: 1 / -1;
+    padding: 0.35rem 0.5rem;
+}
+
+@media (max-width: 560px) {
+    .skill-choice-dialog {
+        max-width: calc(100vw - 1rem);
+    }
+
+    .skill-choice-card {
+        min-height: 0;
+        max-height: min(94vh, 52rem);
+    }
+
+    .skill-choice-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .skill-choice-list {
+        min-height: 10rem;
+    }
+
+    .skill-choice-actions {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 960px) {

@@ -756,6 +756,13 @@ const PatientsModule = (() => {
         heading.innerHTML = `<span>Patients</span><span id="census-count-badge" class="census-count-badge">${patients.size}</span>`;
         tabsHost.appendChild(heading);
 
+        if (!patients.size) {
+            const empty = document.createElement('p');
+            empty.className = 'census-tabs-empty';
+            empty.textContent = 'No patients on census';
+            tabsHost.appendChild(empty);
+        }
+
         patients.forEach((patient) => {
             const btn = document.createElement('button');
             btn.type = 'button';

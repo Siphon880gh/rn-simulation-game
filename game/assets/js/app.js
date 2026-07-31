@@ -822,7 +822,7 @@ class GameApplication {
             this.handleGameOver
         );
 
-        // Landing skill library: ?skill= opens one assigned mini-game after shell/census ready
+        // Landing Test skill: ?skill=&skillMode=test → blank census + challenge → landing
         const skillFocus = this.modules.get('skillFocus');
         if (skillFocus && skillFocus.init) {
             Promise.resolve(skillFocus.init()).catch((err) => {
