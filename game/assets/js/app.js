@@ -31,8 +31,7 @@ import DelegationModule, {
     getSelectedAide,
     canAidePerformTask,
     showDelegateHint,
-    modeConfig,
-    getDelegateMode
+    modeConfig
 } from './delegation.js';
 import SkillFocusModule from './skill-focus.js';
 import BoostersModule from './boosters.js';
@@ -420,23 +419,25 @@ class GameApplication {
                     };
                 }
 
-                // E13: clear mode labels when aide available (no selection required)
+                // E13: team/solo when an available aide can perform (call lights = floor CNA only)
                 if (canPerform && task.patientId) {
                     const aide = findAvailableAideForPatient(task.patientId, now);
-                    const mode = getDelegateMode(task);
-                    if (aide && mode === 'team') {
-                        const label = modeConfig('team')?.shortLabel || 'Team · ½ time';
-                        items.assistTurn = {
-                            name: `${label} with ${formatAideLabel(aide)}`,
-                            icon: 'add'
-                        };
-                    }
-                    if (aide && mode === 'solo') {
-                        const label = modeConfig('solo')?.shortLabel || 'CNA does this · instant';
-                        items.delegateSolo = {
-                            name: `${label} — ${formatAideLabel(aide)}`,
-                            icon: 'add'
-                        };
+                    if (aide) {
+                        const check = canAidePerformTask(aide, task, now);
+                        if (check.ok && check.mode === 'team') {
+                            const label = modeConfig('team')?.shortLabel || 'Team · ½ time';
+                            items.assistTurn = {
+                                name: `${label} with ${formatAideLabel(aide)}`,
+                                icon: 'add'
+                            };
+                        }
+                        if (check.ok && check.mode === 'solo') {
+                            const label = modeConfig('solo')?.shortLabel || 'CNA does this · instant';
+                            items.delegateSolo = {
+                                name: `${label} — ${formatAideLabel(aide)}`,
+                                icon: 'add'
+                            };
+                        }
                     }
                 }
 
@@ -507,6 +508,11 @@ class GameApplication {
                 const aide = findAvailableAideForPatient(task.patientId);
                 if (!aide) {
                     showDelegateHint('No aide available for this patient right now');
+                    return;
+                }
+                const check = canAidePerformTask(aide, task);
+                if (!check.ok || check.mode !== 'solo') {
+                    showDelegateHint(`${formatAideLabel(aide)} can't perform this task`);
                     return;
                 }
                 this.performDelegatedSolo(task, aide);

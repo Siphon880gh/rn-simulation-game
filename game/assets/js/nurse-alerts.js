@@ -68,6 +68,10 @@ export function spawnNurseAlert(channel, template, currentTime, opts = {}) {
 
     const id = `alert-${channel}-${template.id || 'x'}-${Date.now()}-${Math.floor(random() * 1e4)}`;
     const alarm = template.alarm || (channel === 'bedAlarms' ? 'bed' : 'callLight');
+    const channelCfg = cfg()[channel] || {};
+    const delegateMode = template.delegateMode
+        || channelCfg.delegateMode
+        || (channel === 'callLights' ? 'solo' : null);
     const task = taskSystem.createTask({
         id,
         type: template.type || 'assessment',
@@ -83,7 +87,8 @@ export function spawnNurseAlert(channel, template, currentTime, opts = {}) {
             nurseAlert: true,
             alertChannel: channel,
             alarm,
-            templateId: template.id || null
+            templateId: template.id || null,
+            ...(delegateMode ? { delegateMode } : {})
         }
     });
 

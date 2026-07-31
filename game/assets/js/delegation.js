@@ -150,10 +150,19 @@ export function isTurnCareTask(task) {
         || /turn\s*\/\s*reposition/i.test(String(task?.name || ''));
 }
 
+/** Call light water/comfort — floor CNA solo (instant) on tele/med-surg. */
+export function isCallLightTask(task) {
+    if (!task) return false;
+    if (task.metadata?.alertChannel === 'callLights') return true;
+    if (task.metadata?.nurseAlert && /call\s*light/i.test(String(task.name || ''))) return true;
+    return false;
+}
+
 /** @returns {'team'|'solo'|null} */
 export function getDelegateMode(task) {
     if (!task) return null;
     if (isTurnCareTask(task)) return 'team';
+    if (isCallLightTask(task)) return 'solo';
     const raw = String(task.metadata?.delegateMode || '').toLowerCase();
     if (raw === 'team' || raw === 'solo') return raw;
     return null;
@@ -298,6 +307,10 @@ export function canAidePerformTask(aide, task, now = gameState.getStateSlice('cu
     }
     const mode = getDelegateMode(task);
     if (!mode) return { ok: false, mode: null, reason: 'not-delegable' };
+    // Call lights: tele/med-surg CNA only (not ICU CCT)
+    if (isCallLightTask(task) && aide.role !== 'cna') {
+        return { ok: false, mode: null, reason: 'not-delegable' };
+    }
     // Meds / IV / orders / etc. never go through CNA even if mis-tagged
     const kind = String(task.type || '').toLowerCase();
     if (['med', 'iv', 'orders', 'criticallab', 'bedprep', 'admission'].includes(kind)) {

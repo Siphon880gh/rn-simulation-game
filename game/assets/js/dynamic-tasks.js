@@ -262,6 +262,9 @@ export function mountTaskDom(task) {
     }
     li.setAttribute('data-duration-mins', String(task.duration || 10));
     li.setAttribute('data-task-class', task.taskClass || 'urgent');
+    if (task.metadata?.delegateMode) {
+        li.setAttribute('data-delegate-mode', String(task.metadata.delegateMode));
+    }
     if (task.metadata?.challenge) {
         li.setAttribute('data-challenge', task.metadata.challenge);
     }

@@ -23,7 +23,9 @@ const {
     formatAideLabel,
     withTeamAssist,
     isTurnCareTask,
-    getDelegateMode
+    isCallLightTask,
+    getDelegateMode,
+    canAidePerformTask
 } = await import(delegationUrl);
 const { resolveEffectiveDuration, resetClassInteractions } = await import(classUrl);
 
@@ -115,9 +117,33 @@ const soloTask = {
     patientId: 'joe',
     metadata: { delegateMode: 'solo' }
 };
+const callLightTask = {
+    id: 't-call',
+    name: 'Call light — water',
+    duration: 8,
+    type: 'assessment',
+    status: 'active',
+    patientId: 'joe',
+    metadata: { nurseAlert: true, alertChannel: 'callLights', delegateMode: 'solo' }
+};
 if (getDelegateMode(turnTask) !== 'team') fail('turn → team');
 if (getDelegateMode(soloTask) !== 'solo') fail('linen → solo');
 if (!isTurnCareTask(turnTask)) fail('isTurnCareTask');
+if (!isCallLightTask(callLightTask)) fail('isCallLightTask');
+if (getDelegateMode(callLightTask) !== 'solo') fail('call light → solo');
+const cnaAide = floor.aides.find((a) => a.patientIds.includes('joe')) || floor.aides[0];
+const cnaCheck = canAidePerformTask(
+    { ...cnaAide, patientIds: ['joe'] },
+    callLightTask,
+    cnaAide.availableFrom
+);
+if (!cnaCheck.ok || cnaCheck.mode !== 'solo') fail('floor CNA should solo call light');
+const cctCheck = canAidePerformTask(
+    { ...icu.aides[0], role: 'cct', patientIds: ['joe'] },
+    callLightTask,
+    1930
+);
+if (cctCheck.ok) fail('ICU CCT must not solo call lights');
 
 resetClassInteractions();
 const assisted = withTeamAssist(turnTask, floor.aides[0]);

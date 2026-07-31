@@ -1008,12 +1008,15 @@ export const GameConfig = {
   /**
    * Nurse alerts — call lights (water, etc.) + bed near-fall alarms a few times / shift.
    * Plays sound.alarms on spawn when sound is enabled.
+   * Call lights: floor CNA can solo-delegate (instant) on tele/med-surg when available.
    */
   nurseAlerts: {
     callLights: {
       cadenceGameMinutes: 120,
       maxPerShift: 4,
       firstAfterGameMinutes: 45,
+      /** Floor CNA completes alone when available (tele/med-surg). */
+      delegateMode: 'solo',
       templates: [
         {
           id: 'water',
@@ -1023,7 +1026,8 @@ export const GameConfig = {
           taskClass: 'urgent',
           durationMins: 8,
           expire: '+40',
-          alarm: 'callLight'
+          alarm: 'callLight',
+          delegateMode: 'solo'
         },
         {
           id: 'bathroom',
@@ -1033,7 +1037,8 @@ export const GameConfig = {
           taskClass: 'urgent',
           durationMins: 12,
           expire: '+35',
-          alarm: 'callLight'
+          alarm: 'callLight',
+          delegateMode: 'solo'
         },
         {
           id: 'reposition',
@@ -1043,7 +1048,8 @@ export const GameConfig = {
           taskClass: 'urgent',
           durationMins: 10,
           expire: '+45',
-          alarm: 'callLight'
+          alarm: 'callLight',
+          delegateMode: 'solo'
         },
         {
           id: 'blanket',
@@ -1053,7 +1059,8 @@ export const GameConfig = {
           taskClass: 'routine',
           durationMins: 8,
           expire: '+50',
-          alarm: 'callLight'
+          alarm: 'callLight',
+          delegateMode: 'solo'
         }
       ]
     },

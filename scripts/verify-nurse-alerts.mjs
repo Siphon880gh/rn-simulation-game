@@ -48,6 +48,12 @@ const alertSrc = readFileSync(join(root, 'game/assets/js/nurse-alerts.js'), 'utf
 assert(alertSrc.includes("playAlarm(alarm)"), 'alerts play sound on spawn');
 assert(alertSrc.includes('presentSpawnedTask'), 'alerts present task as active/selectable');
 assert(alertSrc.includes('opts.patientId'), 'alerts accept patientId override');
+assert(alertSrc.includes('delegateMode'), 'call lights stamp delegateMode for CNA solo');
+assert(
+  GameConfig.nurseAlerts.callLights.delegateMode === 'solo'
+    || GameConfig.nurseAlerts.callLights.templates.every((t) => t.delegateMode === 'solo'),
+  'call light templates are solo-delegable'
+);
 
 const dynSrc = readFileSync(join(root, 'game/assets/js/dynamic-tasks.js'), 'utf8');
 assert(dynSrc.includes('export function presentSpawnedTask'), 'presentSpawnedTask export');
