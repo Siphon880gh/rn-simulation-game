@@ -23,7 +23,6 @@ export const medIdentityPairs = [
     brands: ['Bayer', 'Ecotrin', 'Bufferin'],
     aliases: ['asa', 'acetylsalicylic acid']
   },
-  { generic: 'heparin', brand: 'Hep-Lock', brandAliases: ['heplock', 'hep lock'] },
   {
     generic: 'gabapentin',
     brands: ['Neurontin', 'Gralise', 'Horizant']

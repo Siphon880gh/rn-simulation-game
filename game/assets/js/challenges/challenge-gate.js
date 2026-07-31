@@ -11,7 +11,8 @@ import {
     checkMedIdentityAnswer,
     renderMedIdentityHtml,
     applyMedIdentityCheat,
-    readMedIdentitySataSelection
+    readMedIdentitySataSelection,
+    revealMedIdentitySataOutcome
 } from './skills/med-identity/challenge.js';
 import {
     isAccucheckTask,
@@ -477,6 +478,30 @@ function setChallengeFeedback(message, { ok = false } = {}) {
     );
 }
 
+/** Bullet list of expected SATA choices when the row paint did not already fill it. */
+function ensureChallengeAnswerKey(expected, labels) {
+    const key = document.querySelector('#challenge-answer-key');
+    if (!key) return;
+    if (!key.classList.contains('hidden') && key.children.length) return;
+    const items = Array.isArray(labels) && labels.length
+        ? labels.map(String)
+        : String(expected || '')
+            .split('; ')
+            .map((s) => s.trim())
+            .filter(Boolean);
+    if (items.length < 2) return;
+    const escape = (str) => String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    key.innerHTML = `
+      <li class="list-none -ml-5 mb-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-800">Correct selections</li>
+      ${items.map((l) => `<li class="text-emerald-900">${escape(l)}</li>`).join('')}
+    `;
+    key.classList.remove('hidden');
+}
+
 function wireSafetyHandlers() {
     const root = document.querySelector('.challenge-gate');
     if (!root) return;
@@ -504,7 +529,7 @@ function wirePoolChoiceQuiz(cfg) {
 
     initQuizChallengeLevel(poolSize);
 
-    const handleGrade = ({ ok, empty }) => {
+    const handleGrade = ({ ok, empty, expectedLabels }) => {
         if (activeSession?.closing) return;
         const expected = activeSession?.quizExpected;
         if (empty) {
@@ -512,7 +537,10 @@ function wirePoolChoiceQuiz(cfg) {
             return;
         }
         if (!ok) {
-            finishAttempt(false, `${kind}-incorrect`, expected, { allowRetry: true });
+            finishAttempt(false, `${kind}-incorrect`, expected, {
+                allowRetry: true,
+                expectedLabels: expectedLabels || activeSession?.quizExpectedLabels
+            });
             return;
         }
         noteQuizCorrectAndMaybeContinue({
@@ -570,6 +598,9 @@ function wirePoolChoiceQuiz(cfg) {
 function mountPoolChoiceQuiz(next, task, poolSize, kind) {
     if (!activeSession || !next?.quiz) return;
     activeSession.quizExpected = next.quiz.expected;
+    activeSession.quizExpectedLabels = Array.isArray(next.quiz.expectedLabels)
+        ? next.quiz.expectedLabels
+        : undefined;
     activeSession.currentQuestionId = next.quiz.questionId || null;
     if (next.quiz.questionId != null) {
         activeSession.quizSeenIds?.add(String(next.quiz.questionId));
@@ -648,6 +679,7 @@ function finishAttempt(passed, reason, expected, opts = {}) {
                 ? `Incorrect — expected “${expected}”. Task not started. Try again.`
                 : 'Incorrect — task not started. Try again.'
         );
+        ensureChallengeAnswerKey(expected, opts.expectedLabels);
         const input = document.querySelector('#med-identity-answer, #accucheck-answer, #iv-answer');
         if (input) {
             input.focus();
@@ -662,6 +694,7 @@ function finishAttempt(passed, reason, expected, opts = {}) {
             ? `Incorrect (expected “${expected}”) — task was not started.`
             : 'Incorrect — task was not started.'
     );
+    ensureChallengeAnswerKey(expected, opts.expectedLabels);
     gameState.dispatch('APPEND_SHIFT_LOG', {
         message: `Challenge failed: ${activeSession?.taskName || 'task'} (no slot)`,
         timeLabel: String(gameState.getStateSlice('currentTime') ?? '—')
@@ -693,11 +726,14 @@ export function submitMedIdentity() {
             return;
         }
         const ok = checkMedIdentityAnswer(selected, prompt);
+        const expectedLabels = ok
+            ? undefined
+            : revealMedIdentitySataOutcome();
         finishAttempt(
             ok,
             ok ? 'med-identity-correct' : 'med-identity-incorrect',
             prompt.expected,
-            { allowRetry: true }
+            { allowRetry: true, expectedLabels }
         );
         return;
     }
@@ -1016,6 +1052,9 @@ export function runChallengeGate(task) {
             const skillId = String(liveTask?.metadata?.skillId || '').trim();
             const poolSize = getSkillMcqPoolSize(skillId);
             activeSession.quizExpected = skillMcq.expected;
+            activeSession.quizExpectedLabels = Array.isArray(skillMcq.expectedLabels)
+                ? skillMcq.expectedLabels
+                : undefined;
             activeSession.currentQuestionId = skillMcq.questionId || null;
             ModalModule.openModal({
                 title: skillMcq.title || 'Skill practice',

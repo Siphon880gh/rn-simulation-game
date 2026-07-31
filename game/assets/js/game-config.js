@@ -154,12 +154,16 @@ export const GameConfig = {
       OVERDUE: 'overdue'
     },
     /**
-     * Availability window phases inside [scheduled, expire] (E3.M3).
+     * Availability window phases inside [windowStart, expire] (E3.M3).
      * early / late / end = thirds of the open window; used for cues + Perform gating context.
+     * Meds: due time is `scheduled`; selectable from scheduled−medEarlyMins through expire
+     * (default expire = scheduled+medLateMins when author omits data-expire).
      */
     availability: {
       phases: ['before', 'early', 'late', 'end', 'after', 'open'],
-      gatePerform: true
+      gatePerform: true,
+      medEarlyMins: 60,
+      medLateMins: 60
     }
   },
 

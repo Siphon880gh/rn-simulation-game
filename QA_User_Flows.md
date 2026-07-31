@@ -97,24 +97,24 @@ Aligned with [`docs/players/ABOUT.md`](docs/players/ABOUT.md) and scenario pack 
 
 **Goals:** LG-2, LG-5
 
-**Setup:** Night pack at shift start (~19:00). Joe’s **Heparin** (`data-scheduled="1900"`) should be `active`.
+**Setup:** Night pack; advance to ~19:30 so Joe’s **Heparin (SQ bridge)** (`data-scheduled="1930"`) is `active`. Or use another active med with a brand↔generic identity quiz (e.g. Aspirin → Bayer/Ecotrin/Bufferin).
 
 ### Steps
 
 1. Open quick-night seed (`?speed-factor=48`).
 2. Confirm left census tab **201-A Joe Johnson** is selected (or click it).
 3. In Joe’s panel, find **Medications** (list should start open).
-4. Find the **Heparin** tile with green/active status and a **Click · Perform** cue.
+4. Find the **Heparin (SQ bridge)** tile with green/active status and a **Click · Perform** cue (after 19:30).
 5. **Left-click** the Heparin tile → context menu shows **Perform** and **Details**.
 6. Click **Perform**.
 7. Observe:
-   - Modal **Med identity challenge** opens.
+   - Modal **Heparin safety** (skill MCQ) opens — one clinical question by default (antidote, aPTT/platelets, HIT, or bleeding).
+   - Optional: expand **I want to feel challenged** to answer more questions for boosters.
    - `#pause` shows **Resume** (challenge pause).
-8. Read the prompt (brand↔generic for the med).
-9. Type the correct answer in **Your answer** (example: brand for heparin → `Hep-Lock`).
-10. Click **Submit**.
-11. Observe Heparin occupying a bottom **task slot** with a progress / end timemark.
-12. Wait for slot completion → task status becomes completed; score/log may update.
+8. Select the correct multiple-choice answer.
+9. Click the choice (or submit if prompted).
+10. Observe Heparin occupying a bottom **task slot** with a progress / end timemark.
+11. Wait for slot completion → task status becomes completed; score/log may update.
 
 ### Fail / retry path (also PASS if behavior matches)
 

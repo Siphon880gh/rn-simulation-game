@@ -3,12 +3,14 @@ import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import {
   getWindowPhase,
+  getTaskWindowBounds,
   isPerformAllowed,
   buildRevealRule,
   syncTaskWindowDomAttrs,
   applyWindowPhaseClass,
   isAtOrAfterInShift,
-  isAfterInShift
+  isAfterInShift,
+  addMinutesToHhmm
 } from './availability-windows.js';
 
 class TaskSystem {
@@ -38,14 +40,16 @@ class TaskSystem {
       render: (task) => this.renderGenericTask(task)
     });
 
-    // Medication-specific processor
+    // Medication-specific processor — ±1h around due (`scheduled`)
     this.taskProcessors.set('med', {
       shouldActivate: (task, currentTime) => {
-        return isAtOrAfterInShift(currentTime, task.scheduled);
+        const { start } = getTaskWindowBounds(task);
+        return start != null && isAtOrAfterInShift(currentTime, start);
       },
       
       shouldExpire: (task, currentTime) => {
-        return task.expire != null && isAfterInShift(currentTime, task.expire);
+        const { expire } = getTaskWindowBounds(task);
+        return expire != null && isAfterInShift(currentTime, expire);
       },
 
       getContextMenu: (task) => ({
@@ -142,9 +146,15 @@ class TaskSystem {
     ).toLowerCase();
     const scheduledRaw = taskData.scheduled;
     const scheduled = this.parseTime(scheduledRaw);
-    const expire = taskData.expire != null && taskData.expire !== ''
+    let expire = taskData.expire != null && taskData.expire !== ''
       ? this.parseTime(taskData.expire, scheduledRaw ?? scheduled)
       : null;
+    // Meds default to +medLateMins after due when author omits expire
+    if (expire == null && type === 'med' && Number.isFinite(scheduled)) {
+      const late = Number(GameConfig.tasks.availability?.medLateMins);
+      const lateMins = Number.isFinite(late) ? late : 60;
+      expire = addMinutesToHhmm(scheduled, lateMins);
+    }
     const duration = Number(taskData.durationMins ?? taskData.duration ?? 0) || 0;
 
     return {
@@ -212,6 +222,83 @@ class TaskSystem {
       if (!el) return;
       syncTaskWindowDomAttrs(el, task);
       applyWindowPhaseClass(el, getWindowPhase(task, currentTime));
+    });
+    this.refreshFalloutUi();
+  }
+
+  /** Too-late / overdue task tiles (red + not-allowed cursor). */
+  isTaskFallout(el) {
+    if (!el || !el.hasAttribute?.('data-task-type')) return false;
+    if (el.getAttribute('data-status') === GameConfig.tasks.statuses.OVERDUE) return true;
+    if (el.classList.contains('task-status-overdue')) return true;
+    if (el.getAttribute('data-window-phase') === 'after') return true;
+    return false;
+  }
+
+  ensureFalloutToggle(heading, block) {
+    if (!heading || !block) return null;
+    let link = heading.querySelector(':scope > .task-fallout-toggle');
+    if (link) return link;
+    link = document.createElement('a');
+    link.href = '#';
+    link.className = 'task-fallout-toggle';
+    link.setAttribute('role', 'button');
+    link.setAttribute('data-count', '0');
+    link.hidden = true;
+    link.textContent = 'Hide fallouts (0)';
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const hiding = !block.classList.contains('task-section-hide-fallouts');
+      block.classList.toggle('task-section-hide-fallouts', hiding);
+      this.updateFalloutToggleLabel(link, block);
+    });
+    heading.appendChild(link);
+    return link;
+  }
+
+  updateFalloutToggleLabel(link, block) {
+    if (!link || !block) return;
+    const count = Number(link.getAttribute('data-count') || 0);
+    const hiding = block.classList.contains('task-section-hide-fallouts');
+    link.textContent = hiding
+      ? `Show fallouts (${count})`
+      : `Hide fallouts (${count})`;
+    link.setAttribute('aria-pressed', hiding ? 'true' : 'false');
+    link.title = hiding
+      ? 'Show missed / too-late tasks in this section'
+      : 'Hide missed / too-late tasks in this section';
+  }
+
+  /**
+   * Mark fallout tiles and attach heading toggles (Hide/Show fallouts (n))
+   * on sections that contain performable task lists.
+   */
+  refreshFalloutUi(root = typeof document !== 'undefined' ? document : null) {
+    if (!root) return;
+
+    root.querySelectorAll('[data-task-type]').forEach((el) => {
+      el.setAttribute('data-fallout', this.isTaskFallout(el) ? '1' : '0');
+    });
+
+    const lists = [];
+    root.querySelectorAll('ul').forEach((ul) => {
+      if (ul.querySelector(':scope > [data-task-type]')) lists.push(ul);
+    });
+
+    lists.forEach((list) => {
+      const block = list.closest(
+        '.dynamic-tasks-block, .shift-assessment-block, .care-tasks-block, .care-solo-block, .space-y-2.mb-4, .space-y-2'
+      ) || list.parentElement;
+      if (!block) return;
+      const heading = [...block.children].find((el) => el.tagName === 'H4');
+      if (!heading) return;
+
+      const link = this.ensureFalloutToggle(heading, block);
+      const count = list.querySelectorAll(':scope > [data-task-type][data-fallout="1"]').length;
+      link.setAttribute('data-count', String(count));
+      link.hidden = count === 0;
+      this.updateFalloutToggleLabel(link, block);
     });
   }
 
@@ -281,12 +368,20 @@ class TaskSystem {
   }
 
   showTaskDetails(task) {
+    const bounds = getTaskWindowBounds(task);
+    const isMed = String(task.type || '').toLowerCase() === 'med';
+    const windowBlock = isMed && bounds.start != null
+      ? `<p><strong>Give window:</strong> ${this.formatTime(bounds.start)} – ${
+          bounds.expire != null ? this.formatTime(bounds.expire) : 'open'
+        } (±1 hour from due)</p>`
+      : '';
     const details = {
       title: task.name,
       content: `
         <div class="space-y-2">
           <p><strong>Duration:</strong> ${task.duration} minutes</p>
-          <p><strong>Scheduled:</strong> ${this.formatTime(task.scheduled)}</p>
+          <p><strong>Due:</strong> ${this.formatTime(task.scheduled)}</p>
+          ${windowBlock}
           ${task.expire ? `<p><strong>Expires:</strong> ${this.formatTime(task.expire)}</p>` : ''}
           <p><strong>Status:</strong> ${task.status}</p>
         </div>
@@ -296,6 +391,31 @@ class TaskSystem {
 
     // Dispatch modal update
     this.showModal(details);
+  }
+
+  /** Player-facing copy for the Medications section “?” control. */
+  getMedicationWindowHelpHtml() {
+    const early = Number(GameConfig.tasks.availability?.medEarlyMins) || 60;
+    const late = Number(GameConfig.tasks.availability?.medLateMins) || 60;
+    return `
+      <div class="space-y-3 text-left text-sm text-gray-700">
+        <p>Each medication lists a <strong>due time</strong> (the time on the right of the row).</p>
+        <p>You may give it up to <strong>${early} minutes before</strong> or
+           <strong>${late} minutes after</strong> that due time
+           (not before the shift starts).</p>
+        <p>When the clock is inside that window, the med becomes selectable — click it and choose
+           <strong>Perform</strong> / Administer.</p>
+        <p class="text-xs text-gray-500">Outside the window, Perform stays disabled.</p>
+      </div>
+    `;
+  }
+
+  showMedicationWindowHelp() {
+    this.showModal({
+      title: 'Medication time window',
+      content: this.getMedicationWindowHelpHtml(),
+      footer: '<button class="px-4 py-2 bg-blue-500 text-white rounded" onclick="closeModal()">Close</button>'
+    });
   }
 
   completeTask(task) {

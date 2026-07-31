@@ -232,10 +232,18 @@ export function mountTaskDom(task) {
         const block = document.createElement('div');
         block.className = 'space-y-2 mb-4 dynamic-tasks-block';
         const heading = document.createElement('h4');
-        heading.className = 'font-semibold flex items-center gap-2 text-amber-800';
-        heading.textContent = 'Urgent / dynamic';
+        heading.className = 'font-semibold flex items-center gap-2 text-amber-800 w-full task-section-heading cursor-pointer hover:bg-amber-50';
+        heading.innerHTML = '<span class="task-section-chevron" aria-hidden="true"></span><i class="fas fa-bell text-amber-600 text-xl mr-1"></i><span>Urgent / dynamic</span>';
         list = document.createElement('ul');
         list.className = 'dynamic-tasks-list space-y-3';
+        heading.setAttribute('aria-expanded', 'true');
+        heading.addEventListener('click', (e) => {
+            if (e.target.closest('.task-fallout-toggle')) return;
+            list.classList.toggle('hidden');
+            const expanded = !list.classList.contains('hidden');
+            heading.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            heading.classList.toggle('is-collapsed', !expanded);
+        });
         block.appendChild(heading);
         block.appendChild(list);
         const patientRoot = panel.querySelector('.patient') || panel;
@@ -280,6 +288,8 @@ export function mountTaskDom(task) {
     `;
     list.appendChild(li);
     decorateAccucheckDice(li.parentElement || list);
+    taskSystem.syncTaskWindowDomAttrs?.(li, task);
+    taskSystem.refreshFalloutUi?.(list.closest('.dynamic-tasks-block') || panel);
 }
 
 export function spawnFromTemplate(template, currentTime, opts = {}) {

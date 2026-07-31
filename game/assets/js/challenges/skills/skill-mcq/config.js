@@ -835,6 +835,56 @@ export const skillMcqBanks = {
       }
     ]
   },
+  /** SQ / therapeutic heparin safety (med perform). Default 1 Q; extra Qs = boosters. */
+  heparin: {
+    title: 'Heparin safety',
+    questions: [
+      {
+        id: 'antidote',
+        prompt: 'What is the antidote for heparin?',
+        correct: 'Protamine sulfate',
+        choices: [
+          'Protamine sulfate',
+          'Vitamin K',
+          'Flumazenil',
+          'Naloxone'
+        ]
+      },
+      {
+        id: 'lab-before',
+        prompt: 'Which lab value is most important to review before giving therapeutic heparin?',
+        correct: 'aPTT / PTT (and platelets for HIT risk)',
+        choices: [
+          'aPTT / PTT (and platelets for HIT risk)',
+          'HbA1c only',
+          'Serum amylase only',
+          'Urine specific gravity only'
+        ]
+      },
+      {
+        id: 'hit',
+        prompt: 'A falling platelet count on heparin raises concern for?',
+        correct: 'Heparin-induced thrombocytopenia (HIT)',
+        choices: [
+          'Heparin-induced thrombocytopenia (HIT)',
+          'Iron-deficiency anemia from diet',
+          'Expected benign hemodilution only',
+          'Vitamin K deficiency'
+        ]
+      },
+      {
+        id: 'bleed',
+        prompt: 'Priority assessment while a patient is on heparin?',
+        correct: 'Signs of bleeding (gums, urine/stool, neuro change, hematoma)',
+        choices: [
+          'Signs of bleeding (gums, urine/stool, neuro change, hematoma)',
+          'Only daily weight for fluid status',
+          'Pupil checks for opioid toxicity',
+          'Peak/trough vancomycin levels only'
+        ]
+      }
+    ]
+  },
   'heparin-drip': {
     title: 'Heparin drip',
     questions: [
@@ -847,6 +897,28 @@ export const skillMcqBanks = {
           'Only once at discharge',
           'Never — titrate by blood pressure alone',
           'Only if the patient requests it'
+        ]
+      },
+      {
+        id: 'antidote',
+        prompt: 'What is the antidote for heparin?',
+        correct: 'Protamine sulfate',
+        choices: [
+          'Protamine sulfate',
+          'Vitamin K',
+          'Idarucizumab',
+          'Andexanet alfa'
+        ]
+      },
+      {
+        id: 'hold-high',
+        prompt: 'If aPTT/PTT is critically high on a heparin drip, the usual first nursing action is?',
+        correct: 'Hold/adjust per protocol and notify the provider',
+        choices: [
+          'Hold/adjust per protocol and notify the provider',
+          'Double the infusion rate to catch up',
+          'Give IM vitamin K without an order',
+          'Ignore the result until the next shift'
         ]
       }
     ]

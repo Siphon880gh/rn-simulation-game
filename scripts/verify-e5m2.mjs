@@ -98,7 +98,7 @@ assert(typeof applyMedIdentityCheat === 'function', 'applyMedIdentityCheat expor
 
 // Scan patient med task names: every resolvable identity med has brands
 const patientsDir = join(root, 'game/events/patients');
-const skipChallenge = new Set(['accucheck', 'ivpb', 'ivpb-hang']);
+const skipChallenge = new Set(['accucheck', 'ivpb', 'ivpb-hang', 'skill-mcq']);
 const skipName = /accucheck|hypertonic saline|sliding scale/i;
 const unresolved = [];
 const covered = [];

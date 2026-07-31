@@ -154,11 +154,12 @@ export function buildSkillMcqQuiz(task, opts = {}) {
       correct: correctSet.has(i)
     }));
     const shuffled = shuffle(indexed, opts.random);
-    const expected = indexed.filter((c) => c.correct).map((c) => c.label).join('; ');
+    const expectedLabels = indexed.filter((c) => c.correct).map((c) => c.label);
     return {
       ...base,
       choices: shuffled,
-      expected
+      expectedLabels,
+      expected: expectedLabels.join('; ')
     };
   }
 
@@ -232,12 +233,76 @@ function stopSkillMcqAudio(root = document) {
   });
 }
 
+const SATA_PAINT_CLASSES = [
+  'border-emerald-500',
+  'bg-emerald-50',
+  'border-rose-500',
+  'bg-rose-50',
+  'ring-2',
+  'ring-amber-400',
+  'bg-amber-50'
+];
+
+function clearSataOutcomePaint(gate) {
+  gate?.querySelectorAll?.('.skill-sata-choice')?.forEach((b) => {
+    const label = b.closest('label');
+    if (!label) return;
+    label.classList.remove(...SATA_PAINT_CLASSES);
+    label.querySelectorAll('.skill-sata-result-badge').forEach((el) => el.remove());
+  });
+  const key = gate?.querySelector?.('#challenge-answer-key');
+  if (key) {
+    key.classList.add('hidden');
+    key.innerHTML = '';
+  }
+}
+
+/**
+ * Paint correct / wrong SATA rows and list the expected choices under feedback.
+ * Keeps the textual “Incorrect — expected …” line; this is the visual key.
+ */
+export function revealSataOutcome(gate = document.querySelector('.challenge-gate[data-challenge="skill-mcq"]')) {
+  if (!gate) return [];
+  clearSataOutcomePaint(gate);
+  const correctLabels = [];
+  gate.querySelectorAll('.skill-sata-choice').forEach((b) => {
+    const label = b.closest('label');
+    if (!label) return;
+    const correct = b.getAttribute('data-challenge-correct') === '1';
+    const checked = b.checked;
+    const text = b.getAttribute('data-label') || label.querySelector('span')?.textContent || '';
+    if (correct) {
+      correctLabels.push(text);
+      label.classList.add('border-emerald-500', 'bg-emerald-50');
+      const badge = document.createElement('span');
+      badge.className = 'skill-sata-result-badge ml-auto shrink-0 text-[10px] font-bold uppercase tracking-wide text-emerald-800';
+      badge.textContent = checked ? 'Correct' : 'Should select';
+      label.appendChild(badge);
+    } else if (checked) {
+      label.classList.add('border-rose-500', 'bg-rose-50');
+      const badge = document.createElement('span');
+      badge.className = 'skill-sata-result-badge ml-auto shrink-0 text-[10px] font-bold uppercase tracking-wide text-rose-800';
+      badge.textContent = 'Not correct';
+      label.appendChild(badge);
+    }
+  });
+  const key = gate.querySelector('#challenge-answer-key');
+  if (key && correctLabels.length) {
+    key.innerHTML = `
+      <li class="list-none -ml-5 mb-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-800">Correct selections</li>
+      ${correctLabels.map((l) => `<li class="text-emerald-900">${escapeHtml(l)}</li>`).join('')}
+    `;
+    key.classList.remove('hidden');
+  }
+  return correctLabels;
+}
+
 function renderSataHtml(quiz) {
   const opts = (quiz.choices || []).map((c, i) => `
       <label class="flex items-start gap-2 px-3 py-2 rounded border border-gray-200 text-sm cursor-pointer hover:bg-gray-50">
         <input type="checkbox" class="mt-1 skill-sata-choice" data-choice-index="${i}"
           data-challenge-correct="${c.correct ? '1' : '0'}" data-label="${escapeHtml(c.label)}" />
-        <span>${escapeHtml(c.label)}</span>
+        <span class="flex-1 min-w-0">${escapeHtml(c.label)}</span>
       </label>
     `).join('');
   return `
@@ -415,6 +480,7 @@ export function renderSkillMcqHtml(quiz, taskName, opts = {}) {
         ${randomHint}
         ${body}
         <p id="challenge-feedback" class="text-sm font-medium rounded px-3 py-2 hidden" role="status" aria-live="polite"></p>
+        <ul id="challenge-answer-key" class="hidden text-sm text-emerald-900 list-disc pl-5 space-y-1 rounded border border-emerald-200 bg-emerald-50/80 px-3 py-2" aria-label="Correct selections"></ul>
       </div>
     `;
 }
@@ -439,6 +505,7 @@ function clearSkillMcqCheat(gate, type) {
     return;
   }
   if (type === 'sata') {
+    clearSataOutcomePaint(gate);
     gate.querySelectorAll('.skill-sata-choice').forEach((b) => {
       b.checked = false;
       b.closest('label')?.classList.remove('ring-2', 'ring-amber-400', 'bg-amber-50');
@@ -497,6 +564,7 @@ export function applySkillMcqCheat() {
   if (type === 'sata') {
     const boxes = [...gate.querySelectorAll('.skill-sata-choice')];
     if (!boxes.length) return { ok: false, message: '' };
+    clearSataOutcomePaint(gate);
     boxes.forEach((b) => {
       const correct = b.getAttribute('data-challenge-correct') === '1';
       b.checked = correct;
@@ -577,12 +645,19 @@ export function wireSkillMcqInteractions(onGraded) {
     check?.addEventListener('click', () => {
       const boxes = [...gate.querySelectorAll('.skill-sata-choice')];
       if (!boxes.some((b) => b.checked)) {
+        clearSataOutcomePaint(gate);
         onGraded({ ok: false, expected: undefined, empty: true });
         return;
       }
       const ok = boxes.every((b) => (b.checked ? b.getAttribute('data-challenge-correct') === '1'
         : b.getAttribute('data-challenge-correct') !== '1'));
-      onGraded({ ok });
+      if (!ok) {
+        const expectedLabels = revealSataOutcome(gate);
+        onGraded({ ok: false, expectedLabels });
+        return;
+      }
+      clearSataOutcomePaint(gate);
+      onGraded({ ok: true });
     });
     return;
   }

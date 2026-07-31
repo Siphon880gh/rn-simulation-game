@@ -58,6 +58,102 @@
     cursor: not-allowed;
 }
 
+/* Collapsible patient task-section headings — chevron (not bare ">") */
+.task-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    cursor: pointer;
+    user-select: none;
+}
+
+.task-section-chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1rem;
+    flex-shrink: 0;
+    color: #6b7280;
+    font-size: 0.7rem;
+    line-height: 1;
+    transition: transform 0.15s ease;
+}
+
+.task-section-chevron::before {
+    content: '▾';
+    display: block;
+}
+
+.task-section-heading.is-collapsed .task-section-chevron::before {
+    content: '▸';
+}
+
+.task-section-heading[aria-expanded="false"] .task-section-chevron::before {
+    content: '▸';
+}
+
+.task-section-help {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: 0.15rem;
+    border-radius: 999px;
+    border: 1px solid #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.task-section-help:hover {
+    background: #dbeafe;
+    border-color: #60a5fa;
+}
+
+.task-section-help:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* Missed / too-late tasks ("fallouts") — hide via section heading toggle */
+.task-section-hide-fallouts [data-task-type][data-fallout="1"] {
+    display: none !important;
+}
+
+.task-fallout-toggle {
+    margin-left: auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #b91c1c;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.task-fallout-toggle:hover {
+    color: #991b1b;
+}
+
+.task-fallout-toggle[hidden],
+.task-fallout-toggle[data-count="0"] {
+    display: none !important;
+}
+
+h4:has(.task-fallout-toggle) {
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 0.35rem 0.5rem;
+}
+
 @keyframes pulse-danger {
     0%, 100% {
         border-left-color: #dc2626;

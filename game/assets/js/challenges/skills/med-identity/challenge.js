@@ -200,12 +200,75 @@ function escapeHtml(value) {
         .replace(/"/g, '&quot;');
 }
 
+const MED_SATA_PAINT = [
+    'border-emerald-500',
+    'bg-emerald-50',
+    'border-rose-500',
+    'bg-rose-50',
+    'ring-2',
+    'ring-amber-400',
+    'bg-amber-50'
+];
+
+function clearMedSataOutcomePaint(gate) {
+    gate?.querySelectorAll?.('.med-sata-choice')?.forEach((b) => {
+        const label = b.closest('label');
+        if (!label) return;
+        label.classList.remove(...MED_SATA_PAINT);
+        label.querySelectorAll('.skill-sata-result-badge').forEach((el) => el.remove());
+    });
+    const key = gate?.querySelector?.('#challenge-answer-key');
+    if (key) {
+        key.classList.add('hidden');
+        key.innerHTML = '';
+    }
+}
+
+/** Visual key for incorrect med-identity SATA (keeps textual expected line). */
+export function revealMedIdentitySataOutcome(
+    gate = document.querySelector('.challenge-gate[data-challenge="med-identity"]')
+) {
+    if (!gate) return [];
+    clearMedSataOutcomePaint(gate);
+    const correctLabels = [];
+    gate.querySelectorAll('.med-sata-choice').forEach((b) => {
+        const label = b.closest('label');
+        if (!label) return;
+        const correct = b.getAttribute('data-challenge-correct') === '1';
+        const checked = b.checked;
+        const text = b.getAttribute('data-label') || '';
+        if (correct) {
+            correctLabels.push(text);
+            label.classList.add('border-emerald-500', 'bg-emerald-50');
+            const badge = document.createElement('span');
+            badge.className = 'skill-sata-result-badge ml-auto shrink-0 text-[10px] font-bold uppercase tracking-wide text-emerald-800';
+            badge.textContent = checked ? 'Correct' : 'Should select';
+            label.appendChild(badge);
+        } else if (checked) {
+            label.classList.add('border-rose-500', 'bg-rose-50');
+            const badge = document.createElement('span');
+            badge.className = 'skill-sata-result-badge ml-auto shrink-0 text-[10px] font-bold uppercase tracking-wide text-rose-800';
+            badge.textContent = 'Not correct';
+            label.appendChild(badge);
+        }
+    });
+    const key = gate.querySelector('#challenge-answer-key');
+    if (key && correctLabels.length) {
+        key.innerHTML = `
+      <li class="list-none -ml-5 mb-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-800">Correct selections</li>
+      ${correctLabels.map((l) => `<li class="text-emerald-900">${escapeHtml(l)}</li>`).join('')}
+    `;
+        key.classList.remove('hidden');
+    }
+    return correctLabels;
+}
+
 function renderSataHtml(prompt) {
     const opts = (prompt.choices || []).map((c, i) => `
         <label class="flex items-start gap-2 px-3 py-2 rounded border border-gray-200 text-sm cursor-pointer hover:bg-gray-50">
           <input type="checkbox" class="mt-1 med-sata-choice" data-choice-index="${i}"
             data-challenge-correct="${c.correct ? '1' : '0'}" data-label="${escapeHtml(c.label)}" />
-          <span>${escapeHtml(c.label)}</span>
+          <span class="flex-1 min-w-0">${escapeHtml(c.label)}</span>
         </label>
       `).join('');
     return `
@@ -243,6 +306,7 @@ export function renderMedIdentityHtml(prompt, taskName) {
         </p>
         ${body}
         <p id="challenge-feedback" class="text-sm font-medium rounded px-3 py-2 hidden" role="status" aria-live="polite"></p>
+        <ul id="challenge-answer-key" class="hidden text-sm text-emerald-900 list-disc pl-5 space-y-1 rounded border border-emerald-200 bg-emerald-50/80 px-3 py-2" aria-label="Correct selections"></ul>
       </div>
     `;
 }
@@ -252,6 +316,8 @@ export function applyMedIdentityCheat(prompt) {
     if (!prompt) return false;
 
     if (prompt.mode === 'sata') {
+        const gate = document.querySelector('.challenge-gate[data-challenge="med-identity"]');
+        clearMedSataOutcomePaint(gate);
         const boxes = [...document.querySelectorAll('.med-sata-choice')];
         if (!boxes.length) return false;
         boxes.forEach((b) => {

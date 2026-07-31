@@ -1403,6 +1403,94 @@ const PatientsModule = (() => {
         return Math.floor(day / 60) * 100 + (day % 60);
     }
 
+    /** Chevron + aria for collapsible patient panel sections (▸ / ▾). */
+    function ensureSectionChevron(heading) {
+        if (!heading || heading.querySelector(':scope > .task-section-chevron')) return;
+        heading.classList.add('task-section-heading');
+        const chevron = document.createElement('span');
+        chevron.className = 'task-section-chevron';
+        chevron.setAttribute('aria-hidden', 'true');
+        heading.insertBefore(chevron, heading.firstChild);
+    }
+
+    function syncSectionExpanded(heading, bodyEl) {
+        if (!heading || !bodyEl) return;
+        const expanded = !bodyEl.classList.contains('hidden');
+        heading.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        heading.classList.toggle('is-collapsed', !expanded);
+    }
+
+    function wireSectionToggle(heading, bodyEl, onExpand) {
+        if (!heading || !bodyEl) return;
+        ensureSectionChevron(heading);
+        syncSectionExpanded(heading, bodyEl);
+        if (heading.dataset.sectionToggleBound === '1') return;
+        heading.dataset.sectionToggleBound = '1';
+        heading.addEventListener('click', (e) => {
+            if (e.target.closest('.task-section-help, .task-fallout-toggle')) return;
+            e.preventDefault();
+            bodyEl.classList.toggle('hidden');
+            syncSectionExpanded(heading, bodyEl);
+            if (typeof onExpand === 'function' && !bodyEl.classList.contains('hidden')) {
+                onExpand();
+            }
+        });
+        heading.removeAttribute('onclick');
+    }
+
+    function ensureMedWindowHelp(heading) {
+        if (!heading || heading.querySelector(':scope > .task-section-help')) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'task-section-help';
+        btn.setAttribute('aria-label', 'Medication time window help');
+        btn.title = 'When can I give medications?';
+        btn.textContent = '?';
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            taskSystem.showMedicationWindowHelp?.();
+        });
+        const fallout = heading.querySelector(':scope > .task-fallout-toggle');
+        if (fallout) heading.insertBefore(btn, fallout);
+        else heading.appendChild(btn);
+    }
+
+    function decoratePatientSectionHeadings(patientElement, patient = null) {
+        if (!patientElement) return;
+        patientElement.querySelectorAll('h4').forEach((heading) => {
+            let body = heading.nextElementSibling;
+            if (!body) return;
+            // Skip note paragraphs between heading and the collapsible list
+            if (body.matches('p') && body.nextElementSibling?.matches('ul')) {
+                body = body.nextElementSibling;
+            }
+            const isToggleable = heading.hasAttribute('onclick')
+                || heading.classList.contains('past-hx-toggle')
+                || heading.classList.contains('task-section-heading')
+                || heading.dataset.sectionToggleBound === '1'
+                || body.matches('ul, .past-hx-panel');
+            if (!isToggleable) return;
+
+            const onExpand = heading.classList.contains('past-hx-toggle') && patient
+                ? () => {
+                    const mount = body.querySelector('[data-past-hx-mount]') || body;
+                    ensurePastHxTimeline(patient.id, mount, patient.pastHxPack || {
+                        displayName: patient.name,
+                        pastHx: patient.pastHx || []
+                    });
+                }
+                : null;
+
+            wireSectionToggle(heading, body, onExpand);
+
+            const label = heading.textContent || '';
+            if (body.classList.contains('meds-list') || /medications/i.test(label)) {
+                ensureMedWindowHelp(heading);
+            }
+        });
+    }
+
     function resolveCareScheduleKeys(patientConfig, html) {
         const keys = new Set(
             Array.isArray(patientConfig.careSchedules) ? patientConfig.careSchedules : []
@@ -1531,11 +1619,11 @@ const PatientsModule = (() => {
             const block = document.createElement('div');
             block.className = 'space-y-2 mb-4 shift-assessment-block';
             const heading = document.createElement('h4');
-            heading.className = 'font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100';
+            heading.className = 'font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 task-section-heading';
             heading.innerHTML = '<i class="fas fa-stethoscope text-xl mr-1 text-sky-700"></i> Shift assessment / charting';
             list = document.createElement('ul');
             list.className = 'shift-assessment-list space-y-3';
-            heading.addEventListener('click', () => list.classList.toggle('hidden'));
+            wireSectionToggle(heading, list);
             block.appendChild(heading);
             const note = document.createElement('p');
             note.className = 'text-xs text-gray-600 mb-2';
@@ -1636,11 +1724,11 @@ const PatientsModule = (() => {
             const block = document.createElement('div');
             block.className = 'space-y-2 mb-4 care-solo-block';
             const heading = document.createElement('h4');
-            heading.className = 'font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100';
+            heading.className = 'font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 task-section-heading';
             heading.innerHTML = '<i class="fas fa-hands-helping text-xl mr-1 text-violet-600"></i> Patient requests (CNA)';
             list = document.createElement('ul');
             list.className = 'care-solo-list space-y-3';
-            heading.addEventListener('click', () => list.classList.toggle('hidden'));
+            wireSectionToggle(heading, list);
             block.appendChild(heading);
             const note = document.createElement('p');
             note.className = 'text-xs text-gray-600 mb-2';
@@ -1708,13 +1796,11 @@ const PatientsModule = (() => {
             const block = document.createElement('div');
             block.className = 'space-y-2 mb-4 care-tasks-block';
             const heading = document.createElement('h4');
-            heading.className = 'font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100';
+            heading.className = 'font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 task-section-heading';
             heading.innerHTML = '<i class="fas fa-bed text-xl mr-1 text-emerald-700"></i> Turning / skin care';
             list = document.createElement('ul');
             list.className = 'care-tasks-list space-y-3';
-            heading.addEventListener('click', () => {
-                list.classList.toggle('hidden');
-            });
+            wireSectionToggle(heading, list);
             block.appendChild(heading);
             if (careReason) {
                 const note = document.createElement('p');
@@ -2104,34 +2190,13 @@ const PatientsModule = (() => {
 
     // Setup declarative patient interactions
     const setupPatientInteractions = (patient, patientElement) => {
-        // Collapsible sections (legacy inline onclick + declarative toggles)
-        const collapsibleHeaders = patientElement.querySelectorAll('[onclick*="toggleClass"], .past-hx-toggle');
-        collapsibleHeaders.forEach(header => {
-            header.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetElement = header.nextElementSibling;
-                if (targetElement) {
-                    targetElement.classList.toggle('hidden');
-                }
-
-                // Lazy-init TimelineJS when past hx opens
-                if (header.classList.contains('past-hx-toggle') && targetElement && !targetElement.classList.contains('hidden')) {
-                    const mount = targetElement.querySelector('[data-past-hx-mount]');
-                    ensurePastHxTimeline(patient.id, mount, patient.pastHxPack || {
-                        displayName: patient.name,
-                        pastHx: patient.pastHx || []
-                    });
-                }
-            });
-            
-            // Remove inline onclick
-            header.removeAttribute('onclick');
-        });
-
         // Learning UX: medications + IV + turning / CNA care start open so timed work is visible
         patientElement.querySelectorAll('.meds-list, .iv-list, .care-tasks-list, .care-solo-list').forEach((list) => {
             list.classList.remove('hidden');
         });
+
+        // Chevrons + med “?” — replaces legacy inline onclick toggles
+        decoratePatientSectionHeadings(patientElement, patient);
 
         // Task interactions — DOM ids must match extractTasksFromHTML / createTask registry ids
         const taskElements = patientElement.querySelectorAll('[data-task-type]');
@@ -2255,6 +2320,7 @@ const PatientsModule = (() => {
             });
         });
         SlotSystem.refreshOccupancyMarkers?.();
+        taskSystem.refreshFalloutUi?.();
     };
 
     // Subscribe to game state changes

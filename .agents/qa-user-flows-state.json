@@ -11,7 +11,7 @@
     },
     "UF-02": {
       "status": "pass",
-      "notes": "Med identity pauses (#pause=Resume); wrong answer → no slot + retry feedback; Hep-Lock/heparin correct → slot (→19:26) then Finished; data-status=completed. Fixed: DOM task ids match registry; panel-host selector for status sync; schedule unlock skips terminal statuses."
+      "notes": "Heparin perform uses skill-mcq bank `heparin` (antidote/aPTT/HIT/bleed; default 1 Q, more for boosters). Wrong answer → no slot + retry; correct → slot then Finished. Med-identity still used for other brand↔generic meds."
     },
     "UF-03": {
       "status": "pass",
