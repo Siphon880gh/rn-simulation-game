@@ -11,12 +11,18 @@ const BOTTOM_HEIGHT_STORAGE_KEY = 'rngame.shellBottomHeightPx';
 const BOTTOM_HEIGHT_MIN_PX = 120;
 const BOTTOM_HEIGHT_MAX_VH = 0.55;
 const BOTTOM_HEIGHT_DEFAULT_PX = 176;
+const BOTTOM_HEIGHT_NARROW_DEFAULT_PX = 128;
 const TOP_COLLAPSED_STORAGE_KEY = 'rngame.shellTopCollapsed';
 const CLOCK_FLOAT_POS_STORAGE_KEY = 'rngame.shellClockFloatPos';
+const NARROW_LAYOUT_MQ = '(max-width: 900px)';
 const HOUR_PEEK_TRUNCATE = 3;
 const HOUR_PEEK_SHOW_MS = 220;
 const HOUR_PEEK_HIDE_MS = 180;
 const PAUSE_MODAL = GameConfig.timer.pauseSources.MODAL;
+
+function isNarrowLayout() {
+    return window.matchMedia(NARROW_LAYOUT_MQ).matches;
+}
 
 let hourPeekPopoverEl = null;
 let hourPeekShowTimer = null;
@@ -386,7 +392,13 @@ function initBottomResize() {
     handle.dataset.bound = '1';
 
     const stored = readStoredBottomHeight();
-    applyBottomHeight(stored ?? BOTTOM_HEIGHT_DEFAULT_PX);
+    const narrow = isNarrowLayout();
+    const fallback = narrow ? BOTTOM_HEIGHT_NARROW_DEFAULT_PX : BOTTOM_HEIGHT_DEFAULT_PX;
+    // Narrow viewports: ignore a tall desktop-stored height that buries panels / Orders.
+    const initial = narrow && stored != null && stored > 150
+        ? BOTTOM_HEIGHT_NARROW_DEFAULT_PX
+        : (stored ?? fallback);
+    applyBottomHeight(initial);
 
     let dragStartY = 0;
     let dragStartHeight = 0;
@@ -569,7 +581,7 @@ function placeFloatingClockCluster({ forceDefault = false } = {}) {
     dockClockFloatDefault(cluster);
 }
 
-function setTopCollapsed(collapsed, { forceDefault = false } = {}) {
+function setTopCollapsed(collapsed, { forceDefault = false, persist = true } = {}) {
     const header = document.querySelector(GameConfig.selectors.topPrimary);
     if (!header) return;
 
@@ -598,7 +610,7 @@ function setTopCollapsed(collapsed, { forceDefault = false } = {}) {
         clearClockFloatPosStyles();
     }
 
-    storeTopCollapsed(collapsed);
+    if (persist) storeTopCollapsed(collapsed);
 }
 
 function initTopCollapse() {
@@ -668,11 +680,27 @@ function initTopCollapse() {
         }
     });
 
-    if (readStoredTopCollapsed()) {
-        // Game start with persisted collapse: dock at right sidebar / page bottom.
-        setTopCollapsed(true, { forceDefault: true });
-    } else {
-        syncTopCollapseChrome(false);
+    const narrowMq = window.matchMedia(NARROW_LAYOUT_MQ);
+    const applyNarrowClockMode = (event) => {
+        const narrow = event?.matches ?? narrowMq.matches;
+        document.body.classList.toggle('shell-narrow', narrow);
+        if (narrow) {
+            // Mobile: floating clock widget; do not overwrite desktop collapse preference.
+            setTopCollapsed(true, { forceDefault: true, persist: false });
+            return;
+        }
+        if (readStoredTopCollapsed()) {
+            setTopCollapsed(true, { forceDefault: true });
+        } else {
+            setTopCollapsed(false, { persist: false });
+        }
+    };
+
+    applyNarrowClockMode();
+    if (typeof narrowMq.addEventListener === 'function') {
+        narrowMq.addEventListener('change', applyNarrowClockMode);
+    } else if (typeof narrowMq.addListener === 'function') {
+        narrowMq.addListener(applyNarrowClockMode);
     }
 }
 

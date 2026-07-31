@@ -614,6 +614,66 @@ li[data-status="active"] {
     white-space: nowrap;
 }
 
+@media (max-width: 900px) {
+    .task-queue-bar {
+        gap: 0.3rem;
+        padding: 0.3rem;
+    }
+
+    .task-slot {
+        width: 4.1rem;
+        min-height: 3.1rem;
+        padding: 0.25rem 0.2rem 0.2rem;
+    }
+
+    .task-slot--empty .task-slot-label,
+    .task-slot--disabled .task-slot-label {
+        font-size: 0.62rem;
+    }
+
+    .task-slot--empty .task-slot-hint,
+    .task-slot--disabled .task-slot-hint {
+        font-size: 0.55rem;
+    }
+
+    .task-slot-media-btn {
+        max-width: 3.5rem;
+        margin-bottom: 0.1rem;
+    }
+
+    .task-slot-name {
+        font-size: 0.58rem;
+    }
+
+    .task-slot-progress {
+        height: 0.28rem;
+        margin: 0.15rem 0;
+    }
+
+    .task-slot-timemark {
+        font-size: 0.62rem;
+    }
+
+    .slot-waiting-queue {
+        min-width: 0;
+        max-width: none;
+        width: 100%;
+        padding: 0.25rem 0.35rem;
+        font-size: 0.65rem;
+    }
+
+    .slot-queue-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.2rem;
+    }
+
+    .slot-queue-item {
+        max-width: 100%;
+        padding: 0.1rem 0.25rem;
+    }
+}
+
 /* Accucheck / finger-stick outcome dice on task rows */
 .finger-stick-dice {
     flex-shrink: 0;
