@@ -126,6 +126,12 @@
     display: none !important;
 }
 
+[data-task-type][data-fallout="1"] {
+    position: relative;
+    padding-right: 5.5rem;
+    cursor: not-allowed;
+}
+
 .task-fallout-toggle {
     margin-left: auto;
     font-size: 0.75rem;
@@ -310,6 +316,32 @@ li[data-status="active"] {
     white-space: nowrap;
 }
 
+/* Fallout badge — must follow Perform / slot / locked ::after rules */
+[data-task-type][data-fallout="1"]::after,
+[data-task-type][data-fallout="1"].task-status-active::after,
+[data-slot-state][data-task-type][data-fallout="1"].task-status-active::after,
+[data-task-kind="chart-assessment"][data-fallout="1"][data-task-locked="1"].task-status-active::after,
+[data-task-type="assessment"][data-fallout="1"][data-task-locked="1"].task-status-active::after {
+    content: "Too late";
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #991b1b;
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: 0.25rem;
+    padding: 0.15rem 0.4rem;
+    opacity: 1;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 2;
+}
+
 /* Patient section styling */
 [data-patient-id] {
     border: 1px solid #e5e7eb;
@@ -469,7 +501,8 @@ li[data-status="active"] {
     width: 100%;
     height: auto;
     aspect-ratio: 4 / 3;
-    object-fit: contain;
+    /* cover: generated thumbs often have dark margins; crop so type icons read at ~80px */
+    object-fit: cover;
     object-position: center;
     border-radius: 0.25rem;
     display: block;
