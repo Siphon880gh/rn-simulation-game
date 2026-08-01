@@ -20,7 +20,7 @@ Also: [`AGENTS.md`](AGENTS.md) (entry), [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](A
 
 **RN Simulation Game** — browser sim of a fast-paced ~12-hour nursing shift. Player manages patients (vitals, meds, tasks) under an accelerated military clock. Goal: complete the shift without overtime by prioritizing timed work.
 
-Multi-patient census (6 packs), declarative tasks + 3-slot execution with FIFO waiting queue, shell chrome, TimelineJS past hx, markdown Help. Challenges: med identity, bed-prep gather (win-to-complete), IVPB hang sequence, Code Blue (E4 escalate). Scenario + optional chaos incident packs; CSS unit scene themes; scoring/debrief at shift end. Titled image/video placeholders (`mediaPlaceholders` + catalog) on landing departments, busy slots, challenge modals (before + after-pass), and critical-lab toast — swap via `replaceWith` / `game/assets/media/`. Narrow viewports use denser shell chrome (lean pause, rail accordion, floating slots/log).
+Multi-patient census (6 packs), declarative tasks + 3-slot execution with FIFO waiting queue, shell chrome, TimelineJS past hx, markdown Help. Challenges: med identity, bed-prep gather (win-to-complete), IVPB hang sequence, Code Blue (E4 escalate). Scenario + optional chaos incident packs; CSS unit scene themes; scoring/debrief at shift end. Titled image/video placeholders (`mediaPlaceholders` + catalog) on landing departments, busy slots (per `task.type` with generic fallback), challenge modals (before + after-pass), and critical-lab toast — swap via `replaceWith` / `game/assets/media/`. Narrow viewports use denser shell chrome (lean pause, rail accordion, floating slots/log).
 
 ---
 

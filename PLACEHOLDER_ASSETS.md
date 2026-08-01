@@ -37,8 +37,16 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 | `situation-code-blue` | image | Code Blue | Code Blue challenge modal still | Crash cart / defibrillator emergency backdrop | `assets/media/situation-code-blue.webp` |
 | `situation-critical-lab` | image | Critical lab | Critical-lab spawn toast + still key | Lab call urgency at the nurses station | `assets/media/situation-critical-lab.webp` |
 | `situation-bed-prep` | image | Bed prep | Bed-prep challenge modal still | Empty bed being made / wall O2-suction | `assets/media/situation-bed-prep.webp` |
-| `slot-perform` | image | Performing care | Busy task slot thumb | Small bedside-care thumb while a patient task runs in a slot | `assets/media/slot-perform.webp` |
-| `slot-perform-video` | video | Performing care | Busy slot (optional video) | Short silent loop for slot; enable via `slotPreferVideo: true` | `assets/media/slot-perform-video.mp4` |
+| `slot-perform` | image | Performing care | Busy task slot thumb (fallback) | Generic bedside-care thumb when task type has no `slotByTaskType` entry | `assets/media/slot-perform.webp` |
+| `slot-perform-video` | video | Performing care | Busy slot (optional video) | Short silent loop for fallback slot; enable via `slotPreferVideo: true` | `assets/media/slot-perform-video.mp4` |
+| `slot-med` | image | Medication | Busy slot · `med` | Med admin thumb for medication tasks in a queue slot | `assets/media/slot-med.webp` |
+| `slot-assessment` | image | Assessment | Busy slot · `assessment` | Vitals / assessment thumb | `assets/media/slot-assessment.webp` |
+| `slot-iv` | image | IV check | Busy slot · `iv` | Infusion pump / drip thumb | `assets/media/slot-iv.webp` |
+| `slot-orders` | image | Orders | Busy slot · `orders` | Doctor-orders clipboard thumb | `assets/media/slot-orders.webp` |
+| `slot-criticallab` | image | Critical lab | Busy slot · `criticallab` | Critical lab call thumb | `assets/media/slot-criticallab.webp` |
+| `slot-admission` | image | Admission | Busy slot · `admission` | Admission / wristband thumb | `assets/media/slot-admission.webp` |
+| `slot-bedprep` | image | Bed prep | Busy slot · `bedprep` | Bed-prep linens thumb | `assets/media/slot-bedprep.webp` |
+| `slot-procedure` | image | Procedure | Busy slot · `procedure` | Procedure tray thumb | `assets/media/slot-procedure.webp` |
 | `challenge-code-blue` | image | Code Blue | Code Blue quiz modal hero | Wide still above Code Blue questions (also uses modal situation still) | `assets/media/challenge-code-blue.webp` |
 | `challenge-code-blue-video` | video | Code Blue | Code Blue quiz modal hero (default) | Short silent loop preferred in-modal (`preferVideo: true`) | `assets/media/challenge-code-blue-video.mp4` |
 | `challenge-bed-prep` | image | Bed prep | Bed-prep mini-game modal | Wide still above gather-items game | `assets/media/challenge-bed-prep.webp` |
@@ -58,6 +66,8 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 | `challenge-icp-after` | image | ICP — monitored | ICP after pass | Controlled ICP waveform | `assets/media/challenge-icp-after.webp` |
 
 Toggle challenge heroes: `GameConfig.mediaPlaceholders.mounts.challenges`. Per-game map: `mediaPlaceholders.challenges.<key>` (`imageId`/`videoId` = **before** during quiz; `afterImageId` swaps in after the last question / challenge-level target, on the Continue screen before the modal closes).
+
+Busy-slot thumbs: `mediaPlaceholders.slotByTaskType` maps `task.type` → catalog id (`med` → `slot-med`, …). Unmapped types use `slotFallbackId` (`slot-perform`).
 
 ---
 

@@ -69,7 +69,7 @@
       "mount": "slot.busy",
       "w": 160,
       "h": 120,
-      "prompt": "Subject: small task-slot thumb (~160×120) while care is being performed — bedside care silhouette / gloved hands at bedside. Caption \"Performing care\".",
+      "prompt": "Subject: generic busy-slot fallback thumb (~160×120) — simple bedside care silhouette / gloved hands at bedside when no task-type icon exists. Caption \"Performing care\".",
       "replaceWith": "assets/media/slot-perform.webp"
     },
     {
@@ -81,6 +81,86 @@
       "h": 180,
       "prompt": "Subject: short looping silent video (3–6s) for a busy task slot — gentle bedside care motion (adjusting IV line / taking vitals), muted. Caption feel \"Performing care\".",
       "replaceWith": "assets/media/slot-perform-video.mp4"
+    },
+    {
+      "id": "slot-med",
+      "kind": "image",
+      "title": "Medication",
+      "mount": "slot.busy.med",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: tiny busy-slot thumb (~160×120) for medication administration — med cup / unit-dose packs on a tray (fictional labels OK), no faces. Caption \"Med\".",
+      "replaceWith": "assets/media/slot-med.webp"
+    },
+    {
+      "id": "slot-assessment",
+      "kind": "image",
+      "title": "Assessment",
+      "mount": "slot.busy.assessment",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: tiny busy-slot thumb (~160×120) for nursing assessment — stethoscope and BP cuff / vitals kit, no faces. Caption \"Assess\".",
+      "replaceWith": "assets/media/slot-assessment.webp"
+    },
+    {
+      "id": "slot-iv",
+      "kind": "image",
+      "title": "IV check",
+      "mount": "slot.busy.iv",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: tiny busy-slot thumb (~160×120) for IV / drip check — infusion pump screen and drip chamber close-up, no faces. Caption \"IV\".",
+      "replaceWith": "assets/media/slot-iv.webp"
+    },
+    {
+      "id": "slot-orders",
+      "kind": "image",
+      "title": "Orders",
+      "mount": "slot.busy.orders",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: tiny busy-slot thumb (~160×120) for doctor orders — clipboard with order sheets / pen at nurses station, no faces. Caption \"Orders\".",
+      "replaceWith": "assets/media/slot-orders.webp"
+    },
+    {
+      "id": "slot-criticallab",
+      "kind": "image",
+      "title": "Critical lab",
+      "mount": "slot.busy.criticallab",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: tiny busy-slot thumb (~160×120) for critical lab call — lab vial / result printout with urgent red flag, no faces. Caption \"Lab\".",
+      "replaceWith": "assets/media/slot-criticallab.webp"
+    },
+    {
+      "id": "slot-admission",
+      "kind": "image",
+      "title": "Admission",
+      "mount": "slot.busy.admission",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: tiny busy-slot thumb (~160×120) for admission tasks — hospital wristband and admission checklist clipboard, no faces. Caption \"Admit\".",
+      "replaceWith": "assets/media/slot-admission.webp"
+    },
+    {
+      "id": "slot-bedprep",
+      "kind": "image",
+      "title": "Bed prep",
+      "mount": "slot.busy.bedprep",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: tiny busy-slot thumb (~160×120) for bed prep — clean hospital bed linens / pillow staged, no faces. Caption \"Bed\".",
+      "replaceWith": "assets/media/slot-bedprep.webp"
+    },
+    {
+      "id": "slot-procedure",
+      "kind": "image",
+      "title": "Procedure",
+      "mount": "slot.busy.procedure",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: tiny busy-slot thumb (~160×120) for a bedside procedure — sterile tray / procedure pack silhouette, no faces, no gore. Caption \"Proc\".",
+      "replaceWith": "assets/media/slot-procedure.webp"
     },
     {
       "id": "challenge-code-blue",

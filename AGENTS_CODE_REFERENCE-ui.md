@@ -46,7 +46,7 @@ Browser chrome around the sim: locked shell regions (E1.M2), patient main mount,
 | Right menu | `#shell-right-menu` | Orders/Tools/Delegate inside `[data-rail-accordion]`; `right-menu.js` |
 | Bottom | `#shell-bottom` | History + slots + status (desktop); mobile uses FABs + floating panels |
 | History log | `#shift-history-log` | Append-only via `APPEND_SHIFT_LOG` |
-| Task queue | `#task-queue-bar` / `#slot-waiting-queue` | 3 slots + FIFO wait (slot-system.js); exclusive → `.task-slot--disabled`; busy slots may show media thumbs |
+| Task queue | `#task-queue-bar` / `#slot-waiting-queue` | 3 slots + FIFO wait (slot-system.js); exclusive → `.task-slot--disabled`; busy slots show type thumbs via `slotByTaskType` (`slot-med`, …) with `slot-perform` fallback |
 | Critical lab media | `#shell-critical-lab-media` | Placeholder host for critical-lab spawn still |
 | Status bar | `#shell-status-bar` / `#shell-status-message` | Live status line |
 | Clock / Pause | `#clock` / `#pause` / `#shell-lean-pause` | Timer module; lean chip on mobile collapsed chrome |
@@ -103,10 +103,11 @@ Adding a doc: place under `docs/{devs,players,learning}/` **and** list it in `do
 
 ## Media placeholders
 
-- Config: `GameConfig.mediaPlaceholders` (`enabled`, `source: data-url|php`, `mounts.*`, `challenges` map, optional `assets` overrides).
+- Config: `GameConfig.mediaPlaceholders` (`enabled`, `source: data-url|php`, `mounts.*`, `challenges` map, `slotByTaskType` / `slotFallbackId`, optional `assets` overrides).
 - Catalog: `media-placeholder-catalog.json`; inventory doc: `PLACEHOLDER_ASSETS.md`.
 - Default source is client **data-url** SVG (works on static servers); PHP under `placeholders/` when `source: 'php'`.
-- Mounts: landing departments, situation stills, critical-lab toast, busy slots, in-modal challenge heroes.
+- Mounts: landing departments, situation stills, critical-lab toast, busy slots (per `task.type`), in-modal challenge heroes.
+- Slot thumbs: `resolveSlotAssetId` → `slotByTaskType` (`med`→`slot-med`, …); unmapped → `slot-perform` (or `slot-perform-video` if `slotPreferVideo`).
 - Challenge map: `imageId`/`videoId` = **before** (during quiz); `afterImageId` = after-pass still. `revealChallengeAfterMedia(key)` runs from `showPassedAcknowledge` in `challenge-gate.js` (after last question, before Continue closes). CSS: `.challenge-media-wrap--after` / `.challenge-media-phase-label` in `app.css`.
 - Final art: set catalog/`assets.<id>.replaceWith` (e.g. `assets/media/dept-tele.webp`); agent skills `scan-placeholder-assets` / `replace-placeholder-assets`.
 - Disable: `enabled: false` or `?placeholders=0`.

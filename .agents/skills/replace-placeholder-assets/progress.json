@@ -1,6 +1,6 @@
 {
   "status": "idle",
-  "updatedAt": "2026-08-01T04:46:52.405Z",
+  "updatedAt": "2026-08-01T05:06:19.390Z",
   "queue": [
     {
       "id": "dept-tele",
@@ -148,6 +148,54 @@
       "status": "done",
       "file": "assets/media/slot-perform-video.mp4",
       "higgsfieldJobId": "0e8444a0-f60c-496a-8976-c850fca42df9"
+    },
+    {
+      "id": "slot-med",
+      "status": "done",
+      "file": "assets/media/slot-med.webp",
+      "higgsfieldJobId": "068d6e21-40e8-41e6-97fd-c7dcb91bde4d"
+    },
+    {
+      "id": "slot-assessment",
+      "status": "done",
+      "file": "assets/media/slot-assessment.webp",
+      "higgsfieldJobId": "8b7c0694-dab6-46da-865e-806d6b00b438"
+    },
+    {
+      "id": "slot-iv",
+      "status": "done",
+      "file": "assets/media/slot-iv.webp",
+      "higgsfieldJobId": "81939005-b3ce-4d20-a6a9-c961580cb33b"
+    },
+    {
+      "id": "slot-orders",
+      "status": "done",
+      "file": "assets/media/slot-orders.webp",
+      "higgsfieldJobId": "d81c4a77-a12c-4dd9-894b-229a6ab8f68f"
+    },
+    {
+      "id": "slot-criticallab",
+      "status": "done",
+      "file": "assets/media/slot-criticallab.webp",
+      "higgsfieldJobId": "1b182944-59e7-40fe-a1dc-cbaf23df7fc8"
+    },
+    {
+      "id": "slot-admission",
+      "status": "done",
+      "file": "assets/media/slot-admission.webp",
+      "higgsfieldJobId": "10b24057-b67a-456a-ae01-5922c4975816"
+    },
+    {
+      "id": "slot-bedprep",
+      "status": "done",
+      "file": "assets/media/slot-bedprep.webp",
+      "higgsfieldJobId": "3d1adba1-a13e-4ab7-9730-a382492d2415"
+    },
+    {
+      "id": "slot-procedure",
+      "status": "done",
+      "file": "assets/media/slot-procedure.webp",
+      "higgsfieldJobId": "16dd6c82-4169-46b6-923a-e0740c9d7be0"
     }
   ]
 }

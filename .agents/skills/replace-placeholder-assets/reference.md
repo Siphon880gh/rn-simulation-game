@@ -23,10 +23,12 @@
 | `mounts.landingDepartments` | Tele / Med-Surg / ICU tiles |
 | `mounts.situations` | Fills null `scene.situationStills` |
 | `mounts.criticalLab` | Spawn toast media |
-| `mounts.slots` | Busy slot thumb |
+| `mounts.slots` | Busy slot thumbs |
 | `mounts.challenges` | In-modal heroes for games/quizzes |
 | `challenges.<key>` | `{ imageId, videoId?, preferVideo? }` — Code Blue prefers video |
-| `slotPreferVideo` | Use `slot-perform-video` |
+| `slotByTaskType` | `task.type` → catalog id (`med` → `slot-med`, …) |
+| `slotFallbackId` | Default `slot-perform` when type unmapped |
+| `slotPreferVideo` | Use `slot-perform-video` for fallback only |
 | `assets` | Per-id patches merged onto catalog |
 
 Disable: `enabled: false`, `?placeholders=0`, or `localStorage.rngame.mediaPlaceholders=0`.
@@ -38,7 +40,7 @@ Disable: `enabled: false`, `?placeholders=0`, or `localStorage.rngame.mediaPlace
 | `landing.unit.*` | `assets/js/landing-media.js` |
 | `situation.code-blue` / `bed-prep` / `critical-lab` | `media-placeholders.applySituationPlaceholderUrls` → `scene-backdrop` |
 | `situation.critical-lab` (toast) | `showCriticalLabMedia` from `critical-labs.js` |
-| `slot.busy` | `slot-system` → `slotMediaHtml` |
+| `slot.busy` (+ `.med` / `.assessment` / …) | `slot-system` → `slotMediaHtml` / `resolveSlotAssetId` |
 | `challenge.code-blue` (+ `.video`) | `challengeMediaHtml('code-blue')` in code-blue challenge |
 | `challenge.bed-prep` / `med-identity` / `ivpb-hang` / `iv-check` / `accucheck` / `admission` / `icp` | matching `render*Html` via `challengeMediaHtml` (before) |
 | `challenge.*.after` | `afterImageId` → `revealChallengeAfterMedia` in `showPassedAcknowledge` (after last q, before Continue) |

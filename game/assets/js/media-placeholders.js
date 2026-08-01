@@ -388,11 +388,30 @@ export function showCriticalLabMedia(opts = {}) {
     loadCatalog().then(run).catch(() => {});
 }
 
+/**
+ * Resolve busy-slot catalog id from task.type → slotByTaskType, else fallback.
+ * Typed thumbs are always stills; slotPreferVideo only applies to the fallback.
+ */
+export function resolveSlotAssetId(task) {
+    const type = String(task?.type || '').toLowerCase().trim();
+    const map = cfg().slotByTaskType || {};
+    const typedId = type && typeof map[type] === 'string' ? map[type].trim() : '';
+    if (typedId) return typedId;
+    const fallback = (typeof cfg().slotFallbackId === 'string' && cfg().slotFallbackId.trim())
+        ? cfg().slotFallbackId.trim()
+        : 'slot-perform';
+    if (cfg().slotPreferVideo === true) return 'slot-perform-video';
+    return fallback;
+}
+
 export function slotMediaHtml(task, catalog) {
     if (!isEnabled() || !cfg().mounts?.slots || !task) return '';
-    const preferVideo = cfg().slotPreferVideo === true;
-    const assetId = preferVideo ? 'slot-perform-video' : 'slot-perform';
+    const assetId = resolveSlotAssetId(task);
+    const fallbackId = (typeof cfg().slotFallbackId === 'string' && cfg().slotFallbackId.trim())
+        ? cfg().slotFallbackId.trim()
+        : 'slot-perform';
     let asset = getAssetById(assetId, catalog);
+    if (!asset && assetId !== fallbackId) asset = getAssetById(fallbackId, catalog);
     if (!asset) asset = getAssetById('slot-perform', catalog);
     if (!asset) return '';
 
@@ -671,6 +690,7 @@ const MediaPlaceholdersModule = {
     videoAudioToggleHtml,
     wireMediaAudioToggles,
     showCriticalLabMedia,
+    resolveSlotAssetId,
     slotMediaHtml,
     challengeMediaHtml,
     revealChallengeAfterMedia,

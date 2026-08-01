@@ -360,8 +360,24 @@ export const GameConfig = {
       /** In-modal hero media for perform games/quizzes */
       challenges: true
     },
-    /** Prefer slot-perform-video when true */
+    /** Prefer slot-perform-video when true (only for unmapped / fallback types) */
     slotPreferVideo: false,
+    /** Catalog id when task type has no entry in slotByTaskType */
+    slotFallbackId: 'slot-perform',
+    /**
+     * Busy-slot thumb by task.type (lowercase). Unlisted types → slotFallbackId
+     * (or slot-perform-video when slotPreferVideo).
+     */
+    slotByTaskType: {
+      med: 'slot-med',
+      assessment: 'slot-assessment',
+      iv: 'slot-iv',
+      orders: 'slot-orders',
+      criticallab: 'slot-criticallab',
+      admission: 'slot-admission',
+      bedprep: 'slot-bedprep',
+      procedure: 'slot-procedure'
+    },
     criticalLabHost: '#shell-critical-lab-media',
     criticalLabAutoHideMs: 12000,
     /**

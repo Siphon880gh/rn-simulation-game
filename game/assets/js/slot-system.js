@@ -102,6 +102,7 @@ function renderSlots(slots) {
         const media = mediaCatalog
             ? slotMediaHtml(
                 {
+                    type: task?.type || slot.taskType,
                     patientId: task?.patientId || slot.patientId,
                     taskName: slot.taskName || task?.name
                 },
