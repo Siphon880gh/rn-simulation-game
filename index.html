@@ -139,7 +139,10 @@
             <p id="skill-choice-picked" class="skill-choice-picked" aria-live="polite"></p>
             <div class="skill-choice-actions">
                 <button type="button" id="skill-choice-start-shift" class="census-choice-btn census-choice-btn--primary" disabled>
-                    Start a shift that has the skill
+                    <span class="skill-choice-btn__label-row">
+                        Start a shift that has the skill
+                        <span id="skill-choice-shift-recommended" class="skill-choice-btn__badge" hidden>Recommended</span>
+                    </span>
                     <span class="census-choice-btn__hint">Patient pack or unit assignment — full shift</span>
                 </button>
                 <button type="button" id="skill-choice-test" class="census-choice-btn census-choice-btn--accent" disabled>

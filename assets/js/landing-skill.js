@@ -73,8 +73,12 @@
     const emptyEl = document.getElementById('skill-choice-empty');
     const pickedEl = document.getElementById('skill-choice-picked');
     const btnStartShift = document.getElementById('skill-choice-start-shift');
+    const btnShiftRecommended = document.getElementById('skill-choice-shift-recommended');
     const btnTest = document.getElementById('skill-choice-test');
     const btnCancel = document.getElementById('skill-choice-cancel');
+
+    /** Skills where Start a shift is the preferred path (vs Test skill only). */
+    const SHIFT_RECOMMENDED_SKILL_IDS = new Set(['sepsis-recognition']);
 
     if (!dialog || !listEl) return;
 
@@ -292,6 +296,10 @@
         }
         if (btnStartShift) {
             btnStartShift.disabled = !selectedId;
+        }
+        if (btnShiftRecommended) {
+            const showRecommended = Boolean(skill && SHIFT_RECOMMENDED_SKILL_IDS.has(skill.id));
+            btnShiftRecommended.hidden = !showRecommended;
         }
         if (btnTest) {
             btnTest.disabled = !selectedId || !skillHasGames(skill);

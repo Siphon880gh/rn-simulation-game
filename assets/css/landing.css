@@ -608,6 +608,31 @@ body.landing {
     font-size: 0.88rem;
 }
 
+.skill-choice-btn__label-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.45rem;
+    width: 100%;
+}
+
+.skill-choice-btn__badge {
+    display: inline-block;
+    padding: 0.12rem 0.4rem;
+    border-radius: 0.25rem;
+    background: #0f766e;
+    color: #f0fdfa;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    line-height: 1.2;
+}
+
+.skill-choice-btn__badge[hidden] {
+    display: none !important;
+}
+
 .skill-choice-actions .census-choice-btn__hint {
     font-size: 0.72rem;
 }
