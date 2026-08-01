@@ -227,13 +227,23 @@ function toggleTrivialOrderOddsPopover(anchor) {
     showTrivialOrderOddsPopover(anchor);
 }
 
+function isOrdersCheckRow(el) {
+    if (!el?.getAttribute) return false;
+    if (el.getAttribute('data-task-type') !== 'orders') return false;
+    if (el.getAttribute('data-orders-kind') === 'doctor-orders-check') return true;
+    return Boolean(el.closest?.('#doctor-orders-list'));
+}
+
 /** Attach dice control inline after the task name (same placement as Accucheck). */
 export function decorateOrdersTrivialDice(root = document) {
     if (typeof document === 'undefined' || !root?.querySelectorAll) return;
     if (trivialCfg().enabled === false) return;
-    const nodes = root.querySelectorAll(
-        '[data-task-type="orders"][data-orders-kind="doctor-orders-check"], #doctor-orders-list [data-task-type="orders"]'
-    );
+    // Include root itself — querySelectorAll only matches descendants
+    const nodes = [];
+    if (isOrdersCheckRow(root)) nodes.push(root);
+    root.querySelectorAll('[data-task-type="orders"]').forEach((el) => {
+        if (isOrdersCheckRow(el) && !nodes.includes(el)) nodes.push(el);
+    });
     nodes.forEach((el) => {
         if (el.querySelector('[data-orders-trivial-dice]')) return;
         const btn = document.createElement('button');

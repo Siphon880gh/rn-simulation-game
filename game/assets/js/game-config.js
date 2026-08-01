@@ -808,7 +808,7 @@ export const GameConfig = {
      */
     trivialOrders: {
       enabled: true,
-      chancePerCheck: 0.4,
+      chancePerCheck: 0.25,
       durationMins: 5,
       expire: '+60',
       toastTitle: 'New doctor order',
