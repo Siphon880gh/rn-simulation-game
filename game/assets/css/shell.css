@@ -1109,6 +1109,20 @@ body.shell-bottom-resizing {
     transform: translateX(-50%) translateY(0);
 }
 
+.shell-awaiting-toast.is-clickable {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.shell-awaiting-toast.is-clickable:focus-visible .shell-awaiting-toast__card {
+    outline: 2px solid #a7f3d0;
+    outline-offset: 3px;
+}
+
+.shell-awaiting-toast.is-clickable:hover .shell-awaiting-toast__card {
+    filter: brightness(1.06);
+}
+
 .shell-awaiting-toast[hidden] {
     display: none !important;
 }

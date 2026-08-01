@@ -1,12 +1,14 @@
 /**
  * Hourly check-doctor-orders (E4.M3) + E11 carryover / sudden procedures.
  * Spawn at each game-hour start; expire at next hour; complete injects pack + carryover + ≤1 procedure.
+ * Also: dice-gated trivial order for a random census patient + clickable toast.
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
 import { mountTaskDom } from './dynamic-tasks.js';
 import { minutesFromShiftAnchor } from './availability-windows.js';
+import { showShellToast } from './critical-labs.js';
 
 const spawnedHourStarts = new Set();
 const injectionHandled = new Set();
@@ -19,6 +21,14 @@ const missedCheckQueuedHours = new Set();
 let procedureInjected = false;
 let shiftStart = GameConfig.timer.defaultShiftStart;
 let shiftDuration = GameConfig.timer.defaultShiftDuration;
+
+/** @type {{ showPatientPanel?: Function }|null} */
+let patientsApi = null;
+
+/** @type {HTMLElement|null} */
+let trivialOddsPopoverEl = null;
+/** @type {HTMLElement|null} */
+let trivialOddsAnchorEl = null;
 
 function hhmmToMinutes(hhmm) {
     const n = Number(hhmm) || 0;
@@ -78,17 +88,226 @@ function procCfg() {
     return GameConfig.doctorOrders?.procedures || {};
 }
 
+function trivialCfg() {
+    return GameConfig.doctorOrders?.trivialOrders || {};
+}
+
+export function getTrivialOrderChance() {
+    const chance = Number(trivialCfg().chancePerCheck);
+    if (!Number.isFinite(chance)) return 0.4;
+    return Math.max(0, Math.min(1, chance));
+}
+
+export function getTrivialOrderOdds() {
+    const generatePct = Math.round(getTrivialOrderChance() * 100);
+    return [
+        { id: 'generate', label: 'New trivial order', percent: generatePct },
+        { id: 'none', label: 'No new trivial order', percent: 100 - generatePct }
+    ];
+}
+
+function escapeHtml(text) {
+    return String(text ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function patientLabel(patientId) {
+    const patient = gameState.getStateSlice('patients')?.get(patientId);
+    if (!patient) return patientId || 'patient';
+    const room = patient.room ? ` · ${patient.room}` : '';
+    return `${patient.name || patientId}${room}`;
+}
+
+function listCensusPatientIds() {
+    const patients = gameState.getStateSlice('patients');
+    if (!patients?.size) return [];
+    return [...patients.keys()];
+}
+
+function focusTaskAtPatient(task) {
+    if (!task) return;
+    if (task.patientId && typeof patientsApi?.showPatientPanel === 'function') {
+        patientsApi.showPatientPanel(task.patientId, {
+            logMessage: `Opened from new order: ${task.name}`
+        });
+    } else if (task.patientId) {
+        gameState.dispatch('SET_ACTIVE_PATIENT', { patientId: task.patientId });
+    }
+    if (typeof document === 'undefined' || typeof requestAnimationFrame !== 'function') return;
+    requestAnimationFrame(() => {
+        const el = document.getElementById(task.id);
+        if (!el) return;
+        el.classList.add('rail-focus-pulse');
+        el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        window.setTimeout(() => el.classList.remove('rail-focus-pulse'), 1200);
+    });
+}
+
+function showTrivialOrderToast(task) {
+    const cfg = trivialCfg();
+    const who = patientLabel(task.patientId);
+    showShellToast({
+        title: cfg.toastTitle || 'New doctor order',
+        detail: `${task.name} · ${who}`,
+        iconClass: 'fas fa-clipboard-list',
+        hideAfterMs: cfg.toastMs ?? 6500,
+        clickAriaLabel: `New order: ${task.name} for ${who}. Click to open task.`,
+        onClick: () => focusTaskAtPatient(task)
+    });
+}
+
+export function renderTrivialOrderOddsHtml() {
+    const rows = getTrivialOrderOdds().map((row) => `
+      <li class="orders-trivial-odds__row">
+        <span class="orders-trivial-odds__label">${escapeHtml(row.label)}</span>
+        <span class="orders-trivial-odds__pct">${row.percent}%</span>
+      </li>
+    `).join('');
+    return `
+      <div class="orders-trivial-odds" role="dialog" aria-label="Orders check trivial-order odds">
+        <p class="orders-trivial-odds__title">Orders check — new task odds</p>
+        <ul class="orders-trivial-odds__list">${rows}</ul>
+      </div>
+    `;
+}
+
+function ensureTrivialOddsPopover() {
+    if (trivialOddsPopoverEl) return trivialOddsPopoverEl;
+    if (typeof document === 'undefined') return null;
+    trivialOddsPopoverEl = document.createElement('div');
+    trivialOddsPopoverEl.className = 'orders-trivial-odds-popover';
+    trivialOddsPopoverEl.hidden = true;
+    trivialOddsPopoverEl.innerHTML = renderTrivialOrderOddsHtml();
+    document.body.appendChild(trivialOddsPopoverEl);
+    return trivialOddsPopoverEl;
+}
+
+function positionTrivialOddsPopover(anchor) {
+    if (!trivialOddsPopoverEl || !anchor?.getBoundingClientRect) return;
+    const rect = anchor.getBoundingClientRect();
+    const pad = 8;
+    const width = trivialOddsPopoverEl.offsetWidth || 240;
+    let left = rect.left + rect.width / 2 - width / 2;
+    left = Math.max(pad, Math.min(left, window.innerWidth - width - pad));
+    let top = rect.bottom + 6;
+    const height = trivialOddsPopoverEl.offsetHeight || 120;
+    if (top + height > window.innerHeight - pad) {
+        top = Math.max(pad, rect.top - height - 6);
+    }
+    trivialOddsPopoverEl.style.left = `${left}px`;
+    trivialOddsPopoverEl.style.top = `${top}px`;
+}
+
+export function showTrivialOrderOddsPopover(anchor) {
+    if (typeof document === 'undefined') return;
+    const pop = ensureTrivialOddsPopover();
+    if (!pop) return;
+    pop.innerHTML = renderTrivialOrderOddsHtml();
+    pop.hidden = false;
+    trivialOddsAnchorEl = anchor || null;
+    positionTrivialOddsPopover(anchor);
+}
+
+export function hideTrivialOrderOddsPopover() {
+    if (!trivialOddsPopoverEl) return;
+    trivialOddsPopoverEl.hidden = true;
+    trivialOddsAnchorEl = null;
+}
+
+function toggleTrivialOrderOddsPopover(anchor) {
+    const pop = ensureTrivialOddsPopover();
+    if (!pop) return;
+    if (!pop.hidden && trivialOddsAnchorEl === anchor) {
+        hideTrivialOrderOddsPopover();
+        return;
+    }
+    showTrivialOrderOddsPopover(anchor);
+}
+
+/** Attach dice control inline after the task name (same placement as Accucheck). */
+export function decorateOrdersTrivialDice(root = document) {
+    if (typeof document === 'undefined' || !root?.querySelectorAll) return;
+    if (trivialCfg().enabled === false) return;
+    const nodes = root.querySelectorAll(
+        '[data-task-type="orders"][data-orders-kind="doctor-orders-check"], #doctor-orders-list [data-task-type="orders"]'
+    );
+    nodes.forEach((el) => {
+        if (el.querySelector('[data-orders-trivial-dice]')) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'orders-trivial-dice';
+        btn.setAttribute('data-orders-trivial-dice', '1');
+        btn.setAttribute('title', 'New trivial order odds');
+        btn.setAttribute('aria-label', 'Show new trivial order odds');
+        btn.innerHTML = '<i class="fas fa-dice" aria-hidden="true"></i>';
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof e.stopImmediatePropagation === 'function') {
+                e.stopImmediatePropagation();
+            }
+            toggleTrivialOrderOddsPopover(btn);
+        });
+
+        const nameEl = el.querySelector('.font-medium');
+        const timeEl = el.querySelector('.ml-auto');
+        if (nameEl?.parentElement === el) {
+            // Flat row: icon · name · dice · window (Accucheck layout)
+            el.insertBefore(btn, timeEl || nameEl.nextSibling);
+        } else if (nameEl) {
+            nameEl.insertAdjacentElement('afterend', btn);
+        } else if (timeEl) {
+            el.insertBefore(btn, timeEl);
+        } else {
+            el.appendChild(btn);
+        }
+    });
+}
+
+let trivialDiceUiWired = false;
+export function initOrdersTrivialDiceUi() {
+    if (typeof document === 'undefined' || trivialDiceUiWired) return;
+    trivialDiceUiWired = true;
+    decorateOrdersTrivialDice(document);
+    document.addEventListener('click', (e) => {
+        if (e.target.closest?.('[data-orders-trivial-dice]')) return;
+        if (e.target.closest?.('.orders-trivial-odds-popover')) return;
+        hideTrivialOrderOddsPopover();
+    });
+    window.addEventListener('resize', () => {
+        if (trivialOddsAnchorEl) positionTrivialOddsPopover(trivialOddsAnchorEl);
+    });
+}
+
 function ensureOrdersHost() {
     let host = document.querySelector('#doctor-orders-list');
-    if (host) return host;
+    if (host) {
+        const wrap = host.closest('.doctor-orders');
+        if (wrap && !wrap.classList.contains('space-y-2')) {
+            wrap.classList.add('space-y-2', 'mb-4');
+        }
+        const heading = wrap?.querySelector(':scope > h4');
+        if (heading) {
+            heading.classList.add('flex', 'items-center', 'gap-2', 'task-section-heading');
+            heading.classList.remove('mb-2');
+        }
+        if (host.classList.contains('space-y-2')) {
+            host.classList.remove('space-y-2');
+            host.classList.add('space-y-3');
+        }
+        return host;
+    }
     const panel = document.querySelector(GameConfig.selectors.globalPanel)
         || document.querySelector('#global-panel');
     if (!panel) return null;
     const wrap = document.createElement('div');
-    wrap.className = 'doctor-orders mt-4 text-left';
+    wrap.className = 'doctor-orders space-y-2 mb-4 mt-4 text-left';
     wrap.innerHTML = `
-      <h4 class="font-semibold text-gray-800 mb-2">Doctor orders checks</h4>
-      <ul id="doctor-orders-list" class="space-y-2"></ul>
+      <h4 class="font-semibold text-gray-800 flex items-center gap-2 task-section-heading">Doctor orders checks</h4>
+      <ul id="doctor-orders-list" class="space-y-3"></ul>
     `;
     panel.querySelector('.bg-white, .rounded-lg')?.appendChild(wrap) || panel.appendChild(wrap);
     return wrap.querySelector('#doctor-orders-list');
@@ -105,18 +324,21 @@ function renderOrdersTask(task) {
     }
     const expireLabel = task.expire != null ? formatHHMM(task.expire) : '—';
     li.setAttribute('data-task-type', 'orders');
+    li.setAttribute('data-orders-kind', 'doctor-orders-check');
     li.setAttribute('data-status', task.status);
     li.setAttribute('data-scheduled', String(task.scheduled).padStart(4, '0'));
     li.setAttribute('data-expire', task.expire != null ? String(task.expire).padStart(4, '0') : '');
     li.setAttribute('data-duration-mins', String(task.duration || 5));
     li.className = `bg-white p-3 rounded-lg shadow flex items-center task-status-${task.status} border border-gray-100`;
+    // Flat row like Accucheck: icon · name · (dice) · window — dice stays clickable outside Perform
     li.innerHTML = `
       <i class="fas fa-clipboard-list text-indigo-500 text-xl mr-3"></i>
-      <div class="flex-1 text-left">
-        <span class="font-medium text-gray-900">${task.name}</span>
-        <p class="text-xs text-gray-500">Window ${formatHHMM(task.scheduled)} – ${expireLabel}</p>
-      </div>
+      <span class="font-medium text-gray-900">${task.name}</span>
+      <span class="ml-auto text-xs text-gray-500 whitespace-nowrap">Window ${formatHHMM(task.scheduled)} – ${expireLabel}</span>
     `;
+    decorateOrdersTrivialDice(li);
+    taskSystem.syncTaskWindowDomAttrs?.(li, task);
+    taskSystem.refreshFalloutUi?.(host.closest('.doctor-orders') || host.parentElement || host);
 }
 
 function spawnHourlyCheck(hourStart, hourEnd, hourIndex) {
@@ -438,6 +660,63 @@ export function maybeInjectSuddenProcedure(opts = {}) {
     return spawned;
 }
 
+/**
+ * Dice roll: maybe inject one random trivial order for a random census patient.
+ * @returns {object|null} live task when generated
+ */
+export function maybeInjectTrivialOrder(opts = {}) {
+    const cfg = trivialCfg();
+    if (cfg.enabled === false) return null;
+    const catalog = Array.isArray(cfg.catalog) ? cfg.catalog : [];
+    if (!catalog.length) return null;
+
+    const random = typeof opts.random === 'function' ? opts.random : Math.random;
+    const force = Boolean(opts.force);
+    const chance = getTrivialOrderChance();
+    if (!force && !(chance > 0 && random() < chance)) return null;
+
+    const patientIds = listCensusPatientIds();
+    if (!patientIds.length) return null;
+
+    const patientId = opts.patientId && patientIds.includes(opts.patientId)
+        ? opts.patientId
+        : patientIds[Math.floor(random() * patientIds.length)];
+    const template = opts.template
+        || catalog[Math.floor(random() * catalog.length)];
+    if (!template?.name) return null;
+
+    const now = opts.now ?? gameState.getStateSlice('currentTime') ?? shiftStart;
+    const hourStart = opts.hourStart ?? now;
+    const id = opts.id || `order-trivial-${patientId}-${hourStart}-${Math.random().toString(36).slice(2, 6)}`;
+
+    const live = injectOrderSpec({
+        id,
+        type: template.type || 'assessment',
+        name: template.name,
+        patientId,
+        taskClass: template.taskClass || GameConfig.tasks.classes.ROUTINE,
+        durationMins: template.durationMins ?? cfg.durationMins ?? 5,
+        scheduled: now,
+        expire: template.expire || cfg.expire || '+60',
+        metadata: {
+            kind: 'trivial-order',
+            orderKind: 'trivial',
+            fromTrivialDice: true
+        }
+    }, { now, hourStart });
+
+    gameState.dispatch('APPEND_SHIFT_LOG', {
+        message: `New trivial order: ${live.name} — ${patientId}`,
+        timeLabel: formatHHMM(now)
+    });
+
+    if (opts.showToast !== false) {
+        showTrivialOrderToast(live);
+    }
+
+    return live;
+}
+
 export function handleOrdersCheckComplete(task, opts = {}) {
     if (!task || task.metadata?.kind !== 'doctor-orders-check') return;
     if (injectionHandled.has(task.id)) return;
@@ -464,6 +743,17 @@ export function handleOrdersCheckComplete(task, opts = {}) {
         injected += 1;
     });
 
+    const trivial = maybeInjectTrivialOrder({
+        now,
+        hourStart,
+        random: opts.random,
+        force: opts.forceTrivial,
+        patientId: opts.trivialPatientId,
+        template: opts.trivialTemplate,
+        showToast: opts.showToast
+    });
+    if (trivial) injected += 1;
+
     const proc = maybeInjectSuddenProcedure({
         now,
         hourStart,
@@ -480,7 +770,7 @@ export function handleOrdersCheckComplete(task, opts = {}) {
         });
     } else {
         gameState.dispatch('APPEND_SHIFT_LOG', {
-            message: `Orders check complete — ${injected} order task(s) (incl. carryover/procedure)`,
+            message: `Orders check complete — ${injected} order task(s) (incl. carryover/procedure/trivial)`,
             timeLabel: formatHHMM(now)
         });
     }
@@ -531,6 +821,11 @@ const DoctorOrdersModule = {
     injectOrderSpec,
     injectionsForHour,
     maybeInjectSuddenProcedure,
+    maybeInjectTrivialOrder,
+    getTrivialOrderChance,
+    getTrivialOrderOdds,
+    decorateOrdersTrivialDice,
+    initOrdersTrivialDiceUi,
     listProcedureEligiblePatients,
     nextMidnightExpire,
     addMinutesToHhmm,
@@ -540,6 +835,8 @@ const DoctorOrdersModule = {
         resetDoctorOrders();
         shiftStart = config.shiftStarts ?? GameConfig.timer.defaultShiftStart;
         shiftDuration = config.shiftDuration ?? GameConfig.timer.defaultShiftDuration;
+        patientsApi = config.patients || patientsApi;
+        initOrdersTrivialDiceUi();
 
         gameState.subscribe('currentTime', (t) => processDoctorOrdersTime(t));
         gameState.subscribe('tasks', (tasks) => {

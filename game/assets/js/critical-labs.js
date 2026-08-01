@@ -31,6 +31,8 @@ const callbackCompleteHandled = new Set();
 
 /** @type {ReturnType<typeof setTimeout>|null} */
 let toastHideTimer = null;
+/** @type {((ev: Event) => void)|null} */
+let toastClickHandler = null;
 
 function cfg() {
     return GameConfig.criticalLabs || {};
@@ -114,9 +116,29 @@ function ensureToastEl() {
     return el;
 }
 
+function clearToastClick(el) {
+    if (el && toastClickHandler) {
+        el.removeEventListener('click', toastClickHandler);
+    }
+    toastClickHandler = null;
+    if (el) {
+        el.classList.remove('is-clickable');
+        el.setAttribute('role', 'status');
+        el.removeAttribute('tabindex');
+        el.removeAttribute('aria-label');
+    }
+}
+
 /**
  * Temporary top banner (same widget as “Dr will call back”).
- * @param {{ title?: string, detail?: string, iconClass?: string, hideAfterMs?: number }} [opts]
+ * @param {{
+ *   title?: string,
+ *   detail?: string,
+ *   iconClass?: string,
+ *   hideAfterMs?: number,
+ *   onClick?: (ev: Event) => void,
+ *   clickAriaLabel?: string
+ * }} [opts]
  */
 export function showShellToast(opts = {}) {
     if (typeof document === 'undefined') return;
@@ -131,6 +153,23 @@ export function showShellToast(opts = {}) {
     } else if (iconEl && !opts.iconClass) {
         iconEl.className = 'fas fa-phone-alt';
     }
+
+    clearToastClick(el);
+    if (typeof opts.onClick === 'function') {
+        el.classList.add('is-clickable');
+        el.setAttribute('role', 'button');
+        el.setAttribute('tabindex', '0');
+        el.setAttribute(
+            'aria-label',
+            opts.clickAriaLabel || `${titleEl?.textContent || 'Notification'}. Click to open.`
+        );
+        toastClickHandler = (ev) => {
+            opts.onClick(ev);
+            hideAwaitingCallbackToast();
+        };
+        el.addEventListener('click', toastClickHandler);
+    }
+
     el.hidden = false;
     // Force reflow so the enter transition runs when re-shown
     void el.offsetWidth;
@@ -143,6 +182,7 @@ export function showShellToast(opts = {}) {
         el.classList.remove('is-visible');
         toastHideTimer = setTimeout(() => {
             el.hidden = true;
+            clearToastClick(el);
             toastHideTimer = null;
         }, 300);
     }, hideAfter);
@@ -175,6 +215,7 @@ function hideAwaitingCallbackToast() {
     if (!el) return;
     el.classList.remove('is-visible');
     el.hidden = true;
+    clearToastClick(el);
 }
 
 function pickPatientId(preferred, random = Math.random) {

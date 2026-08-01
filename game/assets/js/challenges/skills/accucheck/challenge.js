@@ -365,11 +365,17 @@ export function decorateAccucheckDice(root = document) {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
+            if (typeof e.stopImmediatePropagation === 'function') {
+                e.stopImmediatePropagation();
+            }
             toggleFingerStickOddsPopover(btn);
         });
 
+        const nameEl = el.querySelector('.font-medium');
         const timeEl = el.querySelector('.ml-auto');
-        if (timeEl) {
+        if (nameEl?.parentElement === el) {
+            el.insertBefore(btn, timeEl || nameEl.nextSibling);
+        } else if (timeEl) {
             el.insertBefore(btn, timeEl);
         } else {
             el.appendChild(btn);

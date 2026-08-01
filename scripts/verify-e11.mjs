@@ -25,24 +25,34 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const failures = [];
 const assert = (cond, msg) => { if (!cond) failures.push(msg); };
 
-globalThis.document = {
-  querySelector: () => ({
-    querySelector: () => ({ appendChild() {} }),
-    appendChild() {},
-    contains: () => false,
-    classList: { add() {}, remove() {} }
-  }),
-  getElementById: () => null,
-  createElement: () => ({
+function stubEl() {
+  return {
     className: '',
     innerHTML: '',
     textContent: '',
     style: {},
-    classList: { add() {}, remove() {} },
+    hidden: true,
+    classList: { add() {}, remove() {}, toggle() {}, contains: () => false },
     setAttribute() {},
+    getAttribute: () => null,
+    removeAttribute() {},
     appendChild() {},
-    querySelector: () => null
-  })
+    addEventListener() {},
+    removeEventListener() {},
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    closest: () => null,
+    contains: () => false,
+    getBoundingClientRect: () => ({ top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0 })
+  };
+}
+
+globalThis.document = {
+  body: stubEl(),
+  querySelector: () => null,
+  querySelectorAll: () => [],
+  getElementById: () => null,
+  createElement: () => stubEl()
 };
 
 assert(existsSync(join(root, 'game/assets/js/doctor-orders.js')), 'doctor-orders.js');

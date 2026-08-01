@@ -116,7 +116,7 @@ Invalid click while aide selected → soft `#shell-delegate-hint`. AUTO: `node s
 
 ## Doctor orders + E11
 
-`doctor-orders.js` — hourly `doctor-orders-check` (duration 5). On **complete**: inject pack `orderInjections` + **carryover** (missed-check undelivered specs + overdue `fromOrdersCheck` tasks) + maybe **one** sudden procedure (`GameConfig.doctorOrders.procedures`).
+`doctor-orders.js` — hourly `doctor-orders-check` (duration 5). On **complete**: inject pack `orderInjections` + **carryover** (missed-check undelivered specs + overdue `fromOrdersCheck` tasks) + dice-gated **trivial order** for a random census patient (`GameConfig.doctorOrders.trivialOrders`, odds dice on the check row; clickable shell toast → patient + scroll to task) + maybe **one** sudden procedure (`GameConfig.doctorOrders.procedures`).
 
 | Procedure rule | Behavior |
 |----------------|----------|

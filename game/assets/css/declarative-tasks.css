@@ -799,3 +799,79 @@ li[data-status="active"] {
     font-weight: 700;
     color: #881337;
 }
+
+/* Doctor-orders check — trivial new-order dice */
+.orders-trivial-dice {
+    flex-shrink: 0;
+    margin-left: 0.35rem;
+    width: 1.85rem;
+    height: 1.85rem;
+    border: 1px solid #a5b4fc;
+    border-radius: 0.4rem;
+    background: #eef2ff;
+    color: #4338ca;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    font-size: 0.9rem;
+}
+
+.orders-trivial-dice:hover {
+    background: #e0e7ff;
+    border-color: #818cf8;
+}
+
+.orders-trivial-dice:focus-visible {
+    outline: 2px solid #4f46e5;
+    outline-offset: 2px;
+}
+
+.orders-trivial-odds-popover {
+    position: fixed;
+    z-index: 60;
+    min-width: 15rem;
+    max-width: min(20rem, calc(100vw - 1rem));
+    padding: 0.75rem 0.85rem;
+    border-radius: 0.55rem;
+    background: #fff;
+    border: 1px solid #c7d2fe;
+    box-shadow: 0 10px 28px rgba(67, 56, 202, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+}
+
+.orders-trivial-odds-popover[hidden] {
+    display: none !important;
+}
+
+.orders-trivial-odds__title {
+    margin: 0 0 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #3730a3;
+}
+
+.orders-trivial-odds__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.orders-trivial-odds__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.78rem;
+    color: #374151;
+}
+
+.orders-trivial-odds__pct {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: #312e81;
+}

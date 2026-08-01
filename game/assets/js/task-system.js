@@ -287,10 +287,12 @@ class TaskSystem {
     });
 
     lists.forEach((list) => {
-      const block = list.closest(
-        '.dynamic-tasks-block, .shift-assessment-block, .care-tasks-block, .care-solo-block, .space-y-2.mb-4, .space-y-2'
+      let block = list.closest(
+        '.doctor-orders, .dynamic-tasks-block, .shift-assessment-block, .care-tasks-block, .care-solo-block, .space-y-2.mb-4, .space-y-2'
       ) || list.parentElement;
-      if (!block) return;
+      // ul.space-y-2 would match itself — always prefer the section wrap over the list
+      if (block === list) block = list.parentElement;
+      if (!block || block === list) return;
       const heading = [...block.children].find((el) => el.tagName === 'H4');
       if (!heading) return;
 

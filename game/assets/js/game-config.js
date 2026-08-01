@@ -376,13 +376,20 @@ export const GameConfig = {
       'turn-patient': 'slot-turn-patient',
       'chair-alarm': 'slot-chair-alarm',
       'bed-alarm': 'slot-bed-alarm',
-      'call-light': 'slot-call-light'
+      'call-light': 'slot-call-light',
+      /** Medication form thumbs (type=med); see also data-route on pack HTML */
+      'med-pills': 'slot-med',
+      'med-shot': 'slot-med-shot',
+      'med-ivpb': 'slot-med-ivpb',
+      'med-iv-push': 'slot-med-iv-push'
     },
     /**
      * Busy-slot thumb by task.type (lowercase). Unlisted types → slotFallbackId
      * (or slot-perform-video when slotPreferVideo).
      * Note: do NOT map type=assessment here — many non-assess tasks reuse that
      * processor key; use slotByTaskKind (shift-assessment / chart-assessment / …).
+     * Med form variants prefer slotByTaskKind (med-pills / med-shot / med-ivpb / med-iv-push);
+     * bare type=med falls through to slot-med (pills/capsules).
      */
     slotByTaskType: {
       med: 'slot-med',
@@ -795,6 +802,28 @@ export const GameConfig = {
     durationMins: 5,
     taskType: 'orders',
     defaultInjectExpire: '+60',
+    /**
+     * Per check: dice roll may inject one random trivial order for a census patient.
+     * chancePerCheck = P(generate); dice UI on the check task shows generate vs not.
+     */
+    trivialOrders: {
+      enabled: true,
+      chancePerCheck: 0.4,
+      durationMins: 5,
+      expire: '+60',
+      toastTitle: 'New doctor order',
+      toastMs: 6500,
+      catalog: [
+        { type: 'assessment', name: 'Incentive spirometry teaching', durationMins: 5 },
+        { type: 'assessment', name: 'Ambulate in hallway ×1', durationMins: 10 },
+        { type: 'med', name: 'Acetaminophen 650 mg PO PRN (new order)', durationMins: 5 },
+        { type: 'med', name: 'Docusate 100 mg PO (new order)', durationMins: 5 },
+        { type: 'assessment', name: 'Daily weight', durationMins: 5 },
+        { type: 'assessment', name: 'SCDs on while in bed', durationMins: 5 },
+        { type: 'assessment', name: 'Encourage oral fluids', durationMins: 5 },
+        { type: 'assessment', name: 'Skin check / turn reminder', durationMins: 5 }
+      ]
+    },
     procedures: {
       enabled: true,
       maxPerGame: 1,

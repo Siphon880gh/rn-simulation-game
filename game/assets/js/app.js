@@ -41,7 +41,6 @@ import { setShiftAnchor } from './availability-windows.js';
 import {
     isAccucheckTask,
     applyFingerStickResult,
-    showFingerStickOddsPopover,
     initFingerStickDiceUi
 } from './challenges/skills/accucheck/challenge.js';
 
@@ -247,6 +246,7 @@ class GameApplication {
     setupTaskUIHandlers() {
         // E13: when a CNA/CCT is selected, capture task clicks for delegate modes
         document.addEventListener('click', (e) => {
+            if (e.target.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice]')) return;
             const aide = getSelectedAide();
             if (!aide) return;
             const taskElement = e.target.closest('[data-task-type]');
@@ -262,6 +262,8 @@ class GameApplication {
         // Use event delegation for dynamic task elements
         document.addEventListener('click', (e) => {
             if (getSelectedAide()) return;
+            // Dice odds controls own their click (Accucheck + orders trivial)
+            if (e.target.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice]')) return;
             const taskElement = e.target.closest('[data-task-type]');
             if (!taskElement) return;
 
@@ -338,6 +340,10 @@ class GameApplication {
             selector: '[data-task-type="med"][data-status="active"], [data-task-type="orders"][data-status="active"], [data-task-type="assessment"][data-status="active"], [data-task-type="bedprep"][data-status="active"], [data-task-type="iv"][data-status="active"], [data-task-type="criticallab"][data-status="active"], [data-task-type="admission"][data-status="active"]',
             trigger: 'left',
             build: (triggerElement, e) => {
+                // Leave Accucheck / orders dice clicks alone (odds popover, not Perform)
+                if (e?.target?.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice]')) {
+                    return false;
+                }
                 const element = e.target.closest('[data-task-type]');
                 if (!element || element.getAttribute('data-status') !== GameConfig.tasks.statuses.ACTIVE) {
                     return false;
@@ -425,13 +431,6 @@ class GameApplication {
                     },
                     details: { name: 'Details', icon: 'question' }
                 };
-
-                if (isAccucheckTask(task)) {
-                    items.fingerStickOdds = {
-                        name: 'Finger-stick odds',
-                        icon: 'dice'
-                    };
-                }
 
                 // E13: team/solo when an available aide can perform (call lights = floor CNA only)
                 if (canPerform && task.patientId) {
@@ -548,10 +547,6 @@ class GameApplication {
                     }
                 }
                 alert(msg);
-            },
-            fingerStickOdds: () => {
-                const diceBtn = element?.querySelector?.('[data-finger-stick-dice]');
-                showFingerStickOddsPopover(diceBtn || element);
             }
         };
 
@@ -932,7 +927,10 @@ class GameApplication {
         // E4.M3: hourly doctor-orders checks (subscribes to currentTime)
         const doctorOrders = this.modules.get('doctorOrders');
         if (doctorOrders && doctorOrders.init) {
-            doctorOrders.init(gameConfig);
+            doctorOrders.init({
+                ...gameConfig,
+                patients: this.modules.get('patients')
+            });
         }
 
         // E3.M5: thin dynamic/urgent spawn (game-time cadence)
