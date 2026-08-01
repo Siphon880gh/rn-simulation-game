@@ -938,6 +938,7 @@ export function cheatChallenge() {
         || activeSession.icpQuiz
         || activeSession.alteplaseQuiz
         || activeSession.admissionQuiz
+        || activeSession.sepsisScreen
     ) {
         if (cheatSafetyHighlight()) {
             setChallengeFeedback('Cheat highlighted the correct choice — click it to submit.', { ok: true });
