@@ -7,6 +7,7 @@
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
   "learningObjectives": [
     "Manage a two-patient ICU assignment with elevated starting acuity",
+    "Identify monitor rhythms from strips during ICU alarms",
     "Protect high-risk windows when both patients can deteriorate",
     "Practice Code Blue / escalate cues under compressed census"
   ],
@@ -29,7 +30,7 @@
       "bed-prep": null
     }
   },
-  "incidentPackUrl": "events/incidents/chaos-night-medsurg.json",
+  "incidentPackUrl": "events/incidents/rhythm-analysis-night-icu.json",
   "orderInjections": {
     "1900": [],
     "default": []
@@ -50,6 +51,28 @@
           "expire": "+30",
           "durationMins": 15,
           "taskClass": "stat"
+        }
+      ]
+    },
+    {
+      "id": "icu-rhythm-open-1945",
+      "at": 1945,
+      "type": "emergency",
+      "message": "Bedside monitor: new arrhythmia alarm — identify the strip",
+      "injectTasks": [
+        {
+          "id": "evt-icu-lyle-rhythm-1945",
+          "type": "assessment",
+          "name": "New arrhythmia alarm — rhythm strip analysis",
+          "patientId": "lyle",
+          "scheduled": 1945,
+          "expire": "+30",
+          "durationMins": 12,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "ecg-basics"
+          }
         }
       ]
     },

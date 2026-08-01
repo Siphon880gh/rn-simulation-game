@@ -4,6 +4,7 @@
  * Author content: ./config.js (+ ./banks/*)
  */
 import { GameConfig } from '../../../game-config.js';
+import gameState from '../../../game-state.js';
 import { skillMcqChallengeConfig, skillMcqBanks } from './config.js';
 
 function cfg() {
@@ -25,18 +26,42 @@ export function getSkillMcqBank(skillId) {
   return banks[id] || null;
 }
 
-function visibleQuestions(bank) {
-  const pool = Array.isArray(bank?.questions) ? bank.questions : [];
-  return pool.filter((q) => q && q.rank !== -1 && q.hidden !== true);
+/** Current scenario unit (`icu` | `medsurg` | `tele`); empty when unknown / skill-test blank. */
+export function resolveSkillMcqUnit(opts = {}) {
+  if (opts.unit != null && String(opts.unit).trim() !== '') {
+    return String(opts.unit).trim().toLowerCase();
+  }
+  const pack = gameState.getStateSlice?.('scenarioPack') || gameState.state?.scenarioPack;
+  const raw = pack?.department || pack?.scene?.theme || '';
+  return String(raw).trim().toLowerCase();
 }
 
-export function getSkillMcqPoolSize(skillId) {
-  return visibleQuestions(getSkillMcqBank(skillId)).length;
+/** Questions with `units: ['icu']` (etc.) only appear on those departments; no tag = all units. */
+function questionAllowedForUnit(question, unit) {
+  const allowed = Array.isArray(question?.units)
+    ? question.units.map((u) => String(u).toLowerCase()).filter(Boolean)
+    : [];
+  if (!allowed.length) return true;
+  if (!unit) return true;
+  return allowed.includes(unit);
+}
+
+function visibleQuestions(bank, unit = '') {
+  const pool = Array.isArray(bank?.questions) ? bank.questions : [];
+  return pool.filter(
+    (q) => q && q.rank !== -1 && q.hidden !== true && questionAllowedForUnit(q, unit)
+  );
+}
+
+export function getSkillMcqPoolSize(skillId, opts = {}) {
+  const unit = resolveSkillMcqUnit(opts);
+  return visibleQuestions(getSkillMcqBank(skillId), unit).length;
 }
 
 /** Visible question ids in bank order (caller should shuffle for a run). */
-export function getSkillMcqQuestionIds(skillId) {
-  return visibleQuestions(getSkillMcqBank(skillId))
+export function getSkillMcqQuestionIds(skillId, opts = {}) {
+  const unit = resolveSkillMcqUnit(opts);
+  return visibleQuestions(getSkillMcqBank(skillId), unit)
     .map((q) => q?.id)
     .filter((id) => id != null && id !== '')
     .map(String);
@@ -44,7 +69,8 @@ export function getSkillMcqQuestionIds(skillId) {
 
 export function pickSkillMcqQuestion(skillId, opts = {}) {
   const bank = getSkillMcqBank(skillId);
-  const pool = visibleQuestions(bank);
+  const unit = resolveSkillMcqUnit(opts);
+  const pool = visibleQuestions(bank, unit);
   if (!pool.length) return null;
   if (opts.questionId != null && opts.questionId !== '') {
     const wanted = String(opts.questionId);
@@ -88,6 +114,8 @@ function questionType(question) {
   if (t === 'sata' || t === 'match' || t === 'flash') return t;
   // Sheet "Video" rows that are MP3/audio identify prompts
   if (t === 'audio' || t === 'video') return 'audio';
+  // Rhythm-strip / still-image identify prompts
+  if (t === 'image' || t === 'strip') return 'image';
   return 'choice';
 }
 
@@ -127,14 +155,18 @@ export function buildSkillMcqQuiz(task, opts = {}) {
     type
   };
 
-  if (type === 'choice' || type === 'audio') {
+  if (type === 'choice' || type === 'audio' || type === 'image') {
     const correctLabel = String(expectedLabelForChoice(question) ?? '').trim();
     const labels = shuffle(question.choices || [], opts.random);
+    const resolvedType = type === 'audio' ? 'audio' : (type === 'image' ? 'image' : 'choice');
     return {
       ...base,
-      type: type === 'audio' ? 'audio' : 'choice',
+      type: resolvedType,
       audioSrc: type === 'audio'
         ? resolveMediaSrc(question.audio || question.media || question.video)
+        : '',
+      imageSrc: type === 'image'
+        ? resolveMediaSrc(question.image || question.media || question.strip)
         : '',
       choices: labels.map((label) => ({
         label,
@@ -220,6 +252,20 @@ function renderAudioHtml(quiz) {
     : '<p class="text-sm text-rose-700">Audio file missing for this prompt.</p>';
   return `
       ${player}
+      <div class="flex flex-col gap-2" data-quiz-choices>${renderChoiceHtml(quiz)}</div>
+    `;
+}
+
+function renderImageHtml(quiz) {
+  const src = escapeHtml(quiz.imageSrc || '');
+  const alt = escapeHtml(quiz.instruction || 'Rhythm strip');
+  const strip = src
+    ? `<div class="rounded border border-slate-300 bg-white p-2 space-y-2" data-skill-strip>
+        <img class="w-full max-h-56 object-contain skill-strip-image" src="${src}" alt="${alt}" loading="eager" />
+      </div>`
+    : '<p class="text-sm text-rose-700">Rhythm strip image missing for this prompt.</p>';
+  return `
+      ${strip}
       <div class="flex flex-col gap-2" data-quiz-choices>${renderChoiceHtml(quiz)}</div>
     `;
 }
@@ -464,6 +510,7 @@ export function renderSkillMcqHtml(quiz, taskName, opts = {}) {
   else if (type === 'match') body = renderMatchHtml(quiz);
   else if (type === 'flash') body = renderFlashHtml(quiz);
   else if (type === 'audio') body = renderAudioHtml(quiz);
+  else if (type === 'image') body = renderImageHtml(quiz);
   else {
     body = `<div class="flex flex-col gap-2" data-quiz-choices>${renderChoiceHtml(quiz)}</div>`;
   }
@@ -498,7 +545,7 @@ function resetMatchBoard(gate) {
 }
 
 function clearSkillMcqCheat(gate, type) {
-  if (type === 'choice' || type === 'audio') {
+  if (type === 'choice' || type === 'audio' || type === 'image') {
     gate.querySelectorAll('.challenge-choice').forEach((btn) => {
       btn.classList.remove('ring-2', 'ring-amber-400', 'bg-amber-50');
     });
@@ -543,7 +590,7 @@ export function applySkillMcqCheat() {
     return { ok: true, cleared: true, message: 'Cheat hints cleared.' };
   }
 
-  if (type === 'choice' || type === 'audio') {
+  if (type === 'choice' || type === 'audio' || type === 'image') {
     let found = false;
     gate.querySelectorAll('.challenge-choice').forEach((btn) => {
       btn.classList.remove('ring-2', 'ring-amber-400', 'bg-amber-50');
@@ -629,7 +676,7 @@ export function wireSkillMcqInteractions(onGraded) {
   if (!gate || typeof onGraded !== 'function') return;
   const type = gate.getAttribute('data-quiz-type') || 'choice';
 
-  if (type === 'choice' || type === 'audio') {
+  if (type === 'choice' || type === 'audio' || type === 'image') {
     gate.querySelectorAll('.challenge-choice').forEach((btn) => {
       btn.addEventListener('click', () => {
         stopSkillMcqAudio(gate);

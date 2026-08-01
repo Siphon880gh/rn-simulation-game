@@ -75,20 +75,26 @@
       "aliases": [
         "FAST",
         "CVA",
-        "BE-FAST"
+        "BE-FAST",
+        "BEFAST",
+        "suspected stroke",
+        "stroke alert"
       ],
       "tags": [
         "neuro",
-        "assessment"
+        "assessment",
+        "emergency",
+        "tele"
       ],
-      "blurb": "Recognize stroke signs and escalate.",
+      "blurb": "BEFAST recognition, ABCs/glucose, last known well, stroke-team activation, CT hemorrhage branch, rtPA vs aspirin, stroke-unit admit.",
       "games": [
         "skill-mcq"
       ],
       "status": "active",
-      "unitHint": "icu",
-      "pack": "events/scenarios/skill-stroke-assessment-icu.json",
+      "unitHint": "tele",
+      "pack": "events/scenarios/skill-stroke-assessment-tele.json",
       "patients": [
+        "nell",
         "priya"
       ]
     },
@@ -717,6 +723,74 @@
       ]
     },
     {
+      "id": "respiratory-failure-airway",
+      "label": "Desat -> Respiratory Failure",
+      "aliases": [
+        "desaturation",
+        "ambu bag",
+        "BVM",
+        "bag valve mask",
+        "respiratory failure",
+        "desat airway",
+        "ETT",
+        "intubation",
+        "transfer to ICU"
+      ],
+      "tags": [
+        "respiratory",
+        "emergency",
+        "medsurg",
+        "tele"
+      ],
+      "blurb": "Med-surg or tele desat → Ambu/BVM → Code Blue for ETT → Transfer to ICU (floor path; no RSI).",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-respiratory-failure-airway-medsurg.json",
+      "packs": [
+        "events/scenarios/skill-respiratory-failure-airway-medsurg.json",
+        "events/scenarios/skill-respiratory-failure-airway-tele.json"
+      ],
+      "patients": [
+        "maren",
+        "cass"
+      ]
+    },
+    {
+      "id": "respiratory-failure-airway-icu",
+      "label": "Desat -> Respiratory Failure in ICU",
+      "aliases": [
+        "desaturation",
+        "ambu bag",
+        "BVM",
+        "bag valve mask",
+        "respiratory failure",
+        "desat airway",
+        "ETT",
+        "intubation",
+        "RSI",
+        "rapid sequence intubation",
+        "etomidate"
+      ],
+      "tags": [
+        "respiratory",
+        "emergency",
+        "icu"
+      ],
+      "blurb": "ICU desat → Ambu/BVM → Code Blue for ETT → RSI (etomidate, laryngoscope assist).",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-respiratory-failure-airway-icu.json",
+      "patients": [
+        "kira"
+      ]
+    },
+    {
       "id": "sbar",
       "label": "SBAR communication",
       "aliases": [
@@ -743,14 +817,16 @@
       "label": "ECG / telemetry basics",
       "aliases": [
         "rhythm strip",
+        "rhythm analysis",
         "tele",
-        "arrhythmia"
+        "arrhythmia",
+        "ekg strip"
       ],
       "tags": [
         "cardiac",
         "assessment"
       ],
-      "blurb": "Recognize common tele rhythms.",
+      "blurb": "Identify rhythms from telemetry strips (1 question; bump for boosters).",
       "games": [
         "skill-mcq"
       ],

@@ -7,6 +7,7 @@
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
   "learningObjectives": [
     "Monitor a telemetry census of four under slot pressure",
+    "Identify common rhythms from telemetry strips during bedside alarms",
     "Respond to rhythm / bedside alarms without losing routine meds",
     "Sequence work when multiple patients share similar urgency cues"
   ],
@@ -19,27 +20,31 @@
       "bed-prep": null
     }
   },
-  "incidentPackUrl": "events/incidents/chaos-night-medsurg.json",
+  "incidentPackUrl": "events/incidents/rhythm-analysis-night-tele.json",
   "orderInjections": {
     "1900": [],
     "default": []
   },
   "events": [
     {
-      "id": "tele-alarm-1930",
-      "at": 1930,
+      "id": "tele-alarm-1915",
+      "at": 1915,
       "type": "emergency",
-      "message": "Telemetry: frequent PVCs — bedside check needed",
+      "message": "Central tele: new irregular rhythm — bedside strip check",
       "injectTasks": [
         {
-          "id": "evt-tele-pvc-check",
+          "id": "evt-tele-rhythm-1915",
           "type": "assessment",
-          "name": "Telemetry PVC / rhythm bedside check",
+          "name": "Central tele alarm — rhythm strip analysis",
           "patientId": "derek",
-          "scheduled": 1930,
-          "expire": "+45",
-          "durationMins": 10,
-          "taskClass": "urgent"
+          "scheduled": 1915,
+          "expire": "+35",
+          "durationMins": 12,
+          "taskClass": "urgent",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "ecg-basics"
+          }
         }
       ]
     }

@@ -11,6 +11,8 @@ import { decorateAlteplaseDice } from './challenges/skills/alteplase/challenge.j
 import { decorateSepsisScreenDice } from './challenges/skills/sepsis-recognition/challenge.js';
 
 const spawnedCadenceKeys = new Set();
+/** Task ids whose spawnTasksOnComplete chain already fired */
+const spawnedOnCompleteKeys = new Set();
 let spawnCount = 0;
 let shiftStart = GameConfig.timer.defaultShiftStart;
 /** @type {{ showPatientPanel?: Function } | null} */
@@ -250,6 +252,68 @@ function renderIncidentTab(task) {
     }
 }
 
+/**
+ * After a task completes, inject metadata.spawnTasksOnComplete specs (dependent chain).
+ * Used by stroke-alert and similar incident pathways.
+ */
+export function spawnTasksOnComplete(completedTask) {
+    if (!completedTask?.id) return [];
+    if (completedTask.status !== GameConfig.tasks.statuses.COMPLETED) return [];
+    if (spawnedOnCompleteKeys.has(completedTask.id)) return [];
+    const specs = completedTask.metadata?.spawnTasksOnComplete;
+    if (!Array.isArray(specs) || !specs.length) return [];
+    spawnedOnCompleteKeys.add(completedTask.id);
+
+    const at = gameState.getStateSlice('currentTime') ?? completedTask.scheduled;
+    const created = [];
+    specs.forEach((spec) => {
+        if (!spec) return;
+        if (spec.patientId && !gameState.getStateSlice('patients')?.has(spec.patientId)) return;
+        if (spec.id && gameState.getStateSlice('tasks')?.has(spec.id)) return;
+
+        const scheduled = spec.scheduled != null ? spec.scheduled : at;
+        const task = taskSystem.createTask({
+            id: spec.id || `spawn-${completedTask.id}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            type: spec.type || 'assessment',
+            taskClass: spec.taskClass || GameConfig.tasks.classes.URGENT,
+            name: spec.name || 'Follow-up task',
+            scheduled,
+            expire: spec.expire != null ? spec.expire : '+45',
+            durationMins: spec.durationMins ?? 10,
+            patientId: spec.patientId || completedTask.patientId || null,
+            metadata: {
+                ...(spec.metadata || {}),
+                fromEvent: true,
+                incident: true,
+                spawnedFromTaskId: completedTask.id
+            }
+        });
+        taskSystem.processTasks(gameState.getStateSlice('currentTime') || scheduled);
+        const live = gameState.getStateSlice('tasks')?.get(task.id) || task;
+        mountTaskDom(live);
+        if (live.metadata?.incident) renderIncidentTab(live);
+        created.push(live);
+
+        gameState.dispatch('APPEND_SHIFT_LOG', {
+            message: `Next step: ${live.name}`,
+            timeLabel: formatHHMM(at)
+        });
+        const statusEl = document.querySelector(GameConfig.selectors.statusMessage);
+        if (statusEl) statusEl.textContent = `Next: ${live.name}`;
+    });
+    return created;
+}
+
+function processSpawnOnCompleteFromTasks() {
+    const tasks = gameState.getStateSlice('tasks');
+    if (!tasks) return;
+    tasks.forEach((task) => {
+        if (task.status === GameConfig.tasks.statuses.COMPLETED) {
+            spawnTasksOnComplete(task);
+        }
+    });
+}
+
 /** Mount an injected/dynamic task tile on the patient panel (used by event-drip too). */
 export function mountTaskDom(task) {
     if (!task.patientId) return;
@@ -298,10 +362,27 @@ export function mountTaskDom(task) {
     if (task.metadata?.challenge) {
         li.setAttribute('data-challenge', task.metadata.challenge);
     }
+    if (task.metadata?.skillId) {
+        li.setAttribute('data-skill-id', String(task.metadata.skillId));
+    }
+    if (task.metadata?.kind) {
+        li.setAttribute('data-task-kind', String(task.metadata.kind));
+    }
     if (task.metadata?.alteplasePhase) {
         li.setAttribute('data-alteplase-phase', String(task.metadata.alteplasePhase));
     }
-    li.setAttribute('title', 'Click for Perform / Details menu');
+    if (task.metadata?.requiresCompletedTaskId) {
+        const req = gameState.getStateSlice('tasks')?.get(task.metadata.requiresCompletedTaskId);
+        const unlocked = req?.status === GameConfig.tasks.statuses.COMPLETED;
+        li.setAttribute('data-task-locked', unlocked ? '0' : '1');
+        li.setAttribute('data-task-reveal', task.metadata?.taskReveal || 'on-prereq');
+        li.setAttribute(
+            'title',
+            unlocked ? 'Click for Perform / Details menu' : 'Locked — complete the prior step first'
+        );
+    } else {
+        li.setAttribute('title', 'Click for Perform / Details menu');
+    }
     const isCrit = task.type === 'criticallab' || task.metadata?.criticalLab;
     li.className = isCrit
         ? `bg-red-50 p-4 rounded-lg shadow flex items-center task-status-${task.status} border border-red-300`
@@ -350,6 +431,9 @@ export function spawnFromTemplate(template, currentTime, opts = {}) {
         durationMins: template.durationMins ?? 10,
         patientId: patientId || null,
         metadata: {
+            ...(template.metadata && typeof template.metadata === 'object' ? template.metadata : {}),
+            ...(template.challenge ? { challenge: template.challenge } : {}),
+            ...(template.skillId ? { skillId: template.skillId } : {}),
             dynamic: true,
             templateId: template.id || null,
             incident: true
@@ -426,6 +510,7 @@ function refreshIncidentTabs() {
 
 export function resetDynamicTasks() {
     spawnedCadenceKeys.clear();
+    spawnedOnCompleteKeys.clear();
     spawnCount = 0;
 }
 
@@ -434,6 +519,7 @@ const DynamicTasksModule = {
     spawnFromTemplate,
     mountTaskDom,
     presentSpawnedTask,
+    spawnTasksOnComplete,
     weightedPick,
     resetDynamicTasks,
     init(config = {}) {
@@ -442,7 +528,10 @@ const DynamicTasksModule = {
         patientsApi = config.patients || patientsApi;
         ensureIncidentHost();
         gameState.subscribe('currentTime', (t) => processDynamicTasksTime(t));
-        gameState.subscribe('tasks', () => refreshIncidentTabs());
+        gameState.subscribe('tasks', () => {
+            processSpawnOnCompleteFromTasks();
+            refreshIncidentTabs();
+        });
     }
 };
 

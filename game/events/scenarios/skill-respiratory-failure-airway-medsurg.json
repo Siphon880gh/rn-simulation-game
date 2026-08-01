@@ -1,0 +1,35 @@
+{
+  "id": "skill-respiratory-failure-airway-medsurg",
+  "title": "Skill practice — Desat -> Respiratory Failure (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize acute desaturation and escalate oxygen / BVM",
+    "Activate Code Blue for emergent ETT when Ambu fails — floor path stops before RSI drugs",
+    "Complete disposition with Transfer to ICU"
+  ],
+  "patients": ["maren"],
+  "patientOverrides": {
+    "maren": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Desatting on NRB — BVM / Code Blue for ETT"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/respiratory-failure-airway-night-medsurg.json",
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

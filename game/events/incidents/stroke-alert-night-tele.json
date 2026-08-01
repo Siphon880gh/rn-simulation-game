@@ -1,0 +1,106 @@
+{
+  "id": "stroke-alert-night-tele",
+  "title": "Night Tele — Suspected stroke / BEFAST incidents",
+  "version": 1,
+  "fictionalOnly": true,
+  "disclaimer": "Incident pack content is fictional practice — not a competency assessment.",
+  "dynamicTemplates": [
+    {
+      "id": "stroke-befast-check",
+      "weight": 3,
+      "type": "assessment",
+      "taskClass": "stat",
+      "name": "Sudden BEFAST change — stroke alert check",
+      "durationMins": 12,
+      "expire": "+25",
+      "patientScope": "random"
+    }
+  ],
+  "events": [
+    {
+      "id": "stroke-befast-2010",
+      "at": 2010,
+      "type": "emergency",
+      "message": "Nell: new facial droop, arm drift, slurred speech — BEFAST stroke alert (LKW 1845)",
+      "injectTasks": [
+        {
+          "id": "evt-nell-stroke-befast",
+          "type": "assessment",
+          "name": "BEFAST — recognize and activate stroke path",
+          "patientId": "nell",
+          "scheduled": 2010,
+          "expire": "+30",
+          "durationMins": 12,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "stroke-assessment",
+            "spawnTasksOnComplete": [
+              {
+                "id": "evt-nell-stroke-abcs",
+                "type": "assessment",
+                "name": "Stroke alert — ABCs / glucose / last known well",
+                "patientId": "nell",
+                "scheduled": 2010,
+                "expire": "+45",
+                "durationMins": 12,
+                "taskClass": "stat",
+                "metadata": {
+                  "challenge": "skill-mcq",
+                  "skillId": "stroke-assessment",
+                  "spawnTasksOnComplete": [
+                    {
+                      "id": "evt-nell-stroke-team-ct",
+                      "type": "assessment",
+                      "name": "Activate stroke team / ED goals / brain imaging",
+                      "patientId": "nell",
+                      "scheduled": 2010,
+                      "expire": "+60",
+                      "durationMins": 12,
+                      "taskClass": "stat",
+                      "metadata": {
+                        "challenge": "skill-mcq",
+                        "skillId": "stroke-assessment",
+                        "spawnTasksOnComplete": [
+                          {
+                            "id": "evt-nell-stroke-tx-path",
+                            "type": "assessment",
+                            "name": "CT hemorrhage branch — rtPA vs aspirin path",
+                            "patientId": "nell",
+                            "scheduled": 2010,
+                            "expire": "+75",
+                            "durationMins": 12,
+                            "taskClass": "stat",
+                            "metadata": {
+                              "challenge": "skill-mcq",
+                              "skillId": "stroke-assessment",
+                              "spawnTasksOnComplete": [
+                                {
+                                  "id": "evt-nell-stroke-unit",
+                                  "type": "assessment",
+                                  "name": "Admit stroke unit / ICU — post-decision observation",
+                                  "patientId": "nell",
+                                  "scheduled": 2010,
+                                  "expire": "+90",
+                                  "durationMins": 10,
+                                  "taskClass": "urgent",
+                                  "metadata": {
+                                    "kind": "stroke-unit-handoff"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

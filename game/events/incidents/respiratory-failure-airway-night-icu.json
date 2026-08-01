@@ -1,0 +1,55 @@
+{
+  "id": "respiratory-failure-airway-night-icu",
+  "title": "Night ICU — Desat -> Respiratory Failure in ICU",
+  "version": 1,
+  "fictionalOnly": true,
+  "disclaimer": "Incident pack content is fictional practice — not a competency assessment.",
+  "dynamicTemplates": [
+    {
+      "id": "desat-airway-check",
+      "weight": 3,
+      "type": "assessment",
+      "taskClass": "stat",
+      "name": "Desat / BVM / RSI airway check",
+      "durationMins": 14,
+      "expire": "+25",
+      "patientScope": "random"
+    }
+  ],
+  "events": [
+    {
+      "id": "kira-desat-2000",
+      "at": 2000,
+      "type": "emergency",
+      "message": "Kira: SpO2 crash into the low 80s on NRB — escalate O2 / prepare Ambu"
+    },
+    {
+      "id": "kira-bvm-fail-2012",
+      "at": 2012,
+      "type": "emergency",
+      "message": "Kira: still desatting despite Ambu — call for airway / prepare Code Blue for ETT"
+    },
+    {
+      "id": "kira-rsi-2024",
+      "at": 2024,
+      "type": "emergency",
+      "message": "Kira: Code Blue airway — RSI (etomidate / paralytic) and laryngoscope assist",
+      "injectTasks": [
+        {
+          "id": "evt-kira-resp-failure-rsi",
+          "type": "assessment",
+          "name": "Desat -> Respiratory Failure in ICU — BVM → RSI / ETT",
+          "patientId": "kira",
+          "scheduled": 2024,
+          "expire": "+30",
+          "durationMins": 16,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "respiratory-failure-airway-icu"
+          }
+        }
+      ]
+    }
+  ]
+}

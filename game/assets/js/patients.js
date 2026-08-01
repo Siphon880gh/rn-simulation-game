@@ -160,6 +160,27 @@ const PatientsModule = (() => {
             htmlFile: 'events/patients/priya.html',
             pastHxFile: 'events/patients/priya-past-hx.json'
         },
+        nell: {
+            id: 'nell',
+            name: 'Nell Park',
+            room: 'Tele-8',
+            age: 71,
+            sex: 'Female',
+            diagnosis: 'Suspected acute stroke — BEFAST alert',
+            skills: ['stroke-assessment'],
+            careSchedules: ['turnQ2h'],
+            careReason: 'Acute hemiparesis — cannot self-reposition safely',
+            vitals: {
+                hr: 98,
+                bp: '178/96',
+                temp: '98.4°F',
+                o2: '95% RA',
+                pain: '0/10',
+                rr: 18
+            },
+            htmlFile: 'events/patients/nell.html',
+            pastHxFile: 'events/patients/nell-past-hx.json'
+        },
         dante: {
             id: 'dante',
             name: 'Dante Ruiz',
@@ -1600,6 +1621,63 @@ const PatientsModule = (() => {
             },
             htmlFile: 'events/patients/sven.html',
             pastHxFile: 'events/patients/sven-past-hx.json'
+        },
+        kira: {
+            id: 'kira',
+            name: 'Kira Mendoza',
+            room: 'ICU-8',
+            age: 67,
+            sex: 'Female',
+            diagnosis: 'Acute hypoxemic respiratory failure — BVM → RSI / ETT',
+            skills: ['respiratory-failure-airway-icu'],
+            vitals: {
+                hr: 128,
+                bp: '96/54',
+                temp: '100.8°F',
+                o2: '82% NRB 15 L',
+                pain: '2/10',
+                rr: 36
+            },
+            htmlFile: 'events/patients/kira.html',
+            pastHxFile: 'events/patients/kira-past-hx.json'
+        },
+        cass: {
+            id: 'cass',
+            name: 'Cass Okonkwo',
+            room: 'Tele-8',
+            age: 71,
+            sex: 'Male',
+            diagnosis: 'Acute respiratory failure / desat — BVM → Code Blue for ETT → Transfer to ICU',
+            skills: ['respiratory-failure-airway'],
+            vitals: {
+                hr: 122,
+                bp: '102/60',
+                temp: '99.4°F',
+                o2: '84% NRB 15 L',
+                pain: '1/10',
+                rr: 34
+            },
+            htmlFile: 'events/patients/cass.html',
+            pastHxFile: 'events/patients/cass-past-hx.json'
+        },
+        maren: {
+            id: 'maren',
+            name: 'Maren Sullivan',
+            room: 'Room 318-A',
+            age: 64,
+            sex: 'Female',
+            diagnosis: 'Acute respiratory failure / desat — BVM → Code Blue for ETT → Transfer to ICU',
+            skills: ['respiratory-failure-airway'],
+            vitals: {
+                hr: 118,
+                bp: '108/62',
+                temp: '101.1°F',
+                o2: '83% NRB 15 L',
+                pain: '3/10 chest wall',
+                rr: 32
+            },
+            htmlFile: 'events/patients/maren.html',
+            pastHxFile: 'events/patients/maren-past-hx.json'
         }
     };
 
@@ -1829,6 +1907,26 @@ const PatientsModule = (() => {
         chartEl.title = unlocked
             ? 'Click for Perform / Details menu'
             : 'Locked — complete shift assessment first';
+    }
+
+    /** Unlock / reveal tasks gated by metadata.requiresCompletedTaskId (stroke chains, chart, etc.). */
+    function syncPrerequisiteLockAttrs() {
+        const tasks = gameState.getStateSlice('tasks');
+        if (!tasks) return;
+        tasks.forEach((task) => {
+            const reqId = task?.metadata?.requiresCompletedTaskId;
+            if (!reqId) return;
+            const el = document.getElementById(task.id);
+            if (!el) return;
+            const unlocked = tasks.get(reqId)?.status === GameConfig.tasks.statuses.COMPLETED;
+            el.setAttribute('data-task-locked', unlocked ? '0' : '1');
+            if (task.metadata?.taskReveal === 'on-prereq' || el.getAttribute('data-task-reveal') === 'on-prereq') {
+                el.setAttribute('data-task-reveal', 'on-prereq');
+            }
+            el.title = unlocked
+                ? 'Click for Perform / Details menu'
+                : 'Locked — complete the prior step first';
+        });
     }
 
     /** Show remaining duration on aborted shift/chart assessment rows. */
@@ -2265,6 +2363,10 @@ const PatientsModule = (() => {
             if (challenge) metadata.challenge = challenge;
             const skillId = element.getAttribute('data-skill-id');
             if (skillId) metadata.skillId = skillId;
+            const requiresCompletedTaskId = element.getAttribute('data-requires-completed-task-id');
+            if (requiresCompletedTaskId) metadata.requiresCompletedTaskId = requiresCompletedTaskId;
+            const taskReveal = element.getAttribute('data-task-reveal');
+            if (taskReveal) metadata.taskReveal = taskReveal;
             const alteplasePhase = element.getAttribute('data-alteplase-phase');
             if (alteplasePhase) metadata.alteplasePhase = alteplasePhase;
             const weightKgAttr = element.getAttribute('data-weight-kg');
@@ -2621,8 +2723,8 @@ const PatientsModule = (() => {
 
     // Setup declarative patient interactions
     const setupPatientInteractions = (patient, patientElement) => {
-        // Learning UX: medications + IV + turning / CNA care start open so timed work is visible
-        patientElement.querySelectorAll('.meds-list, .iv-list, .care-tasks-list, .care-solo-list').forEach((list) => {
+        // Learning UX: medications + IV + turning / CNA care + assess chains start open
+        patientElement.querySelectorAll('.meds-list, .iv-list, .care-tasks-list, .care-solo-list, .assess-list').forEach((list) => {
             list.classList.remove('hidden');
         });
 
@@ -2638,6 +2740,7 @@ const PatientsModule = (() => {
             taskElement.setAttribute('title', 'Click for Perform / Details menu');
             setupTaskInteractions(taskElement, patient);
         });
+        syncPrerequisiteLockAttrs();
     };
 
     // Setup task-specific interactions
@@ -2768,6 +2871,7 @@ const PatientsModule = (() => {
         updatePatientTaskStatuses();
         const patients = gameState.getStateSlice('patients');
         patients?.forEach((p) => syncShiftAssessmentLockAttrs(p.id));
+        syncPrerequisiteLockAttrs();
     });
 
     gameState.subscribe('activePatientId', () => {

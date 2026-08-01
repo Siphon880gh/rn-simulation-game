@@ -1,0 +1,89 @@
+{
+  "id": "skill-stroke-assessment-tele",
+  "title": "Skill practice — Suspected stroke / BEFAST (Tele)",
+  "version": 1,
+  "department": "tele",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize BEFAST signs and establish last known well",
+    "Apply adult suspected-stroke priorities: ABCs, glucose, stroke-team activation, imaging for hemorrhage, fibrinolytic vs aspirin path, stroke-unit admission"
+  ],
+  "patients": ["nell"],
+  "patientOverrides": {
+    "nell": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Suspected acute stroke — BEFAST alert"
+    }
+  },
+  "scene": {
+    "theme": "tele",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/stroke-alert-night-tele.json",
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": [
+    {
+      "id": "stroke-onset-1935",
+      "at": 1935,
+      "type": "emergency",
+      "message": "Nell: sudden speech change and arm weakness — possible stroke",
+      "injectTasks": [
+        {
+          "id": "evt-nell-stroke-1935",
+          "type": "assessment",
+          "name": "Sudden BEFAST change — stroke recognition",
+          "patientId": "nell",
+          "scheduled": 1935,
+          "expire": "+30",
+          "durationMins": 12,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "stroke-assessment",
+            "spawnTasksOnComplete": [
+              {
+                "id": "evt-nell-stroke-1935-abcs",
+                "type": "assessment",
+                "name": "ABCs / glucose / last known well",
+                "patientId": "nell",
+                "scheduled": 1935,
+                "expire": "+45",
+                "durationMins": 12,
+                "taskClass": "stat",
+                "metadata": {
+                  "challenge": "skill-mcq",
+                  "skillId": "stroke-assessment",
+                  "spawnTasksOnComplete": [
+                    {
+                      "id": "evt-nell-stroke-1935-path",
+                      "type": "assessment",
+                      "name": "Stroke team / imaging / fibrinolytic decision path",
+                      "patientId": "nell",
+                      "scheduled": 1935,
+                      "expire": "+60",
+                      "durationMins": 12,
+                      "taskClass": "stat",
+                      "metadata": {
+                        "challenge": "skill-mcq",
+                        "skillId": "stroke-assessment"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

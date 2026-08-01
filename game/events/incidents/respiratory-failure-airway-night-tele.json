@@ -1,0 +1,61 @@
+{
+  "id": "respiratory-failure-airway-night-tele",
+  "title": "Night Tele — Desat -> Respiratory Failure",
+  "version": 1,
+  "fictionalOnly": true,
+  "disclaimer": "Incident pack content is fictional practice — not a competency assessment.",
+  "dynamicTemplates": [
+    {
+      "id": "desat-bvm-check",
+      "weight": 3,
+      "type": "assessment",
+      "taskClass": "stat",
+      "name": "Desat / BVM / Code for ETT check",
+      "durationMins": 12,
+      "expire": "+25",
+      "patientScope": "random"
+    }
+  ],
+  "events": [
+    {
+      "id": "cass-desat-2000",
+      "at": 2000,
+      "type": "emergency",
+      "message": "Cass: SpO2 crash into the mid-80s on NRB — escalate O2 / prepare Ambu"
+    },
+    {
+      "id": "cass-bvm-fail-2012",
+      "at": 2012,
+      "type": "emergency",
+      "message": "Cass: still desatting despite Ambu — activate Code Blue for emergent ETT (floor path; no RSI)"
+    },
+    {
+      "id": "cass-code-ett-2020",
+      "at": 2020,
+      "type": "emergency",
+      "message": "Cass: Code Blue for airway / ETT — keep bagging until intubation team arrives",
+      "injectTasks": [
+        {
+          "id": "evt-cass-resp-failure-airway",
+          "type": "assessment",
+          "name": "Desat -> Respiratory Failure — BVM → Code Blue for ETT",
+          "patientId": "cass",
+          "scheduled": 2020,
+          "expire": "+30",
+          "durationMins": 15,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "respiratory-failure-airway"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cass-transfer-icu-2035",
+      "at": 2035,
+      "type": "emergency",
+      "message": "Cass: airway secured / stabilized for transport — Transfer to ICU"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Cass Okonkwo</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Tele-8</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 71</p>
+        <p class="text-sm text-gray-600">Sex: Male</p>
+        <p class="text-sm text-gray-600">Diagnosis: Acute respiratory failure / desat — BVM → Code Blue for ETT</p>
+        <p class="text-sm text-gray-600">Floor path: Ambu while deteriorating; activate Code for intubation team (no RSI drugs on tele)</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 122</div>
+        <div>BP: 102/60</div>
+        <div>Temp: 99.4°F</div>
+        <div>O<sub>2</sub>: 84% on NRB 15 L</div>
+        <div>Pain: 1/10</div>
+        <div>RR: 34 labored</div>
+        <div>Mentation: confused</div>
+        <div>Work of breathing: severe</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-lungs text-xl mr-1 text-sky-700"></i>
+            Airway / desat
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="respiratory-failure-airway" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="14" data-task-class="stat" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-lungs text-sky-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Desat → Ambu → Code Blue for ETT</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="1930" data-expire="2030" data-duration-mins="10" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-stethoscope text-sky-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Reassess oxygenation after help arrives</span>
+                <span class="ml-auto text-sm text-gray-500">1930</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-cass" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

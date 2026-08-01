@@ -26,16 +26,6 @@
       "patientScope": "random"
     },
     {
-      "id": "telemetry-alarm",
-      "weight": 3,
-      "type": "assessment",
-      "taskClass": "urgent",
-      "name": "Telemetry alarm — bedside check",
-      "durationMins": 10,
-      "expire": "+35",
-      "patientScope": "random"
-    },
-    {
       "id": "oxygen-desat",
       "weight": 2,
       "type": "assessment",

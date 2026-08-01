@@ -730,7 +730,7 @@ class GameApplication {
         }
         const now = gameState.getStateSlice('currentTime');
         if (!taskSystem.isPrerequisiteMet?.(task)) {
-            alert('Complete the bedside shift assessment first, then chart.');
+            alert('Complete the prior required step first.');
             return;
         }
         if (!taskSystem.isPerformAllowed(task, now)) {

@@ -262,9 +262,14 @@ h4:has(.task-fallout-toggle) {
 
 [data-task-kind="chart-assessment"][data-task-locked="1"].task-status-active::after,
 [data-task-type="assessment"][data-task-locked="1"].task-status-active::after {
-    content: "Locked · assess first";
+    content: "Locked · prior step first";
     color: #92400e;
     background: #fffbeb;
+}
+
+/* Dependent pathway steps (stroke alert, etc.) — hidden until prerequisite completes */
+[data-task-reveal="on-prereq"][data-task-locked="1"] {
+    display: none;
 }
 
 [data-task-type="procedure"].task-status-active {

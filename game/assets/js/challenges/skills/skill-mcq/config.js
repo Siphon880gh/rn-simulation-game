@@ -3,7 +3,7 @@
  * Path: challenges/skills/skill-mcq/config.js
  * Keys match game/events/skills/library.json skill ids.
  * Larger banks may live under ./banks/ and be merged below.
- * Question types: choice (default) | sata | match | flash | audio (sheet "Video")
+ * Question types: choice (default) | sata | match | flash | audio (sheet "Video") | image (rhythm strip)
  */
 import { abgSkillBank } from './banks/abg.js';
 import { arterialLineSkillBank } from './banks/arterial-line.js';
@@ -35,6 +35,12 @@ import {
   aclsBradycardiaSkillBank,
   aclsTachycardiaSkillBank
 } from './banks/acls-algorithms.js';
+import {
+  respiratoryFailureAirwaySkillBank,
+  respiratoryFailureAirwayIcuSkillBank
+} from './banks/respiratory-failure-airway.js';
+import { strokeAssessmentSkillBank } from './banks/stroke-assessment.js';
+import { ecgBasicsSkillBank } from './banks/ecg-basics.js';
 
 /** @type {Record<string, { title: string, questions: object[] }>} */
 export const skillMcqBanks = {
@@ -65,22 +71,7 @@ export const skillMcqBanks = {
       }
     ]
   },
-  'stroke-assessment': {
-    title: 'Stroke assessment',
-    questions: [
-      {
-        id: 'fast',
-        prompt: 'Which cluster best supports immediate stroke activation?',
-        correct: 'Facial droop, arm weakness, speech change, time last known well',
-        choices: [
-          'Facial droop, arm weakness, speech change, time last known well',
-          'Isolated low-grade fever only',
-          'Chronic stable back pain',
-          'Mild headache that resolved yesterday'
-        ]
-      }
-    ]
-  },
+  'stroke-assessment': strokeAssessmentSkillBank,
   'chest-tube': {
     title: 'Chest tube care',
     questions: [
@@ -407,22 +398,7 @@ export const skillMcqBanks = {
       }
     ]
   },
-  'ecg-basics': {
-    title: 'ECG / telemetry basics',
-    questions: [
-      {
-        id: 'vfib',
-        prompt: 'Unresponsive patient with VF on the monitor — priority?',
-        correct: 'Call a code / start CPR and defibrillation pathway',
-        choices: [
-          'Call a code / start CPR and defibrillation pathway',
-          'Obtain orthostatic vitals first',
-          'Give oral aspirin and wait',
-          'Turn off the monitor to stop the alarm'
-        ]
-      }
-    ]
-  },
+  'ecg-basics': ecgBasicsSkillBank,
   'dvt-prophylaxis': {
     title: 'DVT prophylaxis',
     questions: [
@@ -1361,7 +1337,9 @@ export const skillMcqBanks = {
   'pulmonary-embolism': pulmonaryEmbolismSkillBank,
   'peripheral-clot': peripheralClotSkillBank,
   'acls-bradycardia': aclsBradycardiaSkillBank,
-  'acls-tachycardia': aclsTachycardiaSkillBank
+  'acls-tachycardia': aclsTachycardiaSkillBank,
+  'respiratory-failure-airway': respiratoryFailureAirwaySkillBank,
+  'respiratory-failure-airway-icu': respiratoryFailureAirwayIcuSkillBank
 };
 
 export const skillMcqChallengeConfig = {

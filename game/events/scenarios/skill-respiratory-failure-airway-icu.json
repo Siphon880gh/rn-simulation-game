@@ -1,0 +1,35 @@
+{
+  "id": "skill-respiratory-failure-airway-icu",
+  "title": "Skill practice — Desat -> Respiratory Failure in ICU",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize failing oxygenation and support with BVM while calling for help",
+    "Escalate to Code Blue for emergent ETT when Ambu cannot reverse deterioration",
+    "Assist RSI: etomidate/paralytic sequence, laryngoscope help, EtCO2 confirmation"
+  ],
+  "patients": ["kira"],
+  "patientOverrides": {
+    "kira": {
+      "clinicalStatus": "critical",
+      "acuityScore": 5,
+      "clinicalStatusReason": "Hypoxemic respiratory failure — impending intubation / RSI"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/respiratory-failure-airway-night-icu.json",
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

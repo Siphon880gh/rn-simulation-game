@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EKG Rhythm Identification — Local Source</title>
+<style>
+:root { --ink:#1a2332; --muted:#5b6b7c; --line:#d5dde6; --bg:#f3f6f9; --card:#fff; --accent:#0b6e99; }
+* { box-sizing:border-box; }
+body { margin:0; font-family: "IBM Plex Sans", system-ui, sans-serif; color:var(--ink); background:linear-gradient(180deg,#e8f1f6 0%, var(--bg) 240px); }
+header { padding:2rem 1.25rem 1rem; max-width:960px; margin:0 auto; }
+h1 { margin:0 0 .35rem; font-size:1.75rem; }
+p { color:var(--muted); line-height:1.5; }
+nav { display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0 0; }
+nav a { color:var(--accent); text-decoration:none; font-size:.9rem; }
+main { max-width:960px; margin:0 auto; padding:0 1.25rem 3rem; }
+section { margin:1.75rem 0; }
+section h2 { margin:0 0 .75rem; font-size:1.25rem; border-bottom:1px solid var(--line); padding-bottom:.35rem; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:1rem; margin:0 0 1rem; }
+.card h3 { margin:0 0 .5rem; font-size:1.05rem; }
+.card img { display:block; width:100%; max-width:100%; height:auto; background:#fff; border:1px solid var(--line); }
+.meta { font-size:.8rem; color:var(--muted); margin-top:.5rem; }
+h2, h3 { scroll-margin-top:1.25rem; }
+
+/* Floating TOC */
+#toc-float {
+  position:fixed; z-index:1000; top:1rem; right:1rem;
+  width:min(280px, calc(100vw - 1.5rem));
+  background:var(--card); border:1px solid var(--line); border-radius:10px;
+  box-shadow:0 8px 28px rgba(26,35,50,.12); font-size:.85rem;
+  user-select:none; touch-action:none;
+}
+#toc-float.collapsed { width:auto; }
+#toc-float .toc-bar {
+  display:flex; align-items:center; gap:.5rem;
+  padding:.55rem .7rem; cursor:grab;
+  background:linear-gradient(180deg,#f7fafc,#eef3f7);
+  border-radius:10px 10px 0 0; border-bottom:1px solid var(--line);
+}
+#toc-float.collapsed .toc-bar { border-bottom:none; border-radius:10px; }
+#toc-float.dragging .toc-bar { cursor:grabbing; }
+#toc-float .toc-title { flex:1; font-weight:600; color:var(--ink); letter-spacing:.01em; }
+#toc-float .toc-toggle {
+  appearance:none; border:1px solid var(--line); background:#fff; color:var(--accent);
+  border-radius:6px; width:1.75rem; height:1.75rem; padding:0; cursor:pointer;
+  font-size:1rem; line-height:1; display:grid; place-items:center;
+}
+#toc-float .toc-toggle:hover { border-color:var(--accent); }
+#toc-float .toc-panel {
+  display:block; margin:0; gap:0;
+  max-height:min(60vh, 420px); overflow:auto; padding:.45rem 0 .55rem;
+}
+#toc-float.collapsed .toc-panel { display:none; }
+#toc-float a {
+  display:block; color:var(--ink); text-decoration:none;
+  padding:.38rem .9rem; line-height:1.35; font-size:.85rem;
+}
+#toc-float a:hover { background:#eef6fa; color:var(--accent); }
+#toc-float a.h2 { font-weight:600; color:var(--accent); padding-top:.7rem; }
+#toc-float a.h2:first-child { padding-top:.38rem; }
+#toc-float a.h3 { padding-left:1.4rem; color:var(--muted); font-size:.8rem; }
+#toc-float a.h3:hover { color:var(--accent); }
+</style>
+</head>
+<body>
+<aside id="toc-float" class="collapsed" aria-label="Table of contents">
+  <div class="toc-bar" id="toc-drag">
+    <span class="toc-title">Contents</span>
+    <button type="button" class="toc-toggle" id="toc-toggle" aria-expanded="false" aria-controls="toc-panel" title="Expand or collapse">+</button>
+  </div>
+  <nav class="toc-panel" id="toc-panel" hidden></nav>
+</aside>
+<header>
+  <h1>EKG Rhythm Identification — Local Source</h1>
+  <p>Exhaustive local strip library for rhythm identification. Images are served from this folder; the ACLS quiz uses these same local files.</p>
+  <nav>
+<a href="#sinus">Sinus</a>
+<a href="#atrial">Atrial</a>
+<a href="#junctional">Junctional</a>
+<a href="#heart-block">Heart Block</a>
+<a href="#pacemaker">Pacemaker</a>
+</nav></header><main>
+<section id="sinus"><h2>Sinus</h2>
+<article class="card">
+  <h3>Normal Sinus Rhythm</h3>
+  <img src="normal-sinus-rhythm.gif" alt="Normal Sinus Rhythm EKG strip">
+  <div class="meta">Local: normal-sinus-rhythm.gif · Source: <a href="https://ekg.academy/sinus-rhythms">https://ekg.academy/sinus-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Sinus Bradycardia</h3>
+  <img src="sinus-bradycardia.gif" alt="Sinus Bradycardia EKG strip">
+  <div class="meta">Local: sinus-bradycardia.gif · Source: <a href="https://ekg.academy/sinus-rhythms">https://ekg.academy/sinus-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Sinus Tachycardia</h3>
+  <img src="sinus-tachycardia.gif" alt="Sinus Tachycardia EKG strip">
+  <div class="meta">Local: sinus-tachycardia.gif · Source: <a href="https://ekg.academy/sinus-rhythms">https://ekg.academy/sinus-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Sinus Arrhythmia</h3>
+  <img src="sinus-arrhythmia.gif" alt="Sinus Arrhythmia EKG strip">
+  <div class="meta">Local: sinus-arrhythmia.gif · Source: <a href="https://ekg.academy/sinus-rhythms">https://ekg.academy/sinus-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Sinus Arrest</h3>
+  <img src="sinus-arrest.gif" alt="Sinus Arrest EKG strip">
+  <div class="meta">Local: sinus-arrest.gif · Source: <a href="https://ekg.academy/sinus-rhythms">https://ekg.academy/sinus-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Sinus Exit Block</h3>
+  <img src="sinus-exit-block.gif" alt="Sinus Exit Block EKG strip">
+  <div class="meta">Local: sinus-exit-block.gif · Source: <a href="https://ekg.academy/sinus-rhythms">https://ekg.academy/sinus-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Sinus Pause</h3>
+  <img src="sinus-pause.gif" alt="Sinus Pause EKG strip">
+  <div class="meta">Local: sinus-pause.gif · Source: <a href="https://ekg.academy/sinus-rhythms">https://ekg.academy/sinus-rhythms</a></div>
+</article>
+</section>
+<section id="atrial"><h2>Atrial</h2>
+<article class="card">
+  <h3>Premature Atrial Complex</h3>
+  <img src="premature-atrial-complex.gif" alt="Premature Atrial Complex EKG strip">
+  <div class="meta">Local: premature-atrial-complex.gif · Source: <a href="https://ekg.academy/atrial-rhythms">https://ekg.academy/atrial-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Wandering Atrial Pacemaker</h3>
+  <img src="wandering-atrial-pacemaker.gif" alt="Wandering Atrial Pacemaker EKG strip">
+  <div class="meta">Local: wandering-atrial-pacemaker.gif · Source: <a href="https://ekg.academy/atrial-rhythms">https://ekg.academy/atrial-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Multifocal Atrial Tachycardia</h3>
+  <img src="multifocal-atrial-tachycardia.gif" alt="Multifocal Atrial Tachycardia EKG strip">
+  <div class="meta">Local: multifocal-atrial-tachycardia.gif · Source: <a href="https://ekg.academy/atrial-rhythms">https://ekg.academy/atrial-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Atrial Flutter</h3>
+  <img src="atrial-flutter.gif" alt="Atrial Flutter EKG strip">
+  <div class="meta">Local: atrial-flutter.gif · Source: <a href="https://ekg.academy/atrial-rhythms">https://ekg.academy/atrial-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Atrial Fibrillation</h3>
+  <img src="atrial-fibrillation.gif" alt="Atrial Fibrillation EKG strip">
+  <div class="meta">Local: atrial-fibrillation.gif · Source: <a href="https://ekg.academy/atrial-rhythms">https://ekg.academy/atrial-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Supraventricular Tachycardia</h3>
+  <img src="supraventricular-tachycardia.gif" alt="Supraventricular Tachycardia EKG strip">
+  <div class="meta">Local: supraventricular-tachycardia.gif · Source: <a href="https://ekg.academy/atrial-rhythms">https://ekg.academy/atrial-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Wolff-Parkinson-White Syndrome</h3>
+  <img src="wolff-parkinson-white.gif" alt="Wolff-Parkinson-White Syndrome EKG strip">
+  <div class="meta">Local: wolff-parkinson-white.gif · Source: <a href="https://ekg.academy/atrial-rhythms">https://ekg.academy/atrial-rhythms</a></div>
+</article>
+</section>
+<section id="junctional"><h2>Junctional</h2>
+<article class="card">
+  <h3>Premature Junctional Complex</h3>
+  <img src="premature-junctional-complex.gif" alt="Premature Junctional Complex EKG strip">
+  <div class="meta">Local: premature-junctional-complex.gif · Source: <a href="https://ekg.academy/junctional-rhythms">https://ekg.academy/junctional-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Junctional Escape Beat</h3>
+  <img src="junctional-escape-beat.gif" alt="Junctional Escape Beat EKG strip">
+  <div class="meta">Local: junctional-escape-beat.gif · Source: <a href="https://ekg.academy/junctional-rhythms">https://ekg.academy/junctional-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Junctional Escape Rhythm</h3>
+  <img src="junctional-escape-rhythm.gif" alt="Junctional Escape Rhythm EKG strip">
+  <div class="meta">Local: junctional-escape-rhythm.gif · Source: <a href="https://ekg.academy/junctional-rhythms">https://ekg.academy/junctional-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Accelerated Junctional Rhythm</h3>
+  <img src="accelerated-junctional-rhythm.gif" alt="Accelerated Junctional Rhythm EKG strip">
+  <div class="meta">Local: accelerated-junctional-rhythm.gif · Source: <a href="https://ekg.academy/junctional-rhythms">https://ekg.academy/junctional-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Junctional Tachycardia</h3>
+  <img src="junctional-tachycardia.gif" alt="Junctional Tachycardia EKG strip">
+  <div class="meta">Local: junctional-tachycardia.gif · Source: <a href="https://ekg.academy/junctional-rhythms">https://ekg.academy/junctional-rhythms</a></div>
+</article>
+</section>
+<section id="heart-block"><h2>Heart Block</h2>
+<article class="card">
+  <h3>First Degree Heart Block</h3>
+  <img src="first-degree-heart-block.gif" alt="First Degree Heart Block EKG strip">
+  <div class="meta">Local: first-degree-heart-block.gif · Source: <a href="https://ekg.academy/heart-block-rhythms">https://ekg.academy/heart-block-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Second Degree Heart Block Type I</h3>
+  <img src="second-degree-heart-block-type-i.gif" alt="Second Degree Heart Block Type I EKG strip">
+  <div class="meta">Local: second-degree-heart-block-type-i.gif · Source: <a href="https://ekg.academy/heart-block-rhythms">https://ekg.academy/heart-block-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Second Degree Heart Block Type II</h3>
+  <img src="second-degree-heart-block-type-ii.gif" alt="Second Degree Heart Block Type II EKG strip">
+  <div class="meta">Local: second-degree-heart-block-type-ii.gif · Source: <a href="https://ekg.academy/heart-block-rhythms">https://ekg.academy/heart-block-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Second Degree Heart Block Type II (unpatterned)</h3>
+  <img src="second-degree-heart-block-type-ii-unpatterned.gif" alt="Second Degree Heart Block Type II (unpatterned) EKG strip">
+  <div class="meta">Local: second-degree-heart-block-type-ii-unpatterned.gif · Source: <a href="https://ekg.academy/heart-block-rhythms">https://ekg.academy/heart-block-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Third Degree Heart Block</h3>
+  <img src="third-degree-heart-block.gif" alt="Third Degree Heart Block EKG strip">
+  <div class="meta">Local: third-degree-heart-block.gif · Source: <a href="https://ekg.academy/heart-block-rhythms">https://ekg.academy/heart-block-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Bundle Branch Block</h3>
+  <img src="bundle-branch-block.gif" alt="Bundle Branch Block EKG strip">
+  <div class="meta">Local: bundle-branch-block.gif · Source: <a href="https://ekg.academy/heart-block-rhythms">https://ekg.academy/heart-block-rhythms</a></div>
+</article>
+</section>
+<section id="pacemaker"><h2>Pacemaker</h2>
+<article class="card">
+  <h3>Atrial Pacemaker Rhythm</h3>
+  <img src="atrial-pacemaker-rhythm.gif" alt="Atrial Pacemaker Rhythm EKG strip">
+  <div class="meta">Local: atrial-pacemaker-rhythm.gif · Source: <a href="https://ekg.academy/pacemaker-rhythms">https://ekg.academy/pacemaker-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Ventricular Pacemaker Rhythm</h3>
+  <img src="ventricular-pacemaker-rhythm.gif" alt="Ventricular Pacemaker Rhythm EKG strip">
+  <div class="meta">Local: ventricular-pacemaker-rhythm.gif · Source: <a href="https://ekg.academy/pacemaker-rhythms">https://ekg.academy/pacemaker-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Atrioventricular (Sequential) Pacemaker Rhythm</h3>
+  <img src="av-sequential-pacemaker-rhythm.gif" alt="Atrioventricular (Sequential) Pacemaker Rhythm EKG strip">
+  <div class="meta">Local: av-sequential-pacemaker-rhythm.gif · Source: <a href="https://ekg.academy/pacemaker-rhythms">https://ekg.academy/pacemaker-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Failure to Capture</h3>
+  <img src="failure-to-capture.gif" alt="Failure to Capture EKG strip">
+  <div class="meta">Local: failure-to-capture.gif · Source: <a href="https://ekg.academy/pacemaker-rhythms">https://ekg.academy/pacemaker-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Failure to Pace</h3>
+  <img src="failure-to-pace.gif" alt="Failure to Pace EKG strip">
+  <div class="meta">Local: failure-to-pace.gif · Source: <a href="https://ekg.academy/pacemaker-rhythms">https://ekg.academy/pacemaker-rhythms</a></div>
+</article>
+<article class="card">
+  <h3>Failure to Sense</h3>
+  <img src="failure-to-sense.jpg" alt="Failure to Sense EKG strip">
+  <div class="meta">Local: failure-to-sense.jpg · Source: manual add (pacemaker undersensing)</div>
+</article>
+</section>
+</main>
+<script>
+(function () {
+  const root = document.getElementById('toc-float');
+  const panel = document.getElementById('toc-panel');
+  const toggle = document.getElementById('toc-toggle');
+  const dragHandle = document.getElementById('toc-drag');
+  if (!root || !panel || !toggle || !dragHandle) return;
+
+  function slugify(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+
+  function ensureId(el) {
+    if (el.id) return el.id;
+    let base = slugify(el.textContent.trim()) || 'heading';
+    let id = base;
+    let n = 2;
+    while (document.getElementById(id)) {
+      id = base + '-' + n;
+      n += 1;
+    }
+    el.id = id;
+    return id;
+  }
+
+  const headings = document.querySelectorAll('main h2, main h3');
+  const frag = document.createDocumentFragment();
+  headings.forEach(function (h) {
+    const id = ensureId(h);
+    const a = document.createElement('a');
+    a.href = '#' + id;
+    a.textContent = h.textContent.trim();
+    a.className = h.tagName.toLowerCase();
+    frag.appendChild(a);
+  });
+  panel.appendChild(frag);
+
+  function setExpanded(open) {
+    root.classList.toggle('collapsed', !open);
+    panel.hidden = !open;
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.textContent = open ? '−' : '+';
+    toggle.title = open ? 'Collapse' : 'Expand';
+  }
+
+  toggle.addEventListener('click', function (e) {
+    e.stopPropagation();
+    setExpanded(root.classList.contains('collapsed'));
+  });
+
+  let dragging = false;
+  let startX = 0, startY = 0, originLeft = 0, originTop = 0;
+
+  function clamp(n, min, max) {
+    return Math.min(max, Math.max(min, n));
+  }
+
+  function onPointerDown(e) {
+    if (e.target.closest('.toc-toggle')) return;
+    dragging = true;
+    root.classList.add('dragging');
+    const rect = root.getBoundingClientRect();
+    originLeft = rect.left;
+    originTop = rect.top;
+    startX = e.clientX;
+    startY = e.clientY;
+    root.style.left = originLeft + 'px';
+    root.style.top = originTop + 'px';
+    root.style.right = 'auto';
+    dragHandle.setPointerCapture(e.pointerId);
+  }
+
+  function onPointerMove(e) {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const rect = root.getBoundingClientRect();
+    const maxLeft = window.innerWidth - rect.width - 8;
+    const maxTop = window.innerHeight - rect.height - 8;
+    root.style.left = clamp(originLeft + dx, 8, Math.max(8, maxLeft)) + 'px';
+    root.style.top = clamp(originTop + dy, 8, Math.max(8, maxTop)) + 'px';
+  }
+
+  function onPointerUp(e) {
+    if (!dragging) return;
+    dragging = false;
+    root.classList.remove('dragging');
+    try { dragHandle.releasePointerCapture(e.pointerId); } catch (_) {}
+  }
+
+  dragHandle.addEventListener('pointerdown', onPointerDown);
+  dragHandle.addEventListener('pointermove', onPointerMove);
+  dragHandle.addEventListener('pointerup', onPointerUp);
+  dragHandle.addEventListener('pointercancel', onPointerUp);
+
+  window.addEventListener('resize', function () {
+    const rect = root.getBoundingClientRect();
+    if (rect.right > window.innerWidth - 8) {
+      root.style.left = Math.max(8, window.innerWidth - rect.width - 8) + 'px';
+      root.style.right = 'auto';
+    }
+    if (rect.bottom > window.innerHeight - 8) {
+      root.style.top = Math.max(8, window.innerHeight - rect.height - 8) + 'px';
+    }
+  });
+})();
+</script>
+</body></html>
