@@ -45,9 +45,17 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 | `challenge-accucheck` | image | Accucheck | Accucheck quiz modal | Glucometer / sliding-scale still | `null` |
 | `challenge-admission` | image | Admission | Admission quiz modal | Clipboard / wristband still | `null` |
 | `challenge-icp` | image | ICP | ICP quiz modal | ICP waveform / EVD still | `null` |
-| `challenge-iv-check` | image | IV check | IV check / titration / heparin-PTT modal | IV site + infusion pump still | `null` |
+| `challenge-iv-check` | image | IV check | IV check / titration / heparin-PTT modal | IV site + infusion pump still (**before**) | `null` |
+| `challenge-code-blue-after` | image | Code Blue — resolved | Code Blue modal after pass | Calm/stable bedside after successful response | `null` |
+| `challenge-bed-prep-after` | image | Bed prep — ready | Bed-prep modal after pass | Made bed ready for admission | `null` |
+| `challenge-med-identity-after` | image | Med identity — verified | Med identity after pass | Verified med package | `null` |
+| `challenge-ivpb-hang-after` | image | IVPB hang — running | IVPB hang after pass | Secondary bag running | `null` |
+| `challenge-iv-check-after` | image | IV check — confirmed | IV check after pass | Confirmed pump rate | `null` |
+| `challenge-accucheck-after` | image | Accucheck — logged | Accucheck after pass | Result logged | `null` |
+| `challenge-admission-after` | image | Admission — complete | Admission after pass | Checklist complete | `null` |
+| `challenge-icp-after` | image | ICP — monitored | ICP after pass | Controlled ICP waveform | `null` |
 
-Toggle challenge heroes: `GameConfig.mediaPlaceholders.mounts.challenges`. Per-game map: `mediaPlaceholders.challenges.<key>`.
+Toggle challenge heroes: `GameConfig.mediaPlaceholders.mounts.challenges`. Per-game map: `mediaPlaceholders.challenges.<key>` (`imageId`/`videoId` = **before** during quiz; `afterImageId` swaps in after the last question / challenge-level target, on the Continue screen before the modal closes).
 
 ---
 

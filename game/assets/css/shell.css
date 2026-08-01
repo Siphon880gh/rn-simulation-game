@@ -306,6 +306,130 @@ body.is-test-mode #shell-brand-title::after {
     border-color: #9ca3af;
 }
 
+/* Lean timer (mobile super-collapsed) — hidden on desktop */
+.shell-lean-pause {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    min-height: 1.75rem;
+    border: 1px solid #93c5fd;
+    background: #eff6ff;
+    color: #1e3a8a;
+    border-radius: 0.375rem;
+    padding: 0.2rem 0.45rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    line-height: 1.2;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.shell-lean-pause:hover {
+    background: #dbeafe;
+    border-color: #60a5fa;
+}
+
+.shell-lean-pause.is-paused {
+    border-color: #fbbf24;
+    background: #fffbeb;
+    color: #92400e;
+}
+
+.shell-lean-pause__icon {
+    flex-shrink: 0;
+    color: #2563eb;
+}
+
+.shell-lean-pause.is-paused .shell-lean-pause__icon {
+    color: #d97706;
+}
+
+.shell-lean-pause__time {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shell-brand-read-more {
+    display: none;
+    margin-top: 0.35rem;
+    border: 0;
+    background: transparent;
+    color: #1d4ed8;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.shell-brand-read-more:hover {
+    color: #1e40af;
+}
+
+/* Orders / Tools / Delegate accordion (desktop = always open labels) */
+.rail-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.rail-accordion__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    margin: 0 0 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6b7280;
+    cursor: default;
+    text-align: left;
+}
+
+.rail-accordion__section + .rail-accordion__section .rail-accordion__toggle {
+    margin-top: 0.45rem;
+}
+
+.rail-accordion__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.15rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: #e5e7eb;
+    color: #374151;
+    font-size: 0.65rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.rail-accordion__badge.is-zero {
+    opacity: 0.55;
+}
+
+.rail-accordion__panel[hidden] {
+    display: none;
+}
+
+.shell-slots-toggle,
+.shell-log-toggle {
+    display: none;
+}
+
 #shell-top-primary.is-collapsed {
     position: relative;
     padding: 0;
@@ -1276,7 +1400,7 @@ body.shell-bottom-resizing {
 
 @media (max-width: 900px) {
     #shell {
-        --shell-bottom-height: 8rem;
+        --shell-bottom-height: 2.75rem;
     }
 
     #shell-top-primary {
@@ -1293,59 +1417,117 @@ body.shell-bottom-resizing {
         font-size: 1.1rem;
     }
 
-    #fiction-disclaimer,
-    #scenario-pack-note,
-    #demo-preset-links,
-    [data-scenario-objectives] {
+    /* Expanded mobile: condense brand copy; full text via Read more modal */
+    #shell-top-primary:not(.is-collapsed) #fiction-disclaimer {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        overflow: hidden;
+        margin-top: 0.2rem;
+    }
+
+    #shell-top-primary:not(.is-collapsed) #scenario-pack-title {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 0.15rem;
+    }
+
+    #shell-top-primary:not(.is-collapsed) #scenario-pack-note,
+    #shell-top-primary:not(.is-collapsed) #demo-preset-links,
+    #shell-top-primary:not(.is-collapsed) [data-scenario-objectives] {
         display: none;
     }
 
-    /* Floating clock widget — compact chrome on narrow viewports */
+    #shell-top-primary:not(.is-collapsed) .shell-brand-read-more {
+        display: inline-block;
+    }
+
+    /* Super-collapsed floating clock — timer chip only; top-right keeps bottom FABs clear */
     #shell-top-primary.is-collapsed .shell-clock-cluster {
-        gap: 0.3rem;
-        padding: 0.35rem;
-        max-width: min(11rem, calc(100vw - 1rem));
+        gap: 0;
+        padding: 0.25rem;
+        max-width: min(14.5rem, calc(100vw - 1rem));
+        background: rgba(249, 250, 251, 0.92);
+        backdrop-filter: blur(8px);
+    }
+
+    #shell-top-primary.is-collapsed .shell-clock-cluster.is-docked-default {
+        /* Below hour-peek strip; leaves bottom-left log + bottom-right slots FABs clear */
+        top: 3.1rem;
+        right: 0.45rem;
+        bottom: auto;
+        left: auto;
     }
 
     #shell-top-primary.is-collapsed .shell-clock-cluster__chrome {
         width: 100%;
+        justify-content: flex-start;
+        gap: 0.25rem;
     }
 
-    #shell-top-primary.is-collapsed .shell-clock-display {
+    #shell-top-primary.is-collapsed .shell-lean-pause {
+        display: inline-flex;
+    }
+
+    #shell-top-primary.is-collapsed .shell-clock-display,
+    #shell-top-primary.is-collapsed .shell-pause-btn,
+    #shell-top-primary.is-collapsed .shell-boosters,
+    #shell-top-primary.is-collapsed .shell-sound-toggle,
+    #shell-top-primary.is-collapsed .shell-docs-control {
+        display: none !important;
+    }
+
+    #shell-top-primary.is-collapsed .shell-clock-cluster__drag {
+        flex: 0 0 auto;
+        min-width: 1.75rem;
+        padding: 0.2rem;
+    }
+
+    #shell-top-primary.is-collapsed .shell-top-collapse {
+        flex-shrink: 0;
+        min-width: 1.75rem;
+        padding: 0.2rem 0.35rem;
+    }
+
+    #shell-top-primary.is-collapsed .shell-top-collapse [data-collapse-label] {
+        display: none;
+    }
+
+    /* Expanded mobile clock cluster stays compact */
+    #shell-top-primary:not(.is-collapsed) .shell-clock-cluster {
+        gap: 0.3rem;
+    }
+
+    #shell-top-primary:not(.is-collapsed) .shell-lean-pause {
+        display: none;
+    }
+
+    #shell-top-primary:not(.is-collapsed) .shell-clock-display {
         width: 100% !important;
+        max-width: 9.5rem;
         padding: 0.35rem 0.45rem;
         font-size: 1rem;
         gap: 0.25rem;
     }
 
-    #shell-top-primary.is-collapsed .shell-clock-display svg {
-        width: 1.1rem;
-        height: 1.1rem;
-    }
-
-    #shell-top-primary.is-collapsed .shell-pause-btn {
+    #shell-top-primary:not(.is-collapsed) .shell-pause-btn {
         width: 100% !important;
+        max-width: 9.5rem;
         padding: 0.35rem 0.5rem;
         font-size: 0.8rem;
     }
 
-    #shell-top-primary.is-collapsed .shell-boosters {
+    #shell-top-primary:not(.is-collapsed) .shell-boosters,
+    #shell-top-primary:not(.is-collapsed) .shell-sound-toggle {
         width: 100%;
+        max-width: 9.5rem;
         font-size: 0.68rem;
     }
 
-    #shell-top-primary.is-collapsed .shell-boosters__summary {
-        padding: 0.3rem 0.4rem;
-    }
-
-    #shell-top-primary.is-collapsed .shell-sound-toggle {
-        width: 100%;
-        padding: 0.3rem 0.4rem;
-        font-size: 0.72rem;
-    }
-
-    #shell-top-primary.is-collapsed .shell-sound-toggle [data-sound-label],
-    #shell-top-primary.is-collapsed .shell-top-collapse [data-collapse-label] {
+    #shell-top-primary:not(.is-collapsed) .shell-sound-toggle [data-sound-label],
+    #shell-top-primary:not(.is-collapsed) .shell-top-collapse [data-collapse-label] {
         display: none;
     }
 
@@ -1368,12 +1550,17 @@ body.shell-bottom-resizing {
         order: 1;
         border-right: 0;
         border-bottom: 1px solid #d1d5db;
-        padding: 0.45rem 0.55rem;
-        max-height: 6.5rem;
-        overflow: auto;
+        padding: 0.4rem 0.5rem;
+        max-height: none;
+        overflow: visible;
     }
 
-    /* E10.M6: Orders/Tools above main so they stay visible without scrolling past panels */
+    #shell-left-menu > .shell-menu-label,
+    #shell-left-menu .incident-tabs-wrap {
+        display: none;
+    }
+
+    /* E10.M6: Orders/Tools accordion above main */
     #shell-right-menu {
         order: 2;
         display: block;
@@ -1381,16 +1568,59 @@ body.shell-bottom-resizing {
         border-bottom: 1px solid #d1d5db;
         border-top: 0;
         max-height: none;
-        overflow: auto;
-        padding: 0.45rem 0.55rem;
+        overflow: visible;
+        padding: 0.4rem 0.5rem;
     }
 
-    #shell-right-menu .shell-menu-label {
-        margin: 0 0 0.25rem;
+    .rail-accordion {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        align-items: flex-start;
     }
 
-    #shell-right-menu .shell-menu-label--spaced {
-        margin-top: 0.45rem;
+    .rail-accordion__section {
+        flex: 1 1 auto;
+        min-width: 5.5rem;
+    }
+
+    .rail-accordion__section.is-open {
+        flex: 1 1 100%;
+    }
+
+    .rail-accordion__toggle {
+        cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        border-radius: 0.45rem;
+        padding: 0.4rem 0.5rem;
+        margin: 0;
+        font-size: 0.68rem;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .rail-accordion__section + .rail-accordion__section .rail-accordion__toggle {
+        margin-top: 0;
+    }
+
+    .rail-accordion__section.is-open .rail-accordion__toggle {
+        border-color: #93c5fd;
+        background: #eff6ff;
+        color: #1e3a8a;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .rail-accordion__panel {
+        border: 1px solid #93c5fd;
+        border-top: 0;
+        border-radius: 0 0 0.45rem 0.45rem;
+        background: #f8fafc;
+        padding: 0.35rem;
+    }
+
+    .rail-accordion__panel[hidden] {
+        display: none !important;
     }
 
     #shell-right-menu .orders-rail,
@@ -1420,24 +1650,88 @@ body.shell-bottom-resizing {
 
     #shell-bottom {
         grid-template-columns: 1fr;
-        grid-template-rows: minmax(0, 2.5rem) auto auto;
-        gap: 0.3rem 0.5rem;
-        padding: 0.4rem 0.5rem 0.45rem;
+        grid-template-rows: auto;
+        gap: 0;
+        padding: 0.3rem 0.5rem;
     }
 
+    #shell-bottom-resize {
+        display: none;
+    }
+
+    /* Event log collapses to a bottom-left FAB; panel floats when open */
     #shift-history-log {
-        grid-column: 1;
-        grid-row: 1;
-        max-height: 2.5rem;
-        padding: 0.25rem 0.4rem;
-        font-size: 0.68rem;
+        display: none;
+        grid-column: unset;
+        grid-row: unset;
+        position: fixed;
+        left: 0.5rem;
+        right: 3.25rem;
+        bottom: calc(var(--shell-bottom-height, 2.75rem) + 3.15rem);
+        z-index: 46;
+        max-height: min(40vh, 14rem);
+        height: auto;
+        padding: 0.4rem 0.5rem;
+        font-size: 0.72rem;
+        border-radius: 0.65rem;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
     }
 
+    body.shell-log-visible #shift-history-log {
+        display: block;
+    }
+
+    /* Slots float when pinned or busy; otherwise hidden (beats declarative-tasks.css) */
+    #shell .slot-cluster,
     .slot-cluster {
-        grid-column: 1;
-        grid-row: 2;
+        display: none !important;
+        grid-column: unset;
+        grid-row: unset;
+    }
+
+    body.shell-slots-visible #shell .slot-cluster,
+    body.shell-slots-visible .slot-cluster {
+        display: flex !important;
+        flex-direction: column;
+        gap: 0.25rem;
+        position: fixed;
+        left: 0.5rem;
+        right: 3.25rem;
+        bottom: calc(var(--shell-bottom-height, 2.75rem) + 3.15rem);
+        z-index: 45;
         justify-self: stretch;
         align-self: start;
+        padding: 0.35rem;
+        border-radius: 0.65rem;
+        border: 1px solid rgba(209, 213, 219, 0.65);
+        background: rgba(255, 255, 255, 0.72);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+        pointer-events: auto;
+    }
+
+    body.shell-slots-visible .slot-cluster .task-queue-bar {
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+        padding: 0;
+    }
+
+    body.shell-slots-visible .slot-cluster .task-slot {
+        background: rgba(249, 250, 251, 0.88);
+    }
+
+    body.shell-slots-visible .slot-cluster .task-slot--busy {
+        background: rgba(239, 246, 255, 0.92);
+    }
+
+    /* Hide empty waiting-queue copy while floating */
+    body.shell-slots-visible .slot-waiting-queue[data-count="0"] {
+        display: none;
     }
 
     #task-queue-bar {
@@ -1448,15 +1742,54 @@ body.shell-bottom-resizing {
 
     #shell-status-bar {
         grid-column: 1;
-        grid-row: 3;
+        grid-row: 1;
         font-size: 0.68rem;
         gap: 0.4rem;
         flex-wrap: wrap;
+        padding: 0 2.75rem;
     }
 
-    .patient-tabs {
-        flex-direction: row;
-        flex-wrap: wrap;
+    .shell-slots-toggle,
+    .shell-log-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        position: fixed;
+        bottom: calc(var(--shell-bottom-height, 2.75rem) + 0.45rem);
+        z-index: 55;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 999px;
+        border: 1px solid #d1d5db;
+        background: rgba(255, 255, 255, 0.94);
+        color: #374151;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
+        cursor: pointer;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .shell-slots-toggle {
+        right: 0.55rem;
+    }
+
+    .shell-log-toggle {
+        left: 0.55rem;
+    }
+
+    .shell-slots-toggle__label,
+    .shell-log-toggle__label {
+        display: none;
+    }
+
+    .shell-slots-toggle.is-active,
+    .shell-slots-toggle[aria-pressed="true"],
+    .shell-log-toggle.is-active,
+    .shell-log-toggle[aria-pressed="true"] {
+        border-color: #93c5fd;
+        background: #eff6ff;
+        color: #1d4ed8;
     }
 
     .incident-tabs-wrap {
@@ -1466,16 +1799,19 @@ body.shell-bottom-resizing {
 
 @media (max-width: 480px) {
     #shell-top-primary.is-collapsed .shell-clock-cluster.is-docked-default {
-        right: 4px;
-        bottom: calc(var(--shell-bottom-height, 8rem) + 4px);
-    }
-
-    #shell-left-menu {
-        max-height: 5.25rem;
+        top: 2.85rem;
+        right: 0.35rem;
+        bottom: auto;
     }
 
     #shell-right-menu .rail-item {
         min-width: 5.75rem;
         font-size: 0.64rem;
+    }
+
+    body.shell-slots-visible .slot-cluster,
+    body.shell-log-visible #shift-history-log {
+        right: 3rem;
+        left: 0.35rem;
     }
 }

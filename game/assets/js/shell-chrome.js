@@ -11,7 +11,7 @@ const BOTTOM_HEIGHT_STORAGE_KEY = 'rngame.shellBottomHeightPx';
 const BOTTOM_HEIGHT_MIN_PX = 120;
 const BOTTOM_HEIGHT_MAX_VH = 0.55;
 const BOTTOM_HEIGHT_DEFAULT_PX = 176;
-const BOTTOM_HEIGHT_NARROW_DEFAULT_PX = 128;
+const BOTTOM_HEIGHT_NARROW_DEFAULT_PX = 72;
 const TOP_COLLAPSED_STORAGE_KEY = 'rngame.shellTopCollapsed';
 const CLOCK_FLOAT_POS_STORAGE_KEY = 'rngame.shellClockFloatPos';
 const NARROW_LAYOUT_MQ = '(max-width: 900px)';
@@ -30,6 +30,10 @@ let hourPeekHideTimer = null;
 let hourPeekActiveBtn = null;
 let hourPeekModalOpen = false;
 let brandMenuModalOpen = false;
+let brandReadMoreModalOpen = false;
+let leanPauseModalOpen = false;
+let slotsPinnedOpen = false;
+let shiftLogPinnedOpen = false;
 
 function formatHHMM(hhmm) {
     const n = Number(hhmm) || 0;
@@ -345,6 +349,252 @@ function wireBrandMenu() {
             openBrandMenuModal();
         }
     });
+}
+
+function syncLeanClockFromPrimary() {
+    const primary = document.querySelector(GameConfig.selectors.clock);
+    const lean = document.querySelector(GameConfig.selectors.clockLean || '#clock-lean');
+    if (!primary || !lean) return;
+    lean.textContent = primary.textContent || '\u00a0';
+}
+
+function syncLeanPauseLabel() {
+    const lean = document.querySelector(GameConfig.selectors.leanPause || '#shell-lean-pause');
+    if (!lean) return;
+    const paused = !!gameState.getStateSlice('isPaused');
+    const action = paused ? 'Resume' : 'Pause';
+    lean.setAttribute('aria-label', `${action} shift`);
+    lean.title = `${action} — tap to confirm`;
+    lean.classList.toggle('is-paused', paused);
+}
+
+function closeLeanPauseModal() {
+    if (!leanPauseModalOpen) {
+        ModalModule.closeModal();
+        return;
+    }
+    leanPauseModalOpen = false;
+    ModalModule.closeModal();
+}
+
+function applyLeanPauseToggle() {
+    closeLeanPauseModal();
+    // Reuse #pause wiring (incl. booster-freeze confirm) without importing boosters here.
+    const pauseBtn = document.querySelector(GameConfig.selectors.pauseButton || '#pause');
+    if (pauseBtn) {
+        pauseBtn.click();
+    } else {
+        gameState.dispatch('TOGGLE_PAUSE');
+    }
+    syncLeanPauseLabel();
+}
+
+function openLeanPauseConfirm() {
+    if (leanPauseModalOpen || hourPeekModalOpen || brandMenuModalOpen || brandReadMoreModalOpen) return;
+    if (gameState.getStateSlice('gameStatus') === GameConfig.gameStates.GAME_OVER) return;
+
+    const action = gameState.getStateSlice('isPaused') ? 'Resume' : 'Pause';
+
+    leanPauseModalOpen = true;
+    ModalModule.openModal({
+        title: `${action} shift?`,
+        content: `
+            <p class="text-sm text-gray-600 text-left">
+                Confirm ${action.toLowerCase()} on the shift clock?
+            </p>
+        `,
+        footer: `
+            <div class="flex flex-wrap gap-2 justify-end">
+                <button type="button" data-lean-pause-action="cancel"
+                    class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancel</button>
+                <button type="button" data-lean-pause-action="confirm"
+                    class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Yes, ${action}</button>
+            </div>
+        `,
+        overlay: true,
+        persistent: false
+    });
+
+    const footer = document.querySelector(GameConfig.selectors.modalFooter);
+    footer?.querySelectorAll('[data-lean-pause-action]').forEach((btn) => {
+        btn.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (btn.getAttribute('data-lean-pause-action') === 'confirm') {
+                applyLeanPauseToggle();
+            } else {
+                closeLeanPauseModal();
+            }
+        });
+    });
+}
+
+function initLeanPause() {
+    const lean = document.querySelector(GameConfig.selectors.leanPause || '#shell-lean-pause');
+    const primary = document.querySelector(GameConfig.selectors.clock);
+    if (!lean || lean.dataset.bound === '1') return;
+    lean.dataset.bound = '1';
+
+    syncLeanClockFromPrimary();
+    syncLeanPauseLabel();
+
+    lean.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openLeanPauseConfirm();
+    });
+
+    if (primary && typeof MutationObserver !== 'undefined') {
+        const observer = new MutationObserver(() => syncLeanClockFromPrimary());
+        observer.observe(primary, { characterData: true, childList: true, subtree: true });
+    }
+
+    gameState.subscribe('isPaused', () => syncLeanPauseLabel());
+}
+
+function closeBrandReadMoreModal() {
+    if (!brandReadMoreModalOpen) {
+        ModalModule.closeModal();
+        return;
+    }
+    brandReadMoreModalOpen = false;
+    ModalModule.closeModal();
+}
+
+function openBrandReadMoreModal() {
+    if (brandReadMoreModalOpen || hourPeekModalOpen || brandMenuModalOpen || leanPauseModalOpen) return;
+
+    const disclaimer = document.getElementById('fiction-disclaimer')?.textContent?.trim() || '';
+    const packTitle = document.getElementById('scenario-pack-title')?.textContent?.trim() || '';
+    const packNote = document.getElementById('scenario-pack-note');
+    const noteText = packNote && !packNote.hidden ? (packNote.textContent?.trim() || '') : '';
+    const demo = document.getElementById('demo-preset-links');
+    const objectivesHost = document.querySelector('[data-scenario-objectives]');
+    const objectivesList = document.getElementById('scenario-pack-objectives');
+
+    const demoHtml = demo ? demo.innerHTML : '';
+    const objectivesHtml = objectivesHost && !objectivesHost.hidden && objectivesList
+        ? `<div class="mt-3"><p class="text-xs font-medium text-gray-500 mb-1">Pack learning objectives</p>
+             <ul class="text-sm text-gray-600 list-disc pl-4">${objectivesList.innerHTML}</ul></div>`
+        : '';
+
+    brandReadMoreModalOpen = true;
+    ModalModule.openModal({
+        title: 'Shift details',
+        content: `
+            <div class="shell-brand-read-more-modal space-y-2 text-left">
+                ${packTitle ? `<p class="text-sm font-semibold text-gray-800">${escapeHtml(packTitle)}</p>` : ''}
+                <p class="text-sm text-gray-600">${escapeHtml(disclaimer)}</p>
+                ${noteText ? `<p class="text-sm text-gray-500">${escapeHtml(noteText)}</p>` : ''}
+                ${demoHtml ? `<div class="text-sm text-gray-500 pt-1">${demoHtml}</div>` : ''}
+                ${objectivesHtml}
+            </div>
+        `,
+        footer: `
+            <button type="button" data-brand-read-more-close
+                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Close</button>
+        `,
+        overlay: true,
+        persistent: false
+    });
+
+    document.querySelector(GameConfig.selectors.modalFooter)
+        ?.querySelector('[data-brand-read-more-close]')
+        ?.addEventListener('click', (event) => {
+            event.preventDefault();
+            closeBrandReadMoreModal();
+        });
+}
+
+function initBrandReadMore() {
+    const btn = document.querySelector(GameConfig.selectors.brandReadMore || '#shell-brand-read-more');
+    if (!btn || btn.dataset.bound === '1') return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', (event) => {
+        event.preventDefault();
+        openBrandReadMoreModal();
+    });
+}
+
+function slotsHaveActiveWork() {
+    const slots = gameState.getStateSlice('slots') || [];
+    const queue = gameState.getStateSlice('slotQueue') || [];
+    return slots.some((slot) => !!slot?.taskId) || queue.length > 0;
+}
+
+function syncSlotClusterVisibility() {
+    const narrow = isNarrowLayout();
+    const active = slotsHaveActiveWork();
+    const show = !narrow || slotsPinnedOpen || active;
+    document.body.classList.toggle('shell-slots-visible', show);
+    document.body.classList.toggle('shell-slots-pinned', slotsPinnedOpen);
+    document.body.classList.toggle('shell-slots-active', active);
+
+    const toggle = document.querySelector(GameConfig.selectors.slotsToggle || '#shell-slots-toggle');
+    if (toggle) {
+        toggle.setAttribute('aria-pressed', slotsPinnedOpen ? 'true' : 'false');
+        toggle.title = slotsPinnedOpen ? 'Hide task slots' : 'Show task slots';
+        toggle.classList.toggle('is-active', slotsPinnedOpen || active);
+    }
+}
+
+function syncShiftLogVisibility() {
+    const narrow = isNarrowLayout();
+    const show = !narrow || shiftLogPinnedOpen;
+    document.body.classList.toggle('shell-log-visible', show);
+
+    const toggle = document.querySelector(GameConfig.selectors.logToggle || '#shell-log-toggle');
+    if (toggle) {
+        toggle.setAttribute('aria-pressed', shiftLogPinnedOpen ? 'true' : 'false');
+        toggle.title = shiftLogPinnedOpen ? 'Hide event log' : 'Show event log';
+        toggle.classList.toggle('is-active', shiftLogPinnedOpen);
+    }
+}
+
+function initSlotClusterVisibility() {
+    const toggle = document.querySelector(GameConfig.selectors.slotsToggle || '#shell-slots-toggle');
+    if (toggle && toggle.dataset.bound !== '1') {
+        toggle.dataset.bound = '1';
+        toggle.addEventListener('click', (event) => {
+            event.preventDefault();
+            slotsPinnedOpen = !slotsPinnedOpen;
+            // Opening slots closes the log panel so they don't stack.
+            if (slotsPinnedOpen) shiftLogPinnedOpen = false;
+            syncSlotClusterVisibility();
+            syncShiftLogVisibility();
+        });
+    }
+
+    const logToggle = document.querySelector(GameConfig.selectors.logToggle || '#shell-log-toggle');
+    if (logToggle && logToggle.dataset.bound !== '1') {
+        logToggle.dataset.bound = '1';
+        logToggle.addEventListener('click', (event) => {
+            event.preventDefault();
+            shiftLogPinnedOpen = !shiftLogPinnedOpen;
+            if (shiftLogPinnedOpen) slotsPinnedOpen = false;
+            syncShiftLogVisibility();
+            syncSlotClusterVisibility();
+        });
+    }
+
+    syncSlotClusterVisibility();
+    syncShiftLogVisibility();
+    gameState.subscribe('slots', () => syncSlotClusterVisibility());
+    gameState.subscribe('slotQueue', () => syncSlotClusterVisibility());
+
+    const narrowMq = window.matchMedia(NARROW_LAYOUT_MQ);
+    const onNarrowChange = () => {
+        if (!isNarrowLayout()) {
+            slotsPinnedOpen = false;
+            shiftLogPinnedOpen = false;
+        }
+        syncSlotClusterVisibility();
+        syncShiftLogVisibility();
+    };
+    if (typeof narrowMq.addEventListener === 'function') {
+        narrowMq.addEventListener('change', onNarrowChange);
+    } else if (typeof narrowMq.addListener === 'function') {
+        narrowMq.addListener(onNarrowChange);
+    }
 }
 
 function clampBottomHeight(px) {
@@ -809,6 +1059,9 @@ const ShellChromeModule = {
 
         initBottomResize();
         initTopCollapse();
+        initLeanPause();
+        initBrandReadMore();
+        initSlotClusterVisibility();
         wireBrandMenu();
         renderHourTabs(shiftStart, shiftDuration, activeHour);
         renderShiftLog(gameState.getStateSlice('shiftLog') || []);
@@ -826,7 +1079,7 @@ const ShellChromeModule = {
         });
 
         gameState.subscribe('isPaused', (isPaused) => {
-            if (hourPeekModalOpen || brandMenuModalOpen) return;
+            if (hourPeekModalOpen || brandMenuModalOpen || brandReadMoreModalOpen || leanPauseModalOpen) return;
             setStatusMessage(isPaused ? 'Shift paused' : 'Shift running');
         });
 

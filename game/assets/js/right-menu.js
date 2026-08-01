@@ -42,6 +42,75 @@ function emptyRow(host, message) {
     host.appendChild(p);
 }
 
+function setRailBadge(section, count) {
+    const badge = document.querySelector(`[data-rail-badge="${section}"]`);
+    if (!badge) return;
+    const n = Math.max(0, Number(count) || 0);
+    badge.textContent = String(n);
+    badge.hidden = false;
+    badge.classList.toggle('is-zero', n === 0);
+}
+
+function countRailItems(host) {
+    if (!host) return 0;
+    return host.querySelectorAll('.rail-item').length;
+}
+
+function setRailSectionOpen(section, open) {
+    const root = document.querySelector('[data-rail-accordion]');
+    if (!root) return;
+    const narrow = window.matchMedia('(max-width: 900px)').matches;
+
+    root.querySelectorAll('[data-rail-section]').forEach((el) => {
+        const key = el.getAttribute('data-rail-section');
+        const isTarget = key === section;
+        const shouldOpen = narrow ? (isTarget && open) : true;
+        el.classList.toggle('is-open', shouldOpen);
+        const toggle = el.querySelector('[data-rail-toggle]');
+        const panel = el.querySelector('[data-rail-panel]');
+        if (toggle) toggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+        if (panel) {
+            if (shouldOpen) panel.removeAttribute('hidden');
+            else panel.setAttribute('hidden', '');
+        }
+    });
+}
+
+function initRailAccordion() {
+    const root = document.querySelector('[data-rail-accordion]');
+    if (!root || root.dataset.bound === '1') return;
+    root.dataset.bound = '1';
+
+    root.querySelectorAll('[data-rail-toggle]').forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+            if (!window.matchMedia('(max-width: 900px)').matches) return;
+            const section = toggle.getAttribute('data-rail-toggle');
+            const host = toggle.closest('[data-rail-section]');
+            const isOpen = host?.classList.contains('is-open');
+            setRailSectionOpen(section, !isOpen);
+        });
+    });
+
+    const syncDesktopOpen = () => {
+        if (window.matchMedia('(max-width: 900px)').matches) {
+            // Keep current open section; if none open, leave all closed.
+            const open = root.querySelector('[data-rail-section].is-open');
+            if (open) {
+                setRailSectionOpen(open.getAttribute('data-rail-section'), true);
+            } else {
+                setRailSectionOpen(null, false);
+            }
+            return;
+        }
+        setRailSectionOpen('orders', true);
+    };
+
+    syncDesktopOpen();
+    const mq = window.matchMedia('(max-width: 900px)');
+    if (typeof mq.addEventListener === 'function') mq.addEventListener('change', syncDesktopOpen);
+    else if (typeof mq.addListener === 'function') mq.addListener(syncDesktopOpen);
+}
+
 function statusClass(status) {
     return `rail-item status-${status || 'unknown'}`;
 }
@@ -110,6 +179,7 @@ function renderOrders() {
 
     if (!checks.length && !injected.length) {
         emptyRow(host, 'No orders checks yet');
+        setRailBadge('orders', 0);
         return;
     }
 
@@ -147,6 +217,8 @@ function renderOrders() {
         btn.addEventListener('click', () => onInjectedOrderClick(task));
         host.appendChild(btn);
     });
+
+    setRailBadge('orders', countRailItems(host));
 }
 
 function ivAttentionRows(patients, now) {
@@ -236,6 +308,7 @@ function renderTools() {
 
     if (!awaiting.length && !ivRows.length && !admitRows.length) {
         emptyRow(host, 'No unit tools alerts');
+        setRailBadge('tools', 0);
         return;
     }
 
@@ -287,6 +360,8 @@ function renderTools() {
         });
         host.appendChild(btn);
     });
+
+    setRailBadge('tools', countRailItems(host));
 }
 
 function renderDelegate() {
@@ -303,6 +378,7 @@ function renderDelegate() {
     const rows = listDelegateRailRows();
     if (!rows.length) {
         emptyRow(host, 'No assist staff this assignment');
+        setRailBadge('delegate', 0);
         return;
     }
 
@@ -337,6 +413,8 @@ function renderDelegate() {
         });
         host.appendChild(el);
     });
+
+    setRailBadge('delegate', countRailItems(host));
 }
 
 function renderAll() {
@@ -347,6 +425,7 @@ function renderAll() {
 
 export function initRightMenu(deps = {}) {
     patientsApi = deps.patients || null;
+    initRailAccordion();
     renderAll();
     gameState.subscribe('tasks', renderAll);
     gameState.subscribe('currentTime', renderAll);

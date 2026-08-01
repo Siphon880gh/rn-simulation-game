@@ -478,22 +478,21 @@ function syntheticAsset(id, kind, title) {
     };
 }
 
-/**
- * In-modal hero for a perform challenge/quiz.
- * @param {string} challengeKey e.g. 'code-blue', 'bed-prep'
- * @param {{ catalog?: object, className?: string }} [opts]
- */
-export function challengeMediaHtml(challengeKey, opts = {}) {
-    if (!isEnabled() || !cfg().mounts?.challenges) return '';
-    const key = String(challengeKey || '').toLowerCase();
-    if (!key) return '';
-    const spec = cfg().challenges?.[key];
-    if (!spec) return '';
+/** Map data-challenge / session key → mediaPlaceholders.challenges key. */
+export function resolveChallengeMediaKey(rawKey) {
+    const raw = String(rawKey || '').toLowerCase();
+    if (!raw) return '';
+    const aliases = cfg().challengeMediaAliases || {};
+    if (aliases[raw]) return String(aliases[raw]).toLowerCase();
+    if (cfg().challenges?.[raw]) return raw;
+    return raw;
+}
 
-    const catalog = opts.catalog || catalogCache;
+function resolveChallengeBeforeAsset(key, catalog) {
+    const spec = cfg().challenges?.[key];
+    if (!spec) return null;
     const preferVideo = spec.preferVideo === true;
     let asset = null;
-
     if (preferVideo && spec.videoId) {
         asset = getAssetById(spec.videoId, catalog)
             || syntheticAsset(spec.videoId, 'video', key);
@@ -506,25 +505,86 @@ export function challengeMediaHtml(challengeKey, opts = {}) {
         asset = getAssetById(spec.videoId, catalog)
             || syntheticAsset(spec.videoId, 'video', key);
     }
-    if (!asset) return '';
-
-    // If preferVideo but video is still a poster-only placeholder and an image
-    // has a real replaceWith, prefer the real still.
     if (
         preferVideo
-        && asset.kind === 'video'
+        && asset?.kind === 'video'
         && !asset.replaceWith
         && spec.imageId
     ) {
         const still = getAssetById(spec.imageId, catalog);
         if (still?.replaceWith) asset = still;
     }
+    return asset;
+}
+
+/**
+ * In-modal hero for a perform challenge/quiz (before / during the quiz).
+ * @param {string} challengeKey e.g. 'code-blue', 'bed-prep'
+ * @param {{ catalog?: object, className?: string }} [opts]
+ */
+export function challengeMediaHtml(challengeKey, opts = {}) {
+    if (!isEnabled() || !cfg().mounts?.challenges) return '';
+    const key = resolveChallengeMediaKey(challengeKey);
+    if (!key) return '';
+    const catalog = opts.catalog || catalogCache;
+    const asset = resolveChallengeBeforeAsset(key, catalog);
+    if (!asset) return '';
 
     const cls = opts.className
-        || `challenge-media media-ph challenge-media--${key}`;
+        || `challenge-media media-ph challenge-media--${key} challenge-media--before`;
     const tag = buildMediaTagHtml(asset, { className: cls });
     if (!tag) return '';
-    return `<div class="challenge-media-wrap" data-challenge-media="${escapeHtml(key)}">${tag}</div>`;
+    return (
+        `<div class="challenge-media-wrap challenge-media-wrap--before"`
+        + ` data-challenge-media="${escapeHtml(key)}"`
+        + ` data-challenge-media-phase="before">`
+        + `<span class="challenge-media-phase-label" aria-hidden="true">Before</span>`
+        + tag
+        + `</div>`
+    );
+}
+
+/**
+ * Swap in-modal hero to the after still once the full challenge is passed
+ * (after last question / level target; before Continue closes the modal).
+ * @param {string} [challengeKey] — defaults from `.challenge-gate[data-challenge]`
+ * @returns {boolean} true if after media was shown
+ */
+export function revealChallengeAfterMedia(challengeKey) {
+    if (!isEnabled() || !cfg().mounts?.challenges || typeof document === 'undefined') {
+        return false;
+    }
+    const gate = document.querySelector('.challenge-gate');
+    const fromDom = challengeKey
+        || gate?.getAttribute('data-challenge')
+        || gate?.querySelector('[data-challenge-media]')?.getAttribute('data-challenge-media');
+    const key = resolveChallengeMediaKey(fromDom);
+    if (!key) return false;
+    const spec = cfg().challenges?.[key];
+    const afterId = spec?.afterImageId;
+    if (!afterId) return false;
+
+    const catalog = catalogCache;
+    const asset = getAssetById(afterId, catalog)
+        || syntheticAsset(afterId, 'image', `${key} after`);
+    const tag = buildMediaTagHtml(asset, {
+        className: `challenge-media media-ph challenge-media--${key} challenge-media--after`
+    });
+    if (!tag) return false;
+
+    let wrap = document.querySelector('.challenge-media-wrap[data-challenge-media]');
+    if (!wrap && gate) {
+        wrap = document.createElement('div');
+        gate.insertBefore(wrap, gate.firstChild);
+    }
+    if (!wrap) return false;
+
+    wrap.className = 'challenge-media-wrap challenge-media-wrap--after is-revealed';
+    wrap.setAttribute('data-challenge-media', key);
+    wrap.setAttribute('data-challenge-media-phase', 'after');
+    wrap.innerHTML =
+        `<span class="challenge-media-phase-label" aria-hidden="true">After</span>${tag}`;
+    return true;
 }
 
 async function bootGameMounts() {
@@ -552,6 +612,8 @@ const MediaPlaceholdersModule = {
     showCriticalLabMedia,
     slotMediaHtml,
     challengeMediaHtml,
+    revealChallengeAfterMedia,
+    resolveChallengeMediaKey,
     openMediaPreview,
     closeMediaPreview,
     wireMediaPreviewClicks,

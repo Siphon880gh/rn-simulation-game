@@ -2087,6 +2087,20 @@ const PatientsModule = (() => {
         }
     };
 
+    /**
+     * Mobile census chip: first-name initial + bed letter (Derek Nguyen / 203-A → D.A.).
+     * Falls back to first + last initials when room has no bed suffix.
+     */
+    const abbreviatePatientName = (name, room) => {
+        const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+        const first = (parts[0] || '?').charAt(0).toUpperCase() || '?';
+        const roomStr = String(room || '').replace(/^Room\s+/i, '');
+        const bed = roomStr.match(/-([A-Za-z0-9]+)$/i)?.[1];
+        if (bed) return `${first}.${String(bed).toUpperCase()}`;
+        const last = (parts[parts.length - 1] || '').charAt(0).toUpperCase();
+        return last ? `${first}.${last}` : `${first}.`;
+    };
+
     const renderPatientTabs = () => {
         const tabsHost = document.querySelector(GameConfig.selectors.patientTabs);
         if (!tabsHost) return;
@@ -2100,11 +2114,15 @@ const PatientsModule = (() => {
         heading.innerHTML = `<span>Patients</span><span id="census-count-badge" class="census-count-badge">${patients.size}</span>`;
         tabsHost.appendChild(heading);
 
+        const row = document.createElement('div');
+        row.className = 'patient-tabs-row';
+        tabsHost.appendChild(row);
+
         if (!patients.size) {
             const empty = document.createElement('p');
             empty.className = 'census-tabs-empty';
             empty.textContent = 'No patients on census';
-            tabsHost.appendChild(empty);
+            row.appendChild(empty);
         }
 
         patients.forEach((patient) => {
@@ -2118,10 +2136,17 @@ const PatientsModule = (() => {
                 btn.classList.add('is-admitting');
             }
             const room = (patient.room || '').replace(/^Room\s+/i, '');
+            const abbrev = abbreviatePatientName(patient.name, patient.room || room);
             const admitBadge = patient.admissionPhase === 'admitting'
                 ? '<span class="patient-tab-admit">Admitting</span>'
                 : '';
-            btn.innerHTML = `<span class="patient-tab-room">${room}</span><span class="patient-tab-name">${patient.name}</span>${admitBadge}`;
+            btn.title = `${room} ${patient.name}`.trim();
+            btn.setAttribute('aria-label', `${room} ${patient.name}`.trim());
+            btn.innerHTML = `
+              <span class="patient-tab-room">${room}</span>
+              <span class="patient-tab-name patient-tab-name--full">${patient.name}</span>
+              <span class="patient-tab-name patient-tab-name--abbrev" aria-hidden="true">${abbrev}</span>
+              ${admitBadge}`;
             if (panelMode === 'patient' && patient.id === activeId) {
                 btn.classList.add('is-active');
                 btn.setAttribute('aria-selected', 'true');
@@ -2133,15 +2158,17 @@ const PatientsModule = (() => {
                     logMessage: `Switched to ${patient.name}`
                 });
             });
-            tabsHost.appendChild(btn);
+            row.appendChild(btn);
         });
 
         const globalBtn = document.createElement('button');
         globalBtn.type = 'button';
-        globalBtn.className = 'patient-tab';
+        globalBtn.className = 'patient-tab patient-tab--global';
         globalBtn.dataset.tab = 'global';
         globalBtn.setAttribute('role', 'tab');
-        globalBtn.textContent = 'Global';
+        globalBtn.innerHTML = `
+          <span class="patient-tab-name patient-tab-name--full">Global</span>
+          <span class="patient-tab-name patient-tab-name--abbrev" aria-hidden="true">G</span>`;
         if (panelMode === 'global') {
             globalBtn.classList.add('is-active');
             globalBtn.setAttribute('aria-selected', 'true');
@@ -2151,7 +2178,7 @@ const PatientsModule = (() => {
         globalBtn.addEventListener('click', () => {
             showGlobalPanel();
         });
-        tabsHost.appendChild(globalBtn);
+        row.appendChild(globalBtn);
         updateCensusMeta();
     };
 

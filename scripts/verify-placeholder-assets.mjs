@@ -71,6 +71,8 @@ if (!exists(catalogPath)) {
       'challenge-med-identity',
       'challenge-ivpb-hang',
       'challenge-iv-check',
+      'challenge-code-blue-after',
+      'challenge-bed-prep-after',
       'slot-perform'
     ];
     for (const id of required) {
@@ -131,6 +133,9 @@ const hooks = [
   ['game/assets/js/critical-labs.js', 'showCriticalLabMedia'],
   ['game/assets/js/challenges/emergencies/code-blue/challenge.js', 'challengeMediaHtml'],
   ['game/assets/js/media-placeholders.js', 'challengeMediaHtml'],
+  ['game/assets/js/media-placeholders.js', 'revealChallengeAfterMedia'],
+  ['game/assets/js/challenges/challenge-gate.js', 'revealChallengeAfterMedia'],
+  ['game/assets/js/game-config.js', 'afterImageId'],
   ['game/assets/js/media-placeholders.js', 'promptStyleAppendix'],
   ['game/assets/js/media-placeholders.js', 'withPromptDimensions'],
   ['game/assets/js/game-config.js', 'promptStyleAppendix'],

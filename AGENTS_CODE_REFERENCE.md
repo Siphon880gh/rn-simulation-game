@@ -20,7 +20,7 @@ Also: [`AGENTS.md`](AGENTS.md) (entry), [`AGENTS_POSSIBLE_DECISIONS_INDEX.md`](A
 
 **RN Simulation Game** — browser sim of a fast-paced ~12-hour nursing shift. Player manages patients (vitals, meds, tasks) under an accelerated military clock. Goal: complete the shift without overtime by prioritizing timed work.
 
-Multi-patient census (6 packs), declarative tasks + 3-slot execution with FIFO waiting queue, shell chrome, TimelineJS past hx, markdown Help. Challenges: med identity, bed-prep gather (win-to-complete), IVPB hang sequence, Code Blue (E4 escalate). Scenario + optional chaos incident packs; CSS unit scene themes; scoring/debrief at shift end. Titled image/video placeholders (`mediaPlaceholders` + catalog) on landing departments, busy slots, challenge modals, and critical-lab toast — swap via `replaceWith` / `game/assets/media/`.
+Multi-patient census (6 packs), declarative tasks + 3-slot execution with FIFO waiting queue, shell chrome, TimelineJS past hx, markdown Help. Challenges: med identity, bed-prep gather (win-to-complete), IVPB hang sequence, Code Blue (E4 escalate). Scenario + optional chaos incident packs; CSS unit scene themes; scoring/debrief at shift end. Titled image/video placeholders (`mediaPlaceholders` + catalog) on landing departments, busy slots, challenge modals (before + after-pass), and critical-lab toast — swap via `replaceWith` / `game/assets/media/`. Narrow viewports use denser shell chrome (lean pause, rail accordion, floating slots/log).
 
 ---
 
@@ -104,15 +104,15 @@ rngame/
 │   │   ├── scene-backdrop.js          # E7.M1 unit theme + situation still hooks
 │   │   ├── availability-windows.js    # E3.M3 window phases + Perform gate
 │   │   ├── doctor-orders.js           # E4.M3 hourly check + E11 carryover / ≤1 procedure
-│   │   ├── right-menu.js              # E10 Orders + Tools right rail
+│   │   ├── right-menu.js              # E10 Orders + Tools + E13 Delegate (+ mobile accordion)
 │   │   ├── dynamic-tasks.js           # E3.M5 weighted dynamic/urgent spawn + incident tabs
 │   │   ├── slot-system.js             # 3 slots + FIFO waiting queue (+ slot media thumbs)
 │   │   ├── slot-constraints.js        # Declarative slot concurrency (mutex / exclusive / blocksWith)
-│   │   ├── media-placeholders.js      # catalog load, SVG/data-url or PHP tags, mounts helpers
+│   │   ├── media-placeholders.js      # catalog + mounts; challenge before/after heroes
 │   │   ├── media-placeholder-catalog.json  # asset ids / titles / prompts / replaceWith
 │   │   ├── skill-focus.js             # Test skill: blank census + challenge → landing
 │   │   ├── docs.js                    # Help FAB + in-page docs viewer (ES module)
-│   │   ├── shell-chrome.js            # hour tabs + shift history log
+│   │   ├── shell-chrome.js            # hour tabs, shift log, lean pause, mobile FABs
 │   │   ├── markdown-renderer.js       # shared markdown-it / Mermaid / KaTeX
 │   │   ├── link-popover.js            # internal-link hover Preview + Contents
 │   │   └── events.js                  # legacy Signal reveal (~23)

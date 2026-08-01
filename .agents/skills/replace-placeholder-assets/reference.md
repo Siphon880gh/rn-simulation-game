@@ -40,4 +40,5 @@ Disable: `enabled: false`, `?placeholders=0`, or `localStorage.rngame.mediaPlace
 | `situation.critical-lab` (toast) | `showCriticalLabMedia` from `critical-labs.js` |
 | `slot.busy` | `slot-system` → `slotMediaHtml` |
 | `challenge.code-blue` (+ `.video`) | `challengeMediaHtml('code-blue')` in code-blue challenge |
-| `challenge.bed-prep` / `med-identity` / `ivpb-hang` / `iv-check` / `accucheck` / `admission` / `icp` | matching `render*Html` via `challengeMediaHtml` |
+| `challenge.bed-prep` / `med-identity` / `ivpb-hang` / `iv-check` / `accucheck` / `admission` / `icp` | matching `render*Html` via `challengeMediaHtml` (before) |
+| `challenge.*.after` | `afterImageId` → `revealChallengeAfterMedia` in `showPassedAcknowledge` (after last q, before Continue) |

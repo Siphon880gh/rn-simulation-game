@@ -171,6 +171,86 @@
       "h": 280,
       "prompt": "Subject: wide still for IV drip check / titration / heparin-PTT quiz — IV catheter dressing and infusion pump screen at bedside (no face). Caption \"IV check\".",
       "replaceWith": null
+    },
+    {
+      "id": "challenge-code-blue-after",
+      "kind": "image",
+      "title": "Code Blue — resolved",
+      "mount": "challenge.code-blue.after",
+      "w": 720,
+      "h": 320,
+      "prompt": "Subject: after-pass still for Code Blue quiz — calmer bedside, monitor trending stable, crash cart closed/organized, relief after successful response. Caption \"Resolved\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-bed-prep-after",
+      "kind": "image",
+      "title": "Bed prep — ready",
+      "mount": "challenge.bed-prep.after",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: after-pass still for bed-prep mini-game — neatly made hospital bed ready for admission, supplies staged. Caption \"Ready\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-med-identity-after",
+      "kind": "image",
+      "title": "Med identity — verified",
+      "mount": "challenge.med-identity.after",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: after-pass still for med identity quiz — verified med package with checkmark feel on a clean med cart. Caption \"Verified\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-ivpb-hang-after",
+      "kind": "image",
+      "title": "IVPB hang — running",
+      "mount": "challenge.ivpb-hang.after",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: after-pass still for IVPB hang game — secondary bag hung and dripping correctly on the pump pole. Caption \"Running\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-iv-check-after",
+      "kind": "image",
+      "title": "IV check — confirmed",
+      "mount": "challenge.iv-check.after",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: after-pass still for IV check/titration — pump screen showing confirmed rate, tidy IV site. Caption \"Confirmed\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-accucheck-after",
+      "kind": "image",
+      "title": "Accucheck — logged",
+      "mount": "challenge.accucheck.after",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: after-pass still for accucheck quiz — glucometer result logged, insulin syringe or pen staged if indicated (no face). Caption \"Logged\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-admission-after",
+      "kind": "image",
+      "title": "Admission — complete",
+      "mount": "challenge.admission.after",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: after-pass still for admission quiz — completed checklist with wristband applied on bedside table. Caption \"Complete\".",
+      "replaceWith": null
+    },
+    {
+      "id": "challenge-icp-after",
+      "kind": "image",
+      "title": "ICP — monitored",
+      "mount": "challenge.icp.after",
+      "w": 720,
+      "h": 280,
+      "prompt": "Subject: after-pass still for ICP quiz — ICP waveform trending controlled, EVD leveled correctly (schematic). Caption \"Monitored\".",
+      "replaceWith": null
     }
   ]
 }

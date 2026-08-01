@@ -15,8 +15,8 @@ Browser chrome around the sim: locked shell regions (E1.M2), patient main mount,
 | File | ~Lines | Role |
 |------|--------|------|
 | `game/index.html` | ~170 | DOM shell + CDN scripts + module entry |
-| `game/assets/js/shell-chrome.js` | ~120 | Hour tabs + shift history log wiring |
-| `game/assets/js/right-menu.js` | ~ESM | E10 Orders + Tools + E13 Delegate rail (subscribe-driven) |
+| `game/assets/js/shell-chrome.js` | ~ESM | Hour tabs, shift log, lean pause, mobile slots/log FABs |
+| `game/assets/js/right-menu.js` | ~ESM | E10 Orders + Tools + E13 Delegate rail + mobile rail accordion |
 | `game/assets/js/delegation.js` | ~ESM | E13 CCT/CNA availability + turn assist helpers |
 | `game/assets/js/modal.js` | ~210 | Modal configs + open/close/promise helpers |
 | `game/assets/js/debrief.js` | ~160 | E6.M0 thin prioritization debrief (completed/late/missed + shift log) |
@@ -43,18 +43,30 @@ Browser chrome around the sim: locked shell regions (E1.M2), patient main mount,
 | Top secondary | `#shell-top-secondary` / `#shell-hour-tabs` | Hour strip (E4.M2 fills content) |
 | Left menu | `#shell-left-menu` | Placeholder for patient nav (E2) |
 | Main | `#shell-main` / `#patients` | Clinical panels mount |
-| Right menu | `#shell-right-menu` | E10 Orders (`#orders-rail`) + Tools (`#tools-rail`) + E13 Delegate (`#delegate-rail`); `right-menu.js` |
-| Bottom | `#shell-bottom` | History + slots + status |
+| Right menu | `#shell-right-menu` | Orders/Tools/Delegate inside `[data-rail-accordion]`; `right-menu.js` |
+| Bottom | `#shell-bottom` | History + slots + status (desktop); mobile uses FABs + floating panels |
 | History log | `#shift-history-log` | Append-only via `APPEND_SHIFT_LOG` |
 | Task queue | `#task-queue-bar` / `#slot-waiting-queue` | 3 slots + FIFO wait (slot-system.js); exclusive → `.task-slot--disabled`; busy slots may show media thumbs |
 | Critical lab media | `#shell-critical-lab-media` | Placeholder host for critical-lab spawn still |
 | Status bar | `#shell-status-bar` / `#shell-status-message` | Live status line |
-| Clock / Pause | `#clock` / `#pause` | Timer module |
+| Clock / Pause | `#clock` / `#pause` / `#shell-lean-pause` | Timer module; lean chip on mobile collapsed chrome |
+| Slots / log toggles | `#shell-slots-toggle` / `#shell-log-toggle` | Mobile FABs; body classes `shell-slots-visible` / `shell-log-visible` |
 | Modal | `#modal`… | Overlay; dims `#shell`; challenge heroes via `challengeMediaHtml` |
 | Docs FAB | `#docs-container` | Fixed bottom-right |
 | Reveal style | `#reveal-scheduled-tasks` | Empty `<style>` filled by timer |
 
 Selectors centralized in `GameConfig.selectors` (`game-config.js`).
+
+---
+
+## Mobile shell (`shell.css` `@media max-width: 900px`)
+
+- Super-collapsed clock: `#shell-lean-pause` shows time + pause; full clock chrome hidden.
+- Brand copy condensed; Read more opens disclaimer/objectives modal.
+- Right rail: accordion sections (one open at a time on narrow); badges from `right-menu.js`.
+- Patient tabs: horizontal scroll row with abbreviated names (`.patient-tab-name--abbrev` from `patients.js`).
+- Bottom chrome lean: event log + slot cluster float via FABs; `--shell-bottom-height` ~2.75rem.
+- Slot cluster visibility: `body.shell-slots-visible` (also gated in `declarative-tasks.css` so it does not force-flex on mobile).
 
 ---
 
@@ -95,6 +107,7 @@ Adding a doc: place under `docs/{devs,players,learning}/` **and** list it in `do
 - Catalog: `media-placeholder-catalog.json`; inventory doc: `PLACEHOLDER_ASSETS.md`.
 - Default source is client **data-url** SVG (works on static servers); PHP under `placeholders/` when `source: 'php'`.
 - Mounts: landing departments, situation stills, critical-lab toast, busy slots, in-modal challenge heroes.
+- Challenge map: `imageId`/`videoId` = **before** (during quiz); `afterImageId` = after-pass still. `revealChallengeAfterMedia(key)` runs from `showPassedAcknowledge` in `challenge-gate.js` (after last question, before Continue closes). CSS: `.challenge-media-wrap--after` / `.challenge-media-phase-label` in `app.css`.
 - Final art: set catalog/`assets.<id>.replaceWith` (e.g. `assets/media/dept-tele.webp`); agent skills `scan-placeholder-assets` / `replace-placeholder-assets`.
 - Disable: `enabled: false` or `?placeholders=0`.
 

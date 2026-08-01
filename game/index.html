@@ -60,6 +60,10 @@
                     <p class="text-xs font-medium text-gray-500">Pack learning objectives</p>
                     <ul id="scenario-pack-objectives" class="text-xs text-gray-500 list-disc pl-4"></ul>
                 </div>
+                <button type="button" id="shell-brand-read-more" class="shell-brand-read-more"
+                        title="Shift details">
+                    Read more
+                </button>
             </div>
             <div id="shell-clock-cluster" class="shell-clock-cluster">
                 <div class="shell-clock-cluster__chrome">
@@ -77,6 +81,17 @@
                         <i class="fas fa-chevron-up" data-collapse-icon="collapse" aria-hidden="true"></i>
                         <i class="fas fa-chevron-down hidden" data-collapse-icon="expand" aria-hidden="true"></i>
                         <span data-collapse-label>Collapse</span>
+                    </button>
+                    <button type="button" id="shell-lean-pause" class="shell-lean-pause"
+                            aria-label="Pause or resume shift"
+                            title="Pause / Resume">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                             class="shell-lean-pause__icon" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span id="clock-lean" class="shell-lean-pause__time">&nbsp;</span>
                     </button>
                 </div>
                 <div class="shell-clock-display flex flex-col items-center gap-2 text-xl font-bold bg-white p-3 rounded-lg shadow"
@@ -188,12 +203,38 @@
             </main>
 
             <aside id="shell-right-menu" aria-label="Right menu">
-                <p class="shell-menu-label">Orders</p>
-                <div id="orders-rail" class="orders-rail" role="list" aria-label="Doctor orders checks"></div>
-                <p class="shell-menu-label shell-menu-label--spaced">Tools</p>
-                <div id="tools-rail" class="tools-rail" role="list" aria-label="Unit tools"></div>
-                <p id="delegate-rail-label" class="shell-menu-label shell-menu-label--spaced">Delegate</p>
-                <div id="delegate-rail" class="delegate-rail" role="list" aria-label="Delegate assist staff"></div>
+                <div class="rail-accordion" data-rail-accordion>
+                    <section class="rail-accordion__section" data-rail-section="orders">
+                        <button type="button" class="rail-accordion__toggle" data-rail-toggle="orders"
+                                aria-expanded="false" aria-controls="orders-rail-panel">
+                            <span class="rail-accordion__title">Orders</span>
+                            <span class="rail-accordion__badge" data-rail-badge="orders">0</span>
+                        </button>
+                        <div id="orders-rail-panel" class="rail-accordion__panel" data-rail-panel="orders" hidden>
+                            <div id="orders-rail" class="orders-rail" role="list" aria-label="Doctor orders checks"></div>
+                        </div>
+                    </section>
+                    <section class="rail-accordion__section" data-rail-section="tools">
+                        <button type="button" class="rail-accordion__toggle" data-rail-toggle="tools"
+                                aria-expanded="false" aria-controls="tools-rail-panel">
+                            <span class="rail-accordion__title">Tools</span>
+                            <span class="rail-accordion__badge" data-rail-badge="tools">0</span>
+                        </button>
+                        <div id="tools-rail-panel" class="rail-accordion__panel" data-rail-panel="tools" hidden>
+                            <div id="tools-rail" class="tools-rail" role="list" aria-label="Unit tools"></div>
+                        </div>
+                    </section>
+                    <section class="rail-accordion__section" data-rail-section="delegate">
+                        <button type="button" class="rail-accordion__toggle" data-rail-toggle="delegate"
+                                aria-expanded="false" aria-controls="delegate-rail-panel">
+                            <span id="delegate-rail-label" class="rail-accordion__title">Delegate</span>
+                            <span class="rail-accordion__badge" data-rail-badge="delegate">0</span>
+                        </button>
+                        <div id="delegate-rail-panel" class="rail-accordion__panel" data-rail-panel="delegate" hidden>
+                            <div id="delegate-rail" class="delegate-rail" role="list" aria-label="Delegate assist staff"></div>
+                        </div>
+                    </section>
+                </div>
             </aside>
         </div>
 
@@ -205,7 +246,7 @@
                 <p class="shift-log-empty">No shift events yet.</p>
             </div>
 
-            <div class="slot-cluster">
+            <div class="slot-cluster" id="slot-cluster">
                 <div id="task-queue-bar" class="task-queue-bar" aria-label="Task execution slots"></div>
                 <div id="slot-waiting-queue" class="slot-waiting-queue" aria-label="Slot waiting queue"></div>
             </div>
@@ -216,6 +257,20 @@
                 <span id="shell-status-meta">Slots: 3</span>
             </div>
         </footer>
+
+        <button type="button" id="shell-log-toggle" class="shell-log-toggle"
+                aria-pressed="false" aria-controls="shift-history-log"
+                title="Shift event log">
+            <i class="fas fa-list-ul" aria-hidden="true"></i>
+            <span class="shell-log-toggle__label">Log</span>
+        </button>
+
+        <button type="button" id="shell-slots-toggle" class="shell-slots-toggle"
+                aria-pressed="false" aria-controls="slot-cluster"
+                title="Show task slots">
+            <i class="fas fa-th-large" aria-hidden="true"></i>
+            <span class="shell-slots-toggle__label">Slots</span>
+        </button>
     </div>
 
     <!-- Critical lab placeholder media (config: GameConfig.mediaPlaceholders) -->

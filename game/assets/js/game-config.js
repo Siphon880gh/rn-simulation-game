@@ -366,21 +366,51 @@ export const GameConfig = {
     criticalLabAutoHideMs: 12000,
     /**
      * Challenge key → catalog asset ids for in-modal hero (see challengeMediaHtml).
+     * imageId/videoId = before (during quiz); afterImageId shown after last pass,
+     * before Continue closes the modal (showPassedAcknowledge).
      * preferVideo: show videoId when set (Code Blue default).
      */
     challenges: {
       'code-blue': {
         imageId: 'challenge-code-blue',
         videoId: 'challenge-code-blue-video',
-        preferVideo: true
+        preferVideo: true,
+        afterImageId: 'challenge-code-blue-after'
       },
-      'bed-prep': { imageId: 'challenge-bed-prep' },
-      'med-identity': { imageId: 'challenge-med-identity' },
-      'ivpb-hang': { imageId: 'challenge-ivpb-hang' },
-      'iv-check': { imageId: 'challenge-iv-check' },
-      accucheck: { imageId: 'challenge-accucheck' },
-      admission: { imageId: 'challenge-admission' },
-      icp: { imageId: 'challenge-icp' }
+      'bed-prep': {
+        imageId: 'challenge-bed-prep',
+        afterImageId: 'challenge-bed-prep-after'
+      },
+      'med-identity': {
+        imageId: 'challenge-med-identity',
+        afterImageId: 'challenge-med-identity-after'
+      },
+      'ivpb-hang': {
+        imageId: 'challenge-ivpb-hang',
+        afterImageId: 'challenge-ivpb-hang-after'
+      },
+      'iv-check': {
+        imageId: 'challenge-iv-check',
+        afterImageId: 'challenge-iv-check-after'
+      },
+      accucheck: {
+        imageId: 'challenge-accucheck',
+        afterImageId: 'challenge-accucheck-after'
+      },
+      admission: {
+        imageId: 'challenge-admission',
+        afterImageId: 'challenge-admission-after'
+      },
+      icp: {
+        imageId: 'challenge-icp',
+        afterImageId: 'challenge-icp-after'
+      }
+    },
+    /** data-challenge attribute → challenges map key */
+    challengeMediaAliases: {
+      'admission-quiz': 'admission',
+      'heparin-ptt': 'iv-check',
+      'iv-titration': 'iv-check'
     },
     /**
      * Optional per-id overrides merged onto the JSON catalog
@@ -441,6 +471,12 @@ export const GameConfig = {
     clockCluster: '#shell-clock-cluster',
     boosters: '#shell-boosters',
     topCollapse: '#shell-top-collapse',
+    leanPause: '#shell-lean-pause',
+    clockLean: '#clock-lean',
+    brandReadMore: '#shell-brand-read-more',
+    slotsToggle: '#shell-slots-toggle',
+    logToggle: '#shell-log-toggle',
+    slotCluster: '#slot-cluster',
     clock: '#clock',
     pauseButton: '#pause',
     testMode: '#shell-test-mode',

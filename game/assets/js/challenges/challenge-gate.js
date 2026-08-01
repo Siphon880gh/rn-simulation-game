@@ -76,6 +76,7 @@ import {
 } from './shared/copy-config.js';
 import BoostersModule from '../boosters.js';
 import { applySituationStill, clearSituationStill } from '../scene-backdrop.js';
+import { revealChallengeAfterMedia } from '../media-placeholders.js';
 import { recordChallengeOutcome } from '../scoring.js';
 import { applyIvChallengeResult, syncIvTaskMetadata } from '../iv-system.js';
 
@@ -412,6 +413,9 @@ function showPassedAcknowledge(onContinue) {
     activeSession.pendingPassContinue = onContinue;
     setChallengeFeedback(challengeCorrectFeedback(), { ok: true });
     lockChallengeControls();
+    // After last question (incl. multi-q challenge level) — swap before→after still
+    // while the player still has the modal open (Continue closes).
+    revealChallengeAfterMedia(activeSession.challengeMediaKey);
 
     const footer = document.querySelector(GameConfig.selectors.modalFooter || '#modal-footer');
     if (!footer) {

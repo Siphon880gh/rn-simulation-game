@@ -561,6 +561,17 @@ li[data-status="active"] {
     gap: 0.35rem;
 }
 
+/* Mobile: shell.css owns show/hide (floating slots). Do not force flex here. */
+@media (max-width: 900px) {
+    .slot-cluster {
+        display: none;
+    }
+
+    body.shell-slots-visible .slot-cluster {
+        display: flex;
+    }
+}
+
 .slot-waiting-queue {
     min-width: 11rem;
     max-width: 14rem;

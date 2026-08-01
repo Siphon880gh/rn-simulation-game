@@ -78,6 +78,46 @@
       "file": null
     },
     {
+      "id": "challenge-code-blue-after",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-bed-prep-after",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-med-identity-after",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-ivpb-hang-after",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-iv-check-after",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-accucheck-after",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-admission-after",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "id": "challenge-icp-after",
+      "status": "pending",
+      "file": null
+    },
+    {
       "id": "slot-perform",
       "status": "pending",
       "file": null

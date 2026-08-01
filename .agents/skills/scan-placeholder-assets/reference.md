@@ -8,7 +8,8 @@
 | Situation stills | `GameConfig.scene.situationStills`, `scene-backdrop.js` | `situation-*` / `situation.*` | 960×540 |
 | Critical lab toast | `critical-labs.js` + `#shell-critical-lab-media` | `situation-critical-lab` | 640×360 |
 | Busy slots | `slot-system.js` | `slot-perform` (+ video) | 160×120 (thumb) / 320×180 video |
-| Challenge heroes | `challenges/**/challenge.js` `render*Html` | `challenge-<key>` / `challenge.<key>` | 720×320 (Code Blue video 720×320) |
+| Challenge heroes (before) | `challenges/**/challenge.js` `render*Html` | `challenge-<key>` / `challenge.<key>` | 720×280–320 |
+| Challenge after-pass | `afterImageId` + `revealChallengeAfterMedia` in `showPassedAcknowledge` | `challenge-<key>-after` / `challenge.<key>.after` | same as before |
 | Skill MCQ banks | library skills using `skill-mcq` | optional per-skill hero | 720×280 |
 | Debrief / game-over | `debrief.js`, modal | `situation-debrief` (if approved) | 960×540 |
 
