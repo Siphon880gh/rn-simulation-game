@@ -66,6 +66,14 @@ export const CHALLENGE_REGISTRY = {
     modulePath: 'challenges/skills/icp/challenge.js',
     testSpawnKind: 'icp'
   },
+  alteplase: {
+    id: 'alteplase',
+    category: 'skills',
+    label: 'Alteplase (Cathflo) — PICC occlusion',
+    configPath: 'challenges/skills/alteplase/config.js',
+    modulePath: 'challenges/skills/alteplase/challenge.js',
+    testSpawnKind: 'alteplase'
+  },
   'skill-mcq': {
     id: 'skill-mcq',
     category: 'skills',

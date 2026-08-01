@@ -991,6 +991,26 @@ const PatientsModule = (() => {
             htmlFile: 'events/patients/ida.html',
             pastHxFile: 'events/patients/ida-past-hx.json'
         },
+        cal: {
+            id: 'cal',
+            name: 'Cal Renner',
+            room: 'Room 312-B',
+            age: 61,
+            sex: 'Male',
+            diagnosis: 'Osteomyelitis — right PICC; alteplase (Cathflo) for occlusion risk',
+            skills: ['alteplase'],
+            weightKg: 72,
+            vitals: {
+                hr: 86,
+                bp: '132/76',
+                temp: '99.1°F',
+                o2: '97% RA',
+                pain: 'leg 2/10',
+                rr: 16
+            },
+            htmlFile: 'events/patients/cal.html',
+            pastHxFile: 'events/patients/cal-past-hx.json'
+        },
         joss: {
             id: 'joss',
             name: 'Joss Kearney',
@@ -1993,6 +2013,13 @@ const PatientsModule = (() => {
             if (challenge) metadata.challenge = challenge;
             const skillId = element.getAttribute('data-skill-id');
             if (skillId) metadata.skillId = skillId;
+            const alteplasePhase = element.getAttribute('data-alteplase-phase');
+            if (alteplasePhase) metadata.alteplasePhase = alteplasePhase;
+            const weightKgAttr = element.getAttribute('data-weight-kg');
+            if (weightKgAttr != null && weightKgAttr !== '') {
+                const weightKg = Number(weightKgAttr);
+                if (Number.isFinite(weightKg)) metadata.weightKg = weightKg;
+            }
             const route = element.getAttribute('data-route') || element.getAttribute('data-med-form');
             if (route) metadata.route = route;
             const authoredKind = element.getAttribute('data-task-kind');

@@ -8,6 +8,7 @@ import { bedPrepChallengeConfig } from './challenges/skills/bed-prep/config.js';
 import { ivpbHangChallengeConfig } from './challenges/skills/ivpb-hang/config.js';
 import { medIdentityChallengeConfig } from './challenges/skills/med-identity/config.js';
 import { icpChallengeConfig } from './challenges/skills/icp/config.js';
+import { alteplaseChallengeConfig } from './challenges/skills/alteplase/config.js';
 import { skillMcqChallengeConfig } from './challenges/skills/skill-mcq/config.js';
 import { getChallengeTestSpawnIncidents } from './challenges/test-spawn.js';
 
@@ -464,6 +465,7 @@ export const GameConfig = {
   ivpbHangChallenge: ivpbHangChallengeConfig,
   medIdentityChallenge: medIdentityChallengeConfig,
   icpChallenge: icpChallengeConfig,
+  alteplaseChallenge: alteplaseChallengeConfig,
   skillMcqChallenge: skillMcqChallengeConfig,
 
   /**
@@ -867,6 +869,41 @@ export const GameConfig = {
    * Accucheck / finger-stick POC glucose — weighted outcomes shown via dice on the task.
    * Critical hyperglycemia spawns a critical-lab Call MD; other bands show a top toast.
    */
+  /**
+   * Alteplase (Cathflo) for occluded PICC — patency dice + dwell / aspirate flow.
+   * Assess: 75% patent (Cathflo quiz) / 25% clotted → Call MD (critical-lab callback).
+   * Dwell 30 min → reassess; if still occluded, additional 120 min; then aspirate.
+   */
+  alteplasePicc: {
+    toastMs: 4200,
+    orderLabId: 'picc-alteplase',
+    defaultWeightKg: 70,
+    adminDurationMins: 15,
+    reassessDurationMins: 8,
+    aspirateDurationMins: 10,
+    incidentDurationMins: 5,
+    /** P(restore) after first 30-min dwell */
+    restoreAfter30: 0.55,
+    /** P(restore) after additional 120-min dwell */
+    restoreAfter120: 1,
+    aspirateMlAdult: { min: 4, max: 5 },
+    aspirateMlPeds: 3,
+    patencyOutcomes: [
+      {
+        id: 'patent',
+        label: 'PICC patent',
+        weight: 75,
+        clotted: false
+      },
+      {
+        id: 'clotted',
+        label: 'PICC clotted',
+        weight: 25,
+        clotted: true
+      }
+    ]
+  },
+
   accucheckFingerStick: {
     toastMs: 4200,
     outcomes: [
@@ -1122,6 +1159,28 @@ export const GameConfig = {
             durationMins: 20,
             expire: '+90',
             taskClass: 'stat'
+          }
+        ]
+      },
+      {
+        id: 'picc-alteplase',
+        shortName: 'PICC occlusion',
+        fullName: 'Occluded PICC — alteplase (Cathflo) order',
+        result: 'PICC lumen occluded (critical access failure) — no blood return / will not flush (fibrin)',
+        ordersHint: 'Alteplase (Cathflo) 2 mg instill into occluded lumen; dwell 30 min then reassess (additional 120 min if needed)',
+        callbackEffects: [
+          {
+            type: 'assessment',
+            name: 'Administer alteplase (Cathflo) into occluded PICC',
+            durationMins: 15,
+            expire: '+60',
+            taskClass: 'stat',
+            metadata: {
+              challenge: 'alteplase',
+              alteplasePhase: 'admin',
+              kind: 'alteplase-admin',
+              fromAlteplase: true
+            }
           }
         ]
       }

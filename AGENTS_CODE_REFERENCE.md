@@ -95,10 +95,12 @@ rngame/
 │   │   │   ├── registry.js            # kind → skills|emergencies paths
 │   │   │   ├── shared/copy-config.js  # pause banner / pass copy
 │   │   │   ├── skills/<id>/           # config.js (author) + challenge.js
-│   │   │   │                          # ivpb-hang, med-identity, bed-prep, accucheck, iv-check, admission
+│   │   │   │                          # ivpb-hang, med-identity, bed-prep, accucheck, iv-check,
+│   │   │   │                          # admission, icp, alteplase, skill-mcq
 │   │   │   └── emergencies/code-blue/ # config.js (author) + challenge.js
 │   │   ├── *-challenge.js / med-identity-quiz.js / admission-quiz.js / challenge-gate.js
 │   │   │                              # thin re-exports → challenges/ (deprecated import paths)
+│   │   ├── alteplase-system.js        # PICC alteplase/Cathflo: dice → clot incident → MD callback → dwell/aspirate
 │   │   ├── admission-system.js        # E9 open-to-admit schedule + checklist / MD callback
 │   │   ├── task-class-interactions.js # E3.M4 batch/context-switch duration
 │   │   ├── scene-backdrop.js          # E7.M1 unit theme + situation still hooks

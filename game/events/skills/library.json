@@ -1092,6 +1092,32 @@
       ]
     },
     {
+      "id": "alteplase",
+      "label": "Alteplase (Cathflo) — PICC occlusion",
+      "aliases": [
+        "Altepase",
+        "Cathflo",
+        "PICC alteplase",
+        "occluded PICC",
+        "fibrin clot PICC"
+      ],
+      "tags": [
+        "vascular",
+        "meds",
+        "procedures"
+      ],
+      "blurb": "Assess PICC patency (75% patent / 25% clotted). Patent → Cathflo quiz. Clotted → Call MD for alteplase, dwell 30 min (+120 if needed), aspirate 4–5 mL (≥10 kg) or 3 mL (<10 kg).",
+      "games": [
+        "alteplase"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-alteplase-medsurg.json",
+      "patients": [
+        "cal"
+      ]
+    },
+    {
       "id": "iv-insertion",
       "label": "IV insertion",
       "aliases": [

@@ -20,6 +20,11 @@ import SceneBackdropModule from './scene-backdrop.js';
 import MediaPlaceholdersModule from './media-placeholders.js';
 import IvSystemModule from './iv-system.js';
 import CriticalLabsModule from './critical-labs.js';
+import AlteplaseSystemModule, {
+    applyPiccAssessRoll,
+    applyPiccRestoreRoll,
+    focusPiccClotDependents
+} from './alteplase-system.js';
 import TestModeModule from './test-mode.js';
 import SoundModule from './sound.js';
 import NurseAlertsModule from './nurse-alerts.js';
@@ -43,6 +48,11 @@ import {
     applyFingerStickResult,
     initFingerStickDiceUi
 } from './challenges/skills/accucheck/challenge.js';
+import {
+    isAlteplaseTask,
+    getAlteplasePhase,
+    initAlteplaseDiceUi
+} from './challenges/skills/alteplase/challenge.js';
 
 // Declarative Application Configuration
 const AppConfig = {
@@ -64,6 +74,7 @@ const AppConfig = {
         scene: SceneBackdropModule,
         iv: IvSystemModule,
         criticalLabs: CriticalLabsModule,
+        alteplase: AlteplaseSystemModule,
         testMode: TestModeModule,
         sound: SoundModule,
         nurseAlerts: NurseAlertsModule,
@@ -137,7 +148,7 @@ class GameApplication {
 
     // Initialize modules with dependency management
     async initializeModules() {
-        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, mediaPlaceholders, scene, iv, criticalLabs, testMode, sound, nurseAlerts, admission, rightMenu, delegation, skillFocus, boosters } = this.config.modules;
+        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, mediaPlaceholders, scene, iv, criticalLabs, alteplase, testMode, sound, nurseAlerts, admission, rightMenu, delegation, skillFocus, boosters } = this.config.modules;
         
         // Register modules
         this.modules.set('modal', modal);
@@ -157,6 +168,7 @@ class GameApplication {
         this.modules.set('scene', scene);
         this.modules.set('iv', iv);
         this.modules.set('criticalLabs', criticalLabs);
+        this.modules.set('alteplase', alteplase);
         this.modules.set('testMode', testMode);
         this.modules.set('sound', sound);
         this.modules.set('nurseAlerts', nurseAlerts);
@@ -187,6 +199,9 @@ class GameApplication {
         if (criticalLabs && criticalLabs.init) {
             criticalLabs.init();
         }
+        if (alteplase && alteplase.init) {
+            alteplase.init();
+        }
         if (sound && sound.init) {
             sound.init();
         }
@@ -209,6 +224,7 @@ class GameApplication {
         // Initialize patients (loads tasks)
         await patients.init();
         initFingerStickDiceUi();
+        initAlteplaseDiceUi();
 
         // E4.M2: game-time drip after census (subscribes to currentTime)
         if (eventDrip && eventDrip.init) {
@@ -246,7 +262,7 @@ class GameApplication {
     setupTaskUIHandlers() {
         // E13: when a CNA/CCT is selected, capture task clicks for delegate modes
         document.addEventListener('click', (e) => {
-            if (e.target.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice]')) return;
+            if (e.target.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice], [data-picc-patency-dice]')) return;
             const aide = getSelectedAide();
             if (!aide) return;
             const taskElement = e.target.closest('[data-task-type]');
@@ -262,8 +278,8 @@ class GameApplication {
         // Use event delegation for dynamic task elements
         document.addEventListener('click', (e) => {
             if (getSelectedAide()) return;
-            // Dice odds controls own their click (Accucheck + orders trivial)
-            if (e.target.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice]')) return;
+            // Dice odds controls own their click (Accucheck + orders trivial + PICC patency)
+            if (e.target.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice], [data-picc-patency-dice]')) return;
             const taskElement = e.target.closest('[data-task-type]');
             if (!taskElement) return;
 
@@ -341,7 +357,7 @@ class GameApplication {
             trigger: 'left',
             build: (triggerElement, e) => {
                 // Leave Accucheck / orders dice clicks alone (odds popover, not Perform)
-                if (e?.target?.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice]')) {
+                if (e?.target?.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice], [data-picc-patency-dice]')) {
                     return false;
                 }
                 const element = e.target.closest('[data-task-type]');
@@ -602,11 +618,87 @@ class GameApplication {
         });
     }
 
+    // Alteplase / Cathflo PICC: patency dice → patent quiz or clotted incident + MD order flow
+    async performAlteplaseTask(task) {
+        const now = gameState.getStateSlice('currentTime');
+        if (!taskSystem.isPerformAllowed(task, now)) {
+            alert(`Cannot perform outside the availability window (${taskSystem.getWindowPhase(task, now)}).`);
+            return;
+        }
+        const phase = getAlteplasePhase(task);
+        const kind = String(task.metadata?.kind || '').toLowerCase();
+
+        if (kind === 'picc-clotted-incident' || phase === 'incident') {
+            focusPiccClotDependents(task);
+            return;
+        }
+
+        if (phase === 'assess') {
+            const roll = applyPiccAssessRoll(task, { now });
+            if (roll.skipQuiz) {
+                taskSystem.completeTask(task.id);
+                return;
+            }
+            const challengeGate = this.modules.get('challengeGate');
+            const outcome = challengeGate?.runChallengeGate
+                ? await challengeGate.runChallengeGate(task)
+                : { passed: false, reason: 'no-gate' };
+            if (!outcome?.passed) return;
+            const slotSystem = this.modules.get('slots');
+            const result = slotSystem?.requestSlot(task, gameState.getStateSlice('currentTime'));
+            if (!result?.ok) {
+                alert(result?.message || 'Could not start or queue that task.');
+            }
+            return;
+        }
+
+        if (phase === 'reassess-30' || phase === 'reassess-120') {
+            applyPiccRestoreRoll(task, { now, phase });
+            taskSystem.completeTask(task.id);
+            return;
+        }
+
+        if (phase === 'dwell-30' || phase === 'dwell-120') {
+            const slotGate = SlotSystem.canAcceptTask?.(task) || canEnterSlot(task);
+            if (slotGate?.ok === false) {
+                alert(slotGate.message || 'Cannot start that task in the queue slots right now.');
+                return;
+            }
+            const slotSystem = this.modules.get('slots');
+            const result = slotSystem?.requestSlot(task, now);
+            if (!result?.ok) {
+                alert(result?.message || 'Could not start or queue that dwell.');
+            }
+            return;
+        }
+
+        // admin / aspirate / focus (skill practice): quiz then slot
+        const slotGate = SlotSystem.canAcceptTask?.(task) || canEnterSlot(task);
+        if (slotGate?.ok === false) {
+            alert(slotGate.message || 'Cannot start that task in the queue slots right now.');
+            return;
+        }
+        const challengeGate = this.modules.get('challengeGate');
+        const outcome = challengeGate?.runChallengeGate
+            ? await challengeGate.runChallengeGate(task)
+            : { passed: false, reason: 'no-gate' };
+        if (!outcome?.passed) return;
+        const slotSystem = this.modules.get('slots');
+        const result = slotSystem?.requestSlot(task, gameState.getStateSlice('currentTime'));
+        if (!result?.ok) {
+            alert(result?.message || 'Could not start or queue that task.');
+        }
+    }
+
     // E3.M5: assessment/dynamic perform — window gate → optional challenge → slot
     // Shift assessment: random physical-assessment skill-mcq, then slot.
     // Chart assessment: unlocked only after shift assessment completes (15 min slot).
     // E13: opts.assist → team effort with CCT/CNA at half duration
     async performAssessmentTask(task, opts = {}) {
+        if (isAlteplaseTask(task) || task.metadata?.kind === 'picc-clotted-incident') {
+            await this.performAlteplaseTask(task);
+            return;
+        }
         const now = gameState.getStateSlice('currentTime');
         if (!taskSystem.isPrerequisiteMet?.(task)) {
             alert('Complete the bedside shift assessment first, then chart.');

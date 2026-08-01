@@ -1,0 +1,15 @@
+{
+  "title": "Cal Renner — past history",
+  "events": [
+    {
+      "start_date": { "year": 2026, "month": 5, "day": 12 },
+      "headline": "Right basilic PICC placed for long-term IV antibiotics",
+      "text": "<p>Dual-lumen PICC for osteomyelitis therapy. Intermittent sluggish flush noted on prior shifts.</p>"
+    },
+    {
+      "start_date": { "year": 2026, "month": 6, "day": 2 },
+      "headline": "Fibrin sheath / occlusion risk documented",
+      "text": "<p>Protocol: assess patency; if occluded, obtain order for alteplase (Cathflo) lumen dwell.</p>"
+    }
+  ]
+}

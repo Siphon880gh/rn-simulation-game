@@ -221,6 +221,17 @@ export function buildTestChallengeTask(kind, patientId = null, opts = {}) {
         type: 'assessment',
         metadata: { challenge: 'icp' }
       };
+    case 'alteplase':
+      return {
+        ...base,
+        name: 'Assess PICC patency / alteplase (Cathflo)',
+        type: 'assessment',
+        metadata: {
+          challenge: 'alteplase',
+          alteplasePhase: 'focus',
+          weightKg: 70
+        }
+      };
     case 'skill-mcq': {
       const requested = String(opts.skillId || '').trim();
       // Landing Test skill always passes skillId — never silently swap to another bank

@@ -126,6 +126,20 @@ Invalid click while aide selected → soft `#shell-delegate-hint`. AUTO: `node s
 
 AUTO: `node scripts/verify-e11.mjs`.
 
+## Alteplase (Cathflo) PICC occlusion
+
+`alteplase-system.js` + `challenges/skills/alteplase/` + `GameConfig.alteplasePicc`.
+
+| Step | Behavior |
+|------|----------|
+| Assess PICC | Dice 75% patent / 25% clotted (`data-challenge="alteplase"`) |
+| Patent | MCQ — brand name **Cathflo**; then slot |
+| Clotted | Incident **PICC line clotted** → Call MD via critical-lab callback (`picc-alteplase` lab) |
+| After MD orders | Administer Cathflo → dwell **30** min → reassess; if still occluded → dwell **+120** min → reassess |
+| Restored | Aspirate **4–5 mL** blood (≥10 kg) or **3 mL** (&lt;10 kg), then flush |
+
+Skill library: `alteplase` → patient `cal` / pack `skill-alteplase-medsurg.json`. AUTO: `node scripts/verify-alteplase.mjs`.
+
 ---
 
 ## Safe-edit notes

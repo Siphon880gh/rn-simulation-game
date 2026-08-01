@@ -1,0 +1,35 @@
+{
+  "id": "skill-alteplase-medsurg",
+  "title": "Skill practice — Alteplase (Cathflo) PICC occlusion (Med-Surg)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Assess PICC patency (flush / blood return) with chance of occlusion",
+    "Call for alteplase (Cathflo) order when occluded; use MD callback workflow",
+    "Instill alteplase, dwell 30 minutes (then +120 minutes if needed), aspirate waste blood when restored"
+  ],
+  "patients": ["cal"],
+  "patientOverrides": {
+    "cal": {
+      "clinicalStatus": "stable",
+      "acuityScore": 2,
+      "clinicalStatusReason": "PICC patency check — alteplase/Cathflo risk"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

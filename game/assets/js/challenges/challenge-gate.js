@@ -60,6 +60,13 @@ import {
     getIcpQuestionIds
 } from './skills/icp/challenge.js';
 import {
+    isAlteplaseTask,
+    buildAlteplaseQuiz,
+    renderAlteplaseQuizHtml,
+    getAlteplasePoolSize,
+    getAlteplaseQuestionIds
+} from './skills/alteplase/challenge.js';
+import {
     isSkillMcqTask,
     buildSkillMcqQuiz,
     renderSkillMcqHtml,
@@ -521,7 +528,7 @@ function wireSafetyHandlers() {
 /**
  * Choice quizzes with a randomizable pool: optional challenge-level + Random + multi-q.
  * @param {{
- *   kind: 'icp'|'skill-mcq',
+ *   kind: 'icp'|'skill-mcq'|'alteplase',
  *   task: object,
  *   poolSize: number,
  *   rebuild: (opts: object) => { quiz: object, html: string }|null
@@ -620,7 +627,9 @@ function mountPoolChoiceQuiz(next, task, poolSize, kind) {
         : renderChallengeLevelControl(poolSize, selectedLevel);
     content.innerHTML = kind === 'icp'
         ? renderIcpQuizHtml(next.quiz, task?.name, { poolSize, levelHtml })
-        : renderSkillMcqHtml(next.quiz, task?.name, { poolSize, levelHtml });
+        : kind === 'alteplase'
+            ? renderAlteplaseQuizHtml(next.quiz, task?.name, { poolSize, levelHtml })
+            : renderSkillMcqHtml(next.quiz, task?.name, { poolSize, levelHtml });
 
     // Fresh DOM: re-bind or re-lock the challenge-level control
     if (typeof cleanupChallengeLevel === 'function') {
@@ -867,6 +876,7 @@ export function cheatChallenge() {
     if (
         activeSession.safety
         || activeSession.icpQuiz
+        || activeSession.alteplaseQuiz
         || activeSession.admissionQuiz
     ) {
         if (cheatSafetyHighlight()) {
@@ -939,23 +949,29 @@ export function runChallengeGate(task) {
 
         // Per-run shuffled decks so multi-question challenge levels are not bank order.
         let icpQuiz = null;
+        let alteplaseQuiz = null;
         let skillMcq = null;
         let quizDeck = null;
         if (!bedPrep && !ivpbHang && isIcpTask(liveTask)) {
             quizDeck = beginShuffledQuizDeck(getIcpQuestionIds());
             icpQuiz = buildIcpQuiz(liveTask, { questionId: quizDeck[0] });
+        } else if (!bedPrep && !ivpbHang && isAlteplaseTask(liveTask)) {
+            quizDeck = beginShuffledQuizDeck(getAlteplaseQuestionIds(liveTask));
+            alteplaseQuiz = buildAlteplaseQuiz(liveTask, { questionId: quizDeck[0] });
         } else if (!bedPrep && !ivpbHang && isSkillMcqTask(liveTask)) {
             const skillId = String(liveTask?.metadata?.skillId || '').trim();
             quizDeck = beginShuffledQuizDeck(getSkillMcqQuestionIds(skillId));
             skillMcq = buildSkillMcqQuiz(liveTask, { questionId: quizDeck[0] });
         }
 
-        const admissionQuiz = !bedPrep && !ivpbHang && !icpQuiz && !skillMcq
+        const admissionQuiz = !bedPrep && !ivpbHang && !icpQuiz && !alteplaseQuiz && !skillMcq
             ? buildAdmissionQuiz(liveTask)
             : null;
-        const useIv = !bedPrep && !ivpbHang && !icpQuiz && !skillMcq && !admissionQuiz && isIvTask(liveTask);
+        const useIv = !bedPrep && !ivpbHang && !icpQuiz && !alteplaseQuiz && !skillMcq
+            && !admissionQuiz && isIvTask(liveTask);
         const ivPrompt = useIv ? buildIvPrompt(liveTask) : null;
-        const isMed = !bedPrep && !ivpbHang && !icpQuiz && !skillMcq && !admissionQuiz && !useIv
+        const isMed = !bedPrep && !ivpbHang && !icpQuiz && !alteplaseQuiz && !skillMcq
+            && !admissionQuiz && !useIv
             && (!liveTask?.type || String(liveTask.type).toLowerCase() === 'med');
         const useAccucheck = isMed && isAccucheckTask(liveTask);
         const accucheckPrompt = useAccucheck ? buildAccucheckPrompt(liveTask) : null;
@@ -973,11 +989,12 @@ export function runChallengeGate(task) {
             bedPrep,
             ivpbHang,
             icpQuiz: Boolean(icpQuiz),
+            alteplaseQuiz: Boolean(alteplaseQuiz),
             skillMcq: Boolean(skillMcq),
             admissionQuiz: Boolean(admissionQuiz),
             quizDeck,
             quizDeckIndex: 0,
-            safety: !bedPrep && !ivpbHang && !icpQuiz && !skillMcq && !admissionQuiz
+            safety: !bedPrep && !ivpbHang && !icpQuiz && !alteplaseQuiz && !skillMcq && !admissionQuiz
                 && !useIv && !accucheckPrompt && !useMedQuiz
         };
 
@@ -1051,6 +1068,36 @@ export function runChallengeGate(task) {
                     poolSize,
                     rebuild: (opts) => {
                         const quiz = buildIcpQuiz(liveTask, opts);
+                        return quiz ? { quiz } : null;
+                    }
+                });
+            }, 0);
+        } else if (alteplaseQuiz) {
+            const poolSize = getAlteplasePoolSize(liveTask);
+            activeSession.quizExpected = alteplaseQuiz.expected;
+            activeSession.currentQuestionId = alteplaseQuiz.questionId || null;
+            ModalModule.openModal({
+                title: alteplaseQuiz.title || 'Alteplase (Cathflo) — PICC occlusion',
+                content: renderAlteplaseQuizHtml(alteplaseQuiz, liveTask?.name, {
+                    poolSize,
+                    levelHtml: renderChallengeLevelControl(poolSize, 1)
+                }),
+                footer: challengeModalFooter({
+                    showSubmit: false,
+                    showRandom: poolSize > 1,
+                    randomHandler: 'poolQuizRandom',
+                    randomLabel: 'Random'
+                }),
+                overlay: true,
+                persistent: false
+            });
+            setTimeout(() => {
+                wirePoolChoiceQuiz({
+                    kind: 'alteplase',
+                    task: liveTask,
+                    poolSize,
+                    rebuild: (opts) => {
+                        const quiz = buildAlteplaseQuiz(liveTask, opts);
                         return quiz ? { quiz } : null;
                     }
                 });

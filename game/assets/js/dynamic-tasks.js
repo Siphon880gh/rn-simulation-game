@@ -7,6 +7,7 @@ import gameState from './game-state.js';
 import taskSystem from './task-system.js';
 import { isAtOrAfterInShift } from './availability-windows.js';
 import { decorateAccucheckDice } from './challenges/skills/accucheck/challenge.js';
+import { decorateAlteplaseDice } from './challenges/skills/alteplase/challenge.js';
 
 const spawnedCadenceKeys = new Set();
 let spawnCount = 0;
@@ -168,19 +169,47 @@ function focusIncidentTask(taskId) {
     const live = gameState.getStateSlice('tasks')?.get(taskId);
     if (!live) return;
 
-    if (live.patientId) {
+    // PICC clot incident → scroll to open dependent (Call MD / alteplase steps)
+    let focus = live;
+    if (live.metadata?.kind === 'picc-clotted-incident') {
+        const tasks = gameState.getStateSlice('tasks');
+        const open = new Set([
+            GameConfig.tasks.statuses.NOT_YET,
+            GameConfig.tasks.statuses.ACTIVE,
+            GameConfig.tasks.statuses.OVERDUE
+        ]);
+        if (tasks?.size) {
+            let dep = null;
+            for (const t of tasks.values()) {
+                if (t.metadata?.parentIncidentId !== live.id) continue;
+                if (!open.has(t.status)) continue;
+                dep = t;
+                const kind = t.metadata?.kind || '';
+                if (
+                    kind === 'critical-lab-call'
+                    || kind === 'critical-lab-callback'
+                    || kind === 'critical-lab-recall'
+                ) {
+                    break;
+                }
+            }
+            if (dep) focus = dep;
+        }
+    }
+
+    if (focus.patientId) {
         if (typeof patientsApi?.showPatientPanel === 'function') {
-            patientsApi.showPatientPanel(live.patientId, {
+            patientsApi.showPatientPanel(focus.patientId, {
                 logMessage: `Opened from incident: ${live.name}`
             });
         } else {
-            gameState.dispatch('SET_ACTIVE_PATIENT', { patientId: live.patientId });
+            gameState.dispatch('SET_ACTIVE_PATIENT', { patientId: focus.patientId });
         }
     }
 
     if (typeof document === 'undefined' || typeof requestAnimationFrame !== 'function') return;
     requestAnimationFrame(() => {
-        const el = document.getElementById(live.id);
+        const el = document.getElementById(focus.id);
         if (!el) return;
         el.classList.add('rail-focus-pulse');
         el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -268,6 +297,9 @@ export function mountTaskDom(task) {
     if (task.metadata?.challenge) {
         li.setAttribute('data-challenge', task.metadata.challenge);
     }
+    if (task.metadata?.alteplasePhase) {
+        li.setAttribute('data-alteplase-phase', String(task.metadata.alteplasePhase));
+    }
     li.setAttribute('title', 'Click for Perform / Details menu');
     const isCrit = task.type === 'criticallab' || task.metadata?.criticalLab;
     li.className = isCrit
@@ -291,6 +323,7 @@ export function mountTaskDom(task) {
     `;
     list.appendChild(li);
     decorateAccucheckDice(li.parentElement || list);
+    decorateAlteplaseDice(li.parentElement || list);
     taskSystem.syncTaskWindowDomAttrs?.(li, task);
     taskSystem.refreshFalloutUi?.(list.closest('.dynamic-tasks-block') || panel);
 }
