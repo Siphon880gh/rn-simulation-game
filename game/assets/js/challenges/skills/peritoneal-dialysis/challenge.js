@@ -149,7 +149,7 @@ export function renderPeritonealDialysisHtml(taskName, round) {
           <p class="text-sm font-medium text-gray-800">
             Given: <strong>${escapeHtml(r.anchorLabel)}</strong>
           </p>
-          <p class="text-sm text-gray-800">Click the next ${r.nextCount} ${nextWord} in order. Some options are distractors.</p>
+          <p class="text-sm text-gray-800">Click the next ${r.nextCount} ${nextWord} in order. Some options are distractors. Click a chosen step to remove it.</p>
           <div id="pd-seq-chosen" class="min-h-[2rem] flex flex-wrap gap-1 text-sm"></div>
           <div id="pd-seq-options" class="flex flex-wrap gap-1">${optionHtml}</div>
           <button type="button" id="pd-seq-undo" class="text-xs text-gray-500 underline">Undo last</button>
@@ -198,8 +198,19 @@ export function wirePeritonealDialysisHandlers({ onDone, onStarted, random = Mat
     function paintChosen() {
         if (!chosenEl) return;
         chosenEl.innerHTML = chosen.length
-            ? chosen.map((label, i) => `<span class="px-2 py-0.5 rounded bg-white border text-xs" data-idx="${i}">${i + 1}. ${escapeHtml(label)}</span>`).join('')
+            ? chosen.map((label, i) => (
+                `<button type="button" class="pd-seq-chosen-step px-2 py-0.5 rounded bg-white border text-xs hover:border-rose-400 hover:bg-rose-50"
+                  data-idx="${i}" title="Remove this step" aria-label="Remove step ${i + 1}: ${escapeHtml(label)}">
+                  ${i + 1}. ${escapeHtml(label)} <span aria-hidden="true" class="text-rose-500">×</span>
+                </button>`
+            )).join('')
             : '<span class="text-gray-400 text-xs">No steps yet</span>';
+    }
+
+    function removeChosenAt(idx) {
+        if (!Number.isInteger(idx) || idx < 0 || idx >= chosen.length) return;
+        chosen.splice(idx, 1);
+        paintChosen();
     }
 
     function flashIntervalMs() {
@@ -280,9 +291,14 @@ export function wirePeritonealDialysisHandlers({ onDone, onStarted, random = Mat
         });
     });
 
+    chosenEl?.addEventListener('click', (ev) => {
+        const stepBtn = ev.target?.closest?.('.pd-seq-chosen-step');
+        if (!stepBtn || !chosenEl.contains(stepBtn)) return;
+        removeChosenAt(Number(stepBtn.getAttribute('data-idx')));
+    });
+
     undoBtn?.addEventListener('click', () => {
-        chosen.pop();
-        paintChosen();
+        removeChosenAt(chosen.length - 1);
     });
 
     window.pdSeqSubmit = () => {
