@@ -7,6 +7,8 @@
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
   "learningObjectives": [
     "Recognize sepsis red flags after infection (confusion, fever, tachycardia, hypotension)",
+    "Perform Q4H sepsis screens with VS, body-system, and lab rundowns",
+    "Use the sepsis/shock/MODS cheat guide and start the hour-1 bundle when criteria are met",
     "Escalate promptly with rapid assessment and provider notification"
   ],
   "patients": ["tessa"],

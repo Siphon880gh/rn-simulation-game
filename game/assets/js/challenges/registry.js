@@ -18,6 +18,14 @@ export const CHALLENGE_REGISTRY = {
     modulePath: 'challenges/skills/ivpb-hang/challenge.js',
     testSpawnKind: 'ivpb-hang'
   },
+  'peritoneal-dialysis': {
+    id: 'peritoneal-dialysis',
+    category: 'skills',
+    label: 'Peritoneal dialysis sequence',
+    configPath: 'challenges/skills/peritoneal-dialysis/config.js',
+    modulePath: 'challenges/skills/peritoneal-dialysis/challenge.js',
+    testSpawnKind: 'peritoneal-dialysis'
+  },
   'med-identity': {
     id: 'med-identity',
     category: 'skills',
@@ -81,6 +89,14 @@ export const CHALLENGE_REGISTRY = {
     configPath: 'challenges/skills/skill-mcq/config.js',
     modulePath: 'challenges/skills/skill-mcq/challenge.js',
     testSpawnKind: 'skill-mcq'
+  },
+  'sepsis-screen': {
+    id: 'sepsis-screen',
+    category: 'skills',
+    label: 'Sepsis screen (Q4H)',
+    configPath: 'challenges/skills/sepsis-recognition/config.js',
+    modulePath: 'challenges/skills/sepsis-recognition/challenge.js',
+    testSpawnKind: 'sepsis-screen'
   },
   'code-blue': {
     id: 'code-blue',

@@ -619,15 +619,19 @@
       "aliases": [
         "SIRS",
         "septic shock",
-        "qSOFA"
+        "qSOFA",
+        "MODS",
+        "sepsis screen",
+        "hour-1 bundle"
       ],
       "tags": [
         "assessment",
         "emergency"
       ],
-      "blurb": "Recognize sepsis and escalate.",
+      "blurb": "Q4H sepsis screen (VS/systems/labs + dice), cheat guide, and hour-1 bundle when criteria met.",
       "games": [
-        "skill-mcq"
+        "skill-mcq",
+        "sepsis-screen"
       ],
       "status": "active",
       "unitHint": "medsurg",
@@ -996,7 +1000,8 @@
       "unitHint": "icu",
       "pack": "events/scenarios/skill-tof-assessment-icu.json",
       "patients": [
-        "elio"
+        "elio",
+        "sol"
       ]
     },
     {
@@ -1223,9 +1228,9 @@
         "renal",
         "procedures"
       ],
-      "blurb": "PD exchange: BP check, prime, drain first, fill, dwell.",
+      "blurb": "PD exchange sequence: BP check, prime, drain first, fill, dwell; watch cloudy effluent.",
       "games": [
-        "skill-mcq"
+        "peritoneal-dialysis"
       ],
       "status": "active",
       "unitHint": "medsurg",
@@ -1774,6 +1779,343 @@
       "pack": "events/scenarios/skill-physical-assessment-medsurg.json",
       "patients": [
         "nell"
+      ]
+    },
+    {
+      "id": "vasopressors",
+      "label": "Vasopressors (ICU class)",
+      "aliases": [
+        "pressor stack",
+        "vasoactive drugs",
+        "shock pressors"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "vasopressors"
+      ],
+      "blurb": "Class overview: Levophed, vasopressin, Neo, dopamine; dobutamine as inotrope.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "patients": [
+        "nova"
+      ]
+    },
+    {
+      "id": "levophed-drip",
+      "label": "Levophed (norepinephrine) drip",
+      "aliases": [
+        "norepinephrine",
+        "Levophed titration",
+        "MAP titration",
+        "SBP titration"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "vasopressors"
+      ],
+      "blurb": "Titrate Levophed to MAP and/or SBP; hospital policy may allow up/down or up-only.",
+      "games": [
+        "skill-mcq",
+        "iv-titration"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "patients": [
+        "nova"
+      ]
+    },
+    {
+      "id": "vasopressin-drip",
+      "label": "Vasopressin drip",
+      "aliases": [
+        "vaso drip",
+        "vasopressin infusion",
+        "ADH drip"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "vasopressors"
+      ],
+      "blurb": "Fixed-rate vasopressin adjunct in septic shock — monitor perfusion and ischemia risk.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "patients": [
+        "nova"
+      ]
+    },
+    {
+      "id": "neosynephrine-drip",
+      "label": "Neo-Synephrine (phenylephrine) drip",
+      "aliases": [
+        "phenylephrine",
+        "Neo drip",
+        "neosynephrine"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "vasopressors"
+      ],
+      "blurb": "Pure α vasoconstrictor — watch reflex bradycardia; second-line pressor use.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "patients": [
+        "nova"
+      ]
+    },
+    {
+      "id": "dopamine-drip",
+      "label": "Dopamine drip",
+      "aliases": [
+        "dopamine infusion",
+        "dose-dependent dopamine"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "vasopressors"
+      ],
+      "blurb": "Dose-dependent dopamine effects; telemetry for tachyarrhythmias.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "patients": [
+        "nova"
+      ]
+    },
+    {
+      "id": "dobutamine-drip",
+      "label": "Dobutamine drip",
+      "aliases": [
+        "dobutamine infusion",
+        "inotrope drip"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "cardiac"
+      ],
+      "blurb": "Inotrope for low-output states — watch tachycardia and possible MAP drop.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "patients": [
+        "nova"
+      ]
+    },
+    {
+      "id": "icu-sedation",
+      "label": "ICU sedation (class)",
+      "aliases": [
+        "sedatives",
+        "RASS titration",
+        "ICU analgesia sedation"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "sedatives"
+      ],
+      "blurb": "Class overview: propofol, Precedex, fentanyl/morphine with RASS/pain goals — and NMB pairing.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "patients": [
+        "sol"
+      ]
+    },
+    {
+      "id": "propofol-drip",
+      "label": "Propofol drip",
+      "aliases": [
+        "propofol infusion",
+        "Diprivan"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "sedatives"
+      ],
+      "blurb": "Continuous propofol sedation — RASS goals, hypotension, PRIS cues.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "patients": [
+        "sol"
+      ]
+    },
+    {
+      "id": "precedex-drip",
+      "label": "Precedex (dexmedetomidine) drip",
+      "aliases": [
+        "dexmedetomidine",
+        "Precedex infusion",
+        "dex drip"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "sedatives"
+      ],
+      "blurb": "Dexmedetomidine sedation — bradycardia and hypotension watch.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "patients": [
+        "sol"
+      ]
+    },
+    {
+      "id": "fentanyl-drip",
+      "label": "Fentanyl drip",
+      "aliases": [
+        "fentanyl infusion",
+        "continuous fentanyl"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "sedatives"
+      ],
+      "blurb": "Continuous fentanyl analgesia — CPOT goals and stacking with sedatives.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "patients": [
+        "sol"
+      ]
+    },
+    {
+      "id": "morphine-drip",
+      "label": "Morphine drip",
+      "aliases": [
+        "morphine infusion",
+        "continuous morphine"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "sedatives"
+      ],
+      "blurb": "Continuous morphine — renal metabolite accumulation and histamine/BP effects.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "patients": [
+        "sol"
+      ]
+    },
+    {
+      "id": "aaa",
+      "label": "AAA recognition",
+      "aliases": [
+        "abdominal aortic aneurysm",
+        "AAA rupture",
+        "pulsatile mass"
+      ],
+      "tags": [
+        "assessment",
+        "emergency",
+        "vascular",
+        "icu"
+      ],
+      "blurb": "Detect AAA expansion/rupture s/s (tearing pain, hypotension, pulsatile mass) and escalate.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-aaa-icu.json",
+      "patients": [
+        "haven"
+      ]
+    },
+    {
+      "id": "pulmonary-embolism",
+      "label": "Pulmonary embolism",
+      "aliases": [
+        "PE",
+        "pulmonary embolus",
+        "VTE lungs"
+      ],
+      "tags": [
+        "assessment",
+        "emergency",
+        "respiratory",
+        "tele"
+      ],
+      "blurb": "Recognize PE s/s (sudden dyspnea, tachycardia, hypoxemia) and escalate after VTE risk.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "tele",
+      "pack": "events/scenarios/skill-pulmonary-embolism-tele.json",
+      "patients": [
+        "keira"
+      ]
+    },
+    {
+      "id": "peripheral-clot",
+      "label": "Peripheral clot suspicion",
+      "aliases": [
+        "limb clot",
+        "arterial occlusion",
+        "DVT vs arterial",
+        "arterial Doppler",
+        "venous Doppler"
+      ],
+      "tags": [
+        "assessment",
+        "vascular",
+        "medsurg"
+      ],
+      "blurb": "Limb clot s/s (incl. no pulse), 6 Ps vs DVT picture, and arterial vs venous Doppler ordering.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "medsurg",
+      "pack": "events/scenarios/skill-peripheral-clot-medsurg.json",
+      "patients": [
+        "tovah"
       ]
     }
   ]

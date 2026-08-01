@@ -31,7 +31,8 @@ const docsStructure = {
         icon: 'book',
         color: 'text-amber-500',
         files: [
-            'PRIORITIZATION_BASICS.md'
+            'PRIORITIZATION_BASICS.md',
+            'SEPSIS_GUIDELINES.md'
         ]
     }
 };
@@ -330,9 +331,42 @@ function setupEventListeners() {
     });
 }
 
+function openDocFromHash() {
+    if (typeof window === 'undefined') return;
+    const raw = String(window.location.hash || '').replace(/^#/, '');
+    if (!raw.startsWith('doc=')) return;
+    const encoded = raw.slice(4);
+    let path = '';
+    try {
+        path = decodeURIComponent(encoded);
+    } catch {
+        path = encoded;
+    }
+    const parts = path.split('/');
+    if (parts.length < 2) return;
+    const category = parts[0];
+    const filename = parts.slice(1).join('/');
+    if (category && filename) {
+        openMarkdownDocument(category, filename);
+    }
+}
+
 $(document).ready(function () {
     initializeDocsDropdown();
     loadNestedDocsList();
     setupEventListeners();
     ensureViewer();
+    openDocFromHash();
+    window.addEventListener('hashchange', openDocFromHash);
 });
+
+/** Challenge / shell helpers — open a registered learning/player/dev note. */
+export function openMarkdownDocumentExport(categoryKey, filename, options = {}) {
+    return openMarkdownDocument(categoryKey, filename, options);
+}
+
+if (typeof window !== 'undefined') {
+    window.docsOpenMarkdown = (categoryKey, filename, options) => {
+        openMarkdownDocument(categoryKey, filename, options);
+    };
+}

@@ -18,6 +18,7 @@ Test spawn (`Test` flask control) groups these as **Skills** and **Emergencies**
 | Challenge | Configure | Runtime |
 |-----------|-----------|---------|
 | IVPB hang | [`skills/ivpb-hang/config.js`](skills/ivpb-hang/config.js) | `skills/ivpb-hang/challenge.js` |
+| Peritoneal dialysis | [`skills/peritoneal-dialysis/config.js`](skills/peritoneal-dialysis/config.js) | `skills/peritoneal-dialysis/challenge.js` |
 | Med identity | [`skills/med-identity/config.js`](skills/med-identity/config.js) | `skills/med-identity/challenge.js` |
 | Bed prep | [`skills/bed-prep/config.js`](skills/bed-prep/config.js) | `skills/bed-prep/challenge.js` |
 | Accucheck | (task attrs + logic) | `skills/accucheck/challenge.js` |
@@ -26,6 +27,7 @@ Test spawn (`Test` flask control) groups these as **Skills** and **Emergencies**
 | ICP monitoring | [`skills/icp/config.js`](skills/icp/config.js) | `skills/icp/challenge.js` |
 | Alteplase (Cathflo) PICC | [`skills/alteplase/config.js`](skills/alteplase/config.js) | `skills/alteplase/challenge.js` (+ `alteplase-system.js`) |
 | Skill library MCQ | [`skills/skill-mcq/config.js`](skills/skill-mcq/config.js) | `skills/skill-mcq/challenge.js` |
+| Sepsis screen (Q4H) | [`skills/sepsis-recognition/config.js`](skills/sepsis-recognition/config.js) | `skills/sepsis-recognition/challenge.js` (+ `sepsis-system.js`) |
 
 Landing skill library: [`game/events/skills/library.json`](../../../events/skills/library.json) (search → pick one → assigned game). Shared MCQ banks cover planned library skills via `games: ["skill-mcq"]` + `metadata.skillId`. Agent scan/confirm: [`.agents/skills/scan-game-skill-library/`](../../../../.agents/skills/scan-game-skill-library/).
 

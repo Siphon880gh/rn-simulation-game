@@ -1,0 +1,57 @@
+{
+  "id": "skill-peripheral-clot-medsurg",
+  "title": "Skill practice — Peripheral clot / Doppler (Med-Surg night)",
+  "version": 1,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Differentiate arterial occlusion (6 Ps / no pulse) vs DVT (swollen warm limb with pulses)",
+    "Choose arterial vs venous Doppler and escalate appropriately"
+  ],
+  "patients": ["tovah"],
+  "patientOverrides": {
+    "tovah": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Possible acute limb ischemia — arterial Doppler"
+    }
+  },
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/peripheral-clot-night-medsurg.json",
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": [
+    {
+      "id": "limb-pulse-loss-1940",
+      "at": 1940,
+      "type": "emergency",
+      "message": "Tovah: left DP still absent on Doppler bedside check — call for arterial study",
+      "injectTasks": [
+        {
+          "id": "evt-tovah-pulse-1940",
+          "type": "assessment",
+          "name": "Absent pulse — arterial vs venous Doppler decision",
+          "patientId": "tovah",
+          "scheduled": 1940,
+          "expire": "+30",
+          "durationMins": 12,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "peripheral-clot"
+          }
+        }
+      ]
+    }
+  ]
+}

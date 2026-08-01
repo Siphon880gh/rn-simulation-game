@@ -1,0 +1,43 @@
+{
+  "id": "aaa-night-icu",
+  "title": "Night ICU — AAA rupture watch incidents",
+  "version": 1,
+  "fictionalOnly": true,
+  "disclaimer": "Incident pack content is fictional practice — not a competency assessment.",
+  "dynamicTemplates": [
+    {
+      "id": "aaa-pain-recheck",
+      "weight": 2,
+      "type": "assessment",
+      "taskClass": "stat",
+      "name": "AAA pain / BP recheck",
+      "durationMins": 10,
+      "expire": "+25",
+      "patientScope": "random"
+    }
+  ],
+  "events": [
+    {
+      "id": "aaa-rupture-cue-2000",
+      "at": 2000,
+      "type": "emergency",
+      "message": "Haven: worsening tearing back pain and falling BP — possible AAA rupture",
+      "injectTasks": [
+        {
+          "id": "evt-haven-aaa-escalate",
+          "type": "assessment",
+          "name": "AAA rupture cue — rapid response / OR notify",
+          "patientId": "haven",
+          "scheduled": 2000,
+          "expire": "+30",
+          "durationMins": 15,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "aaa"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "skill-icu-vasoactive-sedation-icu",
+  "title": "Skill practice — ICU vasoactive + sedation drips (night)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Titrate Levophed to MAP and/or SBP goals and recognize hospital policy differences (up/down vs up-only)",
+    "Manage a vasopressor/inotrope stack: vasopressin, Neo-Synephrine, dopamine, and dobutamine",
+    "Titrate ICU sedatives/analgesics (propofol, Precedex, fentanyl, morphine) to RASS/pain goals",
+    "Pair neuromuscular blockade with TOF assessment and adequate sedation"
+  ],
+  "patients": ["nova", "sol"],
+  "patientOverrides": {
+    "nova": {
+      "clinicalStatus": "critical",
+      "acuityScore": 5,
+      "clinicalStatusReason": "Septic shock — multi-pressor / inotrope stack"
+    },
+    "sol": {
+      "clinicalStatus": "critical",
+      "acuityScore": 5,
+      "clinicalStatusReason": "ARDS — deep sedation + NMB with TOF"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

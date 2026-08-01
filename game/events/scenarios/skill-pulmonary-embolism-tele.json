@@ -1,0 +1,57 @@
+{
+  "id": "skill-pulmonary-embolism-tele",
+  "title": "Skill practice — Pulmonary embolism (Tele night)",
+  "version": 1,
+  "department": "tele",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize acute PE signs (sudden dyspnea, tachycardia, hypoxemia, pleuritic pain)",
+    "Escalate with oxygen support and provider notification after VTE risk context"
+  ],
+  "patients": ["keira"],
+  "patientOverrides": {
+    "keira": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Possible PE — escalate now"
+    }
+  },
+  "scene": {
+    "theme": "tele",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/pe-night-tele.json",
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": [
+    {
+      "id": "pe-desat-1935",
+      "at": 1935,
+      "type": "emergency",
+      "message": "Keira: sudden desaturation and anxiety — PE watch",
+      "injectTasks": [
+        {
+          "id": "evt-keira-pe-1935",
+          "type": "assessment",
+          "name": "Sudden desat — PE recognition",
+          "patientId": "keira",
+          "scheduled": 1935,
+          "expire": "+30",
+          "durationMins": 12,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "pulmonary-embolism"
+          }
+        }
+      ]
+    }
+  ]
+}

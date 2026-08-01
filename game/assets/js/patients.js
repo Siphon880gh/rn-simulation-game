@@ -6,6 +6,7 @@ import SlotSystem from './slot-system.js';
 import { registerPatientIv } from './iv-system.js';
 import { loadPastHxPack, ensurePastHxTimeline } from './past-hx-timeline.js';
 import { inferMedSlotKind } from './media-placeholders.js';
+import { decorateSepsisScreenDice } from './challenges/skills/sepsis-recognition/challenge.js';
 
 const PatientsModule = (() => {
     console.log("Patients module initialized");
@@ -600,6 +601,8 @@ const PatientsModule = (() => {
             sex: 'Female',
             diagnosis: 'UTI with new confusion — possible sepsis',
             skills: ['sepsis-recognition'],
+            careSchedules: ['sepsisScreenQ4h'],
+            careReason: 'Infection risk — Q4H sepsis screen with VS / systems / labs',
             vitals: {
                 hr: 118,
                 bp: '88/54',
@@ -1449,6 +1452,115 @@ const PatientsModule = (() => {
             },
             htmlFile: 'events/patients/nell.html',
             pastHxFile: 'events/patients/nell-past-hx.json'
+        },
+        nova: {
+            id: 'nova',
+            name: 'Nova Ellison',
+            room: 'ICU-21',
+            age: 61,
+            sex: 'Female',
+            diagnosis: 'Septic shock — Levophed/vaso/Neo + dopamine/dobutamine',
+            skills: [
+                'vasopressors',
+                'levophed-drip',
+                'vasopressin-drip',
+                'neosynephrine-drip',
+                'dopamine-drip',
+                'dobutamine-drip'
+            ],
+            vitals: {
+                hr: 124,
+                bp: '82/48 MAP 59',
+                temp: '101.8°F',
+                o2: 'vent',
+                pain: 'sedated',
+                rr: 'vent'
+            },
+            htmlFile: 'events/patients/nova.html',
+            pastHxFile: 'events/patients/nova-past-hx.json'
+        },
+        sol: {
+            id: 'sol',
+            name: 'Sol Marchetti',
+            room: 'ICU-22',
+            age: 48,
+            sex: 'Male',
+            diagnosis: 'ARDS — propofol/Precedex/fentanyl/morphine + cisatracurium TOF',
+            skills: [
+                'icu-sedation',
+                'propofol-drip',
+                'precedex-drip',
+                'fentanyl-drip',
+                'morphine-drip',
+                'tof-assessment'
+            ],
+            vitals: {
+                hr: 88,
+                bp: '102/58',
+                temp: '99.4°F',
+                o2: 'vent',
+                pain: 'sedated / NMB',
+                rr: 'vent'
+            },
+            htmlFile: 'events/patients/sol.html',
+            pastHxFile: 'events/patients/sol-past-hx.json'
+        },
+        haven: {
+            id: 'haven',
+            name: 'Haven Ortiz',
+            room: 'ICU-23',
+            age: 72,
+            sex: 'Male',
+            diagnosis: 'Known AAA 5.8 cm — sudden back/abdominal pain',
+            skills: ['aaa'],
+            vitals: {
+                hr: 122,
+                bp: '86/50',
+                temp: '98.4°F',
+                o2: '94% NC 2 L',
+                pain: '9/10 tearing back',
+                rr: 26
+            },
+            htmlFile: 'events/patients/haven.html',
+            pastHxFile: 'events/patients/haven-past-hx.json'
+        },
+        keira: {
+            id: 'keira',
+            name: 'Keira Dunne',
+            room: 'Room 412-B',
+            age: 58,
+            sex: 'Female',
+            diagnosis: 'POD 3 total hip — sudden dyspnea / possible PE',
+            skills: ['pulmonary-embolism'],
+            vitals: {
+                hr: 124,
+                bp: '102/68',
+                temp: '99.1°F',
+                o2: '88% RA',
+                pain: 'pleuritic 7/10',
+                rr: 28
+            },
+            htmlFile: 'events/patients/keira.html',
+            pastHxFile: 'events/patients/keira-past-hx.json'
+        },
+        tovah: {
+            id: 'tovah',
+            name: 'Tovah Brink',
+            room: 'Room 318-A',
+            age: 67,
+            sex: 'Male',
+            diagnosis: 'Cold pale left leg — arterial vs venous clot workup',
+            skills: ['peripheral-clot'],
+            vitals: {
+                hr: 96,
+                bp: '148/86',
+                temp: '98.6°F',
+                o2: '97% RA',
+                pain: '8/10 left foot',
+                rr: 18
+            },
+            htmlFile: 'events/patients/tovah.html',
+            pastHxFile: 'events/patients/tovah-past-hx.json'
         }
     };
 
@@ -1596,6 +1708,17 @@ const PatientsModule = (() => {
         const tasks = [];
         for (let elapsed = 0; elapsed < shiftMins; elapsed += interval) {
             const scheduled = addMinutesToHhmm(shiftStart, elapsed);
+            const meta = {
+                kind: cfg.taskKind || scheduleKey || null,
+                careSchedule: scheduleKey,
+                reason: careReason || null,
+                icon: cfg.iconClass || null
+            };
+            if (cfg.challenge) meta.challenge = cfg.challenge;
+            if (cfg.skillId) meta.skillId = cfg.skillId;
+            const delegateMode = cfg.delegateMode
+                || (scheduleKey === 'turnQ2h' ? 'team' : undefined);
+            if (delegateMode) meta.delegateMode = delegateMode;
             tasks.push({
                 id: `${patientId}-${scheduleKey}-${String(scheduled).padStart(4, '0')}`,
                 name: cfg.taskName || 'Care task',
@@ -1605,12 +1728,7 @@ const PatientsModule = (() => {
                 expire: `+${Number(cfg.expireMins) || 60}`,
                 durationMins: Number(cfg.durationMins) || 10,
                 status: GameConfig.tasks.statuses.NOT_YET,
-                metadata: {
-                    kind: cfg.taskKind || scheduleKey || null,
-                    careSchedule: scheduleKey,
-                    reason: careReason || null,
-                    delegateMode: scheduleKey === 'turnQ2h' ? 'team' : undefined
-                }
+                metadata: meta
             });
         }
         return tasks;
@@ -1854,70 +1972,96 @@ const PatientsModule = (() => {
         const panel = document.querySelector(`.patient-panel-host[data-patient-id="${patientId}"]`);
         if (!panel) return;
 
-        let list = panel.querySelector('.care-tasks-list');
-        if (!list) {
-            const block = document.createElement('div');
-            block.className = 'space-y-2 mb-4 care-tasks-block';
-            const heading = document.createElement('h4');
-            heading.className = 'font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 task-section-heading';
-            heading.innerHTML = '<i class="fas fa-bed text-xl mr-1 text-emerald-700"></i> Turning / skin care';
-            list = document.createElement('ul');
-            list.className = 'care-tasks-list space-y-3';
-            wireSectionToggle(heading, list);
-            block.appendChild(heading);
-            if (careReason) {
-                const note = document.createElement('p');
-                note.className = 'text-xs text-gray-600 mb-2 care-schedule-reason';
-                note.textContent = careReason;
-                block.appendChild(note);
-            }
-            block.appendChild(list);
-            const patientRoot = panel.querySelector('.patient') || panel;
-            const vitalsGrid = patientRoot.querySelector('.grid.grid-cols-2');
-            if (vitalsGrid?.nextSibling) {
-                patientRoot.insertBefore(block, vitalsGrid.nextSibling);
-            } else {
-                const medsBlock = patientRoot.querySelector('.meds-list')?.closest('.space-y-2.mb-4, .space-y-2');
-                if (medsBlock) patientRoot.insertBefore(block, medsBlock);
-                else patientRoot.appendChild(block);
-            }
-        } else if (careReason && !panel.querySelector('.care-schedule-reason')) {
-            const note = document.createElement('p');
-            note.className = 'text-xs text-gray-600 mb-2 care-schedule-reason';
-            note.textContent = careReason;
-            list.parentElement?.insertBefore(note, list);
-        }
-
+        const bySchedule = new Map();
         careTasks.forEach((task) => {
-            if (document.getElementById(task.id)) return;
-            const live = gameState.getStateSlice('tasks').get(task.id) || task;
-            const li = document.createElement('li');
-            li.id = live.id;
-            li.setAttribute('data-task-type', live.type);
-            li.setAttribute('data-task-class', live.taskClass || 'routine');
-            li.setAttribute('data-status', live.status);
-            li.setAttribute('data-scheduled', String(live.scheduled).padStart(4, '0'));
-            if (live.expire != null) {
-                li.setAttribute(
-                    'data-expire',
-                    typeof live.expire === 'number'
-                        ? String(live.expire).padStart(4, '0')
-                        : String(live.expire)
-                );
+            const key = task.metadata?.careSchedule || 'care';
+            if (!bySchedule.has(key)) bySchedule.set(key, []);
+            bySchedule.get(key).push(task);
+        });
+
+        bySchedule.forEach((tasks, scheduleKey) => {
+            const cfg = GameConfig.careSchedules?.[scheduleKey] || {};
+            const listClass = `care-tasks-list care-tasks-list--${scheduleKey}`;
+            let list = panel.querySelector(`.care-tasks-list--${scheduleKey}`);
+            if (!list) {
+                const block = document.createElement('div');
+                block.className = `space-y-2 mb-4 care-tasks-block care-tasks-block--${scheduleKey}`;
+                const heading = document.createElement('h4');
+                heading.className = 'font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 task-section-heading';
+                const icon = cfg.sectionIcon || 'fas fa-bed text-emerald-700';
+                const title = cfg.sectionTitle || 'Turning / skin care';
+                heading.innerHTML = `<i class="${icon} text-xl mr-1"></i> ${title}`;
+                list = document.createElement('ul');
+                list.className = `${listClass} space-y-3`;
+                wireSectionToggle(heading, list);
+                block.appendChild(heading);
+                const reasonText = careReason || cfg.careReason || null;
+                if (reasonText) {
+                    const note = document.createElement('p');
+                    note.className = `text-xs text-gray-600 mb-2 care-schedule-reason care-schedule-reason--${scheduleKey}`;
+                    note.textContent = reasonText;
+                    block.appendChild(note);
+                }
+                block.appendChild(list);
+                const patientRoot = panel.querySelector('.patient') || panel;
+                const vitalsGrid = patientRoot.querySelector('.grid.grid-cols-2');
+                if (vitalsGrid?.nextSibling) {
+                    patientRoot.insertBefore(block, vitalsGrid.nextSibling);
+                } else {
+                    const medsBlock = patientRoot.querySelector('.meds-list')?.closest('.space-y-2.mb-4, .space-y-2');
+                    if (medsBlock) patientRoot.insertBefore(block, medsBlock);
+                    else patientRoot.appendChild(block);
+                }
             }
-            li.setAttribute('data-duration-mins', String(live.duration || 10));
-            li.setAttribute('data-delegate-mode', 'team');
-            li.setAttribute('title', 'Click for Perform / Details menu');
-            li.className = `bg-emerald-50 p-4 rounded-lg shadow flex items-center task-status-${live.status} border border-emerald-200`;
-            const timeLabel = String(live.scheduled).padStart(4, '0');
-            li.innerHTML = `
-              <data class="slot-label" value="1"></data>
-              <i class="fas fa-bed text-emerald-700 text-xl mr-3"></i>
-              <span class="font-medium text-gray-900">${live.name}</span>
-              <span class="ml-auto text-sm text-gray-500">${timeLabel.slice(0, 2)}:${timeLabel.slice(2)}</span>
-            `;
-            list.appendChild(li);
-            taskSystem.syncTaskWindowDomAttrs?.(li, live);
+
+            const rowClass = cfg.rowClass || 'bg-emerald-50 border border-emerald-200';
+            const iconClass = cfg.iconClass || 'fas fa-bed text-emerald-700';
+            const delegateMode = cfg.delegateMode
+                || (scheduleKey === 'turnQ2h' ? 'team' : null);
+
+            tasks.forEach((task) => {
+                if (document.getElementById(task.id)) return;
+                const live = gameState.getStateSlice('tasks').get(task.id) || task;
+                const li = document.createElement('li');
+                li.id = live.id;
+                li.setAttribute('data-task-type', live.type);
+                li.setAttribute('data-task-class', live.taskClass || 'routine');
+                li.setAttribute('data-status', live.status);
+                li.setAttribute('data-scheduled', String(live.scheduled).padStart(4, '0'));
+                if (live.expire != null) {
+                    li.setAttribute(
+                        'data-expire',
+                        typeof live.expire === 'number'
+                            ? String(live.expire).padStart(4, '0')
+                            : String(live.expire)
+                    );
+                }
+                li.setAttribute('data-duration-mins', String(live.duration || 10));
+                if (live.metadata?.kind) {
+                    li.setAttribute('data-task-kind', String(live.metadata.kind));
+                }
+                if (live.metadata?.challenge) {
+                    li.setAttribute('data-challenge', String(live.metadata.challenge));
+                }
+                if (live.metadata?.skillId) {
+                    li.setAttribute('data-skill-id', String(live.metadata.skillId));
+                }
+                if (delegateMode) {
+                    li.setAttribute('data-delegate-mode', delegateMode);
+                }
+                li.setAttribute('title', 'Click for Perform / Details menu');
+                li.className = `${rowClass} p-4 rounded-lg shadow flex items-center task-status-${live.status}`;
+                const timeLabel = String(live.scheduled).padStart(4, '0');
+                li.innerHTML = `
+                  <data class="slot-label" value="1"></data>
+                  <i class="${iconClass} text-xl mr-3"></i>
+                  <span class="font-medium text-gray-900">${live.name}</span>
+                  <span class="ml-auto text-sm text-gray-500">${timeLabel.slice(0, 2)}:${timeLabel.slice(2)}</span>
+                `;
+                list.appendChild(li);
+                taskSystem.syncTaskWindowDomAttrs?.(li, live);
+            });
+            decorateSepsisScreenDice(list);
         });
     }
 
@@ -2074,6 +2218,16 @@ const PatientsModule = (() => {
             if (element.getAttribute('data-iv-rate') != null) {
                 metadata.currentRate = Number(element.getAttribute('data-iv-rate'));
             }
+            const ivTarget = element.getAttribute('data-target');
+            if (ivTarget) metadata.target = ivTarget;
+            if (element.getAttribute('data-map') != null) {
+                metadata.map = Number(element.getAttribute('data-map'));
+            }
+            if (element.getAttribute('data-sbp') != null) {
+                metadata.sbp = Number(element.getAttribute('data-sbp'));
+            }
+            const ivDirection = element.getAttribute('data-direction');
+            if (ivDirection) metadata.direction = ivDirection;
             const delegateMode = element.getAttribute('data-delegate-mode');
             if (delegateMode) metadata.delegateMode = delegateMode;
             const name = element.querySelector('.font-medium')?.textContent || 'Unknown Task';

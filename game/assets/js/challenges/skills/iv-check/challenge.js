@@ -23,6 +23,14 @@ function drugLabelFallback(drug) {
     if (d === 'heparin') return 'Heparin drip';
     if (d === 'levophed' || d === 'norepinephrine') return 'Levophed (norepinephrine)';
     if (d === 'neosynephrine' || d === 'phenylephrine') return 'Neo-Synephrine (phenylephrine)';
+    if (d === 'vasopressin' || d === 'vaso') return 'Vasopressin';
+    if (d === 'dopamine') return 'Dopamine';
+    if (d === 'dobutamine') return 'Dobutamine';
+    if (d === 'propofol') return 'Propofol';
+    if (d === 'precedex' || d === 'dexmedetomidine') return 'Precedex (dexmedetomidine)';
+    if (d === 'fentanyl') return 'Fentanyl';
+    if (d === 'morphine') return 'Morphine';
+    if (d === 'cisatracurium') return 'Cisatracurium';
     return drug || 'IV drip';
 }
 
@@ -100,7 +108,9 @@ export function buildIvPrompt(task, opts = {}) {
     }
 
     const direction = meta.direction || (roll < 0.5 ? 'increase' : 'decrease');
+    const target = String(meta.target || (meta.map != null ? 'map' : 'sbp')).toLowerCase();
     const sbp = meta.sbp != null ? Number(meta.sbp) : (direction === 'increase' ? 78 : 160);
+    const map = meta.map != null ? Number(meta.map) : (direction === 'increase' ? 58 : 92);
     const isInsulin = /insulin/i.test(drug);
     const step = isInsulin ? (cfg().insulinAdjustStep ?? 1) : (cfg().pressorAdjustStep ?? 2);
     const expected = isInsulin
@@ -110,11 +120,13 @@ export function buildIvPrompt(task, opts = {}) {
     return {
         kind: 'iv-titration',
         drug,
-        brand: meta.brand || drug,
+        brand: meta.brand || drugLabelFallback(drug),
         unit,
         currentRate,
         direction,
+        target,
         sbp,
+        map,
         step,
         expected: String(expected),
         accepted: [String(expected), `${expected}`].map(normalizeIvAnswer)
@@ -125,7 +137,7 @@ export function normalizeIvAnswer(value) {
     return String(value || '')
         .trim()
         .toLowerCase()
-        .replace(/units?\/kg\/hr|units?\/hr|mcg\/min|ml\/hr/g, '')
+        .replace(/units?\/kg\/hr|units?\/min|units?\/hr|mcg\/kg\/min|mcg\/kg\/hr|mcg\/min|mcg\/hr|mg\/hr|ml\/hr/g, '')
         .replace(/units?/g, '')
         .replace(/\s+/g, ' ')
         .trim();
@@ -202,6 +214,13 @@ export function renderIvChallengeHtml(prompt, taskName) {
     }
 
     const dirLabel = prompt.direction === 'increase' ? 'increase' : 'decrease';
+    const targetMode = String(prompt.target || 'sbp').toLowerCase();
+    const incidentMetric = targetMode === 'map'
+        ? `MAP <strong>${escapeHtml(String(prompt.map))}</strong>`
+        : `SBP <strong>${escapeHtml(String(prompt.sbp))}</strong>`;
+    const policyHint = targetMode === 'map'
+        ? 'Titrate to MAP goal (policy may allow up/down or up-only with call to wean).'
+        : 'Titrate to SBP goal (some order sets use SBP; policy may allow up/down or up-only).';
     return `
       <div class="challenge-gate iv-challenge space-y-3 text-left" data-challenge="iv-titration">
         ${mediaHtml}
@@ -216,8 +235,9 @@ export function renderIvChallengeHtml(prompt, taskName) {
           Current rate: <strong>${escapeHtml(String(prompt.currentRate))}</strong> ${escapeHtml(prompt.unit)}
         </p>
         <p class="text-sm text-rose-800">
-          Incident: SBP <strong>${escapeHtml(String(prompt.sbp))}</strong> — ${dirLabel} drip by ${prompt.step} ${escapeHtml(prompt.unit)}
+          Incident: ${incidentMetric} — ${dirLabel} drip by ${prompt.step} ${escapeHtml(prompt.unit)}
         </p>
+        <p class="text-xs text-gray-600">${escapeHtml(policyHint)}</p>
         <label class="block text-sm text-gray-700" for="iv-answer">New rate</label>
         <input id="iv-answer" type="text" inputmode="decimal" autocomplete="off"
           class="w-full border border-gray-300 rounded px-3 py-2 text-sm"

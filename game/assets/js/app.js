@@ -25,6 +25,8 @@ import AlteplaseSystemModule, {
     applyPiccRestoreRoll,
     focusPiccClotDependents
 } from './alteplase-system.js';
+import SepsisSystemModule from './sepsis-system.js';
+import { initSepsisScreenDiceUi } from './challenges/skills/sepsis-recognition/challenge.js';
 import TestModeModule from './test-mode.js';
 import SoundModule from './sound.js';
 import NurseAlertsModule from './nurse-alerts.js';
@@ -75,6 +77,7 @@ const AppConfig = {
         iv: IvSystemModule,
         criticalLabs: CriticalLabsModule,
         alteplase: AlteplaseSystemModule,
+        sepsis: SepsisSystemModule,
         testMode: TestModeModule,
         sound: SoundModule,
         nurseAlerts: NurseAlertsModule,
@@ -148,7 +151,7 @@ class GameApplication {
 
     // Initialize modules with dependency management
     async initializeModules() {
-        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, mediaPlaceholders, scene, iv, criticalLabs, alteplase, testMode, sound, nurseAlerts, admission, rightMenu, delegation, skillFocus, boosters } = this.config.modules;
+        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, mediaPlaceholders, scene, iv, criticalLabs, alteplase, sepsis, testMode, sound, nurseAlerts, admission, rightMenu, delegation, skillFocus, boosters } = this.config.modules;
         
         // Register modules
         this.modules.set('modal', modal);
@@ -169,6 +172,7 @@ class GameApplication {
         this.modules.set('iv', iv);
         this.modules.set('criticalLabs', criticalLabs);
         this.modules.set('alteplase', alteplase);
+        this.modules.set('sepsis', sepsis);
         this.modules.set('testMode', testMode);
         this.modules.set('sound', sound);
         this.modules.set('nurseAlerts', nurseAlerts);
@@ -202,6 +206,9 @@ class GameApplication {
         if (alteplase && alteplase.init) {
             alteplase.init();
         }
+        if (sepsis && sepsis.init) {
+            sepsis.init();
+        }
         if (sound && sound.init) {
             sound.init();
         }
@@ -225,6 +232,7 @@ class GameApplication {
         await patients.init();
         initFingerStickDiceUi();
         initAlteplaseDiceUi();
+        initSepsisScreenDiceUi();
 
         // E4.M2: game-time drip after census (subscribes to currentTime)
         if (eventDrip && eventDrip.init) {
@@ -262,7 +270,7 @@ class GameApplication {
     setupTaskUIHandlers() {
         // E13: when a CNA/CCT is selected, capture task clicks for delegate modes
         document.addEventListener('click', (e) => {
-            if (e.target.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice], [data-picc-patency-dice]')) return;
+            if (e.target.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice], [data-picc-patency-dice], [data-sepsis-screen-dice]')) return;
             const aide = getSelectedAide();
             if (!aide) return;
             const taskElement = e.target.closest('[data-task-type]');
@@ -279,7 +287,7 @@ class GameApplication {
         document.addEventListener('click', (e) => {
             if (getSelectedAide()) return;
             // Dice odds controls own their click (Accucheck + orders trivial + PICC patency)
-            if (e.target.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice], [data-picc-patency-dice]')) return;
+            if (e.target.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice], [data-picc-patency-dice], [data-sepsis-screen-dice]')) return;
             const taskElement = e.target.closest('[data-task-type]');
             if (!taskElement) return;
 
@@ -357,7 +365,7 @@ class GameApplication {
             trigger: 'left',
             build: (triggerElement, e) => {
                 // Leave Accucheck / orders dice clicks alone (odds popover, not Perform)
-                if (e?.target?.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice], [data-picc-patency-dice]')) {
+                if (e?.target?.closest?.('[data-finger-stick-dice], [data-orders-trivial-dice], [data-picc-patency-dice], [data-sepsis-screen-dice]')) {
                     return false;
                 }
                 const element = e.target.closest('[data-task-type]');

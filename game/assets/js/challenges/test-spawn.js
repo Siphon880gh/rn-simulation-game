@@ -137,6 +137,13 @@ export function buildTestChallengeTask(kind, patientId = null, opts = {}) {
         type: 'med',
         metadata: { challenge: 'ivpb', route: 'ivpb' }
       };
+    case 'peritoneal-dialysis':
+      return {
+        ...base,
+        name: 'PD exchange (BP, prime, drain, fill)',
+        type: 'assessment',
+        metadata: { challenge: 'peritoneal-dialysis', skillId: 'peritoneal-dialysis' }
+      };
     case 'med-identity': {
       const pair = medIdentityPairs[0] || { generic: 'atorvastatin', brand: 'Lipitor' };
       return {
@@ -230,6 +237,17 @@ export function buildTestChallengeTask(kind, patientId = null, opts = {}) {
           challenge: 'alteplase',
           alteplasePhase: 'focus',
           weightKg: 70
+        }
+      };
+    case 'sepsis-screen':
+      return {
+        ...base,
+        name: 'Sepsis screen (Q4H)',
+        type: 'assessment',
+        metadata: {
+          challenge: 'sepsis-screen',
+          kind: 'sepsis-screen',
+          skillId: 'sepsis-recognition'
         }
       };
     case 'skill-mcq': {

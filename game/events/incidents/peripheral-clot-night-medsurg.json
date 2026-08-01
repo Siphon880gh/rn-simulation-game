@@ -1,0 +1,43 @@
+{
+  "id": "peripheral-clot-night-medsurg",
+  "title": "Night Med-Surg — limb clot / Doppler incidents",
+  "version": 1,
+  "fictionalOnly": true,
+  "disclaimer": "Incident pack content is fictional practice — not a competency assessment.",
+  "dynamicTemplates": [
+    {
+      "id": "limb-cms-check",
+      "weight": 2,
+      "type": "assessment",
+      "taskClass": "urgent",
+      "name": "Limb CMS / pulse check",
+      "durationMins": 10,
+      "expire": "+30",
+      "patientScope": "random"
+    }
+  ],
+  "events": [
+    {
+      "id": "arterial-pulse-loss-2020",
+      "at": 2020,
+      "type": "emergency",
+      "message": "Tovah: left foot colder; DP/PT still absent — order arterial Doppler / call vascular",
+      "injectTasks": [
+        {
+          "id": "evt-tovah-arterial-doppler",
+          "type": "assessment",
+          "name": "No pulse — arterial Doppler / vascular escalate",
+          "patientId": "tovah",
+          "scheduled": 2020,
+          "expire": "+30",
+          "durationMins": 15,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "peripheral-clot"
+          }
+        }
+      ]
+    }
+  ]
+}

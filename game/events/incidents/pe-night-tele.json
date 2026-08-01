@@ -1,0 +1,43 @@
+{
+  "id": "pe-night-tele",
+  "title": "Night Tele — PE recognition incidents",
+  "version": 1,
+  "fictionalOnly": true,
+  "disclaimer": "Incident pack content is fictional practice — not a competency assessment.",
+  "dynamicTemplates": [
+    {
+      "id": "pe-desat-check",
+      "weight": 3,
+      "type": "assessment",
+      "taskClass": "stat",
+      "name": "Sudden desat — PE bedside check",
+      "durationMins": 12,
+      "expire": "+25",
+      "patientScope": "random"
+    }
+  ],
+  "events": [
+    {
+      "id": "pe-desat-cue-2015",
+      "at": 2015,
+      "type": "emergency",
+      "message": "Keira: SpO2 drop with tachycardia after ambulation attempt — rule out PE",
+      "injectTasks": [
+        {
+          "id": "evt-keira-pe-escalate",
+          "type": "assessment",
+          "name": "PE s/s — O2 / stay / notify provider",
+          "patientId": "keira",
+          "scheduled": 2015,
+          "expire": "+30",
+          "durationMins": 15,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "pulmonary-embolism"
+          }
+        }
+      ]
+    }
+  ]
+}

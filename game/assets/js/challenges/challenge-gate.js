@@ -41,6 +41,12 @@ import {
     buildIvpbHangRound
 } from './skills/ivpb-hang/challenge.js';
 import {
+    isPeritonealDialysisTask,
+    renderPeritonealDialysisHtml,
+    wirePeritonealDialysisHandlers,
+    buildPeritonealDialysisRound
+} from './skills/peritoneal-dialysis/challenge.js';
+import {
     renderCodeBlueHtml,
     wireCodeBlueHandlers,
     pickCodeBlueQuestion,
@@ -75,6 +81,12 @@ import {
     wireSkillMcqInteractions,
     applySkillMcqCheat
 } from './skills/skill-mcq/challenge.js';
+import {
+    isSepsisScreenTask,
+    buildSepsisScreenPrompt,
+    renderSepsisScreenHtml,
+    wireSepsisScreenGuideButton
+} from './skills/sepsis-recognition/challenge.js';
 import {
     renderChallengeLevelControl,
     readChallengeLevel,
@@ -120,6 +132,7 @@ function challengeModalFooter({
 let activeSession = null;
 let cleanupBedPrep = null;
 let cleanupIvpbHang = null;
+let cleanupPdSeq = null;
 let cleanupCodeBlue = null;
 let cleanupChallengeLevel = null;
 let cleanupPoolQuizRandom = null;
@@ -146,6 +159,10 @@ function endSession(result) {
     if (typeof cleanupIvpbHang === 'function') {
         cleanupIvpbHang();
         cleanupIvpbHang = null;
+    }
+    if (typeof cleanupPdSeq === 'function') {
+        cleanupPdSeq();
+        cleanupPdSeq = null;
     }
     if (typeof cleanupCodeBlue === 'function') {
         cleanupCodeBlue();
@@ -854,6 +871,12 @@ export function cheatChallenge() {
         }
         return;
     }
+    if (activeSession.pdSeq) {
+        if (typeof window.pdSeqCheat === 'function') {
+            window.pdSeqCheat();
+        }
+        return;
+    }
     if (activeSession.codeBluePatientId) {
         if (typeof window.codeBlueCheat === 'function') {
             window.codeBlueCheat();
@@ -946,32 +969,37 @@ export function runChallengeGate(task) {
         const liveTask = isIvTask(task) ? syncIvTaskMetadata(task) : task;
         const bedPrep = isBedPrepTask(liveTask);
         const ivpbHang = !bedPrep && isIvpbTask(liveTask);
+        const pdSeq = !bedPrep && !ivpbHang && isPeritonealDialysisTask(liveTask);
 
         // Per-run shuffled decks so multi-question challenge levels are not bank order.
         let icpQuiz = null;
         let alteplaseQuiz = null;
         let skillMcq = null;
+        let sepsisScreenPrompt = null;
         let quizDeck = null;
-        if (!bedPrep && !ivpbHang && isIcpTask(liveTask)) {
+        if (!bedPrep && !ivpbHang && !pdSeq && isIcpTask(liveTask)) {
             quizDeck = beginShuffledQuizDeck(getIcpQuestionIds());
             icpQuiz = buildIcpQuiz(liveTask, { questionId: quizDeck[0] });
-        } else if (!bedPrep && !ivpbHang && isAlteplaseTask(liveTask)) {
+        } else if (!bedPrep && !ivpbHang && !pdSeq && isAlteplaseTask(liveTask)) {
             quizDeck = beginShuffledQuizDeck(getAlteplaseQuestionIds(liveTask));
             alteplaseQuiz = buildAlteplaseQuiz(liveTask, { questionId: quizDeck[0] });
-        } else if (!bedPrep && !ivpbHang && isSkillMcqTask(liveTask)) {
+        } else if (!bedPrep && !ivpbHang && !pdSeq && isSepsisScreenTask(liveTask)) {
+            sepsisScreenPrompt = buildSepsisScreenPrompt(liveTask);
+        } else if (!bedPrep && !ivpbHang && !pdSeq && isSkillMcqTask(liveTask)) {
             const skillId = String(liveTask?.metadata?.skillId || '').trim();
             quizDeck = beginShuffledQuizDeck(getSkillMcqQuestionIds(skillId));
             skillMcq = buildSkillMcqQuiz(liveTask, { questionId: quizDeck[0] });
         }
 
-        const admissionQuiz = !bedPrep && !ivpbHang && !icpQuiz && !alteplaseQuiz && !skillMcq
+        const admissionQuiz = !bedPrep && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz
+            && !skillMcq && !sepsisScreenPrompt
             ? buildAdmissionQuiz(liveTask)
             : null;
-        const useIv = !bedPrep && !ivpbHang && !icpQuiz && !alteplaseQuiz && !skillMcq
-            && !admissionQuiz && isIvTask(liveTask);
+        const useIv = !bedPrep && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz && !skillMcq
+            && !sepsisScreenPrompt && !admissionQuiz && isIvTask(liveTask);
         const ivPrompt = useIv ? buildIvPrompt(liveTask) : null;
-        const isMed = !bedPrep && !ivpbHang && !icpQuiz && !alteplaseQuiz && !skillMcq
-            && !admissionQuiz && !useIv
+        const isMed = !bedPrep && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz && !skillMcq
+            && !sepsisScreenPrompt && !admissionQuiz && !useIv
             && (!liveTask?.type || String(liveTask.type).toLowerCase() === 'med');
         const useAccucheck = isMed && isAccucheckTask(liveTask);
         const accucheckPrompt = useAccucheck ? buildAccucheckPrompt(liveTask) : null;
@@ -988,13 +1016,16 @@ export function runChallengeGate(task) {
             ivTask: useIv ? liveTask : null,
             bedPrep,
             ivpbHang,
+            pdSeq,
             icpQuiz: Boolean(icpQuiz),
             alteplaseQuiz: Boolean(alteplaseQuiz),
             skillMcq: Boolean(skillMcq),
+            sepsisScreen: Boolean(sepsisScreenPrompt),
             admissionQuiz: Boolean(admissionQuiz),
             quizDeck,
             quizDeckIndex: 0,
-            safety: !bedPrep && !ivpbHang && !icpQuiz && !alteplaseQuiz && !skillMcq && !admissionQuiz
+            safety: !bedPrep && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz && !skillMcq
+                && !sepsisScreenPrompt && !admissionQuiz
                 && !useIv && !accucheckPrompt && !useMedQuiz
         };
 
@@ -1036,6 +1067,27 @@ export function runChallengeGate(task) {
             setTimeout(() => {
                 cleanupIvpbHang = wireIvpbHangHandlers({
                     round: ivpbRound,
+                    onDone: ({ passed, reason, expected }) => {
+                        // On fail, omit expected so retry does not spoil the sequence.
+                        finishAttempt(passed, reason, passed ? expected : undefined, { allowRetry: true });
+                    }
+                });
+            }, 0);
+        } else if (pdSeq) {
+            const pdRound = buildPeritonealDialysisRound();
+            ModalModule.openModal({
+                title: 'Peritoneal dialysis sequence',
+                content: renderPeritonealDialysisHtml(liveTask?.name, pdRound),
+                footer: challengeModalFooter({
+                    submitLabel: 'Submit next steps',
+                    submitHandler: 'pdSeqSubmit'
+                }),
+                overlay: true,
+                persistent: false
+            });
+            setTimeout(() => {
+                cleanupPdSeq = wirePeritonealDialysisHandlers({
+                    round: pdRound,
                     onDone: ({ passed, reason, expected }) => {
                         // On fail, omit expected so retry does not spoil the sequence.
                         finishAttempt(passed, reason, passed ? expected : undefined, { allowRetry: true });
@@ -1101,6 +1153,19 @@ export function runChallengeGate(task) {
                         return quiz ? { quiz } : null;
                     }
                 });
+            }, 0);
+        } else if (sepsisScreenPrompt) {
+            activeSession.quizExpected = sepsisScreenPrompt.expected;
+            ModalModule.openModal({
+                title: sepsisScreenPrompt.title || 'Sepsis screen (Q4H)',
+                content: renderSepsisScreenHtml(sepsisScreenPrompt, liveTask?.name),
+                footer: challengeModalFooter({ showSubmit: false }),
+                overlay: true,
+                persistent: false
+            });
+            setTimeout(() => {
+                wireSepsisScreenGuideButton(document);
+                wireSafetyHandlers();
             }, 0);
         } else if (skillMcq) {
             const skillId = String(liveTask?.metadata?.skillId || '').trim();

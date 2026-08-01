@@ -13,6 +13,24 @@ import {
   capillaryRefillSkillBank,
   swellingSkillBank
 } from './banks/physical-assessment.js';
+import {
+  levophedDripSkillBank,
+  vasopressinDripSkillBank,
+  neosynephrineDripSkillBank,
+  dopamineDripSkillBank,
+  dobutamineDripSkillBank,
+  propofolDripSkillBank,
+  precedexDripSkillBank,
+  fentanylDripSkillBank,
+  morphineDripSkillBank,
+  vasopressorsSkillBank,
+  icuSedationSkillBank
+} from './banks/icu-vasoactive-sedation.js';
+import {
+  aaaSkillBank,
+  pulmonaryEmbolismSkillBank,
+  peripheralClotSkillBank
+} from './banks/vascular-emergencies.js';
 
 /** @type {Record<string, { title: string, questions: object[] }>} */
 export const skillMcqBanks = {
@@ -354,6 +372,17 @@ export const skillMcqBanks = {
           'Wait for the next routine round in 4 hours',
           'Encourage ambulation only',
           'Document and discharge home immediately'
+        ]
+      },
+      {
+        id: 'bundle',
+        prompt: 'Sepsis criteria met — which hour-1 actions belong together?',
+        correct: 'Lactate, blood cultures, IV fluids, and empiric antibiotics',
+        choices: [
+          'Lactate, blood cultures, IV fluids, and empiric antibiotics',
+          'Wait for next morning labs only',
+          'Oral acetaminophen and ambulate',
+          'Discharge home with follow-up in a week'
         ]
       }
     ]
@@ -779,17 +808,6 @@ export const skillMcqBanks = {
   'peritoneal-dialysis': {
     title: 'Peritoneal dialysis',
     questions: [
-      {
-        id: 'sequence',
-        prompt: 'Typical PD exchange sequence?',
-        correct: 'Check BP/vitals → prime → drain first → fill → dwell',
-        choices: [
-          'Check BP/vitals → prime → drain first → fill → dwell',
-          'Fill first, never drain',
-          'Skip priming and force cold dialysate',
-          'Ignore cloudy effluent'
-        ]
-      },
       {
         id: 'cloudy',
         prompt: 'Cloudy PD effluent may indicate?',
@@ -1323,7 +1341,21 @@ export const skillMcqBanks = {
   'heart-sounds': heartSoundsSkillBank,
   'lung-sounds': lungSoundsSkillBank,
   'capillary-refill': capillaryRefillSkillBank,
-  swelling: swellingSkillBank
+  swelling: swellingSkillBank,
+  'levophed-drip': levophedDripSkillBank,
+  'vasopressin-drip': vasopressinDripSkillBank,
+  'neosynephrine-drip': neosynephrineDripSkillBank,
+  'dopamine-drip': dopamineDripSkillBank,
+  'dobutamine-drip': dobutamineDripSkillBank,
+  'propofol-drip': propofolDripSkillBank,
+  'precedex-drip': precedexDripSkillBank,
+  'fentanyl-drip': fentanylDripSkillBank,
+  'morphine-drip': morphineDripSkillBank,
+  vasopressors: vasopressorsSkillBank,
+  'icu-sedation': icuSedationSkillBank,
+  aaa: aaaSkillBank,
+  'pulmonary-embolism': pulmonaryEmbolismSkillBank,
+  'peripheral-clot': peripheralClotSkillBank
 };
 
 export const skillMcqChallengeConfig = {

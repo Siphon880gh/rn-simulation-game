@@ -1,0 +1,112 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Sol Marchetti</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">ICU-22</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 48</p>
+        <p class="text-sm text-gray-600">Sex: Male</p>
+        <p class="text-sm text-gray-600">Diagnosis: Severe ARDS — deep sedation + cisatracurium; night drip practice</p>
+        <p class="text-sm text-gray-600">Orders: Propofol + Precedex to RASS −4/−5; fentanyl drip for analgesia; morphine drip available; NMB with TOF goal 1–2/4</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 88</div>
+        <div>BP: 102/58 (MAP 73)</div>
+        <div>Temp: 99.4°F</div>
+        <div>O<sub>2</sub>: vent FiO<sub>2</sub> 0.8 PEEP 14</div>
+        <div>Pain: CPOT low / sedated</div>
+        <div>RR: vent</div>
+        <div>RASS goal: −4 to −5</div>
+        <div>TOF: 1/4 ulnar</div>
+        <div>Propofol: 40 mcg/kg/min</div>
+        <div>Precedex: 0.6 mcg/kg/hr</div>
+        <div>Fentanyl: 100 mcg/hr</div>
+        <div>Cisatracurium: 3 mcg/kg/min</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-moon text-xl mr-1 text-indigo-700"></i>
+            Sedation / analgesia
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="icu-sedation" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="12" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-layer-group text-indigo-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">ICU sedation class — goals with NMB</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="propofol-drip" data-status="not-yet" data-scheduled="1915" data-expire="2015" data-duration-mins="10" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-flask text-indigo-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Propofol — RASS / BP / PRIS cues</span>
+                <span class="ml-auto text-sm text-gray-500">1915</span>
+            </li>
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="precedex-drip" data-status="not-yet" data-scheduled="1930" data-expire="2030" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-heartbeat text-indigo-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Precedex — bradycardia / hypotension</span>
+                <span class="ml-auto text-sm text-gray-500">1930</span>
+            </li>
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="fentanyl-drip" data-status="not-yet" data-scheduled="1945" data-expire="2045" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-syringe text-indigo-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Fentanyl drip — CPOT / stacking</span>
+                <span class="ml-auto text-sm text-gray-500">1945</span>
+            </li>
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="morphine-drip" data-status="not-yet" data-scheduled="2100" data-expire="2200" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-prescription-bottle text-indigo-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Morphine drip — renal / histamine cues</span>
+                <span class="ml-auto text-sm text-gray-500">2100</span>
+            </li>
+            <li data-task-type="iv" data-challenge="iv-check" data-iv-line-id="sol-propofol" data-iv-drug="propofol" data-iv-rate="40" data-iv-unit="mcg/kg/min" data-status="not-yet" data-scheduled="2000" data-expire="2100" data-duration-mins="8" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-syringe text-teal-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Propofol — rate / line check</span>
+                <span class="ml-auto text-sm text-gray-500">2000</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-bolt text-xl mr-1 text-amber-700"></i>
+            Paralytics / TOF
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="tof-assessment" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="12" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-bolt text-amber-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Train-of-four (TOF) — cisatracurium</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2200" data-expire="2300" data-duration-mins="8" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-eye text-amber-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Eye care / skin while paralyzed</span>
+                <span class="ml-auto text-sm text-gray-500">2200</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-syringe text-xl mr-1 text-teal-600"></i>
+            IV / drips
+        </h4>
+        <ul class="iv-list space-y-3 hidden" data-iv-panel>
+            <li data-iv-line data-iv-id="sol-propofol" data-iv-kind="drip" data-iv-drug="propofol" data-iv-name="Propofol" data-iv-rate="40" data-iv-unit="mcg/kg/min" data-iv-status="running" data-iv-started="1500"></li>
+            <li data-iv-line data-iv-id="sol-precedex" data-iv-kind="drip" data-iv-drug="precedex" data-iv-name="Precedex (dexmedetomidine)" data-iv-rate="0.6" data-iv-unit="mcg/kg/hr" data-iv-status="running" data-iv-started="1600"></li>
+            <li data-iv-line data-iv-id="sol-fentanyl" data-iv-kind="drip" data-iv-drug="fentanyl" data-iv-name="Fentanyl" data-iv-rate="100" data-iv-unit="mcg/hr" data-iv-status="running" data-iv-started="1500"></li>
+            <li data-iv-line data-iv-id="sol-morphine" data-iv-kind="drip" data-iv-drug="morphine" data-iv-name="Morphine" data-iv-rate="2" data-iv-unit="mg/hr" data-iv-status="held"></li>
+            <li data-iv-line data-iv-id="sol-cisatracurium" data-iv-kind="drip" data-iv-drug="cisatracurium" data-iv-name="Cisatracurium" data-iv-rate="3" data-iv-unit="mcg/kg/min" data-iv-status="running" data-iv-started="1700"></li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-sol" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

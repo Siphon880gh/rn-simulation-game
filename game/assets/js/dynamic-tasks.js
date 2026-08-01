@@ -8,6 +8,7 @@ import taskSystem from './task-system.js';
 import { isAtOrAfterInShift } from './availability-windows.js';
 import { decorateAccucheckDice } from './challenges/skills/accucheck/challenge.js';
 import { decorateAlteplaseDice } from './challenges/skills/alteplase/challenge.js';
+import { decorateSepsisScreenDice } from './challenges/skills/sepsis-recognition/challenge.js';
 
 const spawnedCadenceKeys = new Set();
 let spawnCount = 0;
@@ -324,6 +325,7 @@ export function mountTaskDom(task) {
     list.appendChild(li);
     decorateAccucheckDice(li.parentElement || list);
     decorateAlteplaseDice(li.parentElement || list);
+    decorateSepsisScreenDice(li.parentElement || list);
     taskSystem.syncTaskWindowDomAttrs?.(li, task);
     taskSystem.refreshFalloutUi?.(list.closest('.dynamic-tasks-block') || panel);
 }

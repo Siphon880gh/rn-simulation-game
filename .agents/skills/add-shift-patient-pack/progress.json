@@ -1,12 +1,15 @@
 {
   "skill": "add-shift-patient-pack",
   "mode": "skill-driven",
-  "skillId": "lasix-drip",
-  "relatedSkillIds": [],
+  "skillId": "aaa",
+  "relatedSkillIds": [
+    "pulmonary-embolism",
+    "peripheral-clot"
+  ],
   "shift": "night",
-  "unit": "tele",
-  "packFile": "game/events/scenarios/skill-lasix-drip-tele.json",
-  "patientId": "hector",
+  "unit": "icu",
+  "packFile": "game/events/scenarios/skill-aaa-icu.json",
+  "patientId": "haven",
   "milestones": {
     "M0": "done",
     "M1": "done",
@@ -18,16 +21,26 @@
   "status": "complete",
   "plan": [
     {
-      "id": "hector",
-      "diagnosis": "ADHF / volume overload — continuous Lasix drip",
-      "tasks": [
-        "Lasix drip skill-mcq (start/verify + titration)",
-        "IV Lasix drip rate/line check",
-        "BMP / K / Mag / Cr lab review tasks",
-        "BNP + daily weight trend",
-        "Volume / I&O / tele assessments"
-      ]
+      "id": "haven",
+      "diagnosis": "Known AAA — rupture watch",
+      "unit": "icu",
+      "pack": "skill-aaa-icu.json",
+      "tasks": ["AAA s/s MCQ", "vitals/IV/NPO escalate", "incident at 1930/2000"]
+    },
+    {
+      "id": "keira",
+      "diagnosis": "POD hip — possible PE",
+      "unit": "tele",
+      "pack": "skill-pulmonary-embolism-tele.json",
+      "tasks": ["PE s/s MCQ", "O2/tele stay", "incident at 1935/2015"]
+    },
+    {
+      "id": "tovah",
+      "diagnosis": "Cold pulseless leg — arterial vs venous Doppler",
+      "unit": "medsurg",
+      "pack": "skill-peripheral-clot-medsurg.json",
+      "tasks": ["Limb clot MCQ", "CMS/pulse check", "incident at 1940/2020"]
     }
   ],
-  "updatedAt": "2026-08-01T07:20:00.000Z"
+  "updatedAt": "2026-08-01T07:30:00.000Z"
 }

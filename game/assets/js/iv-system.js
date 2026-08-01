@@ -30,6 +30,14 @@ function drugLabel(drug) {
     const d = String(drug || '').toLowerCase();
     if (d === 'levophed' || d === 'norepinephrine') return 'Levophed (norepinephrine)';
     if (d === 'neosynephrine' || d === 'phenylephrine' || d === 'neo') return 'Neo-Synephrine (phenylephrine)';
+    if (d === 'vasopressin' || d === 'vaso') return 'Vasopressin';
+    if (d === 'dopamine') return 'Dopamine';
+    if (d === 'dobutamine') return 'Dobutamine';
+    if (d === 'propofol') return 'Propofol';
+    if (d === 'precedex' || d === 'dexmedetomidine') return 'Precedex (dexmedetomidine)';
+    if (d === 'fentanyl') return 'Fentanyl';
+    if (d === 'morphine') return 'Morphine';
+    if (d === 'cisatracurium') return 'Cisatracurium';
     if (d === 'heparin') return 'Heparin drip';
     if (d === 'insulin') return 'Insulin drip (regular)';
     return drug || 'IV drip';
@@ -172,6 +180,8 @@ function createIvTask(spec) {
             currentRate: spec.currentRate,
             direction: spec.direction,
             sbp: spec.sbp,
+            map: spec.map,
+            target: spec.target,
             pttResult: spec.pttResult,
             lineId: spec.lineId,
             ivKind: spec.challenge,
@@ -224,12 +234,18 @@ function processTitrationIncidents(currentTime) {
             spawnedKeys.add(key);
             return;
         }
+        const target = String(inc.target || (inc.map != null ? 'map' : 'sbp')).toLowerCase();
         const direction = inc.direction
-            || (Number(inc.sbp) < 90 ? 'increase' : 'decrease');
+            || (target === 'map'
+                ? (Number(inc.map) < 65 ? 'increase' : 'decrease')
+                : (Number(inc.sbp) < 90 ? 'increase' : 'decrease'));
+        const targetLabel = target === 'map'
+            ? `MAP ${inc.map}`
+            : `SBP ${inc.sbp}`;
         createIvTask({
             id: key,
             patientId: inc.patientId,
-            name: `Titrate ${drugLabel(inc.drug)} (SBP ${inc.sbp})`,
+            name: `Titrate ${drugLabel(inc.drug)} (${targetLabel})`,
             scheduled: inc.at,
             expire: '+45',
             challenge: 'iv-titration',
@@ -239,8 +255,10 @@ function processTitrationIncidents(currentTime) {
             currentRate: line.rate,
             direction,
             sbp: inc.sbp,
+            map: inc.map,
+            target,
             lineId: line.id,
-            logMessage: `BP incident: SBP ${inc.sbp} — titrate ${drugLabel(inc.drug)}`
+            logMessage: `BP incident: ${targetLabel} — titrate ${drugLabel(inc.drug)}`
         });
     });
 }

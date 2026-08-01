@@ -388,6 +388,14 @@
       "notes": ""
     },
     {
+      "id": "alteplase",
+      "status": "covered",
+      "unitHint": "medsurg",
+      "patientId": "cal",
+      "packFile": "game/events/scenarios/skill-alteplase-medsurg.json",
+      "notes": ""
+    },
+    {
       "id": "iv-insertion",
       "status": "covered",
       "unitHint": "medsurg",
@@ -473,6 +481,30 @@
       "unitHint": "icu",
       "patientId": "tate",
       "packFile": "game/events/scenarios/skill-amiodarone-drip-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "protonix-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "glen",
+      "packFile": "game/events/scenarios/skill-protonix-drip-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "sandostatin-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "glen",
+      "packFile": "game/events/scenarios/skill-protonix-drip-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "lasix-drip",
+      "status": "covered",
+      "unitHint": "tele",
+      "patientId": "hector",
+      "packFile": "game/events/scenarios/skill-lasix-drip-tele.json",
       "notes": ""
     },
     {
@@ -578,8 +610,96 @@
       "patientId": "nell",
       "packFile": "game/events/scenarios/skill-physical-assessment-medsurg.json",
       "notes": ""
+    },
+    {
+      "id": "vasopressors",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "nova",
+      "packFile": "game/events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "levophed-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "nova",
+      "packFile": "game/events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "vasopressin-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "nova",
+      "packFile": "game/events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "neosynephrine-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "nova",
+      "packFile": "game/events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "dopamine-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "nova",
+      "packFile": "game/events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "dobutamine-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "nova",
+      "packFile": "game/events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "icu-sedation",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "sol",
+      "packFile": "game/events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "propofol-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "sol",
+      "packFile": "game/events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "precedex-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "sol",
+      "packFile": "game/events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "fentanyl-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "sol",
+      "packFile": "game/events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "notes": ""
+    },
+    {
+      "id": "morphine-drip",
+      "status": "covered",
+      "unitHint": "icu",
+      "patientId": "sol",
+      "packFile": "game/events/scenarios/skill-icu-vasoactive-sedation-icu.json",
+      "notes": ""
     }
   ],
   "blocked": null,
-  "updatedAt": "2026-07-31T11:11:35.347Z"
+  "updatedAt": "2026-08-01T07:25:01.136Z"
 }

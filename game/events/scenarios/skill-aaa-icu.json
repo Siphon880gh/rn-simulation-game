@@ -1,0 +1,57 @@
+{
+  "id": "skill-aaa-icu",
+  "title": "Skill practice — AAA recognition (ICU night)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize AAA expansion/rupture signs (tearing back/abdominal pain, hypotension, pulsatile mass)",
+    "Escalate promptly for OR / rapid-response pathway"
+  ],
+  "patients": ["haven"],
+  "patientOverrides": {
+    "haven": {
+      "clinicalStatus": "critical",
+      "acuityScore": 5,
+      "clinicalStatusReason": "Possible AAA rupture — escalate now"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/aaa-night-icu.json",
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": [
+    {
+      "id": "aaa-pain-escalate-1930",
+      "at": 1930,
+      "type": "emergency",
+      "message": "Haven reports worsening tearing back pain — reassess for AAA rupture",
+      "injectTasks": [
+        {
+          "id": "evt-haven-aaa-1930",
+          "type": "assessment",
+          "name": "Worsening AAA pain — reassess / escalate",
+          "patientId": "haven",
+          "scheduled": 1930,
+          "expire": "+30",
+          "durationMins": 12,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "aaa"
+          }
+        }
+      ]
+    }
+  ]
+}

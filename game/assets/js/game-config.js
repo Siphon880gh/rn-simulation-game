@@ -6,6 +6,7 @@ import { challengeCopyConfig } from './challenges/shared/copy-config.js';
 import { codeBlueChallengeConfig } from './challenges/emergencies/code-blue/config.js';
 import { bedPrepChallengeConfig } from './challenges/skills/bed-prep/config.js';
 import { ivpbHangChallengeConfig } from './challenges/skills/ivpb-hang/config.js';
+import { peritonealDialysisChallengeConfig } from './challenges/skills/peritoneal-dialysis/config.js';
 import { medIdentityChallengeConfig } from './challenges/skills/med-identity/config.js';
 import { icpChallengeConfig } from './challenges/skills/icp/config.js';
 import { alteplaseChallengeConfig } from './challenges/skills/alteplase/config.js';
@@ -200,19 +201,18 @@ export const GameConfig = {
         message: "Can't perform more than one of this same task"
       },
       {
-        id: 'exclusive-chart-assessment',
-        type: 'requiresEmptySlots',
-        match: { kind: 'chart-assessment' },
-        exclusive: true,
-        message: 'Clear all queue slots before charting',
-        exclusiveMessage: 'Charting requires sole use of the queue — finish it first'
-      },
-      {
         id: 'chart-blocks-with-shift-assessment',
         type: 'blocksWith',
         match: { kind: 'chart-assessment' },
         blocksWhen: { kind: 'shift-assessment' },
         message: 'Cannot chart while a shift assessment is in a queue slot'
+      },
+      {
+        id: 'shift-blocks-with-chart-assessment',
+        type: 'blocksWith',
+        match: { kind: 'shift-assessment' },
+        blocksWhen: { kind: 'chart-assessment' },
+        message: 'Cannot start a shift assessment while charting is in a queue slot'
       }
     ]
   },
@@ -293,8 +293,165 @@ export const GameConfig = {
       taskClass: 'routine',
       taskName: 'Turn / reposition (Q2H)',
       /** Align first due to shift start; then every intervalMins through the shift. */
-      alignToShiftStart: true
+      alignToShiftStart: true,
+      sectionTitle: 'Turning / skin care',
+      sectionIcon: 'fas fa-bed text-emerald-700',
+      rowClass: 'bg-emerald-50 border border-emerald-200',
+      iconClass: 'fas fa-bed text-emerald-700',
+      delegateMode: 'team'
+    },
+    /**
+     * Q4H sepsis screen — random VS + systems/labs rundown; dice may meet
+     * sepsis / septic shock / MODS and spawn the hour-1 bundle tasks.
+     * Opt in via careSchedules: ['sepsisScreenQ4h'] or data-care-schedule="sepsis-screen-q4h".
+     */
+    sepsisScreenQ4h: {
+      id: 'sepsisScreenQ4h',
+      htmlAttr: 'sepsis-screen-q4h',
+      intervalMins: 240,
+      durationMins: 12,
+      expireMins: 60,
+      taskType: 'assessment',
+      taskKind: 'sepsis-screen',
+      taskClass: 'urgent',
+      taskName: 'Sepsis screen (Q4H)',
+      alignToShiftStart: true,
+      challenge: 'sepsis-screen',
+      skillId: 'sepsis-recognition',
+      sectionTitle: 'Sepsis screening',
+      sectionIcon: 'fas fa-biohazard text-red-700',
+      rowClass: 'bg-red-50 border border-red-200',
+      iconClass: 'fas fa-biohazard text-red-600'
     }
+  },
+
+  /**
+   * Q4H sepsis screen dice + findings + hour-1 bundle spawn.
+   * Challenge: challenges/skills/sepsis-recognition/; runtime: sepsis-system.js
+   */
+  sepsisScreen: {
+    toastMs: 5200,
+    guideDoc: { category: 'learning', filename: 'SEPSIS_GUIDELINES.md' },
+    /** Weighted screen outcomes (percent-ish weights). */
+    outcomes: [
+      {
+        id: 'clear',
+        label: 'No sepsis criteria',
+        weight: 45,
+        bundle: false,
+        classifyLabel: 'No sepsis — continue monitoring',
+        toastTitle: 'Screen clear',
+        toastDetail: 'Findings do not meet sepsis / shock / MODS criteria'
+      },
+      {
+        id: 'sepsis',
+        label: 'Sepsis',
+        weight: 30,
+        bundle: true,
+        bundleTier: 'sepsis',
+        classifyLabel: 'Sepsis — start hour-1 bundle',
+        toastTitle: 'Sepsis criteria met',
+        toastDetail: 'Hour-1 bundle tasks spawned (lactate, fluids, abx, cultures)'
+      },
+      {
+        id: 'septic-shock',
+        label: 'Septic shock',
+        weight: 15,
+        bundle: true,
+        bundleTier: 'septic-shock',
+        classifyLabel: 'Septic shock — bundle + escalate',
+        toastTitle: 'Septic shock criteria',
+        toastDetail: 'Hypotension / lactate ≥2 — bundle + notify provider'
+      },
+      {
+        id: 'mods',
+        label: 'MODS',
+        weight: 10,
+        bundle: true,
+        bundleTier: 'mods',
+        classifyLabel: 'MODS — multi-organ support / escalate',
+        toastTitle: 'MODS pattern',
+        toastDetail: 'Multi-organ dysfunction — full bundle + rapid escalation'
+      }
+    ],
+    /** Tasks spawned when screen is positive (tier filters extras). */
+    bundleTasks: [
+      {
+        idSuffix: 'lactate',
+        name: 'Draw lactic acid (lactate)',
+        type: 'assessment',
+        taskClass: 'stat',
+        durationMins: 8,
+        expire: '+45',
+        tiers: ['sepsis', 'septic-shock', 'mods'],
+        metadata: { kind: 'sepsis-bundle', bundleItem: 'lactate' }
+      },
+      {
+        idSuffix: 'cultures',
+        name: 'Blood cultures ×2 (before antibiotics)',
+        type: 'assessment',
+        taskClass: 'stat',
+        durationMins: 10,
+        expire: '+45',
+        tiers: ['sepsis', 'septic-shock', 'mods'],
+        metadata: { kind: 'sepsis-bundle', bundleItem: 'cultures' }
+      },
+      {
+        idSuffix: 'fluids',
+        name: 'IV fluid bolus 30 mL/kg crystalloid',
+        type: 'procedure',
+        taskClass: 'stat',
+        durationMins: 15,
+        expire: '+60',
+        tiers: ['sepsis', 'septic-shock', 'mods'],
+        metadata: { kind: 'sepsis-bundle', bundleItem: 'fluids' }
+      },
+      {
+        idSuffix: 'antibiotics',
+        name: 'Empiric IV antibiotics (broad-spectrum)',
+        type: 'med',
+        taskClass: 'stat',
+        durationMins: 15,
+        expire: '+60',
+        tiers: ['sepsis', 'septic-shock', 'mods'],
+        metadata: {
+          kind: 'sepsis-bundle',
+          bundleItem: 'antibiotics',
+          challenge: 'skill-mcq',
+          skillId: 'sepsis-recognition'
+        }
+      },
+      {
+        idSuffix: 'repeat-lactate',
+        name: 'Repeat lactate (reassess perfusion)',
+        type: 'assessment',
+        taskClass: 'urgent',
+        durationMins: 8,
+        expire: '+90',
+        tiers: ['septic-shock', 'mods'],
+        metadata: { kind: 'sepsis-bundle', bundleItem: 'repeat-lactate' }
+      },
+      {
+        idSuffix: 'vasopressors',
+        name: 'Notify provider — vasopressors if MAP <65 after fluids',
+        type: 'assessment',
+        taskClass: 'stat',
+        durationMins: 10,
+        expire: '+60',
+        tiers: ['septic-shock', 'mods'],
+        metadata: { kind: 'sepsis-bundle', bundleItem: 'vasopressors' }
+      },
+      {
+        idSuffix: 'organ-support',
+        name: 'Multi-organ support huddle (resp / renal / coag)',
+        type: 'assessment',
+        taskClass: 'stat',
+        durationMins: 12,
+        expire: '+60',
+        tiers: ['mods'],
+        metadata: { kind: 'sepsis-bundle', bundleItem: 'organ-support' }
+      }
+    ]
   },
 
   /**
@@ -375,6 +532,8 @@ export const GameConfig = {
       'shift-assessment': 'slot-assessment',
       'chart-assessment': 'slot-chart-assessment',
       'turn-patient': 'slot-turn-patient',
+      'sepsis-screen': 'slot-assessment',
+      'sepsis-bundle': 'slot-assessment',
       'chair-alarm': 'slot-chair-alarm',
       'bed-alarm': 'slot-bed-alarm',
       'call-light': 'slot-call-light',
@@ -463,6 +622,7 @@ export const GameConfig = {
   challengeCopy: challengeCopyConfig,
   bedPrepChallenge: bedPrepChallengeConfig,
   ivpbHangChallenge: ivpbHangChallengeConfig,
+  peritonealDialysisChallenge: peritonealDialysisChallengeConfig,
   medIdentityChallenge: medIdentityChallengeConfig,
   icpChallenge: icpChallengeConfig,
   alteplaseChallenge: alteplaseChallengeConfig,
@@ -1239,6 +1399,7 @@ export const GameConfig = {
         drug: 'levophed',
         brand: 'norepinephrine',
         sbp: 78,
+        target: 'sbp',
         direction: 'increase'
       },
       {
@@ -1248,6 +1409,27 @@ export const GameConfig = {
         drug: 'levophed',
         brand: 'norepinephrine',
         sbp: 162,
+        target: 'sbp',
+        direction: 'decrease'
+      },
+      {
+        id: 'map-drop-nova-levophed',
+        at: 2030,
+        patientId: 'nova',
+        drug: 'levophed',
+        brand: 'norepinephrine',
+        map: 58,
+        target: 'map',
+        direction: 'increase'
+      },
+      {
+        id: 'sbp-rise-nova-levophed',
+        at: 2330,
+        patientId: 'nova',
+        drug: 'levophed',
+        brand: 'norepinephrine',
+        sbp: 168,
+        target: 'sbp',
         direction: 'decrease'
       }
     ]
