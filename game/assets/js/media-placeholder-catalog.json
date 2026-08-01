@@ -40,7 +40,7 @@
       "w": 960,
       "h": 540,
       "prompt": "Subject: Code Blue challenge backdrop — crash cart open, defibrillator pads ready, tense ICU/bedside emergency lighting. Caption \"Code Blue\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/situation-code-blue.webp"
     },
     {
       "id": "situation-critical-lab",
@@ -50,7 +50,7 @@
       "w": 640,
       "h": 360,
       "prompt": "Subject: critical lab call moment — lab result printout / phone at nurses station with urgent red-flag styling, call-the-doctor urgency. Caption \"Critical lab\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/situation-critical-lab.webp"
     },
     {
       "id": "situation-bed-prep",
@@ -60,7 +60,7 @@
       "w": 960,
       "h": 540,
       "prompt": "Subject: bed-prep admission challenge — empty hospital bed being made with clean linens, suction/O2 wall setup visible. Caption \"Bed prep\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/situation-bed-prep.webp"
     },
     {
       "id": "slot-perform",
@@ -70,7 +70,7 @@
       "w": 160,
       "h": 120,
       "prompt": "Subject: small task-slot thumb (~160×120) while care is being performed — bedside care silhouette / gloved hands at bedside. Caption \"Performing care\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/slot-perform.webp"
     },
     {
       "id": "slot-perform-video",
@@ -80,7 +80,7 @@
       "w": 320,
       "h": 180,
       "prompt": "Subject: short looping silent video (3–6s) for a busy task slot — gentle bedside care motion (adjusting IV line / taking vitals), muted. Caption feel \"Performing care\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/slot-perform-video.mp4"
     },
     {
       "id": "challenge-code-blue",
@@ -90,7 +90,7 @@
       "w": 720,
       "h": 320,
       "prompt": "Subject: wide hero still for Code Blue quiz modal — open crash cart, defibrillator, tense bedside team silhouettes; readable above quiz choices. Caption \"Code Blue\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-code-blue.webp"
     },
     {
       "id": "challenge-code-blue-video",
@@ -100,7 +100,7 @@
       "w": 720,
       "h": 320,
       "prompt": "Subject: short silent looping video (4–8s) for Code Blue challenge hero — crash cart drawer opening / defibrillator charge lights pulse / urgent bedside motion, muted. Caption feel \"Code Blue\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-code-blue-video.mp4"
     },
     {
       "id": "challenge-bed-prep",
@@ -110,7 +110,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: wide still for bed-prep admission mini-game modal — clean hospital bed mid-make, linen stack, wall O2/suction. Caption \"Bed prep\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-bed-prep.webp"
     },
     {
       "id": "challenge-med-identity",
@@ -120,7 +120,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: wide still for medication identity quiz — labeled med vials / unit-dose packages on a clean med cart (fictional drug names OK). Caption \"Med identity\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-med-identity.webp"
     },
     {
       "id": "challenge-ivpb-hang",
@@ -130,7 +130,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: wide still for IVPB hang sequence game — secondary IV bag on pump pole with primary line. Caption \"IVPB hang\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-ivpb-hang.webp"
     },
     {
       "id": "challenge-accucheck",
@@ -140,7 +140,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: wide still for blood glucose / accucheck quiz — glucometer and test strip, gloved hands (no face). Caption \"Accucheck\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-accucheck.webp"
     },
     {
       "id": "challenge-admission",
@@ -150,7 +150,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: wide still for admission quiz — clipboard admission checklist and hospital wristband on bedside table. Caption \"Admission\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-admission.webp"
     },
     {
       "id": "challenge-icp",
@@ -160,7 +160,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: wide still for ICP monitoring quiz — ICU monitor waveform labeled ICP (schematic), EVD setup silhouette. Caption \"ICP\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-icp.webp"
     },
     {
       "id": "challenge-iv-check",
@@ -170,7 +170,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: wide still for IV drip check / titration / heparin-PTT quiz — IV catheter dressing and infusion pump screen at bedside (no face). Caption \"IV check\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-iv-check.webp"
     },
     {
       "id": "challenge-code-blue-after",
@@ -180,7 +180,7 @@
       "w": 720,
       "h": 320,
       "prompt": "Subject: after-pass still for Code Blue quiz — calmer bedside, monitor trending stable, crash cart closed/organized, relief after successful response. Caption \"Resolved\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-code-blue-after.webp"
     },
     {
       "id": "challenge-bed-prep-after",
@@ -190,7 +190,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: after-pass still for bed-prep mini-game — neatly made hospital bed ready for admission, supplies staged. Caption \"Ready\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-bed-prep-after.webp"
     },
     {
       "id": "challenge-med-identity-after",
@@ -200,7 +200,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: after-pass still for med identity quiz — verified med package with checkmark feel on a clean med cart. Caption \"Verified\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-med-identity-after.webp"
     },
     {
       "id": "challenge-ivpb-hang-after",
@@ -210,7 +210,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: after-pass still for IVPB hang game — secondary bag hung and dripping correctly on the pump pole. Caption \"Running\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-ivpb-hang-after.webp"
     },
     {
       "id": "challenge-iv-check-after",
@@ -220,7 +220,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: after-pass still for IV check/titration — pump screen showing confirmed rate, tidy IV site. Caption \"Confirmed\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-iv-check-after.webp"
     },
     {
       "id": "challenge-accucheck-after",
@@ -230,7 +230,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: after-pass still for accucheck quiz — glucometer result logged, insulin syringe or pen staged if indicated (no face). Caption \"Logged\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-accucheck-after.webp"
     },
     {
       "id": "challenge-admission-after",
@@ -240,7 +240,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: after-pass still for admission quiz — completed checklist with wristband applied on bedside table. Caption \"Complete\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-admission-after.webp"
     },
     {
       "id": "challenge-icp-after",
@@ -250,7 +250,7 @@
       "w": 720,
       "h": 280,
       "prompt": "Subject: after-pass still for ICP quiz — ICP waveform trending controlled, EVD leveled correctly (schematic). Caption \"Monitored\".",
-      "replaceWith": null
+      "replaceWith": "assets/media/challenge-icp-after.webp"
     }
   ]
 }

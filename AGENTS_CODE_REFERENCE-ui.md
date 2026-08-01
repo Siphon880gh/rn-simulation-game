@@ -51,7 +51,7 @@ Browser chrome around the sim: locked shell regions (E1.M2), patient main mount,
 | Status bar | `#shell-status-bar` / `#shell-status-message` | Live status line |
 | Clock / Pause | `#clock` / `#pause` / `#shell-lean-pause` | Timer module; lean chip on mobile collapsed chrome |
 | Slots / log toggles | `#shell-slots-toggle` / `#shell-log-toggle` | Mobile FABs; body classes `shell-slots-visible` / `shell-log-visible` |
-| Modal | `#modal`… | Overlay; dims `#shell`; challenge heroes via `challengeMediaHtml` |
+| Modal | `#modal`… | Overlay; dims `#shell`; challenge heroes via `challengeMediaHtml`. Tall panels: `.modal-panel` max-height uses `svh`/`dvh`; `#modal-content` scrolls; title/footer pinned (`shell.css`) |
 | Docs FAB | `#docs-container` | Fixed bottom-right |
 | Reveal style | `#reveal-scheduled-tasks` | Empty `<style>` filled by timer |
 

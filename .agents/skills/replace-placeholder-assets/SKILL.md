@@ -20,7 +20,8 @@ Swap catalog placeholders for real stills/clips without changing mount wiring.
 | [`game/assets/js/game-config.js`](../../../game/assets/js/game-config.js) → `mediaPlaceholders` | Enable/source/mounts + optional per-id overrides |
 | [`placeholders/`](../../../placeholders/) | PHP `image.php` / `video.php` + `partials/media-tag.php` |
 | [`progress.json`](progress.json) | Loop queue of pending replacements |
-| [`AGENTS_LOOP-Replace-Placeholder-Assets.md`](../../../AGENTS_LOOP-Replace-Placeholder-Assets.md) | `/loop` body |
+| [`AGENTS_LOOP-Replace-Placeholder-Assets.md`](../../../AGENTS_LOOP-Replace-Placeholder-Assets.md) | `/loop` body (user-supplied file) |
+| [`AGENTS_LOOP-Higgsfield-Fill-Placeholders.md`](../../../AGENTS_LOOP-Higgsfield-Fill-Placeholders.md) | `/loop` body (Higgsfield generate → download → `replaceWith`) |
 
 ## Hard rules
 

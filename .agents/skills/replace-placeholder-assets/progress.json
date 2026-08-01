@@ -1,6 +1,6 @@
 {
   "status": "idle",
-  "updatedAt": "2026-07-31T13:10:36Z",
+  "updatedAt": "2026-08-01T04:46:52.405Z",
   "queue": [
     {
       "id": "dept-tele",
@@ -19,113 +19,135 @@
     },
     {
       "id": "situation-code-blue",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/situation-code-blue.webp",
+      "higgsfieldJobId": "c0231e10-94bd-423b-9909-b08a0896cdb7"
     },
     {
       "id": "challenge-code-blue",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-code-blue.webp",
+      "higgsfieldJobId": "5ddf0d22-063f-4eaa-96a2-8ae0a3d705da"
     },
     {
       "id": "challenge-code-blue-video",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-code-blue-video.mp4",
+      "higgsfieldJobId": "e43bdd98-2441-43ca-a543-bfd0b084440d"
     },
     {
       "id": "situation-critical-lab",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/situation-critical-lab.webp",
+      "higgsfieldJobId": "63a69122-bb7f-46de-95f8-76221b41da19"
     },
     {
       "id": "situation-bed-prep",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/situation-bed-prep.webp",
+      "higgsfieldJobId": "3f913823-bfd5-464b-8798-8d22ad236003"
     },
     {
       "id": "challenge-bed-prep",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-bed-prep.webp",
+      "higgsfieldJobId": "1a203747-6a18-4885-bba4-9e72108e65f9"
     },
     {
       "id": "challenge-med-identity",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-med-identity.webp",
+      "higgsfieldJobId": "6c9ce323-94d3-44ac-b0f6-efdaaa1e6d12"
     },
     {
       "id": "challenge-ivpb-hang",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-ivpb-hang.webp",
+      "higgsfieldJobId": "2162b2e6-8591-4be3-b17c-fb28ddcc644b"
     },
     {
       "id": "challenge-accucheck",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-accucheck.webp",
+      "higgsfieldJobId": "ae32e5f5-fcc3-4625-8db0-7062924880ca"
     },
     {
       "id": "challenge-admission",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-admission.webp",
+      "higgsfieldJobId": "ed14cf5d-0ed6-4171-bf6d-84db389b9fe9"
     },
     {
       "id": "challenge-icp",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-icp.webp",
+      "higgsfieldJobId": "12c11eca-ef72-4577-ba9b-ce98392eeba2"
     },
     {
       "id": "challenge-iv-check",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-iv-check.webp",
+      "higgsfieldJobId": "148447ad-8264-4753-9e42-123864645ca7"
     },
     {
       "id": "challenge-code-blue-after",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-code-blue-after.webp",
+      "higgsfieldJobId": "03703e2f-bc1f-446a-8003-422aea1a393b"
     },
     {
       "id": "challenge-bed-prep-after",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-bed-prep-after.webp",
+      "higgsfieldJobId": "339e45c8-8901-4068-be25-d1f042749a34"
     },
     {
       "id": "challenge-med-identity-after",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-med-identity-after.webp",
+      "higgsfieldJobId": "20d95b14-8c80-45d0-9f96-b098dce8ff2a"
     },
     {
       "id": "challenge-ivpb-hang-after",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-ivpb-hang-after.webp",
+      "higgsfieldJobId": "5e10a823-b1e6-40c2-bad4-83acb5542f4a"
     },
     {
       "id": "challenge-iv-check-after",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-iv-check-after.webp",
+      "higgsfieldJobId": "bbc92d9d-2179-479e-879e-936bbe731514"
     },
     {
       "id": "challenge-accucheck-after",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-accucheck-after.webp",
+      "higgsfieldJobId": "48c6eeb4-901a-4781-91c9-a5fcabb89d6d"
     },
     {
       "id": "challenge-admission-after",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-admission-after.webp",
+      "higgsfieldJobId": "248e0bee-9865-4388-813c-03f722f983f2"
     },
     {
       "id": "challenge-icp-after",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/challenge-icp-after.webp",
+      "higgsfieldJobId": "387941b0-6634-47ce-83dc-827f65a65fe8"
     },
     {
       "id": "slot-perform",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/slot-perform.webp",
+      "higgsfieldJobId": "d2065ab7-ed43-4ec5-9fc2-2ad7627aad81"
     },
     {
       "id": "slot-perform-video",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "assets/media/slot-perform-video.mp4",
+      "higgsfieldJobId": "0e8444a0-f60c-496a-8976-c850fca42df9"
     }
   ]
 }

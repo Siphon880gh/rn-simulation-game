@@ -229,6 +229,56 @@ export function getAssetByMount(mount, catalog) {
     return catalog.assets.find((a) => a.mount === mount) || null;
 }
 
+/** Mute / unmute control for autoplay hero clips (starts muted for autoplay policy). */
+export function videoAudioToggleHtml({ muted = true } = {}) {
+    const isMuted = muted !== false;
+    return (
+        `<button type="button" class="media-ph-audio-toggle${isMuted ? ' is-muted' : ''}"`
+        + ` data-media-audio-toggle`
+        + ` aria-pressed="${isMuted ? 'false' : 'true'}"`
+        + ` aria-label="${isMuted ? 'Unmute video' : 'Mute video'}"`
+        + ` title="${isMuted ? 'Unmute' : 'Mute'}">`
+        + `<i class="fas fa-volume-up${isMuted ? ' hidden' : ''}" data-audio-icon="on" aria-hidden="true"></i>`
+        + `<i class="fas fa-volume-mute${isMuted ? '' : ' hidden'}" data-audio-icon="off" aria-hidden="true"></i>`
+        + `</button>`
+    );
+}
+
+function syncMediaAudioToggleUi(btn, muted) {
+    if (!btn) return;
+    const isMuted = !!muted;
+    btn.classList.toggle('is-muted', isMuted);
+    btn.setAttribute('aria-pressed', isMuted ? 'false' : 'true');
+    btn.setAttribute('aria-label', isMuted ? 'Unmute video' : 'Mute video');
+    btn.title = isMuted ? 'Unmute' : 'Mute';
+    const iconOn = btn.querySelector('[data-audio-icon="on"]');
+    const iconOff = btn.querySelector('[data-audio-icon="off"]');
+    if (iconOn) iconOn.classList.toggle('hidden', isMuted);
+    if (iconOff) iconOff.classList.toggle('hidden', !isMuted);
+}
+
+let mediaAudioToggleWired = false;
+
+/** Document-level click wiring for [data-media-audio-toggle] (safe to call often). */
+export function wireMediaAudioToggles() {
+    if (mediaAudioToggleWired || typeof document === 'undefined') return;
+    mediaAudioToggleWired = true;
+    document.addEventListener('click', (event) => {
+        const btn = event.target?.closest?.('[data-media-audio-toggle]');
+        if (!btn) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const host = btn.closest('.challenge-media-wrap, .media-ph-video-host') || btn.parentElement;
+        const video = host?.querySelector?.('video');
+        if (!video) return;
+        video.muted = !video.muted;
+        if (!video.muted) {
+            video.play?.().catch(() => {});
+        }
+        syncMediaAudioToggleUi(btn, video.muted);
+    });
+}
+
 /**
  * Build media element HTML string (mirrors PHP ph_media_tag).
  */
@@ -253,7 +303,10 @@ export function buildMediaTagHtml(asset, extras = {}) {
         const replace = asset.replaceWith;
         const isFile = typeof replace === 'string' && /\.(mp4|webm|ogg)(\?|$)/i.test(replace);
         if (isFile) {
-            return `<video${common} src="${escapeHtml(replace)}" poster="${escapeHtml(url)}" muted playsinline preload="none" aria-label="${escapeHtml(title)}"></video>`;
+            // Real clip: autoplay+loop (muted) for in-modal heroes. Do not use the
+            // .mp4 path as poster — browsers need an image URL, so an mp4 poster
+            // paints black while preload=none never fetches a frame.
+            return `<video${common} src="${escapeHtml(replace)}" muted autoplay loop playsinline preload="auto" aria-label="${escapeHtml(title)}"></video>`;
         }
         return `<video${common} poster="${escapeHtml(url)}" muted playsinline preload="none" aria-label="${escapeHtml(title)}"></video>`;
     }
@@ -534,12 +587,15 @@ export function challengeMediaHtml(challengeKey, opts = {}) {
         || `challenge-media media-ph challenge-media--${key} challenge-media--before`;
     const tag = buildMediaTagHtml(asset, { className: cls });
     if (!tag) return '';
+    const audioToggle = tag.startsWith('<video') ? videoAudioToggleHtml({ muted: true }) : '';
+    wireMediaAudioToggles();
     return (
         `<div class="challenge-media-wrap challenge-media-wrap--before"`
         + ` data-challenge-media="${escapeHtml(key)}"`
         + ` data-challenge-media-phase="before">`
         + `<span class="challenge-media-phase-label" aria-hidden="true">Before</span>`
         + tag
+        + audioToggle
         + `</div>`
     );
 }
@@ -582,13 +638,16 @@ export function revealChallengeAfterMedia(challengeKey) {
     wrap.className = 'challenge-media-wrap challenge-media-wrap--after is-revealed';
     wrap.setAttribute('data-challenge-media', key);
     wrap.setAttribute('data-challenge-media-phase', 'after');
+    const audioToggle = tag.startsWith('<video') ? videoAudioToggleHtml({ muted: true }) : '';
     wrap.innerHTML =
-        `<span class="challenge-media-phase-label" aria-hidden="true">After</span>${tag}`;
+        `<span class="challenge-media-phase-label" aria-hidden="true">After</span>${tag}${audioToggle}`;
+    wireMediaAudioToggles();
     return true;
 }
 
 async function bootGameMounts() {
     if (!isEnabled()) return;
+    wireMediaAudioToggles();
     const catalog = await loadCatalog();
     applySituationPlaceholderUrls(catalog);
     // Re-apply unit scene if stills/backgrounds changed
@@ -609,6 +668,8 @@ const MediaPlaceholdersModule = {
     promptStyleAppendix,
     buildMediaTagHtml,
     buildPlaceholderSvg,
+    videoAudioToggleHtml,
+    wireMediaAudioToggles,
     showCriticalLabMedia,
     slotMediaHtml,
     challengeMediaHtml,
@@ -622,6 +683,7 @@ const MediaPlaceholdersModule = {
     applySituationPlaceholderUrls,
     async init() {
         if (!isEnabled()) return;
+        wireMediaAudioToggles();
         const catalog = await loadCatalog();
         applySituationPlaceholderUrls(catalog);
         if (typeof document !== 'undefined' && document.querySelector('.unit-tile')) {

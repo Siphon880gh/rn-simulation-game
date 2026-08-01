@@ -23,6 +23,8 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 
 **Replace with real art:** [`.agents/skills/replace-placeholder-assets/`](.agents/skills/replace-placeholder-assets/) · [`AGENTS_LOOP-Replace-Placeholder-Assets.md`](AGENTS_LOOP-Replace-Placeholder-Assets.md)
 
+**Generate via Higgsfield MCP:** [`AGENTS_LOOP-Higgsfield-Fill-Placeholders.md`](AGENTS_LOOP-Higgsfield-Fill-Placeholders.md) — reads `data-media-kind` + `data-asset-prompt` (or catalog equivalent), generates, downloads to `game/assets/media/`, sets `replaceWith`
+
 ---
 
 ## Inventory
@@ -32,28 +34,28 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 | `dept-tele` | image | Telemetry unit | Landing Tele tile | Tele nursing station / central monitor bank for the assignment picker | `game/assets/media/dept-tele.webp` |
 | `dept-medsurg` | image | Med-Surg unit | Landing Med-Surg tile | Floor hallway / nurses station + med cart mood | `game/assets/media/dept-medsurg.webp` |
 | `dept-icu` | image | ICU unit | Landing ICU tile | ICU bay with vents/pumps, higher acuity | `game/assets/media/dept-icu.webp` |
-| `situation-code-blue` | image | Code Blue | Code Blue challenge modal still | Crash cart / defibrillator emergency backdrop | `null` |
-| `situation-critical-lab` | image | Critical lab | Critical-lab spawn toast + still key | Lab call urgency at the nurses station | `null` |
-| `situation-bed-prep` | image | Bed prep | Bed-prep challenge modal still | Empty bed being made / wall O2-suction | `null` |
-| `slot-perform` | image | Performing care | Busy task slot thumb | Small bedside-care thumb while a patient task runs in a slot | `null` |
-| `slot-perform-video` | video | Performing care | Busy slot (optional video) | Short silent loop for slot; enable via `slotPreferVideo: true` | `null` |
-| `challenge-code-blue` | image | Code Blue | Code Blue quiz modal hero | Wide still above Code Blue questions (also uses modal situation still) | `null` |
-| `challenge-code-blue-video` | video | Code Blue | Code Blue quiz modal hero (default) | Short silent loop preferred in-modal (`preferVideo: true`) | `null` |
-| `challenge-bed-prep` | image | Bed prep | Bed-prep mini-game modal | Wide still above gather-items game | `null` |
-| `challenge-med-identity` | image | Med identity | Med identity quiz modal | Med cart / vial still above brand↔generic quiz | `null` |
-| `challenge-ivpb-hang` | image | IVPB hang | IVPB hang sequence modal | Secondary bag / pump still | `null` |
-| `challenge-accucheck` | image | Accucheck | Accucheck quiz modal | Glucometer / sliding-scale still | `null` |
-| `challenge-admission` | image | Admission | Admission quiz modal | Clipboard / wristband still | `null` |
-| `challenge-icp` | image | ICP | ICP quiz modal | ICP waveform / EVD still | `null` |
-| `challenge-iv-check` | image | IV check | IV check / titration / heparin-PTT modal | IV site + infusion pump still (**before**) | `null` |
-| `challenge-code-blue-after` | image | Code Blue — resolved | Code Blue modal after pass | Calm/stable bedside after successful response | `null` |
-| `challenge-bed-prep-after` | image | Bed prep — ready | Bed-prep modal after pass | Made bed ready for admission | `null` |
-| `challenge-med-identity-after` | image | Med identity — verified | Med identity after pass | Verified med package | `null` |
-| `challenge-ivpb-hang-after` | image | IVPB hang — running | IVPB hang after pass | Secondary bag running | `null` |
-| `challenge-iv-check-after` | image | IV check — confirmed | IV check after pass | Confirmed pump rate | `null` |
-| `challenge-accucheck-after` | image | Accucheck — logged | Accucheck after pass | Result logged | `null` |
-| `challenge-admission-after` | image | Admission — complete | Admission after pass | Checklist complete | `null` |
-| `challenge-icp-after` | image | ICP — monitored | ICP after pass | Controlled ICP waveform | `null` |
+| `situation-code-blue` | image | Code Blue | Code Blue challenge modal still | Crash cart / defibrillator emergency backdrop | `assets/media/situation-code-blue.webp` |
+| `situation-critical-lab` | image | Critical lab | Critical-lab spawn toast + still key | Lab call urgency at the nurses station | `assets/media/situation-critical-lab.webp` |
+| `situation-bed-prep` | image | Bed prep | Bed-prep challenge modal still | Empty bed being made / wall O2-suction | `assets/media/situation-bed-prep.webp` |
+| `slot-perform` | image | Performing care | Busy task slot thumb | Small bedside-care thumb while a patient task runs in a slot | `assets/media/slot-perform.webp` |
+| `slot-perform-video` | video | Performing care | Busy slot (optional video) | Short silent loop for slot; enable via `slotPreferVideo: true` | `assets/media/slot-perform-video.mp4` |
+| `challenge-code-blue` | image | Code Blue | Code Blue quiz modal hero | Wide still above Code Blue questions (also uses modal situation still) | `assets/media/challenge-code-blue.webp` |
+| `challenge-code-blue-video` | video | Code Blue | Code Blue quiz modal hero (default) | Short silent loop preferred in-modal (`preferVideo: true`) | `assets/media/challenge-code-blue-video.mp4` |
+| `challenge-bed-prep` | image | Bed prep | Bed-prep mini-game modal | Wide still above gather-items game | `assets/media/challenge-bed-prep.webp` |
+| `challenge-med-identity` | image | Med identity | Med identity quiz modal | Med cart / vial still above brand↔generic quiz | `assets/media/challenge-med-identity.webp` |
+| `challenge-ivpb-hang` | image | IVPB hang | IVPB hang sequence modal | Secondary bag / pump still | `assets/media/challenge-ivpb-hang.webp` |
+| `challenge-accucheck` | image | Accucheck | Accucheck quiz modal | Glucometer / sliding-scale still | `assets/media/challenge-accucheck.webp` |
+| `challenge-admission` | image | Admission | Admission quiz modal | Clipboard / wristband still | `assets/media/challenge-admission.webp` |
+| `challenge-icp` | image | ICP | ICP quiz modal | ICP waveform / EVD still | `assets/media/challenge-icp.webp` |
+| `challenge-iv-check` | image | IV check | IV check / titration / heparin-PTT modal | IV site + infusion pump still (**before**) | `assets/media/challenge-iv-check.webp` |
+| `challenge-code-blue-after` | image | Code Blue — resolved | Code Blue modal after pass | Calm/stable bedside after successful response | `assets/media/challenge-code-blue-after.webp` |
+| `challenge-bed-prep-after` | image | Bed prep — ready | Bed-prep modal after pass | Made bed ready for admission | `assets/media/challenge-bed-prep-after.webp` |
+| `challenge-med-identity-after` | image | Med identity — verified | Med identity after pass | Verified med package | `assets/media/challenge-med-identity-after.webp` |
+| `challenge-ivpb-hang-after` | image | IVPB hang — running | IVPB hang after pass | Secondary bag running | `assets/media/challenge-ivpb-hang-after.webp` |
+| `challenge-iv-check-after` | image | IV check — confirmed | IV check after pass | Confirmed pump rate | `assets/media/challenge-iv-check-after.webp` |
+| `challenge-accucheck-after` | image | Accucheck — logged | Accucheck after pass | Result logged | `assets/media/challenge-accucheck-after.webp` |
+| `challenge-admission-after` | image | Admission — complete | Admission after pass | Checklist complete | `assets/media/challenge-admission-after.webp` |
+| `challenge-icp-after` | image | ICP — monitored | ICP after pass | Controlled ICP waveform | `assets/media/challenge-icp-after.webp` |
 
 Toggle challenge heroes: `GameConfig.mediaPlaceholders.mounts.challenges`. Per-game map: `mediaPlaceholders.challenges.<key>` (`imageId`/`videoId` = **before** during quiz; `afterImageId` swaps in after the last question / challenge-level target, on the Continue screen before the modal closes).
 
