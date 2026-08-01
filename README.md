@@ -13,6 +13,10 @@ Experience the intensity of a fast-paced 12-hour shift in this nursing simulatio
 
 Coming soon: Sub-acute and ER.
 
+## Screenshot
+
+![RN Simulation assignment picker with Telemetry, Med-Surg, and ICU units](docs/screenshot.png)
+
 ## STATUS
 
 Playable clinical-training MVP + Later backlog slices (challenges, chaos packs, alternate shifts). Optional auth/friends (**E8.M2**) stays off until explicitly re-approved.
