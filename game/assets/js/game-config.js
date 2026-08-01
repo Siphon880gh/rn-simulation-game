@@ -195,10 +195,26 @@ export const GameConfig = {
         message: "Can't perform more than one of this same task"
       },
       {
+        id: 'exclusive-shift-assessment',
+        type: 'requiresEmptySlots',
+        match: { kind: 'shift-assessment' },
+        exclusive: true,
+        message: 'Clear all queue slots before starting a shift assessment — it needs your full attention',
+        exclusiveMessage: 'Shift assessment needs sole use of the queue — finish it before starting other tasks'
+      },
+      {
         id: 'mutex-chart-assessment',
         type: 'mutexSimilar',
         match: { kind: 'chart-assessment' },
         message: "Can't perform more than one of this same task"
+      },
+      {
+        id: 'exclusive-chart-assessment',
+        type: 'requiresEmptySlots',
+        match: { kind: 'chart-assessment' },
+        exclusive: true,
+        message: 'Clear all queue slots before starting chart assessment — it needs your full attention',
+        exclusiveMessage: 'Chart assessment needs sole use of the queue — finish it before starting other tasks'
       },
       {
         id: 'chart-blocks-with-shift-assessment',
@@ -456,17 +472,20 @@ export const GameConfig = {
 
   /**
    * Per-patient shift assessment → chart flow (injected for every census patient).
-   * Bedside assess must finish in the first N game-hours; chart unlocks after assess
-   * and occupies a slot (~15 game minutes). Perform assess → random skill from pool.
+   * Both expire 5 game-hours from shift start. While occupying a slot they are
+   * abortable (free the slot; remaining duration resumes on next Perform).
+   * Chart unlocks after assess (~15 game min). Perform assess → random skill from pool.
    */
   shiftAssessment: {
-    assessWithinMins: 240,
+    assessWithinMins: 300,
     assessDurationMins: 12,
     assessTaskName: 'Shift assessment',
     chartDurationMins: 15,
-    /** Chart due window from shift start (longer than assess so charting can finish). */
-    chartExpireMins: 480,
+    /** Chart due window from shift start (same 5h window as bedside assess). */
+    chartExpireMins: 300,
     chartTaskName: 'Chart assessment',
+    /** Kinds that show Abort on a busy queue slot and keep remaining time. */
+    abortableKinds: ['shift-assessment', 'chart-assessment'],
     assessmentSkillIds: [
       'heart-sounds',
       'lung-sounds',

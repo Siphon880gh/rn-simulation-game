@@ -1,8 +1,9 @@
 /**
  * AUTO checks for declarative queue-slot concurrency constraints.
  *
- * Shift/chart assessments only mutex against other shift/chart assessments —
- * they must not exclusive-lock the whole queue (other tasks stay allowed).
+ * Shift and chart assessment both exclusive-lock the whole queue (require empty
+ * slots to start; other tasks blocked while either runs). Mutex + blocksWith
+ * still apply between the two assessment kinds.
  */
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -30,12 +31,20 @@ assert(
   'mutex shift-assessment rule'
 );
 assert(
+  GameConfig.slotConstraints.rules.some(
+    (r) => r.type === 'requiresEmptySlots' && r.exclusive === true && r.match?.kind === 'shift-assessment'
+  ),
+  'exclusive shift-assessment rule'
+);
+assert(
   GameConfig.slotConstraints.rules.some((r) => r.type === 'mutexSimilar' && r.match?.kind === 'chart-assessment'),
   'mutex chart-assessment rule'
 );
 assert(
-  !GameConfig.slotConstraints.rules.some((r) => r.type === 'requiresEmptySlots' && r.match?.kind === 'chart-assessment'),
-  'no exclusive/empty-slots chart rule'
+  GameConfig.slotConstraints.rules.some(
+    (r) => r.type === 'requiresEmptySlots' && r.exclusive === true && r.match?.kind === 'chart-assessment'
+  ),
+  'exclusive chart-assessment rule'
 );
 assert(
   GameConfig.slotConstraints.rules.some((r) => r.type === 'blocksWith' && r.match?.kind === 'chart-assessment' && r.blocksWhen?.kind === 'shift-assessment'),
@@ -116,30 +125,51 @@ assert(mutex.ok === false && mutex.reason === 'mutex-similar', `mutex got ${mute
 assert(SlotSystem.requestSlot(assessB, 1900).ok === false, 'second assess blocked');
 
 const chartVsAssess = canEnterSlot(chartA);
-assert(chartVsAssess.ok === false && chartVsAssess.reason === 'blocks-with', `chart reason ${chartVsAssess.reason}`);
+assert(chartVsAssess.ok === false, `chart blocked during assess, got ${chartVsAssess.reason}`);
+assert(
+  chartVsAssess.reason === 'blocks-with'
+    || chartVsAssess.reason === 'exclusive-active'
+    || chartVsAssess.reason === 'requires-empty-slots',
+  `chart reason ${chartVsAssess.reason}`
+);
 
 const medDuringAssess = canEnterSlot(med);
-assert(medDuringAssess.ok === true, 'med allowed while shift assessment busy');
-assert(SlotSystem.requestSlot(med, 1900).ok === true, 'assign med during assess');
-assert(isExclusiveOccupancyActive() === false, 'no exclusive during assess');
-assert(slotDisplayState({ id: 2, taskId: null }) === 'empty', 'empty slot stays empty (not disabled)');
+assert(medDuringAssess.ok === false && medDuringAssess.reason === 'exclusive-active', `med reason ${medDuringAssess.reason}`);
+assert(String(medDuringAssess.message || '').toLowerCase().includes('shift assessment'), 'med block explains shift assessment');
+assert(SlotSystem.requestSlot(med, 1900).ok === false, 'med blocked during assess');
+assert(isExclusiveOccupancyActive() === true, 'exclusive during assess');
+assert(slotDisplayState({ id: 2, taskId: null }) === 'disabled', 'empty slot disabled during assess');
 
 SlotSystem.processSlots(1912);
 assert(!SlotSystem.findSlotForTask(assessA.id), 'assess A finished');
+assert(isExclusiveOccupancyActive() === false, 'exclusive cleared after assess');
 
-assert(canEnterSlot(chartA).ok === true, 'chart ok after assess done');
-assert(SlotSystem.requestSlot(chartA, 1912).ok === true, 'assign chart while med may still be busy');
-assert(isExclusiveOccupancyActive() === false, 'chart is not exclusive');
+assert(canEnterSlot(med).ok === true, 'med ok after assess done');
+assert(SlotSystem.requestSlot(med, 1912).ok === true, 'assign med after assess');
+
+const assessWhileMed = canEnterSlot(assessB);
+assert(assessWhileMed.ok === false && assessWhileMed.reason === 'requires-empty-slots', `assess needs empty got ${assessWhileMed.reason}`);
+assert(String(assessWhileMed.message || '').toLowerCase().includes('clear all queue slots'), 'assess block explains empty slots');
+
+SlotSystem.processSlots(1922);
+assert(!SlotSystem.findSlotForTask(med.id), 'med finished');
+
+assert(canEnterSlot(chartA).ok === true, 'chart ok when slots empty');
+assert(SlotSystem.requestSlot(chartA, 1922).ok === true, 'assign chart');
+assert(isExclusiveOccupancyActive() === true, 'exclusive during chart');
+assert(slotDisplayState({ id: 2, taskId: null }) === 'disabled', 'empty slot disabled during chart');
 
 const chartMutex = canEnterSlot(chartB);
 assert(chartMutex.ok === false && chartMutex.reason === 'mutex-similar', `chart mutex got ${chartMutex.reason}`);
 
 const assessDuringChart = canEnterSlot(assessB);
-assert(assessDuringChart.ok === false && assessDuringChart.reason === 'blocks-with', `assess vs chart ${assessDuringChart.reason}`);
-
-// Med should still be allowed alongside chart (if a free slot remains / after med frees)
-SlotSystem.processSlots(1922);
-assert(canEnterSlot(med).ok === true || SlotSystem.findSlotForTask(med.id), 'med allowed with chart');
+assert(assessDuringChart.ok === false, `assess vs chart ${assessDuringChart.reason}`);
+assert(
+  assessDuringChart.reason === 'blocks-with'
+    || assessDuringChart.reason === 'requires-empty-slots'
+    || assessDuringChart.reason === 'exclusive-active',
+  `assess vs chart reason ${assessDuringChart.reason}`
+);
 
 const med2 = taskSystem.createTask({
   id: 'p2-med',
@@ -151,8 +181,10 @@ const med2 = taskSystem.createTask({
   patientId: 'p2'
 });
 taskSystem.processTasks(1922);
-assert(canEnterSlot(med2).ok === true, 'other meds ok during chart');
-assert(SlotSystem.requestSlot(med2, 1922).ok === true, 'assign med during chart');
+const medDuringChart = canEnterSlot(med2);
+assert(medDuringChart.ok === false && medDuringChart.reason === 'exclusive-active', `med during chart ${medDuringChart.reason}`);
+assert(String(medDuringChart.message || '').toLowerCase().includes('chart'), 'med block explains chart assessment');
+assert(SlotSystem.requestSlot(med2, 1922).ok === false, 'assign med blocked during chart');
 
 if (failures.length) {
   console.error('slot-constraints AUTO FAIL');

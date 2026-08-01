@@ -1734,7 +1734,7 @@ const PatientsModule = (() => {
         return tasks;
     }
 
-    /** Bedside shift assessment (first 4h) + chart assessment (after assess, 15 min). */
+    /** Bedside shift assessment + chart assessment (both expire 5h from shift start). */
     function buildShiftAssessmentTasks(patientId) {
         const cfg = GameConfig.shiftAssessment || {};
         const shiftStart = shiftStartHhmm();
@@ -1750,14 +1750,15 @@ const PatientsModule = (() => {
                 type: 'assessment',
                 taskClass: GameConfig.tasks.classes.URGENT,
                 scheduled: shiftStart,
-                expire: `+${Number(cfg.assessWithinMins) || 240}`,
+                expire: `+${Number(cfg.assessWithinMins) || 300}`,
                 durationMins: Number(cfg.assessDurationMins) || 12,
                 status: GameConfig.tasks.statuses.NOT_YET,
                 metadata: {
                     kind: 'shift-assessment',
                     challenge: 'skill-mcq',
                     skillPool,
-                    icon: 'fas fa-stethoscope'
+                    icon: 'fas fa-stethoscope',
+                    abortable: true
                 }
             },
             {
@@ -1766,13 +1767,14 @@ const PatientsModule = (() => {
                 type: 'assessment',
                 taskClass: GameConfig.tasks.classes.ROUTINE,
                 scheduled: shiftStart,
-                expire: `+${Number(cfg.chartExpireMins) || 480}`,
+                expire: `+${Number(cfg.chartExpireMins) || 300}`,
                 durationMins: Number(cfg.chartDurationMins) || 15,
                 status: GameConfig.tasks.statuses.NOT_YET,
                 metadata: {
                     kind: 'chart-assessment',
                     requiresCompletedTaskId: assessId,
-                    icon: 'fas fa-notes-medical'
+                    icon: 'fas fa-notes-medical',
+                    abortable: true
                 }
             }
         ];
@@ -1788,6 +1790,34 @@ const PatientsModule = (() => {
         chartEl.title = unlocked
             ? 'Click for Perform / Details menu'
             : 'Locked — complete shift assessment first';
+    }
+
+    /** Show remaining duration on aborted shift/chart assessment rows. */
+    function syncAbortedAssessmentUi(taskElement, task) {
+        if (!taskElement || !task) return;
+        const remaining = Number(task.metadata?.remainingMins);
+        const show = Boolean(task.metadata?.aborted)
+            && Number.isFinite(remaining)
+            && remaining > 0
+            && task.status !== GameConfig.tasks.statuses.COMPLETED;
+        let badge = taskElement.querySelector(':scope > .task-abort-remaining');
+        if (!show) {
+            badge?.remove();
+            taskElement.removeAttribute('data-aborted');
+            return;
+        }
+        taskElement.setAttribute('data-aborted', '1');
+        taskElement.setAttribute('data-duration-mins', String(remaining));
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'task-abort-remaining';
+            const nameEl = taskElement.querySelector('.font-medium');
+            if (nameEl) nameEl.after(badge);
+            else taskElement.appendChild(badge);
+        }
+        const minsLabel = remaining === 1 ? '1 min left' : `${remaining} min left`;
+        badge.textContent = `Aborted · ${minsLabel}`;
+        badge.title = `Resume to finish the remaining ${minsLabel}`;
     }
 
     function mountShiftAssessmentTasks(patientId, shiftTasks) {
@@ -1808,7 +1838,7 @@ const PatientsModule = (() => {
             block.appendChild(heading);
             const note = document.createElement('p');
             note.className = 'text-xs text-gray-600 mb-2';
-            note.textContent = 'Assess within first 4 hours (skill check). Chart unlocks after assess (~15 min).';
+            note.textContent = 'Assess within first 5 hours (skill check). Chart unlocks after assess (~15 min).';
             block.appendChild(note);
             block.appendChild(list);
             const patientRoot = panel.querySelector('.patient') || panel;
@@ -1863,6 +1893,7 @@ const PatientsModule = (() => {
             `;
             list.appendChild(li);
             taskSystem.syncTaskWindowDomAttrs?.(li, live);
+            syncAbortedAssessmentUi(li, live);
         });
         syncShiftAssessmentLockAttrs(patientId);
     }
@@ -2577,6 +2608,10 @@ const PatientsModule = (() => {
                     taskElement.setAttribute('data-status', task.status);
                     taskElement.className = taskElement.className.replace(/task-status-[\w-]+/g, '').trim();
                     taskElement.classList.add(`task-status-${task.status}`);
+                    const kind = String(task.metadata?.kind || '').toLowerCase();
+                    if (kind === 'shift-assessment' || kind === 'chart-assessment') {
+                        syncAbortedAssessmentUi(taskElement, task);
+                    }
                 }
             });
         });

@@ -95,7 +95,7 @@ CSS classes: `task-status-*` in `declarative-tasks.css`.
 | `requiresEmptySlots` | Start only when all 3 slots empty; `exclusive:true` blocks other starts and renders remaining slots `.task-slot--disabled` |
 | `blocksWith` | Blocked while any busy-slot task matches `blocksWhen` |
 
-Default rules: shift-assessment mutex; chart-assessment mutex; bidirectional `blocksWith` between shift-assessment and chart-assessment only (other task types stay allowed — no exclusive whole-queue lock). Details menu appends the block `message` to duration/expire copy. AUTO: `node scripts/verify-slot-constraints.mjs`.
+Default rules: shift-assessment and chart-assessment each use mutex + `requiresEmptySlots`/`exclusive` (sole queue use; other starts blocked; empty slots `.task-slot--disabled`); bidirectional `blocksWith` between the two. Perform label and Details append the block `message` when gated. AUTO: `node scripts/verify-slot-constraints.mjs`.
 
 ---
 

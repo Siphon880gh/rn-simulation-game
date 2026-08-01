@@ -179,6 +179,30 @@ class GameState {
       };
     });
 
+    /** Patch task fields (duration / metadata) — used for abort → remaining-time resume. */
+    this.actions.set('UPDATE_TASK', (payload) => {
+      const taskId = payload?.taskId;
+      if (!taskId) return this.state;
+      const newTasks = new Map(this.state.tasks);
+      const existing = newTasks.get(taskId);
+      if (!existing) return this.state;
+      const next = { ...existing };
+      if (payload.duration != null && Number.isFinite(Number(payload.duration))) {
+        next.duration = Math.max(1, Number(payload.duration));
+      }
+      if (payload.metadata && typeof payload.metadata === 'object') {
+        next.metadata = { ...(existing.metadata || {}), ...payload.metadata };
+      }
+      if (payload.status != null) {
+        next.status = payload.status;
+      }
+      newTasks.set(taskId, next);
+      return {
+        ...this.state,
+        tasks: newTasks
+      };
+    });
+
     this.actions.set('REGISTER_TASK', (payload) => {
       const newTasks = new Map(this.state.tasks);
       newTasks.set(payload.task.id, payload.task);

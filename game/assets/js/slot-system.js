@@ -38,6 +38,18 @@ function taskRequiresEmptySlots(task) {
     });
 }
 
+/** Shift / chart assessment (and config.abortableKinds) can free a busy slot mid-run. */
+function isAbortableTask(task) {
+    const kind = String(task?.metadata?.kind || '').toLowerCase();
+    if (!kind) return false;
+    if (task?.metadata?.abortable === true) return true;
+    const kinds = GameConfig.shiftAssessment?.abortableKinds;
+    if (Array.isArray(kinds) && kinds.map((k) => String(k).toLowerCase()).includes(kind)) {
+        return true;
+    }
+    return kind === 'shift-assessment' || kind === 'chart-assessment';
+}
+
 function hhmmToMinutes(hhmm) {
     const n = Number(hhmm) || 0;
     return Math.floor(n / 100) * 60 + (n % 100);
@@ -119,9 +131,15 @@ function renderSlots(slots) {
                 mediaCatalog
             )
             : '';
+        const abortBtn = isAbortableTask(task)
+            ? `<button type="button" class="task-slot-abort" data-slot-abort="${slot.id}"
+                title="Abort — keep remaining time" aria-label="Abort ${slot.taskName || 'task'}">Abort</button>`
+            : '';
         return `
-          <div class="task-slot task-slot--busy" data-slot-id="${slot.id}" data-task-id="${slot.taskId}"
+          <div class="task-slot task-slot--busy${isAbortableTask(task) ? ' task-slot--abortable' : ''}"
+            data-slot-id="${slot.id}" data-task-id="${slot.taskId}"
             data-task-type="${slotType}" data-task-kind="${slotKind}" data-patient-id="${task?.patientId || ''}">
+            ${abortBtn}
             ${media}
             <span class="task-slot-name">${slot.taskName || 'Task'}</span>
             <div class="task-slot-progress" aria-hidden="true">
@@ -214,6 +232,18 @@ const SlotSystem = {
         renderSlots(gameState.getStateSlice('slots') || []);
         renderQueue(gameState.getStateSlice('slotQueue') || []);
         syncTaskOccupancyMarkers();
+        const bar = document.querySelector(GameConfig.selectors.taskQueueBar);
+        if (bar && bar.dataset.slotAbortWired !== '1') {
+            bar.dataset.slotAbortWired = '1';
+            bar.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-slot-abort]');
+                if (!btn) return;
+                e.preventDefault();
+                e.stopPropagation();
+                const slotId = Number(btn.getAttribute('data-slot-abort'));
+                if (Number.isFinite(slotId)) this.abortSlot(slotId);
+            });
+        }
         gameState.subscribe('slots', (slots) => {
             renderSlots(slots || []);
             syncTaskOccupancyMarkers();
@@ -227,6 +257,49 @@ const SlotSystem = {
                 this.processSlots(currentTime);
             }
         });
+    },
+
+    isAbortableTask,
+
+    /**
+     * Free a busy abortable slot; keep the task active with remaining duration.
+     * Next Perform resumes that remaining time (challenge not re-run if already passed).
+     */
+    abortSlot(slotId) {
+        const slots = gameState.getStateSlice('slots') || [];
+        const slot = slots.find((s) => s.id === slotId);
+        if (!slot?.taskId || slot.endsAt == null) return false;
+
+        const task = gameState.getStateSlice('tasks')?.get(slot.taskId);
+        if (!isAbortableTask(task)) return false;
+
+        const now = resolveExecutionTime();
+        const nowMins = hhmmToMinutes(now);
+        const endMins = hhmmToMinutes(slot.endsAt);
+        const remaining = Math.max(0, endMins - nowMins);
+
+        if (remaining <= 0) {
+            this.processSlots(now);
+            return true;
+        }
+
+        gameState.dispatch('UPDATE_TASK', {
+            taskId: task.id,
+            duration: remaining,
+            metadata: {
+                aborted: true,
+                remainingMins: remaining,
+                challengePassed: true,
+                abortable: true
+            }
+        });
+        gameState.dispatch('RELEASE_SLOT', { slotId: slot.id, taskId: slot.taskId });
+        gameState.dispatch('APPEND_SHIFT_LOG', {
+            message: `Aborted ${slot.taskName || task.name || 'task'} (${remaining} min remaining)`,
+            timeLabel: formatHhmm(now)
+        });
+        this.drainQueue(now);
+        return true;
     },
 
     hasFreeSlot() {
@@ -327,9 +400,31 @@ const SlotSystem = {
 
     assignTaskNow(task, currentTime) {
         const now = resolveExecutionTime(currentTime);
-        const resolved = resolveEffectiveDuration(task);
+        const resuming = Boolean(task?.metadata?.aborted)
+            || (Number(task?.metadata?.remainingMins) > 0 && Boolean(task?.metadata?.challengePassed));
+        // Resume aborted work with the saved remaining minutes (no class-interaction retime).
+        const resolved = resuming
+            ? {
+                duration: Math.max(
+                    1,
+                    Number(task.metadata?.remainingMins) || Number(task.duration) || 1
+                ),
+                reason: 'resume'
+            }
+            : resolveEffectiveDuration(task);
         const duration = resolved.duration;
         const endsAt = minutesToHhmm(hhmmToMinutes(now) + duration);
+
+        if (resuming || task?.metadata?.aborted) {
+            gameState.dispatch('UPDATE_TASK', {
+                taskId: task.id,
+                duration,
+                metadata: {
+                    aborted: false,
+                    remainingMins: null
+                }
+            });
+        }
 
         gameState.dispatch('ASSIGN_SLOT', {
             taskId: task.id,

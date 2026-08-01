@@ -377,6 +377,10 @@ class TaskSystem {
           bounds.expire != null ? this.formatTime(bounds.expire) : 'open'
         } (±1 hour from due)</p>`
       : '';
+    const remaining = Number(task.metadata?.remainingMins);
+    const abortedBlock = task.metadata?.aborted && Number.isFinite(remaining) && remaining > 0
+      ? `<p><strong>Aborted:</strong> ${remaining === 1 ? '1 minute' : `${remaining} minutes`} remaining — resume from Perform</p>`
+      : '';
     const details = {
       title: task.name,
       content: `
@@ -386,6 +390,7 @@ class TaskSystem {
           ${windowBlock}
           ${task.expire ? `<p><strong>Expires:</strong> ${this.formatTime(task.expire)}</p>` : ''}
           <p><strong>Status:</strong> ${task.status}</p>
+          ${abortedBlock}
         </div>
       `,
       footer: '<button class="px-4 py-2 bg-blue-500 text-white rounded" onclick="closeModal()">Close</button>'

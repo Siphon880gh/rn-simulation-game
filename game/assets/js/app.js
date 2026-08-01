@@ -433,6 +433,16 @@ class GameApplication {
                 if (isAdmitCb) performName = 'Take admitting callback';
                 if (metaKind === 'shift-assessment') performName = 'Assess (skill check)';
                 if (metaKind === 'chart-assessment') performName = 'Chart assessment';
+                const abortRemaining = Number(task.metadata?.remainingMins);
+                const isAbortedResume = Boolean(task.metadata?.aborted)
+                    && Number.isFinite(abortRemaining)
+                    && abortRemaining > 0;
+                if (isAbortedResume) {
+                    const minsLabel = abortRemaining === 1 ? '1 min left' : `${abortRemaining} min left`;
+                    performName = metaKind === 'chart-assessment'
+                        ? `Resume chart (${minsLabel})`
+                        : `Resume assess (${minsLabel})`;
+                }
 
                 let performLabel = performName;
                 if (occupied) {
@@ -444,7 +454,8 @@ class GameApplication {
                 } else if (!windowOk) {
                     performLabel = `Perform (outside window: ${phase})`;
                 } else if (slotGate.ok === false) {
-                    performLabel = `${performName} (blocked)`;
+                    const reason = String(slotGate.message || 'blocked by queue').trim().replace(/\.$/, '');
+                    performLabel = `${performName} — ${reason}`;
                 }
 
                 const items = {
@@ -555,16 +566,21 @@ class GameApplication {
                 this.performDelegatedSolo(task, aide);
             },
             details: () => {
-                const durationMins = task.duration;
-                const expire = task.expire;
+                const live = gameState.getStateSlice('tasks')?.get(task?.id) || task;
+                const durationMins = live.duration;
+                const expire = live.expire;
                 let msg = `Task is ${durationMins} mins long. Expires at ${expire}.`;
-                const occupied = SlotSystem.getTaskSlotState(task?.id);
+                const abortRemaining = Number(live.metadata?.remainingMins);
+                if (live.metadata?.aborted && Number.isFinite(abortRemaining) && abortRemaining > 0) {
+                    msg += ` Aborted with ${abortRemaining} min remaining — resume from Perform.`;
+                }
+                const occupied = SlotSystem.getTaskSlotState(live?.id);
                 if (occupied === 'busy') {
                     msg += ' Already in progress in a queue slot.';
                 } else if (occupied === 'queued') {
                     msg += ' Already waiting in the queue.';
                 } else {
-                    const gate = SlotSystem.canAcceptTask?.(task) || canEnterSlot(task);
+                    const gate = SlotSystem.canAcceptTask?.(live) || canEnterSlot(live);
                     if (gate?.ok === false && gate.message) {
                         const reason = String(gate.message).trim().replace(/\.$/, '');
                         msg += ` ${reason}.`;
@@ -726,8 +742,11 @@ class GameApplication {
         const challengeId = String(task.metadata?.challenge || '').toLowerCase();
         const needsChallenge = kind === 'shift-assessment'
             || Boolean(challengeId);
+        // Aborted/resumed assessments already passed the skill check before the slot ran.
+        const skipChallenge = Boolean(task.metadata?.challengePassed)
+            || Boolean(task.metadata?.aborted);
 
-        if (needsChallenge && !opts.assist) {
+        if (needsChallenge && !opts.assist && !skipChallenge) {
             let gateTask = task;
             if (kind === 'shift-assessment') {
                 const pool = Array.isArray(task.metadata?.skillPool) && task.metadata.skillPool.length
@@ -755,21 +774,26 @@ class GameApplication {
                 console.log(`Assessment challenge not passed (${outcome?.reason || 'fail'})`);
                 return;
             }
+            gameState.dispatch('UPDATE_TASK', {
+                taskId: task.id,
+                metadata: { challengePassed: true }
+            });
         }
 
-        let workTask = task;
-        if (opts.assist && isTurnCareTask(task) && task.patientId) {
-            const aide = opts.aide || findAvailableAideForPatient(task.patientId, now);
+        // Prefer live state so abort remaining / challengePassed survive the skill check.
+        let workTask = gameState.getStateSlice('tasks')?.get(task.id) || task;
+        if (opts.assist && isTurnCareTask(workTask) && workTask.patientId) {
+            const aide = opts.aide || findAvailableAideForPatient(workTask.patientId, now);
             if (!aide) {
                 showDelegateHint('No assist available for this patient right now');
                 return;
             }
-            const check = canAidePerformTask(aide, task, now);
+            const check = canAidePerformTask(aide, workTask, now);
             if (!check.ok || check.mode !== 'team') {
                 showDelegateHint(`${formatAideLabel(aide)} can't team on this task`);
                 return;
             }
-            workTask = withTeamAssist(task, aide);
+            workTask = withTeamAssist(workTask, aide);
             const teamLabel = modeConfig('team')?.label || 'Team effort';
             gameState.dispatch('APPEND_SHIFT_LOG', {
                 message: `${teamLabel}: turn with ${formatAideLabel(aide)} (½ time)`,
