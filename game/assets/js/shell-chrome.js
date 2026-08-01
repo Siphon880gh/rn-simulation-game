@@ -358,14 +358,28 @@ function syncLeanClockFromPrimary() {
     lean.textContent = primary.textContent || '\u00a0';
 }
 
+function isIcedPauseActive() {
+    const sources = gameState.getStateSlice('pauseSources') || [];
+    const pauseSources = GameConfig.timer?.pauseSources || {};
+    const iced = new Set([pauseSources.CHALLENGE, pauseSources.BOOSTER, pauseSources.MODAL].filter(Boolean));
+    return sources.some((source) => iced.has(source));
+}
+
 function syncLeanPauseLabel() {
     const lean = document.querySelector(GameConfig.selectors.leanPause || '#shell-lean-pause');
     if (!lean) return;
     const paused = !!gameState.getStateSlice('isPaused');
+    const iced = isIcedPauseActive();
     const action = paused ? 'Resume' : 'Pause';
-    lean.setAttribute('aria-label', `${action} shift`);
-    lean.title = `${action} — tap to confirm`;
+    lean.setAttribute('aria-label', iced ? `${action} shift (timer iced)` : `${action} shift`);
+    lean.title = iced ? `${action} — timer iced` : `${action} — tap to confirm`;
     lean.classList.toggle('is-paused', paused);
+    lean.classList.toggle('is-iced', iced);
+    const leanBadge = document.querySelector(GameConfig.selectors.clockIcedLean || '#clock-iced-lean');
+    if (leanBadge) {
+        leanBadge.hidden = !iced;
+        leanBadge.setAttribute('aria-hidden', iced ? 'false' : 'true');
+    }
 }
 
 function closeLeanPauseModal() {
@@ -449,6 +463,7 @@ function initLeanPause() {
     }
 
     gameState.subscribe('isPaused', () => syncLeanPauseLabel());
+    gameState.subscribe('pauseSources', () => syncLeanPauseLabel());
 }
 
 function closeBrandReadMoreModal() {

@@ -4,6 +4,15 @@ import gameState from './game-state.js';
 import BoostersModule from './boosters.js';
 
 const GameTimerModule = (() => {
+  const FLASH_MS = {
+    yellow: 1100,
+    red: 1250
+  };
+  const ICED_PAUSE_SOURCES = () => {
+    const sources = GameConfig.timer?.pauseSources || {};
+    return new Set([sources.CHALLENGE, sources.BOOSTER, sources.MODAL].filter(Boolean));
+  };
+
   // Timer state
   let timerState = {
     totalDays: 1,
@@ -20,7 +29,9 @@ const GameTimerModule = (() => {
     pollTaskTimes: [],
     clockSelector: null,
     pauseSelector: null,
-    speedFactor: 1
+    speedFactor: 1,
+    lastElapsedGameMins: -1,
+    flashClearTimers: { yellow: null, red: null }
   };
 
   // Declarative timer configuration
@@ -84,6 +95,80 @@ const GameTimerModule = (() => {
     }
   };
 
+  function getElapsedGameMinutes() {
+    if (timerState.shiftStart === -1 || !timerState.timePerDay) return 0;
+    const elapsedGameSeconds = (timerState.timePerDay - timerState.secondsLeft) * timerState.gameMinutesPerRealSecond;
+    return Math.floor(elapsedGameSeconds / 60);
+  }
+
+  function clockFlashTargets() {
+    const display = document.querySelector('.shell-clock-display');
+    const lean = document.querySelector(GameConfig.selectors.leanPause || '#shell-lean-pause');
+    return [display, lean].filter(Boolean);
+  }
+
+  function flashClock(kind) {
+    const className = kind === 'red' ? 'is-flash-red' : 'is-flash-yellow';
+    const duration = FLASH_MS[kind] || 1100;
+    const targets = clockFlashTargets();
+    if (!targets.length) return;
+
+    targets.forEach((el) => {
+      el.classList.remove('is-flash-yellow', 'is-flash-red');
+      // Retrigger CSS animation when the same milestone class is re-applied.
+      void el.offsetWidth;
+      el.classList.add(className);
+    });
+
+    if (timerState.flashClearTimers[kind]) {
+      clearTimeout(timerState.flashClearTimers[kind]);
+    }
+    timerState.flashClearTimers[kind] = setTimeout(() => {
+      targets.forEach((el) => el.classList.remove(className));
+      timerState.flashClearTimers[kind] = null;
+    }, duration);
+  }
+
+  function maybeFlashMilestones(elapsedGameMins) {
+    const prev = timerState.lastElapsedGameMins;
+    if (elapsedGameMins === prev) return;
+    timerState.lastElapsedGameMins = elapsedGameMins;
+    if (prev < 0) return;
+
+    if (prev < 30 && elapsedGameMins >= 30) {
+      flashClock('yellow');
+    }
+
+    const prevHour = Math.floor(Math.max(0, prev) / 60);
+    const currHour = Math.floor(elapsedGameMins / 60);
+    if (currHour > prevHour && currHour >= 1) {
+      flashClock('red');
+    }
+  }
+
+  function isIcedPauseActive() {
+    const sources = gameState.getStateSlice('pauseSources') || [];
+    const iced = ICED_PAUSE_SOURCES();
+    return sources.some((source) => iced.has(source));
+  }
+
+  function syncIcedClockUi() {
+    const iced = isIcedPauseActive();
+    const display = document.querySelector('.shell-clock-display');
+    const lean = document.querySelector(GameConfig.selectors.leanPause || '#shell-lean-pause');
+    const badge = document.querySelector(GameConfig.selectors.clockIced || '#clock-iced');
+    const leanBadge = document.querySelector(GameConfig.selectors.clockIcedLean || '#clock-iced-lean');
+
+    display?.classList.toggle('is-iced', iced);
+    lean?.classList.toggle('is-iced', iced);
+
+    [badge, leanBadge].forEach((el) => {
+      if (!el) return;
+      el.hidden = !iced;
+      el.setAttribute('aria-hidden', iced ? 'false' : 'true');
+    });
+  }
+
   // Main timer tick function
   function tickTimer() {
     if (timerState.shiftStart === -1) return;
@@ -94,6 +179,7 @@ const GameTimerModule = (() => {
       // Calculate and update current time
       const currentTime = calculateCurrentTime();
       updateClockDisplay(currentTime);
+      maybeFlashMilestones(getElapsedGameMinutes());
       
       // Update game state with current time
       gameState.dispatch('UPDATE_TIME', { time: currentTime.hours });
@@ -307,6 +393,8 @@ ${selectors.join(',\n')} {
     };
 
     timerActions.initialize(config);
+    timerState.lastElapsedGameMins = -1;
+    syncIcedClockUi();
     timerActions.start();
   };
 
@@ -327,6 +415,11 @@ ${selectors.join(',\n')} {
   gameState.subscribe('isPaused', (isPaused) => {
     timerState.isPaused = !!isPaused;
     syncPauseButtonLabel();
+    syncIcedClockUi();
+  });
+
+  gameState.subscribe('pauseSources', () => {
+    syncIcedClockUi();
   });
 
   return {

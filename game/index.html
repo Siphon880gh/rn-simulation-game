@@ -92,19 +92,91 @@
                             <polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
                         <span id="clock-lean" class="shell-lean-pause__time">&nbsp;</span>
+                        <span id="clock-iced-lean" class="shell-clock-iced" hidden aria-hidden="true" title="Timer iced">
+                            <svg class="shell-clock-iced__cube" viewBox="0 0 40 40" width="18" height="18" aria-hidden="true" focusable="false">
+                                <defs>
+                                    <linearGradient id="ice-cube-body-lean" x1="8" y1="6" x2="32" y2="34" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#e0f2fe"/>
+                                        <stop offset="45%" stop-color="#7dd3fc"/>
+                                        <stop offset="100%" stop-color="#0284c7"/>
+                                    </linearGradient>
+                                    <linearGradient id="ice-cube-glaze-lean" x1="20" y1="4" x2="20" y2="36" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+                                        <stop offset="55%" stop-color="#bae6fd" stop-opacity="0.55"/>
+                                        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.15"/>
+                                    </linearGradient>
+                                    <clipPath id="ice-cube-clip-lean">
+                                        <path d="M20 4 L34 12 L34 26 L20 36 L6 26 L6 12 Z"/>
+                                    </clipPath>
+                                </defs>
+                                <g class="shell-clock-iced__body">
+                                    <path d="M20 4 L34 12 L20 20 L6 12 Z" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.2" stroke-linejoin="round"/>
+                                    <path d="M6 12 L20 20 L20 36 L6 26 Z" fill="url(#ice-cube-body-lean)" stroke="#0369a1" stroke-width="1.2" stroke-linejoin="round"/>
+                                    <path d="M20 20 L34 12 L34 26 L20 36 Z" fill="#38bdf8" stroke="#0369a1" stroke-width="1.2" stroke-linejoin="round" opacity="0.92"/>
+                                    <path d="M12 14 L18 17.5" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>
+                                </g>
+                                <g class="shell-clock-iced__icing" clip-path="url(#ice-cube-clip-lean)">
+                                    <rect class="shell-clock-iced__glaze" x="4" y="2" width="32" height="36" fill="url(#ice-cube-glaze-lean)"/>
+                                    <path class="shell-clock-iced__drip" d="M14 18 Q15 24 13 30" fill="none" stroke="#f0f9ff" stroke-width="1.6" stroke-linecap="round"/>
+                                    <path class="shell-clock-iced__drip shell-clock-iced__drip--delay" d="M26 16 Q27 23 25 29" fill="none" stroke="#e0f2fe" stroke-width="1.3" stroke-linecap="round"/>
+                                </g>
+                                <g class="shell-clock-iced__sparkles" fill="#ffffff">
+                                    <circle class="shell-clock-iced__sparkle" cx="11" cy="10" r="1.1"/>
+                                    <circle class="shell-clock-iced__sparkle shell-clock-iced__sparkle--delay" cx="29" cy="14" r="0.9"/>
+                                    <circle class="shell-clock-iced__sparkle shell-clock-iced__sparkle--delay-2" cx="22" cy="28" r="1"/>
+                                </g>
+                            </svg>
+                            <span class="shell-clock-iced__label">ICED</span>
+                        </span>
                     </button>
                 </div>
                 <div class="shell-clock-display flex flex-col items-center gap-2 text-xl font-bold bg-white p-3 rounded-lg shadow"
                     style="width:150px; cursor:s-resize;"
                     onclick="document.getElementById('shift-ends').classList.toggle('hidden')">
-                    <div class="flex w-full gap-2">
+                    <div class="shell-clock-display__row flex w-full items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide lucide-clock w-6 h-6 text-blue-600">
+                            class="lucide lucide-clock w-6 h-6 text-blue-600 shell-clock-display__icon">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
                         <span id="clock">&nbsp;</span>
+                        <span id="clock-iced" class="shell-clock-iced" hidden aria-hidden="true" title="Timer iced">
+                            <svg class="shell-clock-iced__cube" viewBox="0 0 40 40" width="22" height="22" aria-hidden="true" focusable="false">
+                                <defs>
+                                    <linearGradient id="ice-cube-body" x1="8" y1="6" x2="32" y2="34" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#e0f2fe"/>
+                                        <stop offset="45%" stop-color="#7dd3fc"/>
+                                        <stop offset="100%" stop-color="#0284c7"/>
+                                    </linearGradient>
+                                    <linearGradient id="ice-cube-glaze" x1="20" y1="4" x2="20" y2="36" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+                                        <stop offset="55%" stop-color="#bae6fd" stop-opacity="0.55"/>
+                                        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.15"/>
+                                    </linearGradient>
+                                    <clipPath id="ice-cube-clip">
+                                        <path d="M20 4 L34 12 L34 26 L20 36 L6 26 L6 12 Z"/>
+                                    </clipPath>
+                                </defs>
+                                <g class="shell-clock-iced__body">
+                                    <path d="M20 4 L34 12 L20 20 L6 12 Z" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.2" stroke-linejoin="round"/>
+                                    <path d="M6 12 L20 20 L20 36 L6 26 Z" fill="url(#ice-cube-body)" stroke="#0369a1" stroke-width="1.2" stroke-linejoin="round"/>
+                                    <path d="M20 20 L34 12 L34 26 L20 36 Z" fill="#38bdf8" stroke="#0369a1" stroke-width="1.2" stroke-linejoin="round" opacity="0.92"/>
+                                    <path d="M12 14 L18 17.5" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>
+                                </g>
+                                <g class="shell-clock-iced__icing" clip-path="url(#ice-cube-clip)">
+                                    <rect class="shell-clock-iced__glaze" x="4" y="2" width="32" height="36" fill="url(#ice-cube-glaze)"/>
+                                    <path class="shell-clock-iced__drip" d="M14 18 Q15 24 13 30" fill="none" stroke="#f0f9ff" stroke-width="1.6" stroke-linecap="round"/>
+                                    <path class="shell-clock-iced__drip shell-clock-iced__drip--delay" d="M26 16 Q27 23 25 29" fill="none" stroke="#e0f2fe" stroke-width="1.3" stroke-linecap="round"/>
+                                </g>
+                                <g class="shell-clock-iced__sparkles" fill="#ffffff">
+                                    <circle class="shell-clock-iced__sparkle" cx="11" cy="10" r="1.1"/>
+                                    <circle class="shell-clock-iced__sparkle shell-clock-iced__sparkle--delay" cx="29" cy="14" r="0.9"/>
+                                    <circle class="shell-clock-iced__sparkle shell-clock-iced__sparkle--delay-2" cx="22" cy="28" r="1"/>
+                                </g>
+                            </svg>
+                            <span class="shell-clock-iced__label">ICED</span>
+                        </span>
                     </div>
                     <div id="shift-ends" class="flex flex-col items-center text-sm text-gray-500 font-light hidden">
                         <span>Shift ends on</span>
