@@ -794,8 +794,8 @@ export const GameConfig = {
   // E8.M1: portfolio / demo presets (query-string shortcuts)
   demo: {
     presets: {
-      quickNight: 'game/index.html?speed-factor=48&scenario=events/scenarios/night-shift-default.json',
-      quickDay: 'game/index.html?speed-factor=48&scenario=events/scenarios/day-shift-medsurg.json&shift-starts=0700'
+      quickNight: 'game/index.html?speed-factor=24&scenario=events/scenarios/night-shift-default.json',
+      quickDay: 'game/index.html?speed-factor=24&scenario=events/scenarios/day-shift-medsurg.json&shift-starts=0700'
     }
   },
 
