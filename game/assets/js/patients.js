@@ -2363,12 +2363,98 @@ const PatientsModule = (() => {
         return last ? `${first}.${last}` : `${first}.`;
     };
 
+    /** Incomplete work still in play — excludes completed and fallout / too-late. */
+    function isOpenTaskForTabBadge(task, now) {
+        if (!task) return false;
+        const status = task.status;
+        if (status === GameConfig.tasks.statuses.COMPLETED) return false;
+        if (status === GameConfig.tasks.statuses.OVERDUE) return false;
+        if (taskSystem.getWindowPhase?.(task, now) === 'after') return false;
+        return status === GameConfig.tasks.statuses.NOT_YET
+            || status === GameConfig.tasks.statuses.ACTIVE;
+    }
+
+    function isGlobalTabTask(task) {
+        if (!task) return false;
+        if (!task.patientId) return true;
+        return String(task.metadata?.kind || '').toLowerCase() === 'doctor-orders-check';
+    }
+
+    function countOpenTasksForPatient(patientId, now = gameState.getStateSlice('currentTime')) {
+        if (!patientId) return 0;
+        const tasks = gameState.getStateSlice('tasks');
+        if (!tasks?.size) return 0;
+        let n = 0;
+        tasks.forEach((task) => {
+            if (task.patientId !== patientId) return;
+            if (isOpenTaskForTabBadge(task, now)) n += 1;
+        });
+        return n;
+    }
+
+    function countOpenGlobalTasks(now = gameState.getStateSlice('currentTime')) {
+        const tasks = gameState.getStateSlice('tasks');
+        if (!tasks?.size) return 0;
+        let n = 0;
+        tasks.forEach((task) => {
+            if (!isGlobalTabTask(task)) return;
+            if (isOpenTaskForTabBadge(task, now)) n += 1;
+        });
+        return n;
+    }
+
+    function tabBadgeHtml(count) {
+        const n = Math.max(0, Number(count) || 0);
+        const hidden = n <= 0 ? ' hidden' : '';
+        return `<span class="patient-tab-badge" data-tab-badge${hidden} aria-label="${n} open tasks">${n}</span>`;
+    }
+
+    /** Refresh census tab badges without rebuilding the whole tab list. */
+    function syncTabTaskBadges() {
+        const now = gameState.getStateSlice('currentTime');
+        const tabsHost = document.querySelector(GameConfig.selectors.patientTabs);
+        if (!tabsHost) return;
+
+        tabsHost.querySelectorAll('.patient-tab[data-patient-id]').forEach((btn) => {
+            const id = btn.dataset.patientId;
+            let badge = btn.querySelector('[data-tab-badge]');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'patient-tab-badge';
+                badge.setAttribute('data-tab-badge', '');
+                btn.appendChild(badge);
+            }
+            const n = countOpenTasksForPatient(id, now);
+            badge.textContent = String(n);
+            badge.setAttribute('aria-label', `${n} open task${n === 1 ? '' : 's'}`);
+            badge.hidden = n <= 0;
+            btn.classList.toggle('has-task-badge', n > 0);
+        });
+
+        const globalBtn = tabsHost.querySelector('.patient-tab--global, .patient-tab[data-tab="global"]');
+        if (globalBtn) {
+            let badge = globalBtn.querySelector('[data-tab-badge]');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'patient-tab-badge';
+                badge.setAttribute('data-tab-badge', '');
+                globalBtn.appendChild(badge);
+            }
+            const n = countOpenGlobalTasks(now);
+            badge.textContent = String(n);
+            badge.setAttribute('aria-label', `${n} open global task${n === 1 ? '' : 's'}`);
+            badge.hidden = n <= 0;
+            globalBtn.classList.toggle('has-task-badge', n > 0);
+        }
+    }
+
     const renderPatientTabs = () => {
         const tabsHost = document.querySelector(GameConfig.selectors.patientTabs);
         if (!tabsHost) return;
 
         const patients = gameState.getStateSlice('patients');
         const activeId = gameState.getStateSlice('activePatientId');
+        const now = gameState.getStateSlice('currentTime');
         tabsHost.innerHTML = '';
 
         const heading = document.createElement('div');
@@ -2399,16 +2485,20 @@ const PatientsModule = (() => {
             }
             const room = (patient.room || '').replace(/^Room\s+/i, '');
             const abbrev = abbreviatePatientName(patient.name, patient.room || room);
+            const openCount = countOpenTasksForPatient(patient.id, now);
             const admitBadge = patient.admissionPhase === 'admitting'
                 ? '<span class="patient-tab-admit">Admitting</span>'
                 : '';
-            btn.title = `${room} ${patient.name}`.trim();
-            btn.setAttribute('aria-label', `${room} ${patient.name}`.trim());
+            const taskLabel = `${openCount} open task${openCount === 1 ? '' : 's'}`;
+            btn.title = `${room} ${patient.name}${openCount ? ` · ${taskLabel}` : ''}`.trim();
+            btn.setAttribute('aria-label', `${room} ${patient.name}${openCount ? `, ${taskLabel}` : ''}`.trim());
+            if (openCount > 0) btn.classList.add('has-task-badge');
             btn.innerHTML = `
               <span class="patient-tab-room">${room}</span>
               <span class="patient-tab-name patient-tab-name--full">${patient.name}</span>
               <span class="patient-tab-name patient-tab-name--abbrev" aria-hidden="true">${abbrev}</span>
-              ${admitBadge}`;
+              ${admitBadge}
+              ${tabBadgeHtml(openCount)}`;
             if (panelMode === 'patient' && patient.id === activeId) {
                 btn.classList.add('is-active');
                 btn.setAttribute('aria-selected', 'true');
@@ -2428,9 +2518,18 @@ const PatientsModule = (() => {
         globalBtn.className = 'patient-tab patient-tab--global';
         globalBtn.dataset.tab = 'global';
         globalBtn.setAttribute('role', 'tab');
+        const globalCount = countOpenGlobalTasks(now);
+        if (globalCount > 0) globalBtn.classList.add('has-task-badge');
+        const globalTaskLabel = `${globalCount} open task${globalCount === 1 ? '' : 's'}`;
+        globalBtn.title = globalCount ? `Global · ${globalTaskLabel}` : 'Global';
+        globalBtn.setAttribute(
+            'aria-label',
+            globalCount ? `Global, ${globalTaskLabel}` : 'Global'
+        );
         globalBtn.innerHTML = `
           <span class="patient-tab-name patient-tab-name--full">Global</span>
-          <span class="patient-tab-name patient-tab-name--abbrev" aria-hidden="true">G</span>`;
+          <span class="patient-tab-name patient-tab-name--abbrev" aria-hidden="true">G</span>
+          ${tabBadgeHtml(globalCount)}`;
         if (panelMode === 'global') {
             globalBtn.classList.add('is-active');
             globalBtn.setAttribute('aria-selected', 'true');
@@ -2617,6 +2716,7 @@ const PatientsModule = (() => {
         });
         SlotSystem.refreshOccupancyMarkers?.();
         taskSystem.refreshFalloutUi?.();
+        syncTabTaskBadges();
     };
 
     // Subscribe to game state changes
