@@ -107,7 +107,7 @@ Adding a doc: place under `docs/{devs,players,learning}/` **and** list it in `do
 - Catalog: `media-placeholder-catalog.json`; inventory doc: `PLACEHOLDER_ASSETS.md`.
 - Default source is client **data-url** SVG (works on static servers); PHP under `placeholders/` when `source: 'php'`.
 - Mounts: landing departments, situation stills, critical-lab toast, busy slots (per `task.type`), in-modal challenge heroes.
-- Slot thumbs: `resolveSlotAssetId` → `slotByTaskType` (`med`→`slot-med`, …); unmapped → `slot-perform` (or `slot-perform-video` if `slotPreferVideo`).
+- Slot thumbs: `resolveSlotAssetId` → `slotByTaskKind` first (`shift-assessment` / `chart-assessment` / `turn-patient` / `chair-alarm` / `bed-alarm` / `call-light`), then `slotByTaskType` (`med`→`slot-med`, …; **not** raw `assessment`); unmapped → `slot-perform`.
 - Challenge map: `imageId`/`videoId` = **before** (during quiz); `afterImageId` = after-pass still. `revealChallengeAfterMedia(key)` runs from `showPassedAcknowledge` in `challenge-gate.js` (after last question, before Continue closes). CSS: `.challenge-media-wrap--after` / `.challenge-media-phase-label` in `app.css`.
 - Final art: set catalog/`assets.<id>.replaceWith` (e.g. `assets/media/dept-tele.webp`); agent skills `scan-placeholder-assets` / `replace-placeholder-assets`.
 - Disable: `enabled: false` or `?placeholders=0`.

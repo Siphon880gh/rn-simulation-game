@@ -20,6 +20,8 @@ class GameState {
         id: index,
         taskId: null,
         taskName: null,
+        taskType: null,
+        taskKind: null,
         startedAt: null,
         endsAt: null,
         progress: 0
@@ -66,6 +68,8 @@ class GameState {
         id: index,
         taskId: null,
         taskName: null,
+        taskType: null,
+        taskKind: null,
         startedAt: null,
         endsAt: null,
         progress: 0
@@ -421,6 +425,8 @@ class GameState {
       if (!free) return this.state;
       free.taskId = payload.taskId;
       free.taskName = payload.taskName || null;
+      free.taskType = payload.taskType || null;
+      free.taskKind = payload.taskKind || null;
       free.startedAt = payload.startedAt;
       free.endsAt = payload.endsAt;
       free.progress = 0;
@@ -457,6 +463,8 @@ class GameState {
           id: slot.id,
           taskId: null,
           taskName: null,
+          taskType: null,
+          taskKind: null,
           startedAt: null,
           endsAt: null,
           progress: 0
@@ -473,6 +481,8 @@ class GameState {
       queue.push({
         taskId: payload.taskId,
         taskName: payload.taskName || null,
+        taskType: payload.taskType || null,
+        taskKind: payload.taskKind || null,
         patientId: payload.patientId || null,
         enqueuedAt: payload.enqueuedAt ?? Date.now()
       });

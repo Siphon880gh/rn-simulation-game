@@ -40,7 +40,12 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 | `slot-perform` | image | Performing care | Busy task slot thumb (fallback) | Generic bedside-care thumb when task type has no `slotByTaskType` entry | `assets/media/slot-perform.webp` |
 | `slot-perform-video` | video | Performing care | Busy slot (optional video) | Short silent loop for fallback slot; enable via `slotPreferVideo: true` | `assets/media/slot-perform-video.mp4` |
 | `slot-med` | image | Medication | Busy slot · `med` | Med admin thumb for medication tasks in a queue slot | `assets/media/slot-med.webp` |
-| `slot-assessment` | image | Assessment | Busy slot · `assessment` | Vitals / assessment thumb | `assets/media/slot-assessment.webp` |
+| `slot-assessment` | image | Shift assessment | Busy slot · `shift-assessment` / `assessment` | Bedside vitals / stethoscope thumb | `assets/media/slot-assessment.webp` |
+| `slot-chart-assessment` | image | Chart assessment | Busy slot · `chart-assessment` | Charting at a computer workstation (distinct from shift assess) | `assets/media/slot-chart-assessment.webp` |
+| `slot-turn-patient` | image | Turn patient | Busy slot · `turn-patient` | Q2H turn / reposition thumb | `assets/media/slot-turn-patient.webp` |
+| `slot-chair-alarm` | image | Chair alarm | Busy slot · `chair-alarm` | Chair exit-alarm thumb | `assets/media/slot-chair-alarm.webp` |
+| `slot-bed-alarm` | image | Bed alarm | Busy slot · `bed-alarm` | Bed exit-alarm thumb | `assets/media/slot-bed-alarm.webp` |
+| `slot-call-light` | image | Call light | Busy slot · `call-light` | Nurse call-light thumb | `assets/media/slot-call-light.webp` |
 | `slot-iv` | image | IV check | Busy slot · `iv` | Infusion pump / drip thumb | `assets/media/slot-iv.webp` |
 | `slot-orders` | image | Orders | Busy slot · `orders` | Doctor-orders clipboard thumb | `assets/media/slot-orders.webp` |
 | `slot-criticallab` | image | Critical lab | Busy slot · `criticallab` | Critical lab call thumb | `assets/media/slot-criticallab.webp` |
@@ -67,7 +72,7 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 
 Toggle challenge heroes: `GameConfig.mediaPlaceholders.mounts.challenges`. Per-game map: `mediaPlaceholders.challenges.<key>` (`imageId`/`videoId` = **before** during quiz; `afterImageId` swaps in after the last question / challenge-level target, on the Continue screen before the modal closes).
 
-Busy-slot thumbs: `mediaPlaceholders.slotByTaskType` maps `task.type` → catalog id (`med` → `slot-med`, …). Unmapped types use `slotFallbackId` (`slot-perform`).
+Busy-slot thumbs: `mediaPlaceholders.slotByTaskKind` maps `metadata.kind` first (`chart-assessment`, `shift-assessment`, `turn-patient`, `chair-alarm`, `bed-alarm`, `call-light`, …), then `slotByTaskType` (`med` → `slot-med`, …). Type `assessment` is **not** mapped (too many non-assess tasks share it). Unmapped use `slotFallbackId` (`slot-perform`).
 
 ---
 

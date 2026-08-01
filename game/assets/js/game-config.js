@@ -287,6 +287,8 @@ export const GameConfig = {
       durationMins: 10,
       expireMins: 60,
       taskType: 'assessment',
+      /** Slot media + constraints key (not clinical assessment). */
+      taskKind: 'turn-patient',
       taskClass: 'routine',
       taskName: 'Turn / reposition (Q2H)',
       /** Align first due to shift start; then every intervalMins through the shift. */
@@ -365,12 +367,25 @@ export const GameConfig = {
     /** Catalog id when task type has no entry in slotByTaskType */
     slotFallbackId: 'slot-perform',
     /**
+     * Busy-slot thumb by task.metadata.kind (checked before slotByTaskType).
+     * Distinguishes shift-assessment vs chart-assessment (both type=assessment).
+     */
+    slotByTaskKind: {
+      'shift-assessment': 'slot-assessment',
+      'chart-assessment': 'slot-chart-assessment',
+      'turn-patient': 'slot-turn-patient',
+      'chair-alarm': 'slot-chair-alarm',
+      'bed-alarm': 'slot-bed-alarm',
+      'call-light': 'slot-call-light'
+    },
+    /**
      * Busy-slot thumb by task.type (lowercase). Unlisted types → slotFallbackId
      * (or slot-perform-video when slotPreferVideo).
+     * Note: do NOT map type=assessment here — many non-assess tasks reuse that
+     * processor key; use slotByTaskKind (shift-assessment / chart-assessment / …).
      */
     slotByTaskType: {
       med: 'slot-med',
-      assessment: 'slot-assessment',
       iv: 'slot-iv',
       orders: 'slot-orders',
       criticallab: 'slot-criticallab',
@@ -1178,6 +1193,7 @@ export const GameConfig = {
           weight: 4,
           name: 'Call light — water',
           type: 'assessment',
+          kind: 'call-light',
           taskClass: 'urgent',
           durationMins: 8,
           expire: '+40',
@@ -1189,6 +1205,7 @@ export const GameConfig = {
           weight: 2,
           name: 'Call light — bathroom assist',
           type: 'assessment',
+          kind: 'call-light',
           taskClass: 'urgent',
           durationMins: 12,
           expire: '+35',
@@ -1200,6 +1217,7 @@ export const GameConfig = {
           weight: 2,
           name: 'Call light — reposition / pillow',
           type: 'assessment',
+          kind: 'call-light',
           taskClass: 'urgent',
           durationMins: 10,
           expire: '+45',
@@ -1211,6 +1229,7 @@ export const GameConfig = {
           weight: 1,
           name: 'Call light — blanket / comfort',
           type: 'assessment',
+          kind: 'call-light',
           taskClass: 'routine',
           durationMins: 8,
           expire: '+50',
@@ -1229,6 +1248,7 @@ export const GameConfig = {
           weight: 3,
           name: 'Bed alarm — near fall',
           type: 'assessment',
+          kind: 'bed-alarm',
           taskClass: 'stat',
           durationMins: 12,
           expire: '+25',
@@ -1239,6 +1259,7 @@ export const GameConfig = {
           weight: 1,
           name: 'Chair alarm — standing attempt',
           type: 'assessment',
+          kind: 'chair-alarm',
           taskClass: 'stat',
           durationMins: 12,
           expire: '+25',

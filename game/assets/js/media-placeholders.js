@@ -389,10 +389,16 @@ export function showCriticalLabMedia(opts = {}) {
 }
 
 /**
- * Resolve busy-slot catalog id from task.type → slotByTaskType, else fallback.
+ * Resolve busy-slot catalog id:
+ * metadata.kind → slotByTaskKind, else task.type → slotByTaskType, else fallback.
  * Typed thumbs are always stills; slotPreferVideo only applies to the fallback.
  */
 export function resolveSlotAssetId(task) {
+    const kind = String(task?.kind || task?.metadata?.kind || '').toLowerCase().trim();
+    const kindMap = cfg().slotByTaskKind || {};
+    const kindId = kind && typeof kindMap[kind] === 'string' ? kindMap[kind].trim() : '';
+    if (kindId) return kindId;
+
     const type = String(task?.type || '').toLowerCase().trim();
     const map = cfg().slotByTaskType || {};
     const typedId = type && typeof map[type] === 'string' ? map[type].trim() : '';

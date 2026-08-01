@@ -88,6 +88,10 @@ export function spawnNurseAlert(channel, template, currentTime, opts = {}) {
             alertChannel: channel,
             alarm,
             templateId: template.id || null,
+            kind: template.kind
+                || (channel === 'bedAlarms'
+                    ? (template.id === 'chair-exit' ? 'chair-alarm' : 'bed-alarm')
+                    : 'call-light'),
             ...(delegateMode ? { delegateMode } : {})
         }
     });

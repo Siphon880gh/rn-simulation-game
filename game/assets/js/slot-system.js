@@ -99,10 +99,14 @@ function renderSlots(slots) {
         }
         const progress = Number(slot.progress) || 0;
         const task = gameState.getStateSlice('tasks')?.get(slot.taskId);
+        const slotType = task?.type || slot.taskType || '';
+        const slotKind = task?.metadata?.kind || slot.taskKind || '';
         const media = mediaCatalog
             ? slotMediaHtml(
                 {
-                    type: task?.type || slot.taskType,
+                    type: slotType,
+                    kind: slotKind,
+                    metadata: task?.metadata || (slotKind ? { kind: slotKind } : undefined),
                     patientId: task?.patientId || slot.patientId,
                     taskName: slot.taskName || task?.name
                 },
@@ -111,7 +115,7 @@ function renderSlots(slots) {
             : '';
         return `
           <div class="task-slot task-slot--busy" data-slot-id="${slot.id}" data-task-id="${slot.taskId}"
-            data-patient-id="${task?.patientId || ''}">
+            data-task-type="${slotType}" data-task-kind="${slotKind}" data-patient-id="${task?.patientId || ''}">
             ${media}
             <span class="task-slot-name">${slot.taskName || 'Task'}</span>
             <div class="task-slot-progress" aria-hidden="true">
@@ -294,6 +298,8 @@ const SlotSystem = {
         gameState.dispatch('ENQUEUE_SLOT_TASK', {
             taskId: task.id,
             taskName: task.name,
+            taskType: task.type || null,
+            taskKind: task.metadata?.kind || null,
             patientId: task.patientId || null
         });
         gameState.dispatch('APPEND_SHIFT_LOG', {
@@ -322,6 +328,8 @@ const SlotSystem = {
         gameState.dispatch('ASSIGN_SLOT', {
             taskId: task.id,
             taskName: task.name,
+            taskType: task.type || null,
+            taskKind: task.metadata?.kind || null,
             startedAt: now,
             endsAt
         });
@@ -342,7 +350,14 @@ const SlotSystem = {
             if (!queue.length) break;
             const next = queue[0];
             const task = gameState.getStateSlice('tasks').get(next.taskId)
-                || { id: next.taskId, name: next.taskName, duration: 10, patientId: next.patientId };
+                || {
+                    id: next.taskId,
+                    name: next.taskName,
+                    type: next.taskType,
+                    metadata: next.taskKind ? { kind: next.taskKind } : undefined,
+                    duration: 10,
+                    patientId: next.patientId
+                };
 
             // Skip if already running or completed
             if (this.findSlotForTask(next.taskId)) {

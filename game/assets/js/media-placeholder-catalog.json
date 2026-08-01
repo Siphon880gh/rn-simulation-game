@@ -95,12 +95,62 @@
     {
       "id": "slot-assessment",
       "kind": "image",
-      "title": "Assessment",
+      "title": "Shift assessment",
       "mount": "slot.busy.assessment",
       "w": 160,
       "h": 120,
-      "prompt": "Subject: tiny busy-slot thumb (~160×120) for nursing assessment — stethoscope and BP cuff / vitals kit, no faces. Caption \"Assess\".",
+      "prompt": "Subject: busy-slot ICON thumb for bedside SHIFT assessment — fill 4:3 frame edge-to-edge with extreme close-up stethoscope + BP cuff (no computer); no faces; readable at 80px. Caption \"Assess\".",
       "replaceWith": "assets/media/slot-assessment.webp"
+    },
+    {
+      "id": "slot-chart-assessment",
+      "kind": "image",
+      "title": "Chart assessment",
+      "mount": "slot.busy.chart-assessment",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: busy-slot ICON thumb for CHART assessment / documentation — fill 4:3 frame edge-to-edge with extreme close-up of a hospital computer workstation monitor showing a patient chart UI (fictional, no PHI) plus keyboard; no faces; readable at 80px. Caption \"Chart\".",
+      "replaceWith": "assets/media/slot-chart-assessment.webp"
+    },
+    {
+      "id": "slot-turn-patient",
+      "kind": "image",
+      "title": "Turn patient",
+      "mount": "slot.busy.turn-patient",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: busy-slot ICON thumb for Turn / reposition (Q2H) — fill 4:3 frame edge-to-edge with extreme close-up of gloved hands turning a patient using a pillow/wedge for pressure relief (no faces, no gore); readable at 80px. Caption \"Turn\".",
+      "replaceWith": "assets/media/slot-turn-patient.webp"
+    },
+    {
+      "id": "slot-chair-alarm",
+      "kind": "image",
+      "title": "Chair alarm",
+      "mount": "slot.busy.chair-alarm",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: busy-slot ICON thumb for Chair alarm — fill 4:3 frame edge-to-edge with extreme close-up of a hospital chair with a seat-belt / chair-alarm sensor pad and a small alert light; no faces; readable at 80px. Caption \"Chair\".",
+      "replaceWith": "assets/media/slot-chair-alarm.webp"
+    },
+    {
+      "id": "slot-bed-alarm",
+      "kind": "image",
+      "title": "Bed alarm",
+      "mount": "slot.busy.bed-alarm",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: busy-slot ICON thumb for Bed alarm / near-fall — fill 4:3 frame edge-to-edge with extreme close-up of a hospital bed exit-alarm sensor pad and flashing alert icon; no faces; readable at 80px. Caption \"Bed alm\".",
+      "replaceWith": "assets/media/slot-bed-alarm.webp"
+    },
+    {
+      "id": "slot-call-light",
+      "kind": "image",
+      "title": "Call light",
+      "mount": "slot.busy.call-light",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: busy-slot ICON thumb for Call light — fill 4:3 frame edge-to-edge with extreme close-up of a nurse-call light / handset glowing at the bedside; no faces; readable at 80px. Caption \"Call\".",
+      "replaceWith": "assets/media/slot-call-light.webp"
     },
     {
       "id": "slot-iv",

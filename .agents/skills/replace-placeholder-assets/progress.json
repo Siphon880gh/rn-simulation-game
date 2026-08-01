@@ -1,6 +1,6 @@
 {
   "status": "idle",
-  "updatedAt": "2026-08-01T05:06:19.390Z",
+  "updatedAt": "2026-08-01T05:17:46.510Z",
   "queue": [
     {
       "id": "dept-tele",
@@ -141,7 +141,7 @@
       "id": "slot-perform",
       "status": "done",
       "file": "assets/media/slot-perform.webp",
-      "higgsfieldJobId": "d2065ab7-ed43-4ec5-9fc2-2ad7627aad81"
+      "higgsfieldJobId": "9c1a0989-1a6b-455f-b7fb-ad603c225df1"
     },
     {
       "id": "slot-perform-video",
@@ -153,49 +153,80 @@
       "id": "slot-med",
       "status": "done",
       "file": "assets/media/slot-med.webp",
-      "higgsfieldJobId": "068d6e21-40e8-41e6-97fd-c7dcb91bde4d"
+      "higgsfieldJobId": "df43dabe-6eb3-4de7-8975-e94ff9e78fb1"
     },
     {
       "id": "slot-assessment",
       "status": "done",
       "file": "assets/media/slot-assessment.webp",
-      "higgsfieldJobId": "8b7c0694-dab6-46da-865e-806d6b00b438"
+      "higgsfieldJobId": "0982e595-4019-4652-87fb-dee69f5364d1",
+      "note": "regenerated full-bleed after inset/letterbox composition"
     },
     {
       "id": "slot-iv",
       "status": "done",
       "file": "assets/media/slot-iv.webp",
-      "higgsfieldJobId": "81939005-b3ce-4d20-a6a9-c961580cb33b"
+      "higgsfieldJobId": "db8a349e-b4d0-4f10-b1a9-efac3422d996"
     },
     {
       "id": "slot-orders",
       "status": "done",
       "file": "assets/media/slot-orders.webp",
-      "higgsfieldJobId": "d81c4a77-a12c-4dd9-894b-229a6ab8f68f"
+      "higgsfieldJobId": "699a5749-5848-49df-a549-df0a47907058"
     },
     {
       "id": "slot-criticallab",
       "status": "done",
       "file": "assets/media/slot-criticallab.webp",
-      "higgsfieldJobId": "1b182944-59e7-40fe-a1dc-cbaf23df7fc8"
+      "higgsfieldJobId": "b67eadf9-ce31-4a65-940e-451f6cade9fb"
     },
     {
       "id": "slot-admission",
       "status": "done",
       "file": "assets/media/slot-admission.webp",
-      "higgsfieldJobId": "10b24057-b67a-456a-ae01-5922c4975816"
+      "higgsfieldJobId": "daaa8434-494c-4681-8eda-57261d32ea2f"
     },
     {
       "id": "slot-bedprep",
       "status": "done",
       "file": "assets/media/slot-bedprep.webp",
-      "higgsfieldJobId": "3d1adba1-a13e-4ab7-9730-a382492d2415"
+      "higgsfieldJobId": "ac7eaf5c-fe3c-4464-a170-837f342113c0"
     },
     {
       "id": "slot-procedure",
       "status": "done",
       "file": "assets/media/slot-procedure.webp",
-      "higgsfieldJobId": "16dd6c82-4169-46b6-923a-e0740c9d7be0"
+      "higgsfieldJobId": "61720951-3657-4916-a24f-e13bcf0f5416"
+    },
+    {
+      "id": "slot-chart-assessment",
+      "status": "done",
+      "file": "assets/media/slot-chart-assessment.webp",
+      "higgsfieldJobId": "4940ae5c-f5fb-48d9-ae7f-a736e5d40ea7"
+    },
+    {
+      "id": "slot-turn-patient",
+      "status": "done",
+      "file": "assets/media/slot-turn-patient.webp",
+      "higgsfieldJobId": "3fb0f0ee-4f15-4f4d-b1d1-8debaa045384"
+    },
+    {
+      "id": "slot-chair-alarm",
+      "status": "done",
+      "file": "assets/media/slot-chair-alarm.webp",
+      "higgsfieldJobId": "247d8cdf-5dfa-4043-b468-b4d636b758cf"
+    },
+    {
+      "id": "slot-bed-alarm",
+      "status": "done",
+      "file": "assets/media/slot-bed-alarm.webp",
+      "higgsfieldJobId": "3e6edd89-9865-4c07-8f90-ccaccaeb0dd9"
+    },
+    {
+      "id": "slot-call-light",
+      "status": "done",
+      "file": "assets/media/slot-call-light.webp",
+      "higgsfieldJobId": "c8a7fed9-347d-4bd0-bc1f-c5f262aa5c84"
     }
   ]
 }

@@ -1547,6 +1547,7 @@ const PatientsModule = (() => {
                 durationMins: Number(cfg.durationMins) || 10,
                 status: GameConfig.tasks.statuses.NOT_YET,
                 metadata: {
+                    kind: cfg.taskKind || scheduleKey || null,
                     careSchedule: scheduleKey,
                     reason: careReason || null,
                     delegateMode: scheduleKey === 'turnQ2h' ? 'team' : undefined
