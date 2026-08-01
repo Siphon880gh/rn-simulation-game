@@ -57,6 +57,7 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 | `slot-admission` | image | Admission | `assets/media/slot-admission.webp`| Admission / wristband thumb | `assets/media/slot-admission.webp` |
 | `slot-bedprep` | image | Bed prep | `assets/media/slot-bedprep.webp`| Bed-prep linens thumb | `assets/media/slot-bedprep.webp` |
 | `slot-procedure` | image | Procedure | `assets/media/slot-procedure.webp`| Procedure tray thumb | `assets/media/slot-procedure.webp` |
+| `slot-rhythm-strip` | image | Rhythm strip | `assets/media/slot-rhythm-strip.webp` | Central / telemetry rhythm-strip analysis busy-slot thumb | `assets/media/slot-rhythm-strip.webp` |
 | `challenge-code-blue` | image | Code Blue | `assets/media/challenge-code-blue.webp`| Wide still above Code Blue questions (also uses modal situation still) | `assets/media/challenge-code-blue.webp` |
 | `challenge-code-blue-video` | video | Code Blue | `assets/media/challenge-code-blue-video.mp4`| Short silent loop preferred in-modal (`preferVideo: true`) | `assets/media/challenge-code-blue-video.mp4` |
 | `challenge-bed-prep` | image | Bed prep | `assets/media/challenge-bed-prep.webp`| Wide still above gather-items game | `assets/media/challenge-bed-prep.webp` |
@@ -77,7 +78,7 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 
 Toggle challenge heroes: `GameConfig.mediaPlaceholders.mounts.challenges`. Per-game map: `mediaPlaceholders.challenges.<key>` (`imageId`/`videoId` = **before** during quiz; `afterImageId` swaps in after the last question / challenge-level target, on the Continue screen before the modal closes).
 
-Busy-slot thumbs: `mediaPlaceholders.slotByTaskKind` maps `metadata.kind` first (`chart-assessment`, `shift-assessment`, `turn-patient`, `chair-alarm`, `bed-alarm`, `call-light`, `med-pills`, `med-shot`, `med-ivpb`, `med-iv-push`, …), then `slotByTaskType` (`med` → `slot-med`, …). Med form kinds are stamped from pack `data-route` / `data-task-kind` or inferred (`data-challenge="ivpb"`, name markers like `SQ` / `IVPB` / `IV push`). Type `assessment` is **not** mapped (too many non-assess tasks share it). Unmapped use `slotFallbackId` (`slot-perform`).
+Busy-slot thumbs: `mediaPlaceholders.slotByTaskKind` maps `metadata.kind` first (`chart-assessment`, `shift-assessment`, `turn-patient`, `chair-alarm`, `bed-alarm`, `call-light`, `rhythm-strip`, `med-pills`, `med-shot`, `med-ivpb`, `med-iv-push`, …), then `slotByTaskType` (`med` → `slot-med`, …). Med form kinds are stamped from pack `data-route` / `data-task-kind` or inferred (`data-challenge="ivpb"`, name markers like `SQ` / `IVPB` / `IV push`). Rhythm-strip thumbs infer from `metadata.skillId=ecg-basics` or name markers (`rhythm strip`). Type `assessment` is **not** mapped (too many non-assess tasks share it). Unmapped use `slotFallbackId` (`slot-perform`).
 
 ---
 

@@ -451,6 +451,24 @@ export function inferMedSlotKind(task) {
 }
 
 /**
+ * Infer rhythm-strip busy-slot kind (central monitor or telemetry).
+ * Honors skillId ecg-basics, else name markers.
+ */
+export function inferRhythmStripSlotKind(task) {
+    const skillId = String(task?.metadata?.skillId || task?.skillId || '').toLowerCase().trim();
+    if (skillId === 'ecg-basics') return 'rhythm-strip';
+    const challenge = String(task?.metadata?.challenge || '').toLowerCase().trim();
+    const name = String(task?.name || '');
+    if (
+        (challenge === 'skill-mcq' && /rhythm\s*strip|ecg|telemetry\s*alarm|monitor\s*alarm/i.test(name))
+        || /rhythm\s*strip/i.test(name)
+    ) {
+        return 'rhythm-strip';
+    }
+    return '';
+}
+
+/**
  * Resolve busy-slot catalog id:
  * metadata.kind → slotByTaskKind, else inferred med form kind, else task.type →
  * slotByTaskType, else fallback.
@@ -462,6 +480,10 @@ export function resolveSlotAssetId(task) {
     if (!kind || (String(task?.type || '').toLowerCase() === 'med' && !kind.startsWith('med-'))) {
         const inferred = inferMedSlotKind(task);
         if (inferred) kind = inferred;
+    }
+    if (!kind) {
+        const rhythmKind = inferRhythmStripSlotKind(task);
+        if (rhythmKind) kind = rhythmKind;
     }
     const kindId = kind && typeof kindMap[kind] === 'string' ? kindMap[kind].trim() : '';
     if (kindId) return kindId;

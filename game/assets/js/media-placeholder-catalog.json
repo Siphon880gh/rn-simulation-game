@@ -243,6 +243,16 @@
       "replaceWith": "assets/media/slot-procedure.webp"
     },
     {
+      "id": "slot-rhythm-strip",
+      "kind": "image",
+      "title": "Rhythm strip",
+      "mount": "slot.busy.rhythm-strip",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: busy-slot ICON thumb for Rhythm strip analysis (works for central monitor bank OR telemetry station) — photorealistic clinical product photo, fill entire 4:3 frame edge-to-edge (NO letterbox, NO black bars, NO UI chrome panels). Extreme close-up of a freshly printed ECG rhythm strip unrolling from a strip printer next to a glowing green single-lead waveform on a compact telemetry/central monitor bezel; fictional bed label OK; bright hospital lighting. Absolutely no faces, no gore, no multi-panel dashboard collage, no glitch/pixel art. Subtle caption \"Rhythm\" at bottom.",
+      "replaceWith": "assets/media/slot-rhythm-strip.webp"
+    },
+    {
       "id": "challenge-code-blue",
       "kind": "image",
       "title": "Code Blue",

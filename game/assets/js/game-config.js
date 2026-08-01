@@ -558,6 +558,8 @@ export const GameConfig = {
       'chair-alarm': 'slot-chair-alarm',
       'bed-alarm': 'slot-bed-alarm',
       'call-light': 'slot-call-light',
+      /** Central / telemetry rhythm-strip identify (skillId ecg-basics) */
+      'rhythm-strip': 'slot-rhythm-strip',
       /** Medication form thumbs (type=med); see also data-route on pack HTML */
       'med-pills': 'slot-med',
       'med-shot': 'slot-med-shot',
