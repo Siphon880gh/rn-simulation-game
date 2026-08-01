@@ -70,10 +70,13 @@ assert(isAtOrAfterInShift(100, 100), '0100 at due');
 const aisha = readFileSync(join(root, 'game/events/patients/aisha.html'), 'utf8');
 const joe = readFileSync(join(root, 'game/events/patients/joe.html'), 'utf8');
 const maria = readFileSync(join(root, 'game/events/patients/maria.html'), 'utf8');
+const lyle = readFileSync(join(root, 'game/events/patients/lyle.html'), 'utf8');
 assert(aisha.includes('data-iv-panel') && aisha.includes('Insulin drip (regular)'), 'aisha IV + insulin clarity');
 assert(aisha.includes('data-challenge="iv-check"'), 'aisha insulin rate check task');
 assert(joe.includes('heparin-ptt') && joe.includes('data-iv-next-ptt="0100"'), 'joe heparin PTT');
-assert(maria.includes('levophed') && maria.includes('neosynephrine'), 'maria pressors');
+assert(!maria.includes('levophed') && !maria.includes('neosynephrine'), 'maria med-surg — no pressors');
+assert(lyle.includes('levophed') && lyle.includes('neosynephrine'), 'lyle ICU pressors');
+assert(GameConfig.iv.titrationIncidents.every((i) => i.patientId === 'lyle'), 'pressor titration on ICU lyle');
 assert(joe.includes('data-iv-kind="fluid"') && joe.includes('data-iv-kind="ivpb"'), 'joe fluid+ivpb');
 
 if (failures.length) {

@@ -108,8 +108,8 @@ resetCensusState();
 gameState.dispatch('SET_SCENARIO_PACK', { pack: icuPack });
 gameState.dispatch('REGISTER_PATIENT', {
   patient: {
-    id: 'maria',
-    name: 'Maria Santos',
+    id: 'lyle',
+    name: 'Lyle Okonkwo',
     clinicalStatus: 'watch',
     status: 'active'
   }
@@ -156,8 +156,8 @@ resetCensusState();
 gameState.dispatch('SET_SCENARIO_PACK', { pack: icuPack });
 gameState.dispatch('REGISTER_PATIENT', {
   patient: {
-    id: 'maria',
-    name: 'Maria Santos',
+    id: 'lyle',
+    name: 'Lyle Okonkwo',
     clinicalStatus: 'watch',
     status: 'active'
   }

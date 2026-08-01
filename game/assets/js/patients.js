@@ -42,7 +42,7 @@ const PatientsModule = (() => {
             diagnosis: 'Community-acquired pneumonia',
             /** Bedbound / too weak to turn independently */
             careSchedules: ['turnQ2h'],
-            careReason: 'Bedbound; profound weakness on pressors — cannot self-turn',
+            careReason: 'Bedbound; profound weakness from CAP — cannot self-turn',
             vitals: {
                 hr: 94,
                 bp: '118/72',

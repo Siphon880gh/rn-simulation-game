@@ -91,7 +91,7 @@ if (isAideAvailable(a0, a1.availableFrom) && a0.thirdIndex !== a1.thirdIndex) {
 
 const icu = buildDelegationState({
     pack: { department: 'icu' },
-    patientIds: ['maria', 'robert'],
+    patientIds: ['lyle', 'robert'],
     shiftStart: 1900,
     shiftMins: 720,
     random: seqRandom([0.1, 0.9, 0.2, 0.8, 0.3, 0.7, 0.4, 0.6, 0.15, 0.85, 0.25, 0.75])

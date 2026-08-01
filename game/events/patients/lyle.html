@@ -39,17 +39,13 @@
     </div>
     <div class="space-y-2 mb-4">
         <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
-            <i class="fas fa-tint text-xl mr-1 text-blue-700"></i>
+            <i class="fas fa-syringe text-xl mr-1 text-teal-600"></i>
             IV / drips
         </h4>
-        <ul class="iv-list space-y-3 hidden">
-            <li data-task-type="iv" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="8" data-iv-drug="norepinephrine" data-iv-rate="12" data-iv-unit="mcg/min" class="bg-white p-4 rounded-lg shadow flex items-center">
-                <data class="slot-label" value="1"></data>
-                <i class="fas fa-tint text-blue-500 text-xl mr-3"></i>
-                <span class="font-medium text-gray-900">Levophed (norepinephrine) running drip</span>
-                <span class="ml-2 text-sm text-gray-500">Rate: 12 mcg/min</span>
-                <span class="ml-auto text-sm text-gray-500">1900</span>
-            </li>
+        <ul class="iv-list space-y-3 hidden" data-iv-panel>
+            <li data-iv-line data-iv-id="lyle-ns" data-iv-kind="fluid" data-iv-name="0.9% NS" data-iv-rate="125" data-iv-unit="mL/hr" data-iv-status="running"></li>
+            <li data-iv-line data-iv-id="lyle-levophed" data-iv-kind="drip" data-iv-drug="levophed" data-iv-name="Levophed (norepinephrine)" data-iv-rate="12" data-iv-unit="mcg/min" data-iv-status="running" data-iv-started="1700"></li>
+            <li data-iv-line data-iv-id="lyle-neo" data-iv-kind="drip" data-iv-drug="neosynephrine" data-iv-name="Neo-Synephrine (phenylephrine)" data-iv-rate="40" data-iv-unit="mcg/min" data-iv-status="held"></li>
         </ul>
     </div>
     <div class="space-y-2 mb-4" data-panel="past-hx">

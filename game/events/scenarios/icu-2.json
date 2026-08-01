@@ -10,9 +10,9 @@
     "Protect high-risk windows when both patients can deteriorate",
     "Practice Code Blue / escalate cues under compressed census"
   ],
-  "patients": ["maria", "robert"],
+  "patients": ["lyle", "robert"],
   "patientOverrides": {
-    "maria": {
+    "lyle": {
       "clinicalStatus": "watch",
       "acuityScore": 2
     },
@@ -60,10 +60,10 @@
       "message": "Increasing work of breathing — escalate assessment",
       "injectTasks": [
         {
-          "id": "evt-icu-maria-resp",
+          "id": "evt-icu-lyle-resp",
           "type": "assessment",
           "name": "Respiratory escalate assessment",
-          "patientId": "maria",
+          "patientId": "lyle",
           "scheduled": 2000,
           "expire": "+30",
           "durationMins": 15,

@@ -1174,18 +1174,18 @@ export const GameConfig = {
     /** Timed BP / drip incidents (shift HHMM) — spawn titration tasks */
     titrationIncidents: [
       {
-        id: 'bp-drop-maria-levophed',
+        id: 'bp-drop-lyle-levophed',
         at: 2030,
-        patientId: 'maria',
+        patientId: 'lyle',
         drug: 'levophed',
         brand: 'norepinephrine',
         sbp: 78,
         direction: 'increase'
       },
       {
-        id: 'bp-rise-maria-levophed',
+        id: 'bp-rise-lyle-levophed',
         at: 2300,
-        patientId: 'maria',
+        patientId: 'lyle',
         drug: 'levophed',
         brand: 'norepinephrine',
         sbp: 162,
