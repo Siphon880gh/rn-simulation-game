@@ -1,252 +1,411 @@
 {
   "status": "idle",
-  "updatedAt": "2026-08-01T05:17:46.510Z",
+  "updatedAt": "2026-08-01T05:53:49.547Z",
+  "note": "HQ regen: nano_banana_pro (+ref) for images; kling3_0 (+start_image) for videos. Skipped dept-* landing tiles.",
+  "models": {
+    "image": "nano_banana_pro",
+    "video": "kling3_0",
+    "resolution": "2k"
+  },
   "queue": [
     {
       "id": "dept-tele",
       "status": "done",
-      "file": "game/assets/media/dept-tele.webp"
+      "file": "game/assets/media/dept-tele.webp",
+      "note": "skipped — front-page department select (user request)"
     },
     {
       "id": "dept-medsurg",
       "status": "done",
-      "file": "game/assets/media/dept-medsurg.webp"
+      "file": "game/assets/media/dept-medsurg.webp",
+      "note": "skipped — front-page department select (user request)"
     },
     {
       "id": "dept-icu",
       "status": "done",
-      "file": "game/assets/media/dept-icu.webp"
-    },
-    {
-      "id": "situation-code-blue",
-      "status": "done",
-      "file": "assets/media/situation-code-blue.webp",
-      "higgsfieldJobId": "c0231e10-94bd-423b-9909-b08a0896cdb7"
-    },
-    {
-      "id": "challenge-code-blue",
-      "status": "done",
-      "file": "assets/media/challenge-code-blue.webp",
-      "higgsfieldJobId": "5ddf0d22-063f-4eaa-96a2-8ae0a3d705da"
+      "file": "game/assets/media/dept-icu.webp",
+      "note": "skipped — front-page department select (user request)"
     },
     {
       "id": "challenge-code-blue-video",
       "status": "done",
       "file": "assets/media/challenge-code-blue-video.mp4",
-      "higgsfieldJobId": "e43bdd98-2441-43ca-a543-bfd0b084440d"
+      "kind": "video",
+      "priorFile": "assets/media/challenge-code-blue-video.mp4",
+      "higgsfieldJobId": "2f24725e-62b2-4974-bfbd-15c22d58b676",
+      "model": "kling3_0",
+      "note": "HQ regen with start_image ref"
     },
     {
-      "id": "situation-critical-lab",
+      "id": "challenge-code-blue",
       "status": "done",
-      "file": "assets/media/situation-critical-lab.webp",
-      "higgsfieldJobId": "63a69122-bb7f-46de-95f8-76221b41da19"
+      "file": "assets/media/challenge-code-blue.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-code-blue.webp",
+      "higgsfieldJobId": "9f353b43-ce8a-490e-b6d0-2152de4becf7",
+      "model": "nano_banana_pro",
+      "note": "HQ regen with job-id ref"
     },
     {
-      "id": "situation-bed-prep",
+      "id": "situation-code-blue",
       "status": "done",
-      "file": "assets/media/situation-bed-prep.webp",
-      "higgsfieldJobId": "3f913823-bfd5-464b-8798-8d22ad236003"
-    },
-    {
-      "id": "challenge-bed-prep",
-      "status": "done",
-      "file": "assets/media/challenge-bed-prep.webp",
-      "higgsfieldJobId": "1a203747-6a18-4885-bba4-9e72108e65f9"
-    },
-    {
-      "id": "challenge-med-identity",
-      "status": "done",
-      "file": "assets/media/challenge-med-identity.webp",
-      "higgsfieldJobId": "6c9ce323-94d3-44ac-b0f6-efdaaa1e6d12"
-    },
-    {
-      "id": "challenge-ivpb-hang",
-      "status": "done",
-      "file": "assets/media/challenge-ivpb-hang.webp",
-      "higgsfieldJobId": "2162b2e6-8591-4be3-b17c-fb28ddcc644b"
-    },
-    {
-      "id": "challenge-accucheck",
-      "status": "done",
-      "file": "assets/media/challenge-accucheck.webp",
-      "higgsfieldJobId": "ae32e5f5-fcc3-4625-8db0-7062924880ca"
-    },
-    {
-      "id": "challenge-admission",
-      "status": "done",
-      "file": "assets/media/challenge-admission.webp",
-      "higgsfieldJobId": "ed14cf5d-0ed6-4171-bf6d-84db389b9fe9"
-    },
-    {
-      "id": "challenge-icp",
-      "status": "done",
-      "file": "assets/media/challenge-icp.webp",
-      "higgsfieldJobId": "12c11eca-ef72-4577-ba9b-ce98392eeba2"
-    },
-    {
-      "id": "challenge-iv-check",
-      "status": "done",
-      "file": "assets/media/challenge-iv-check.webp",
-      "higgsfieldJobId": "148447ad-8264-4753-9e42-123864645ca7"
+      "file": "assets/media/situation-code-blue.webp",
+      "kind": "image",
+      "priorFile": "assets/media/situation-code-blue.webp",
+      "higgsfieldJobId": "69f019d7-e6ee-44aa-9df7-8800ab8a5e2b",
+      "model": "nano_banana_pro",
+      "note": "HQ regen with job-id ref"
     },
     {
       "id": "challenge-code-blue-after",
       "status": "done",
       "file": "assets/media/challenge-code-blue-after.webp",
-      "higgsfieldJobId": "03703e2f-bc1f-446a-8003-422aea1a393b"
-    },
-    {
-      "id": "challenge-bed-prep-after",
-      "status": "done",
-      "file": "assets/media/challenge-bed-prep-after.webp",
-      "higgsfieldJobId": "339e45c8-8901-4068-be25-d1f042749a34"
-    },
-    {
-      "id": "challenge-med-identity-after",
-      "status": "done",
-      "file": "assets/media/challenge-med-identity-after.webp",
-      "higgsfieldJobId": "20d95b14-8c80-45d0-9f96-b098dce8ff2a"
-    },
-    {
-      "id": "challenge-ivpb-hang-after",
-      "status": "done",
-      "file": "assets/media/challenge-ivpb-hang-after.webp",
-      "higgsfieldJobId": "5e10a823-b1e6-40c2-bad4-83acb5542f4a"
-    },
-    {
-      "id": "challenge-iv-check-after",
-      "status": "done",
-      "file": "assets/media/challenge-iv-check-after.webp",
-      "higgsfieldJobId": "bbc92d9d-2179-479e-879e-936bbe731514"
-    },
-    {
-      "id": "challenge-accucheck-after",
-      "status": "done",
-      "file": "assets/media/challenge-accucheck-after.webp",
-      "higgsfieldJobId": "48c6eeb4-901a-4781-91c9-a5fcabb89d6d"
-    },
-    {
-      "id": "challenge-admission-after",
-      "status": "done",
-      "file": "assets/media/challenge-admission-after.webp",
-      "higgsfieldJobId": "248e0bee-9865-4388-813c-03f722f983f2"
-    },
-    {
-      "id": "challenge-icp-after",
-      "status": "done",
-      "file": "assets/media/challenge-icp-after.webp",
-      "higgsfieldJobId": "387941b0-6634-47ce-83dc-827f65a65fe8"
-    },
-    {
-      "id": "slot-perform",
-      "status": "done",
-      "file": "assets/media/slot-perform.webp",
-      "higgsfieldJobId": "9c1a0989-1a6b-455f-b7fb-ad603c225df1"
+      "kind": "image",
+      "priorFile": "assets/media/challenge-code-blue-after.webp",
+      "higgsfieldJobId": "9e327b50-1cc0-4f54-883a-f7de6ccb1f46",
+      "model": "nano_banana_pro",
+      "note": "HQ regen with job-id ref"
     },
     {
       "id": "slot-perform-video",
       "status": "done",
       "file": "assets/media/slot-perform-video.mp4",
-      "higgsfieldJobId": "0e8444a0-f60c-496a-8976-c850fca42df9"
+      "kind": "video",
+      "priorFile": "assets/media/slot-perform-video.mp4",
+      "higgsfieldJobId": "f8e13965-52cf-4e81-a7d8-820d65f21bf7",
+      "model": "kling3_0",
+      "note": "HQ regen"
+    },
+    {
+      "id": "situation-critical-lab",
+      "status": "done",
+      "file": "assets/media/situation-critical-lab.webp",
+      "kind": "image",
+      "priorFile": "assets/media/situation-critical-lab.webp",
+      "higgsfieldJobId": "e2761bf6-e1d7-42b6-98be-b9aa2b63cced",
+      "model": "nano_banana_pro",
+      "note": "HQ regen 2k+ref"
+    },
+    {
+      "id": "situation-bed-prep",
+      "status": "done",
+      "file": "assets/media/situation-bed-prep.webp",
+      "kind": "image",
+      "priorFile": "assets/media/situation-bed-prep.webp",
+      "higgsfieldJobId": "d3272b41-0c71-4f92-8a13-4d9d823b4fdf",
+      "model": "nano_banana_pro",
+      "note": "HQ regen 2k+ref"
+    },
+    {
+      "id": "slot-perform",
+      "status": "done",
+      "file": "assets/media/slot-perform.webp",
+      "kind": "image",
+      "priorFile": "assets/media/slot-perform.webp",
+      "higgsfieldJobId": "f89c9686-98bd-43d0-9ad6-f5fcc307e6b3",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
     },
     {
       "id": "slot-med",
       "status": "done",
       "file": "assets/media/slot-med.webp",
-      "higgsfieldJobId": "2b904719-29a5-4589-acd9-e0fc845839c3",
-      "note": "pills/capsules icon thumb"
+      "kind": "image",
+      "priorFile": "assets/media/slot-med.webp",
+      "higgsfieldJobId": "50b1ed4d-3327-4ff7-b831-2eb4cd8cfa9e",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
     },
     {
       "id": "slot-med-shot",
       "status": "done",
       "file": "assets/media/slot-med-shot.webp",
-      "higgsfieldJobId": "b1785907-6997-4925-9765-812507a09d51"
+      "kind": "image",
+      "priorFile": "assets/media/slot-med-shot.webp",
+      "higgsfieldJobId": "b065b30b-e96f-4687-9ef1-2343b3592c50",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
     },
     {
       "id": "slot-med-ivpb",
       "status": "done",
       "file": "assets/media/slot-med-ivpb.webp",
-      "higgsfieldJobId": "3249df0f-b7cd-4774-a118-06e669b3b191",
-      "note": "cropped left panel from triptych to single bag"
+      "kind": "image",
+      "priorFile": "assets/media/slot-med-ivpb.webp",
+      "higgsfieldJobId": "34c91c25-f95a-4f65-83eb-08d31adf5627",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
     },
     {
       "id": "slot-med-iv-push",
       "status": "done",
       "file": "assets/media/slot-med-iv-push.webp",
-      "higgsfieldJobId": "006e936d-1e2f-41cc-99db-2bff3f8d2ef0"
+      "kind": "image",
+      "priorFile": "assets/media/slot-med-iv-push.webp",
+      "higgsfieldJobId": "82c6cd1f-52a4-449c-835b-4c4ee1664d7d",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
     },
     {
       "id": "slot-assessment",
       "status": "done",
       "file": "assets/media/slot-assessment.webp",
-      "higgsfieldJobId": "0982e595-4019-4652-87fb-dee69f5364d1",
-      "note": "regenerated full-bleed after inset/letterbox composition"
-    },
-    {
-      "id": "slot-iv",
-      "status": "done",
-      "file": "assets/media/slot-iv.webp",
-      "higgsfieldJobId": "db8a349e-b4d0-4f10-b1a9-efac3422d996"
-    },
-    {
-      "id": "slot-orders",
-      "status": "done",
-      "file": "assets/media/slot-orders.webp",
-      "higgsfieldJobId": "699a5749-5848-49df-a549-df0a47907058"
-    },
-    {
-      "id": "slot-criticallab",
-      "status": "done",
-      "file": "assets/media/slot-criticallab.webp",
-      "higgsfieldJobId": "b67eadf9-ce31-4a65-940e-451f6cade9fb"
-    },
-    {
-      "id": "slot-admission",
-      "status": "done",
-      "file": "assets/media/slot-admission.webp",
-      "higgsfieldJobId": "daaa8434-494c-4681-8eda-57261d32ea2f"
-    },
-    {
-      "id": "slot-bedprep",
-      "status": "done",
-      "file": "assets/media/slot-bedprep.webp",
-      "higgsfieldJobId": "ac7eaf5c-fe3c-4464-a170-837f342113c0"
-    },
-    {
-      "id": "slot-procedure",
-      "status": "done",
-      "file": "assets/media/slot-procedure.webp",
-      "higgsfieldJobId": "61720951-3657-4916-a24f-e13bcf0f5416"
+      "kind": "image",
+      "priorFile": "assets/media/slot-assessment.webp",
+      "higgsfieldJobId": "47595093-3049-4d6e-a894-d6855646433c",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
     },
     {
       "id": "slot-chart-assessment",
       "status": "done",
       "file": "assets/media/slot-chart-assessment.webp",
-      "higgsfieldJobId": "4940ae5c-f5fb-48d9-ae7f-a736e5d40ea7"
+      "kind": "image",
+      "priorFile": "assets/media/slot-chart-assessment.webp",
+      "higgsfieldJobId": "7c029eab-5298-4146-a548-1084578564b5",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
     },
     {
       "id": "slot-turn-patient",
       "status": "done",
       "file": "assets/media/slot-turn-patient.webp",
-      "higgsfieldJobId": "3fb0f0ee-4f15-4f4d-b1d1-8debaa045384"
+      "kind": "image",
+      "priorFile": "assets/media/slot-turn-patient.webp",
+      "higgsfieldJobId": "dca8c294-8119-4f1e-989a-b6ef67422efa",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
     },
     {
       "id": "slot-chair-alarm",
       "status": "done",
       "file": "assets/media/slot-chair-alarm.webp",
-      "higgsfieldJobId": "247d8cdf-5dfa-4043-b468-b4d636b758cf"
+      "kind": "image",
+      "priorFile": "assets/media/slot-chair-alarm.webp",
+      "higgsfieldJobId": "0e8b6b9f-b8b2-4cb8-8a98-a3c797ed3994",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
     },
     {
       "id": "slot-bed-alarm",
       "status": "done",
       "file": "assets/media/slot-bed-alarm.webp",
-      "higgsfieldJobId": "3e6edd89-9865-4c07-8f90-ccaccaeb0dd9"
+      "kind": "image",
+      "priorFile": "assets/media/slot-bed-alarm.webp",
+      "higgsfieldJobId": "5d61dc65-6dfc-4eac-9bab-b9824559b2ec",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
     },
     {
       "id": "slot-call-light",
       "status": "done",
       "file": "assets/media/slot-call-light.webp",
-      "higgsfieldJobId": "c8a7fed9-347d-4bd0-bc1f-c5f262aa5c84"
+      "kind": "image",
+      "priorFile": "assets/media/slot-call-light.webp",
+      "higgsfieldJobId": "d7bf04a5-c11c-4111-bf12-48d6d38e64db",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "slot-iv",
+      "status": "done",
+      "file": "assets/media/slot-iv.webp",
+      "kind": "image",
+      "priorFile": "assets/media/slot-iv.webp",
+      "higgsfieldJobId": "562e907d-e3c0-4fa8-947b-79cb0a48648a",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "slot-orders",
+      "status": "done",
+      "file": "assets/media/slot-orders.webp",
+      "kind": "image",
+      "priorFile": "assets/media/slot-orders.webp",
+      "higgsfieldJobId": "ed9dcc88-22d6-4dd4-b063-cd6efa251c08",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "slot-criticallab",
+      "status": "done",
+      "file": "assets/media/slot-criticallab.webp",
+      "kind": "image",
+      "priorFile": "assets/media/slot-criticallab.webp",
+      "higgsfieldJobId": "314e5f7a-33dd-473d-80c4-d128662e1d49",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "slot-admission",
+      "status": "done",
+      "file": "assets/media/slot-admission.webp",
+      "kind": "image",
+      "priorFile": "assets/media/slot-admission.webp",
+      "higgsfieldJobId": "6c49a0e5-0bfd-47ab-8027-6bc3317b95d5",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "slot-bedprep",
+      "status": "done",
+      "file": "assets/media/slot-bedprep.webp",
+      "kind": "image",
+      "priorFile": "assets/media/slot-bedprep.webp",
+      "higgsfieldJobId": "831144d9-849c-42a1-8fd7-2ec5136ae247",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "slot-procedure",
+      "status": "done",
+      "file": "assets/media/slot-procedure.webp",
+      "kind": "image",
+      "priorFile": "assets/media/slot-procedure.webp",
+      "higgsfieldJobId": "8053ccd6-4d29-47a8-acc9-fcc9e9148b3d",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "challenge-bed-prep",
+      "status": "done",
+      "file": "assets/media/challenge-bed-prep.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-bed-prep.webp",
+      "higgsfieldJobId": "1832ec1d-2c28-40ec-9ec3-85dd020b31a3",
+      "model": "nano_banana_pro",
+      "note": "HQ regen 2k+ref"
+    },
+    {
+      "id": "challenge-med-identity",
+      "status": "done",
+      "file": "assets/media/challenge-med-identity.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-med-identity.webp",
+      "higgsfieldJobId": "6b5277c9-8c88-4b7d-945f-d89c15f30989",
+      "model": "nano_banana_pro",
+      "note": "HQ regen 2k+ref"
+    },
+    {
+      "id": "challenge-ivpb-hang",
+      "status": "done",
+      "file": "assets/media/challenge-ivpb-hang.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-ivpb-hang.webp",
+      "higgsfieldJobId": "f9d9f067-36b7-4ebb-bd28-d7292a29a03f",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "challenge-accucheck",
+      "status": "done",
+      "file": "assets/media/challenge-accucheck.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-accucheck.webp",
+      "higgsfieldJobId": "807bb06f-6398-4b5b-903f-4e2ed81084ce",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "challenge-admission",
+      "status": "done",
+      "file": "assets/media/challenge-admission.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-admission.webp",
+      "higgsfieldJobId": "03a11daf-a41f-49ff-8552-5ddd060d5fdc",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "challenge-icp",
+      "status": "done",
+      "file": "assets/media/challenge-icp.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-icp.webp",
+      "higgsfieldJobId": "2dbfa68e-eacd-4b6a-a92d-efcb431243d5",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "challenge-iv-check",
+      "status": "done",
+      "file": "assets/media/challenge-iv-check.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-iv-check.webp",
+      "higgsfieldJobId": "13efaddd-8f96-48b6-bc3e-44a4ecb5760e",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "challenge-bed-prep-after",
+      "status": "done",
+      "file": "assets/media/challenge-bed-prep-after.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-bed-prep-after.webp",
+      "higgsfieldJobId": "c587c509-451d-4778-82e8-930a01a600f5",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "challenge-med-identity-after",
+      "status": "done",
+      "file": "assets/media/challenge-med-identity-after.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-med-identity-after.webp",
+      "higgsfieldJobId": "cdd3e518-711c-41af-8085-40e40b252c2a",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "challenge-ivpb-hang-after",
+      "status": "done",
+      "file": "assets/media/challenge-ivpb-hang-after.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-ivpb-hang-after.webp",
+      "higgsfieldJobId": "0500b44a-5c95-4b67-a903-c06bb37dbd86",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "challenge-iv-check-after",
+      "status": "done",
+      "file": "assets/media/challenge-iv-check-after.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-iv-check-after.webp",
+      "higgsfieldJobId": "64da3e99-b51a-48e7-a5a2-cd41880186e4",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "challenge-accucheck-after",
+      "status": "done",
+      "file": "assets/media/challenge-accucheck-after.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-accucheck-after.webp",
+      "higgsfieldJobId": "49b0126f-80ca-4c87-aa86-2de94e518ded",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "challenge-admission-after",
+      "status": "done",
+      "file": "assets/media/challenge-admission-after.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-admission-after.webp",
+      "higgsfieldJobId": "26c2d99c-4739-4767-8827-52a89de1108e",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
+    },
+    {
+      "id": "challenge-icp-after",
+      "status": "done",
+      "file": "assets/media/challenge-icp-after.webp",
+      "kind": "image",
+      "priorFile": "assets/media/challenge-icp-after.webp",
+      "higgsfieldJobId": "f9779ef8-fc81-4cbd-8d5b-d4d7e8f36f8e",
+      "model": "nano_banana_pro",
+      "note": "HQ regen"
     }
-  ]
+  ],
+  "activeJobs": {}
 }
