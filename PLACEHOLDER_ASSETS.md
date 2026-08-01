@@ -25,6 +25,8 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 
 **Generate via Higgsfield MCP:** [`AGENTS_LOOP-Higgsfield-Fill-Placeholders.md`](AGENTS_LOOP-Higgsfield-Fill-Placeholders.md) — reads `data-media-kind` + `data-asset-prompt` (or catalog equivalent), generates, downloads to `game/assets/media/`, sets `replaceWith`
 
+**Model log (image/video tiers used per pass):** [`PLACEHOLDER_MEDIA_MODELS.md`](PLACEHOLDER_MEDIA_MODELS.md)
+
 ---
 
 ## Inventory
@@ -34,44 +36,44 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 | `dept-tele` | image | Telemetry unit | Landing Tele tile | Tele nursing station / central monitor bank for the assignment picker | `game/assets/media/dept-tele.webp` |
 | `dept-medsurg` | image | Med-Surg unit | Landing Med-Surg tile | Floor hallway / nurses station + med cart mood | `game/assets/media/dept-medsurg.webp` |
 | `dept-icu` | image | ICU unit | Landing ICU tile | ICU bay with vents/pumps, higher acuity | `game/assets/media/dept-icu.webp` |
-| `situation-code-blue` | image | Code Blue | Code Blue challenge modal still | Crash cart / defibrillator emergency backdrop | `assets/media/situation-code-blue.webp` |
-| `situation-critical-lab` | image | Critical lab | Critical-lab spawn toast + still key | Lab call urgency at the nurses station | `assets/media/situation-critical-lab.webp` |
-| `situation-bed-prep` | image | Bed prep | Bed-prep challenge modal still | Empty bed being made / wall O2-suction | `assets/media/situation-bed-prep.webp` |
-| `slot-perform` | image | Performing care | Busy task slot thumb (fallback) | Generic bedside-care thumb when task type has no `slotByTaskType` entry | `assets/media/slot-perform.webp` |
-| `slot-perform-video` | video | Performing care | Busy slot (optional video) | Short silent loop for fallback slot; enable via `slotPreferVideo: true` | `assets/media/slot-perform-video.mp4` |
-| `slot-med` | image | Pills / capsules | Busy slot · `med-pills` / `med` | Oral pills/capsules thumb (also type=`med` fallback) | `assets/media/slot-med.webp` |
-| `slot-med-shot` | image | Injection / shot | Busy slot · `med-shot` | SQ/IM syringe shot thumb | `assets/media/slot-med-shot.webp` |
-| `slot-med-ivpb` | image | IVPB | Busy slot · `med-ivpb` | Secondary IV piggyback bag thumb | `assets/media/slot-med-ivpb.webp` |
-| `slot-med-iv-push` | image | IV push | Busy slot · `med-iv-push` | IV push syringe-into-line thumb | `assets/media/slot-med-iv-push.webp` |
-| `slot-assessment` | image | Shift assessment | Busy slot · `shift-assessment` / `assessment` | Bedside vitals / stethoscope thumb | `assets/media/slot-assessment.webp` |
-| `slot-chart-assessment` | image | Chart assessment | Busy slot · `chart-assessment` | Charting at a computer workstation (distinct from shift assess) | `assets/media/slot-chart-assessment.webp` |
-| `slot-turn-patient` | image | Turn patient | Busy slot · `turn-patient` | Q2H turn / reposition thumb | `assets/media/slot-turn-patient.webp` |
-| `slot-chair-alarm` | image | Chair alarm | Busy slot · `chair-alarm` | Chair exit-alarm thumb | `assets/media/slot-chair-alarm.webp` |
-| `slot-bed-alarm` | image | Bed alarm | Busy slot · `bed-alarm` | Bed exit-alarm thumb | `assets/media/slot-bed-alarm.webp` |
-| `slot-call-light` | image | Call light | Busy slot · `call-light` | Nurse call-light thumb | `assets/media/slot-call-light.webp` |
-| `slot-iv` | image | IV check | Busy slot · `iv` | Infusion pump / drip thumb | `assets/media/slot-iv.webp` |
-| `slot-orders` | image | Orders | Busy slot · `orders` | Doctor-orders clipboard thumb | `assets/media/slot-orders.webp` |
-| `slot-criticallab` | image | Critical lab | Busy slot · `criticallab` | Critical lab call thumb | `assets/media/slot-criticallab.webp` |
-| `slot-admission` | image | Admission | Busy slot · `admission` | Admission / wristband thumb | `assets/media/slot-admission.webp` |
-| `slot-bedprep` | image | Bed prep | Busy slot · `bedprep` | Bed-prep linens thumb | `assets/media/slot-bedprep.webp` |
-| `slot-procedure` | image | Procedure | Busy slot · `procedure` | Procedure tray thumb | `assets/media/slot-procedure.webp` |
-| `challenge-code-blue` | image | Code Blue | Code Blue quiz modal hero | Wide still above Code Blue questions (also uses modal situation still) | `assets/media/challenge-code-blue.webp` |
-| `challenge-code-blue-video` | video | Code Blue | Code Blue quiz modal hero (default) | Short silent loop preferred in-modal (`preferVideo: true`) | `assets/media/challenge-code-blue-video.mp4` |
-| `challenge-bed-prep` | image | Bed prep | Bed-prep mini-game modal | Wide still above gather-items game | `assets/media/challenge-bed-prep.webp` |
-| `challenge-med-identity` | image | Med identity | Med identity quiz modal | Med cart / vial still above brand↔generic quiz | `assets/media/challenge-med-identity.webp` |
-| `challenge-ivpb-hang` | image | IVPB hang | IVPB hang sequence modal | Secondary bag / pump still | `assets/media/challenge-ivpb-hang.webp` |
-| `challenge-accucheck` | image | Accucheck | Accucheck quiz modal | Glucometer / sliding-scale still | `assets/media/challenge-accucheck.webp` |
-| `challenge-admission` | image | Admission | Admission quiz modal | Clipboard / wristband still | `assets/media/challenge-admission.webp` |
-| `challenge-icp` | image | ICP | ICP quiz modal | ICP waveform / EVD still | `assets/media/challenge-icp.webp` |
-| `challenge-iv-check` | image | IV check | IV check / titration / heparin-PTT modal | IV site + infusion pump still (**before**) | `assets/media/challenge-iv-check.webp` |
-| `challenge-code-blue-after` | image | Code Blue — resolved | Code Blue modal after pass | Calm/stable bedside after successful response | `assets/media/challenge-code-blue-after.webp` |
-| `challenge-bed-prep-after` | image | Bed prep — ready | Bed-prep modal after pass | Made bed ready for admission | `assets/media/challenge-bed-prep-after.webp` |
-| `challenge-med-identity-after` | image | Med identity — verified | Med identity after pass | Verified med package | `assets/media/challenge-med-identity-after.webp` |
-| `challenge-ivpb-hang-after` | image | IVPB hang — running | IVPB hang after pass | Secondary bag running | `assets/media/challenge-ivpb-hang-after.webp` |
-| `challenge-iv-check-after` | image | IV check — confirmed | IV check after pass | Confirmed pump rate | `assets/media/challenge-iv-check-after.webp` |
-| `challenge-accucheck-after` | image | Accucheck — logged | Accucheck after pass | Result logged | `assets/media/challenge-accucheck-after.webp` |
-| `challenge-admission-after` | image | Admission — complete | Admission after pass | Checklist complete | `assets/media/challenge-admission-after.webp` |
-| `challenge-icp-after` | image | ICP — monitored | ICP after pass | Controlled ICP waveform | `assets/media/challenge-icp-after.webp` |
+| `situation-code-blue` | image | Code Blue | `assets/media/situation-code-blue.webp`| Crash cart / defibrillator emergency backdrop | `assets/media/situation-code-blue.webp` |
+| `situation-critical-lab` | image | Critical lab | `assets/media/situation-critical-lab.webp`| Lab call urgency at the nurses station | `assets/media/situation-critical-lab.webp` |
+| `situation-bed-prep` | image | Bed prep | `assets/media/situation-bed-prep.webp`| Empty bed being made / wall O2-suction | `assets/media/situation-bed-prep.webp` |
+| `slot-perform` | image | Performing care | `assets/media/slot-perform.webp`| Generic bedside-care thumb when task type has no `slotByTaskType` entry | `assets/media/slot-perform.webp` |
+| `slot-perform-video` | video | Performing care | `assets/media/slot-perform-video.mp4`| Short silent loop for fallback slot; enable via `slotPreferVideo: true` | `assets/media/slot-perform-video.mp4` |
+| `slot-med` | image | Pills / capsules | `assets/media/slot-med.webp`| Oral pills/capsules thumb (also type=`med` fallback) | `assets/media/slot-med.webp` |
+| `slot-med-shot` | image | Injection / shot | `assets/media/slot-med-shot.webp`| SQ/IM syringe shot thumb | `assets/media/slot-med-shot.webp` |
+| `slot-med-ivpb` | image | IVPB | `assets/media/slot-med-ivpb.webp`| Secondary IV piggyback bag thumb | `assets/media/slot-med-ivpb.webp` |
+| `slot-med-iv-push` | image | IV push | `assets/media/slot-med-iv-push.webp`| IV push syringe-into-line thumb | `assets/media/slot-med-iv-push.webp` |
+| `slot-assessment` | image | Shift assessment | `assets/media/slot-assessment.webp`| Bedside vitals / stethoscope thumb | `assets/media/slot-assessment.webp` |
+| `slot-chart-assessment` | image | Chart assessment | `assets/media/slot-chart-assessment.webp`| Charting at a computer workstation (distinct from shift assess) | `assets/media/slot-chart-assessment.webp` |
+| `slot-turn-patient` | image | Turn patient | `assets/media/slot-turn-patient.webp`| Q2H turn / reposition thumb | `assets/media/slot-turn-patient.webp` |
+| `slot-chair-alarm` | image | Chair alarm | `assets/media/slot-chair-alarm.webp`| Chair exit-alarm thumb | `assets/media/slot-chair-alarm.webp` |
+| `slot-bed-alarm` | image | Bed alarm | `assets/media/slot-bed-alarm.webp`| Bed exit-alarm thumb | `assets/media/slot-bed-alarm.webp` |
+| `slot-call-light` | image | Call light | `assets/media/slot-call-light.webp`| Nurse call-light thumb | `assets/media/slot-call-light.webp` |
+| `slot-iv` | image | IV check | `assets/media/slot-iv.webp`| Infusion pump / drip thumb | `assets/media/slot-iv.webp` |
+| `slot-orders` | image | Orders | `assets/media/slot-orders.webp`| Doctor-orders clipboard thumb | `assets/media/slot-orders.webp` |
+| `slot-criticallab` | image | Critical lab | `assets/media/slot-criticallab.webp`| Critical lab call thumb | `assets/media/slot-criticallab.webp` |
+| `slot-admission` | image | Admission | `assets/media/slot-admission.webp`| Admission / wristband thumb | `assets/media/slot-admission.webp` |
+| `slot-bedprep` | image | Bed prep | `assets/media/slot-bedprep.webp`| Bed-prep linens thumb | `assets/media/slot-bedprep.webp` |
+| `slot-procedure` | image | Procedure | `assets/media/slot-procedure.webp`| Procedure tray thumb | `assets/media/slot-procedure.webp` |
+| `challenge-code-blue` | image | Code Blue | `assets/media/challenge-code-blue.webp`| Wide still above Code Blue questions (also uses modal situation still) | `assets/media/challenge-code-blue.webp` |
+| `challenge-code-blue-video` | video | Code Blue | `assets/media/challenge-code-blue-video.mp4`| Short silent loop preferred in-modal (`preferVideo: true`) | `assets/media/challenge-code-blue-video.mp4` |
+| `challenge-bed-prep` | image | Bed prep | `assets/media/challenge-bed-prep.webp`| Wide still above gather-items game | `assets/media/challenge-bed-prep.webp` |
+| `challenge-med-identity` | image | Med identity | `assets/media/challenge-med-identity.webp`| Med cart / vial still above brand↔generic quiz | `assets/media/challenge-med-identity.webp` |
+| `challenge-ivpb-hang` | image | IVPB hang | `assets/media/challenge-ivpb-hang.webp`| Secondary bag / pump still | `assets/media/challenge-ivpb-hang.webp` |
+| `challenge-accucheck` | image | Accucheck | `assets/media/challenge-accucheck.webp`| Glucometer / sliding-scale still | `assets/media/challenge-accucheck.webp` |
+| `challenge-admission` | image | Admission | `assets/media/challenge-admission.webp`| Clipboard / wristband still | `assets/media/challenge-admission.webp` |
+| `challenge-icp` | image | ICP | `assets/media/challenge-icp.webp`| ICP waveform / EVD still | `assets/media/challenge-icp.webp` |
+| `challenge-iv-check` | image | IV check | `assets/media/challenge-iv-check.webp`| IV site + infusion pump still (**before**) | `assets/media/challenge-iv-check.webp` |
+| `challenge-code-blue-after` | image | Code Blue — resolved | `assets/media/challenge-code-blue-after.webp`| Calm/stable bedside after successful response | `assets/media/challenge-code-blue-after.webp` |
+| `challenge-bed-prep-after` | image | Bed prep — ready | `assets/media/challenge-bed-prep-after.webp`| Made bed ready for admission | `assets/media/challenge-bed-prep-after.webp` |
+| `challenge-med-identity-after` | image | Med identity — verified | `assets/media/challenge-med-identity-after.webp`| Verified med package | `assets/media/challenge-med-identity-after.webp` |
+| `challenge-ivpb-hang-after` | image | IVPB hang — running | `assets/media/challenge-ivpb-hang-after.webp`| Secondary bag running | `assets/media/challenge-ivpb-hang-after.webp` |
+| `challenge-iv-check-after` | image | IV check — confirmed | `assets/media/challenge-iv-check-after.webp`| Confirmed pump rate | `assets/media/challenge-iv-check-after.webp` |
+| `challenge-accucheck-after` | image | Accucheck — logged | `assets/media/challenge-accucheck-after.webp`| Result logged | `assets/media/challenge-accucheck-after.webp` |
+| `challenge-admission-after` | image | Admission — complete | `assets/media/challenge-admission-after.webp`| Checklist complete | `assets/media/challenge-admission-after.webp` |
+| `challenge-icp-after` | image | ICP — monitored | `assets/media/challenge-icp-after.webp`| Controlled ICP waveform | `assets/media/challenge-icp-after.webp` |
 
 Toggle challenge heroes: `GameConfig.mediaPlaceholders.mounts.challenges`. Per-game map: `mediaPlaceholders.challenges.<key>` (`imageId`/`videoId` = **before** during quiz; `afterImageId` swaps in after the last question / challenge-level target, on the Continue screen before the modal closes).
 

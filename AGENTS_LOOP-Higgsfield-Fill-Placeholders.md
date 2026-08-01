@@ -5,6 +5,7 @@ One tick = generate **one** pending placeholder via **Higgsfield MCP** (`user-hi
 Companion (manual/file drop, no generation): [`AGENTS_LOOP-Replace-Placeholder-Assets.md`](AGENTS_LOOP-Replace-Placeholder-Assets.md)  
 Skill (path conventions + verify): [`.agents/skills/replace-placeholder-assets/SKILL.md`](.agents/skills/replace-placeholder-assets/SKILL.md)  
 Inventory: [`PLACEHOLDER_ASSETS.md`](PLACEHOLDER_ASSETS.md)  
+Model log: [`PLACEHOLDER_MEDIA_MODELS.md`](PLACEHOLDER_MEDIA_MODELS.md)  
 Catalog: [`game/assets/js/media-placeholder-catalog.json`](game/assets/js/media-placeholder-catalog.json)  
 Progress queue: [`.agents/skills/replace-placeholder-assets/progress.json`](.agents/skills/replace-placeholder-assets/progress.json)
 

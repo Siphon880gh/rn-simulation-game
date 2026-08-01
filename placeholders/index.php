@@ -76,6 +76,16 @@ else:
         echo '<div class="meta"><strong>' . ph_escape($id) . '</strong> · '
             . ph_escape((string) ($asset['kind'] ?? 'image')) . ' · '
             . ph_escape((string) ($asset['mount'] ?? '')) . '</div>';
+        $replace = $asset['replaceWith'] ?? null;
+        // Catalog paths are relative to landing (`game/assets/...`) or in-game
+        // (`assets/media/...` → game/assets/media). Rewrite for this demo URL.
+        if (is_string($replace) && $replace !== '') {
+            if (strpos($replace, 'assets/media/') === 0) {
+                $replace = '../game/' . $replace;
+            } elseif (strpos($replace, 'game/') === 0) {
+                $replace = '../' . $replace;
+            }
+        }
         echo ph_media_tag([
             'id' => $id,
             'kind' => (string) ($asset['kind'] ?? 'image'),
@@ -83,8 +93,8 @@ else:
             'prompt' => (string) ($asset['prompt'] ?? ''),
             'w' => (int) ($asset['w'] ?? 480),
             'h' => (int) ($asset['h'] ?? 270),
-            'replaceWith' => $asset['replaceWith'] ?? null,
-            'base' => '/placeholders',
+            'replaceWith' => $replace,
+            'base' => '.',
             'class' => 'media-ph',
         ]);
         echo '<p class="meta">Prompt (also on <code>data-asset-prompt</code>):</p>';

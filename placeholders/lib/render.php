@@ -6,6 +6,13 @@
 
 declare(strict_types=1);
 
+if (!function_exists('str_contains')) {
+    function str_contains(string $haystack, string $needle): bool
+    {
+        return $needle === '' || strpos($haystack, $needle) !== false;
+    }
+}
+
 function ph_query_string(string $key, string $default = ''): string
 {
     if (!isset($_GET[$key])) {

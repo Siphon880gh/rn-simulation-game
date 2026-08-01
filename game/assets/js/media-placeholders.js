@@ -639,16 +639,25 @@ function resolveChallengeBeforeAsset(key, catalog) {
     const preferVideo = spec.preferVideo === true;
     let asset = null;
     if (preferVideo && spec.videoId) {
-        asset = getAssetById(spec.videoId, catalog)
-            || syntheticAsset(spec.videoId, 'video', key);
+        asset = getAssetById(spec.videoId, catalog);
     }
     if (!asset && spec.imageId) {
-        asset = getAssetById(spec.imageId, catalog)
-            || syntheticAsset(spec.imageId, 'image', key);
+        asset = getAssetById(spec.imageId, catalog);
     }
     if (!asset && spec.videoId) {
-        asset = getAssetById(spec.videoId, catalog)
-            || syntheticAsset(spec.videoId, 'video', key);
+        asset = getAssetById(spec.videoId, catalog);
+    }
+    // Only synthesize a titled SVG when the catalog truly has no row — never
+    // invent a replaceWith:null stub while the catalog is still loading (that
+    // baked data:image/svg+xml into challenge modals even after art existed).
+    if (!asset && catalog?.assets?.length) {
+        if (preferVideo && spec.videoId) {
+            asset = syntheticAsset(spec.videoId, 'video', key);
+        } else if (spec.imageId) {
+            asset = syntheticAsset(spec.imageId, 'image', key);
+        } else if (spec.videoId) {
+            asset = syntheticAsset(spec.videoId, 'video', key);
+        }
     }
     if (
         preferVideo
@@ -714,7 +723,10 @@ export function revealChallengeAfterMedia(challengeKey) {
 
     const catalog = catalogCache;
     const asset = getAssetById(afterId, catalog)
-        || syntheticAsset(afterId, 'image', `${key} after`);
+        || (catalog?.assets?.length
+            ? syntheticAsset(afterId, 'image', `${key} after`)
+            : null);
+    if (!asset) return false;
     const tag = buildMediaTagHtml(asset, {
         className: `challenge-media media-ph challenge-media--${key} challenge-media--after`
     });
@@ -797,3 +809,9 @@ const MediaPlaceholdersModule = {
 
 export { bootGameMounts };
 export default MediaPlaceholdersModule;
+
+// Block importers (challenge modals, slots) until replaceWith rows are available
+// so heroes never paint titled SVG stubs while the catalog fetch is in flight.
+if (typeof fetch === 'function') {
+    await loadCatalog();
+}

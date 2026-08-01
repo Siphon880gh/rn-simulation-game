@@ -17,10 +17,16 @@ import {
 } from './slot-constraints.js';
 import { slotMediaHtml, loadCatalog, wireMediaPreviewClicks } from './media-placeholders.js';
 
-/** Populated async; renderSlots uses cache when ready. */
+/** Populated from media-placeholders (module awaits catalog before export). */
 let mediaCatalog = null;
 loadCatalog().then((c) => {
     mediaCatalog = c;
+    // Re-paint any busy slots that rendered before the catalog resolved.
+    try {
+        renderSlots(gameState.getStateSlice('slots') || []);
+    } catch {
+        /* renderSlots may not be initialized yet on first tick */
+    }
 }).catch(() => {
     mediaCatalog = { assets: [] };
 });

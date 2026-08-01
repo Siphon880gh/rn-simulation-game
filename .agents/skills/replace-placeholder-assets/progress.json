@@ -1,30 +1,71 @@
 {
-  "status": "idle",
-  "updatedAt": "2026-08-01T05:53:49.547Z",
-  "note": "HQ regen: nano_banana_pro (+ref) for images; kling3_0 (+start_image) for videos. Skipped dept-* landing tiles.",
+  "status": "done",
+  "updatedAt": "2026-08-01T06:38:08.938Z",
+  "note": "Quality pass 2 complete: gpt_image_2 quality=high resolution=2k (+ref); seedance_2_0 (+start_image). Skipped dept-*.",
   "models": {
-    "image": "nano_banana_pro",
-    "video": "kling3_0",
-    "resolution": "2k"
+    "image": "gpt_image_2",
+    "imageQuality": "high",
+    "imageResolution": "2k",
+    "video": "seedance_2_0"
+  },
+  "priorJobs": {
+    "challenge-code-blue-video": "2f24725e-62b2-4974-bfbd-15c22d58b676",
+    "challenge-code-blue": "9f353b43-ce8a-490e-b6d0-2152de4becf7",
+    "situation-code-blue": "69f019d7-e6ee-44aa-9df7-8800ab8a5e2b",
+    "challenge-code-blue-after": "9e327b50-1cc0-4f54-883a-f7de6ccb1f46",
+    "slot-perform-video": "f8e13965-52cf-4e81-a7d8-820d65f21bf7",
+    "situation-critical-lab": "e2761bf6-e1d7-42b6-98be-b9aa2b63cced",
+    "situation-bed-prep": "d3272b41-0c71-4f92-8a13-4d9d823b4fdf",
+    "slot-perform": "f89c9686-98bd-43d0-9ad6-f5fcc307e6b3",
+    "slot-med": "50b1ed4d-3327-4ff7-b831-2eb4cd8cfa9e",
+    "slot-med-shot": "b065b30b-e96f-4687-9ef1-2343b3592c50",
+    "slot-med-ivpb": "34c91c25-f95a-4f65-83eb-08d31adf5627",
+    "slot-med-iv-push": "82c6cd1f-52a4-449c-835b-4c4ee1664d7d",
+    "slot-assessment": "47595093-3049-4d6e-a894-d6855646433c",
+    "slot-chart-assessment": "7c029eab-5298-4146-a548-1084578564b5",
+    "slot-turn-patient": "dca8c294-8119-4f1e-989a-b6ef67422efa",
+    "slot-chair-alarm": "0e8b6b9f-b8b2-4cb8-8a98-a3c797ed3994",
+    "slot-bed-alarm": "5d61dc65-6dfc-4eac-9bab-b9824559b2ec",
+    "slot-call-light": "d7bf04a5-c11c-4111-bf12-48d6d38e64db",
+    "slot-iv": "562e907d-e3c0-4fa8-947b-79cb0a48648a",
+    "slot-orders": "ed9dcc88-22d6-4dd4-b063-cd6efa251c08",
+    "slot-criticallab": "314e5f7a-33dd-473d-80c4-d128662e1d49",
+    "slot-admission": "6c49a0e5-0bfd-47ab-8027-6bc3317b95d5",
+    "slot-bedprep": "831144d9-849c-42a1-8fd7-2ec5136ae247",
+    "slot-procedure": "8053ccd6-4d29-47a8-acc9-fcc9e9148b3d",
+    "challenge-bed-prep": "1832ec1d-2c28-40ec-9ec3-85dd020b31a3",
+    "challenge-med-identity": "6b5277c9-8c88-4b7d-945f-d89c15f30989",
+    "challenge-ivpb-hang": "f9d9f067-36b7-4ebb-bd28-d7292a29a03f",
+    "challenge-accucheck": "807bb06f-6398-4b5b-903f-4e2ed81084ce",
+    "challenge-admission": "03a11daf-a41f-49ff-8552-5ddd060d5fdc",
+    "challenge-icp": "2dbfa68e-eacd-4b6a-a92d-efcb431243d5",
+    "challenge-iv-check": "13efaddd-8f96-48b6-bc3e-44a4ecb5760e",
+    "challenge-bed-prep-after": "c587c509-451d-4778-82e8-930a01a600f5",
+    "challenge-med-identity-after": "cdd3e518-711c-41af-8085-40e40b252c2a",
+    "challenge-ivpb-hang-after": "0500b44a-5c95-4b67-a903-c06bb37dbd86",
+    "challenge-iv-check-after": "64da3e99-b51a-48e7-a5a2-cd41880186e4",
+    "challenge-accucheck-after": "49b0126f-80ca-4c87-aa86-2de94e518ded",
+    "challenge-admission-after": "26c2d99c-4739-4767-8827-52a89de1108e",
+    "challenge-icp-after": "f9779ef8-fc81-4cbd-8d5b-d4d7e8f36f8e"
   },
   "queue": [
     {
       "id": "dept-tele",
       "status": "done",
       "file": "game/assets/media/dept-tele.webp",
-      "note": "skipped — front-page department select (user request)"
+      "note": "skipped — department select"
     },
     {
       "id": "dept-medsurg",
       "status": "done",
       "file": "game/assets/media/dept-medsurg.webp",
-      "note": "skipped — front-page department select (user request)"
+      "note": "skipped — department select"
     },
     {
       "id": "dept-icu",
       "status": "done",
       "file": "game/assets/media/dept-icu.webp",
-      "note": "skipped — front-page department select (user request)"
+      "note": "skipped — department select"
     },
     {
       "id": "challenge-code-blue-video",
@@ -32,9 +73,9 @@
       "file": "assets/media/challenge-code-blue-video.mp4",
       "kind": "video",
       "priorFile": "assets/media/challenge-code-blue-video.mp4",
-      "higgsfieldJobId": "2f24725e-62b2-4974-bfbd-15c22d58b676",
-      "model": "kling3_0",
-      "note": "HQ regen with start_image ref"
+      "priorJob": "2f24725e-62b2-4974-bfbd-15c22d58b676",
+      "higgsfieldJobId": "0cd76f0c-fad6-43e9-bddc-d82d104a1675",
+      "model": "seedance_2_0"
     },
     {
       "id": "challenge-code-blue",
@@ -42,9 +83,9 @@
       "file": "assets/media/challenge-code-blue.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-code-blue.webp",
-      "higgsfieldJobId": "9f353b43-ce8a-490e-b6d0-2152de4becf7",
-      "model": "nano_banana_pro",
-      "note": "HQ regen with job-id ref"
+      "priorJob": "9f353b43-ce8a-490e-b6d0-2152de4becf7",
+      "higgsfieldJobId": "7beedf4e-e303-4ebb-b452-47fc66662141",
+      "model": "gpt_image_2"
     },
     {
       "id": "situation-code-blue",
@@ -52,9 +93,9 @@
       "file": "assets/media/situation-code-blue.webp",
       "kind": "image",
       "priorFile": "assets/media/situation-code-blue.webp",
-      "higgsfieldJobId": "69f019d7-e6ee-44aa-9df7-8800ab8a5e2b",
-      "model": "nano_banana_pro",
-      "note": "HQ regen with job-id ref"
+      "priorJob": "69f019d7-e6ee-44aa-9df7-8800ab8a5e2b",
+      "higgsfieldJobId": "89493b5f-d88f-4d93-983b-a9030c191eaf",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-code-blue-after",
@@ -62,9 +103,9 @@
       "file": "assets/media/challenge-code-blue-after.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-code-blue-after.webp",
-      "higgsfieldJobId": "9e327b50-1cc0-4f54-883a-f7de6ccb1f46",
-      "model": "nano_banana_pro",
-      "note": "HQ regen with job-id ref"
+      "priorJob": "9e327b50-1cc0-4f54-883a-f7de6ccb1f46",
+      "higgsfieldJobId": "9946230e-c350-41c1-ad51-9e3098c3f4aa",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-perform-video",
@@ -72,9 +113,9 @@
       "file": "assets/media/slot-perform-video.mp4",
       "kind": "video",
       "priorFile": "assets/media/slot-perform-video.mp4",
-      "higgsfieldJobId": "f8e13965-52cf-4e81-a7d8-820d65f21bf7",
-      "model": "kling3_0",
-      "note": "HQ regen"
+      "priorJob": "f8e13965-52cf-4e81-a7d8-820d65f21bf7",
+      "higgsfieldJobId": "89ba4c25-67ea-428d-8e69-395df908bc20",
+      "model": "seedance_2_0"
     },
     {
       "id": "situation-critical-lab",
@@ -82,9 +123,9 @@
       "file": "assets/media/situation-critical-lab.webp",
       "kind": "image",
       "priorFile": "assets/media/situation-critical-lab.webp",
-      "higgsfieldJobId": "e2761bf6-e1d7-42b6-98be-b9aa2b63cced",
-      "model": "nano_banana_pro",
-      "note": "HQ regen 2k+ref"
+      "priorJob": "e2761bf6-e1d7-42b6-98be-b9aa2b63cced",
+      "higgsfieldJobId": "73c6668c-d848-4616-ae0f-85b700311b72",
+      "model": "gpt_image_2"
     },
     {
       "id": "situation-bed-prep",
@@ -92,9 +133,9 @@
       "file": "assets/media/situation-bed-prep.webp",
       "kind": "image",
       "priorFile": "assets/media/situation-bed-prep.webp",
-      "higgsfieldJobId": "d3272b41-0c71-4f92-8a13-4d9d823b4fdf",
-      "model": "nano_banana_pro",
-      "note": "HQ regen 2k+ref"
+      "priorJob": "d3272b41-0c71-4f92-8a13-4d9d823b4fdf",
+      "higgsfieldJobId": "e5b4911d-27ba-41ef-ab2f-ac25d2561fee",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-perform",
@@ -102,9 +143,9 @@
       "file": "assets/media/slot-perform.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-perform.webp",
-      "higgsfieldJobId": "f89c9686-98bd-43d0-9ad6-f5fcc307e6b3",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "f89c9686-98bd-43d0-9ad6-f5fcc307e6b3",
+      "higgsfieldJobId": "d3f4c447-4e19-4090-ad5c-57010210bddc",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-med",
@@ -112,9 +153,9 @@
       "file": "assets/media/slot-med.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-med.webp",
-      "higgsfieldJobId": "50b1ed4d-3327-4ff7-b831-2eb4cd8cfa9e",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "50b1ed4d-3327-4ff7-b831-2eb4cd8cfa9e",
+      "higgsfieldJobId": "ce9c7f81-1d76-4778-a5a3-9496605db8aa",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-med-shot",
@@ -122,9 +163,9 @@
       "file": "assets/media/slot-med-shot.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-med-shot.webp",
-      "higgsfieldJobId": "b065b30b-e96f-4687-9ef1-2343b3592c50",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "b065b30b-e96f-4687-9ef1-2343b3592c50",
+      "higgsfieldJobId": "900d43a6-518d-465c-a55d-2c79586f8dd3",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-med-ivpb",
@@ -132,9 +173,9 @@
       "file": "assets/media/slot-med-ivpb.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-med-ivpb.webp",
-      "higgsfieldJobId": "34c91c25-f95a-4f65-83eb-08d31adf5627",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "34c91c25-f95a-4f65-83eb-08d31adf5627",
+      "higgsfieldJobId": "019b0d54-1b05-4128-9b14-512290fa5f0c",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-med-iv-push",
@@ -142,9 +183,9 @@
       "file": "assets/media/slot-med-iv-push.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-med-iv-push.webp",
-      "higgsfieldJobId": "82c6cd1f-52a4-449c-835b-4c4ee1664d7d",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "82c6cd1f-52a4-449c-835b-4c4ee1664d7d",
+      "higgsfieldJobId": "debebeef-5f32-4a50-a2a8-694e680a279e",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-assessment",
@@ -152,9 +193,9 @@
       "file": "assets/media/slot-assessment.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-assessment.webp",
-      "higgsfieldJobId": "47595093-3049-4d6e-a894-d6855646433c",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "47595093-3049-4d6e-a894-d6855646433c",
+      "higgsfieldJobId": "36ff3803-86f5-4920-b3ae-5ce512545fb8",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-chart-assessment",
@@ -162,9 +203,9 @@
       "file": "assets/media/slot-chart-assessment.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-chart-assessment.webp",
-      "higgsfieldJobId": "7c029eab-5298-4146-a548-1084578564b5",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "7c029eab-5298-4146-a548-1084578564b5",
+      "higgsfieldJobId": "19262bb2-ae07-4b9a-82a0-5197afd19efe",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-turn-patient",
@@ -172,9 +213,9 @@
       "file": "assets/media/slot-turn-patient.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-turn-patient.webp",
-      "higgsfieldJobId": "dca8c294-8119-4f1e-989a-b6ef67422efa",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "dca8c294-8119-4f1e-989a-b6ef67422efa",
+      "higgsfieldJobId": "17f522b4-ff0a-44c8-97bc-bbd8b4eb915f",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-chair-alarm",
@@ -182,9 +223,9 @@
       "file": "assets/media/slot-chair-alarm.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-chair-alarm.webp",
-      "higgsfieldJobId": "0e8b6b9f-b8b2-4cb8-8a98-a3c797ed3994",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "0e8b6b9f-b8b2-4cb8-8a98-a3c797ed3994",
+      "higgsfieldJobId": "534bedbc-4e88-4693-b805-69cacacbaf13",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-bed-alarm",
@@ -192,9 +233,9 @@
       "file": "assets/media/slot-bed-alarm.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-bed-alarm.webp",
-      "higgsfieldJobId": "5d61dc65-6dfc-4eac-9bab-b9824559b2ec",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "5d61dc65-6dfc-4eac-9bab-b9824559b2ec",
+      "higgsfieldJobId": "b7d13926-f71e-4121-9165-968cbe379af9",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-call-light",
@@ -202,9 +243,9 @@
       "file": "assets/media/slot-call-light.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-call-light.webp",
-      "higgsfieldJobId": "d7bf04a5-c11c-4111-bf12-48d6d38e64db",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "d7bf04a5-c11c-4111-bf12-48d6d38e64db",
+      "higgsfieldJobId": "3232d4a1-4183-4ca6-bc32-e5990806c62d",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-iv",
@@ -212,9 +253,9 @@
       "file": "assets/media/slot-iv.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-iv.webp",
-      "higgsfieldJobId": "562e907d-e3c0-4fa8-947b-79cb0a48648a",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "562e907d-e3c0-4fa8-947b-79cb0a48648a",
+      "higgsfieldJobId": "36e3011a-15fa-4a23-98f7-2f5db536ec62",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-orders",
@@ -222,9 +263,9 @@
       "file": "assets/media/slot-orders.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-orders.webp",
-      "higgsfieldJobId": "ed9dcc88-22d6-4dd4-b063-cd6efa251c08",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "ed9dcc88-22d6-4dd4-b063-cd6efa251c08",
+      "higgsfieldJobId": "1df37bda-98c5-4309-8af3-e0c1de90d14a",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-criticallab",
@@ -232,9 +273,9 @@
       "file": "assets/media/slot-criticallab.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-criticallab.webp",
-      "higgsfieldJobId": "314e5f7a-33dd-473d-80c4-d128662e1d49",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "314e5f7a-33dd-473d-80c4-d128662e1d49",
+      "higgsfieldJobId": "ddb1ed9c-3000-4f06-969b-b0e8544392f0",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-admission",
@@ -242,9 +283,9 @@
       "file": "assets/media/slot-admission.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-admission.webp",
-      "higgsfieldJobId": "6c49a0e5-0bfd-47ab-8027-6bc3317b95d5",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "6c49a0e5-0bfd-47ab-8027-6bc3317b95d5",
+      "higgsfieldJobId": "58b8ca05-aed4-4971-9868-1b071b3e9226",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-bedprep",
@@ -252,9 +293,9 @@
       "file": "assets/media/slot-bedprep.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-bedprep.webp",
-      "higgsfieldJobId": "831144d9-849c-42a1-8fd7-2ec5136ae247",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "831144d9-849c-42a1-8fd7-2ec5136ae247",
+      "higgsfieldJobId": "2eb1e4a6-4480-4e13-88bb-189ee3d6e91d",
+      "model": "gpt_image_2"
     },
     {
       "id": "slot-procedure",
@@ -262,9 +303,9 @@
       "file": "assets/media/slot-procedure.webp",
       "kind": "image",
       "priorFile": "assets/media/slot-procedure.webp",
-      "higgsfieldJobId": "8053ccd6-4d29-47a8-acc9-fcc9e9148b3d",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "8053ccd6-4d29-47a8-acc9-fcc9e9148b3d",
+      "higgsfieldJobId": "fd2730d7-0452-498b-8f0e-64b7898b4ec9",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-bed-prep",
@@ -272,9 +313,9 @@
       "file": "assets/media/challenge-bed-prep.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-bed-prep.webp",
-      "higgsfieldJobId": "1832ec1d-2c28-40ec-9ec3-85dd020b31a3",
-      "model": "nano_banana_pro",
-      "note": "HQ regen 2k+ref"
+      "priorJob": "1832ec1d-2c28-40ec-9ec3-85dd020b31a3",
+      "higgsfieldJobId": "b2abff2d-8ddc-493b-aa09-2c0f11b283f4",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-med-identity",
@@ -282,9 +323,9 @@
       "file": "assets/media/challenge-med-identity.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-med-identity.webp",
-      "higgsfieldJobId": "6b5277c9-8c88-4b7d-945f-d89c15f30989",
-      "model": "nano_banana_pro",
-      "note": "HQ regen 2k+ref"
+      "priorJob": "6b5277c9-8c88-4b7d-945f-d89c15f30989",
+      "higgsfieldJobId": "541a26c8-0d4c-4915-81da-545417d32c5d",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-ivpb-hang",
@@ -292,9 +333,9 @@
       "file": "assets/media/challenge-ivpb-hang.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-ivpb-hang.webp",
-      "higgsfieldJobId": "f9d9f067-36b7-4ebb-bd28-d7292a29a03f",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "f9d9f067-36b7-4ebb-bd28-d7292a29a03f",
+      "higgsfieldJobId": "2be10640-d9c1-403a-a2ef-5e287a6fc95c",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-accucheck",
@@ -302,9 +343,9 @@
       "file": "assets/media/challenge-accucheck.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-accucheck.webp",
-      "higgsfieldJobId": "807bb06f-6398-4b5b-903f-4e2ed81084ce",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "807bb06f-6398-4b5b-903f-4e2ed81084ce",
+      "higgsfieldJobId": "8b5dee70-d5c6-4a59-ab0f-3b6e6d2e47d0",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-admission",
@@ -312,9 +353,9 @@
       "file": "assets/media/challenge-admission.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-admission.webp",
-      "higgsfieldJobId": "03a11daf-a41f-49ff-8552-5ddd060d5fdc",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "03a11daf-a41f-49ff-8552-5ddd060d5fdc",
+      "higgsfieldJobId": "ab683f1b-e680-4642-9414-3b7ba8188d6a",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-icp",
@@ -322,9 +363,9 @@
       "file": "assets/media/challenge-icp.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-icp.webp",
-      "higgsfieldJobId": "2dbfa68e-eacd-4b6a-a92d-efcb431243d5",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "2dbfa68e-eacd-4b6a-a92d-efcb431243d5",
+      "higgsfieldJobId": "0429ad07-c3ea-4c2b-a7ae-ca42e600f212",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-iv-check",
@@ -332,9 +373,9 @@
       "file": "assets/media/challenge-iv-check.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-iv-check.webp",
-      "higgsfieldJobId": "13efaddd-8f96-48b6-bc3e-44a4ecb5760e",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "13efaddd-8f96-48b6-bc3e-44a4ecb5760e",
+      "higgsfieldJobId": "7ad078a1-9f43-43ac-b00a-6296490fa083",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-bed-prep-after",
@@ -342,9 +383,9 @@
       "file": "assets/media/challenge-bed-prep-after.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-bed-prep-after.webp",
-      "higgsfieldJobId": "c587c509-451d-4778-82e8-930a01a600f5",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "c587c509-451d-4778-82e8-930a01a600f5",
+      "higgsfieldJobId": "630995ef-6ab3-444f-8ed8-9ae64143cb90",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-med-identity-after",
@@ -352,9 +393,9 @@
       "file": "assets/media/challenge-med-identity-after.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-med-identity-after.webp",
-      "higgsfieldJobId": "cdd3e518-711c-41af-8085-40e40b252c2a",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "cdd3e518-711c-41af-8085-40e40b252c2a",
+      "higgsfieldJobId": "17df6f93-5395-4b2f-b797-fc62ebbd4f43",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-ivpb-hang-after",
@@ -362,9 +403,9 @@
       "file": "assets/media/challenge-ivpb-hang-after.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-ivpb-hang-after.webp",
-      "higgsfieldJobId": "0500b44a-5c95-4b67-a903-c06bb37dbd86",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "0500b44a-5c95-4b67-a903-c06bb37dbd86",
+      "higgsfieldJobId": "2e0980ac-977b-49f5-aece-96de50d69da0",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-iv-check-after",
@@ -372,9 +413,9 @@
       "file": "assets/media/challenge-iv-check-after.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-iv-check-after.webp",
-      "higgsfieldJobId": "64da3e99-b51a-48e7-a5a2-cd41880186e4",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "64da3e99-b51a-48e7-a5a2-cd41880186e4",
+      "higgsfieldJobId": "d9898fe8-fe7c-44fc-95fd-25bd2adfddf4",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-accucheck-after",
@@ -382,9 +423,9 @@
       "file": "assets/media/challenge-accucheck-after.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-accucheck-after.webp",
-      "higgsfieldJobId": "49b0126f-80ca-4c87-aa86-2de94e518ded",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "49b0126f-80ca-4c87-aa86-2de94e518ded",
+      "higgsfieldJobId": "80d4a5fb-7255-44d9-b5ec-d6a1c91e3c8a",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-admission-after",
@@ -392,9 +433,9 @@
       "file": "assets/media/challenge-admission-after.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-admission-after.webp",
-      "higgsfieldJobId": "26c2d99c-4739-4767-8827-52a89de1108e",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "26c2d99c-4739-4767-8827-52a89de1108e",
+      "higgsfieldJobId": "edccf08a-433a-489f-84e7-97cdef9e091a",
+      "model": "gpt_image_2"
     },
     {
       "id": "challenge-icp-after",
@@ -402,9 +443,9 @@
       "file": "assets/media/challenge-icp-after.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-icp-after.webp",
-      "higgsfieldJobId": "f9779ef8-fc81-4cbd-8d5b-d4d7e8f36f8e",
-      "model": "nano_banana_pro",
-      "note": "HQ regen"
+      "priorJob": "f9779ef8-fc81-4cbd-8d5b-d4d7e8f36f8e",
+      "higgsfieldJobId": "5da79de1-3d20-4db4-b136-9abbb957f6ef",
+      "model": "gpt_image_2"
     }
   ],
   "activeJobs": {}
