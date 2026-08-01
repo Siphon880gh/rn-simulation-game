@@ -26,19 +26,9 @@
         <section class="landing-path landing-path--units" aria-labelledby="landing-units-title">
             <div class="landing-path__intro">
                 <h2 id="landing-units-title" class="landing-path__title">Unit assignment</h2>
-                <p class="landing-path__lede">Run a full shift on a specific unit — pick Tele, Med-Surg, or ICU, then set your census.</p>
+                <p class="landing-path__lede">Run a full shift on a specific unit — pick Med-Surg, Tele, or ICU, then set your census.</p>
             </div>
             <div class="landing-choices" aria-label="Department assignments">
-                <button type="button"
-                   class="unit-tile unit-tile--tele"
-                   data-href="game/index.html?speed-factor=24&amp;scenario=events/scenarios/tele-4.json"
-                   data-census-full="4">
-                    <span class="unit-tile__dept">Telemetry</span>
-                    <span class="unit-tile__census">4 patients</span>
-                    <span class="unit-tile__blurb">Rhythm watch and bedside alarms with a mid-size census.</span>
-                    <span class="unit-tile__cta">Start Tele</span>
-                </button>
-
                 <button type="button"
                    class="unit-tile unit-tile--medsurg"
                    data-href="game/index.html?speed-factor=24&amp;scenario=events/scenarios/medsurg-5.json"
@@ -47,6 +37,16 @@
                     <span class="unit-tile__census">5 patients</span>
                     <span class="unit-tile__blurb">Floor workload — meds, assessments, and slot pressure.</span>
                     <span class="unit-tile__cta">Start Med-Surg</span>
+                </button>
+
+                <button type="button"
+                   class="unit-tile unit-tile--tele"
+                   data-href="game/index.html?speed-factor=24&amp;scenario=events/scenarios/tele-4.json"
+                   data-census-full="4">
+                    <span class="unit-tile__dept">Telemetry</span>
+                    <span class="unit-tile__census">4 patients</span>
+                    <span class="unit-tile__blurb">Rhythm watch and bedside alarms with a mid-size census.</span>
+                    <span class="unit-tile__cta">Start Tele</span>
                 </button>
 
                 <button type="button"

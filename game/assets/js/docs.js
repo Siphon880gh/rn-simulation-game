@@ -8,6 +8,15 @@ import {
 import { createLinkPopover } from './link-popover.js';
 
 const docsStructure = {
+    learning: {
+        displayName: 'Learning',
+        icon: 'book',
+        color: 'text-amber-500',
+        files: [
+            'PRIORITIZATION_BASICS.md',
+            'SEPSIS_GUIDELINES.md'
+        ]
+    },
     devs: {
         displayName: 'Developers',
         icon: 'code',
@@ -19,26 +28,17 @@ const docsStructure = {
         ]
     },
     players: {
-        displayName: 'Players',
+        displayName: 'App',
         icon: 'users',
         color: 'text-green-500',
         files: [
             'ABOUT.md'
         ]
-    },
-    learning: {
-        displayName: 'Learning',
-        icon: 'book',
-        color: 'text-amber-500',
-        files: [
-            'PRIORITIZATION_BASICS.md',
-            'SEPSIS_GUIDELINES.md'
-        ]
     }
 };
 
 const noteCatalog = buildNoteCatalog(docsStructure);
-let expandedCategories = new Set(['players', 'learning']);
+let expandedCategories = new Set();
 let linkPopover = null;
 
 function buildNoteCatalog(structure) {
