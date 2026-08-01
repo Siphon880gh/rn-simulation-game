@@ -1,0 +1,34 @@
+{
+  "id": "skill-acls-tachycardia-tele",
+  "title": "Skill practice — Adult tachycardia with pulse (Tele)",
+  "version": 1,
+  "department": "tele",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Decide stable vs unstable tachycardia when a pulse is present",
+    "Apply adult tachycardia-with-pulse algorithm (cardioversion, vagal/adenosine, wide-complex paths)"
+  ],
+  "patients": ["sven"],
+  "patientOverrides": {
+    "sven": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Tachycardia with pulse and instability cues"
+    }
+  },
+  "scene": {
+    "theme": "tele",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/acls-tachycardia-night-tele.json",
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

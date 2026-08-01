@@ -31,6 +31,10 @@ import {
   pulmonaryEmbolismSkillBank,
   peripheralClotSkillBank
 } from './banks/vascular-emergencies.js';
+import {
+  aclsBradycardiaSkillBank,
+  aclsTachycardiaSkillBank
+} from './banks/acls-algorithms.js';
 
 /** @type {Record<string, { title: string, questions: object[] }>} */
 export const skillMcqBanks = {
@@ -1355,7 +1359,9 @@ export const skillMcqBanks = {
   'icu-sedation': icuSedationSkillBank,
   aaa: aaaSkillBank,
   'pulmonary-embolism': pulmonaryEmbolismSkillBank,
-  'peripheral-clot': peripheralClotSkillBank
+  'peripheral-clot': peripheralClotSkillBank,
+  'acls-bradycardia': aclsBradycardiaSkillBank,
+  'acls-tachycardia': aclsTachycardiaSkillBank
 };
 
 export const skillMcqChallengeConfig = {

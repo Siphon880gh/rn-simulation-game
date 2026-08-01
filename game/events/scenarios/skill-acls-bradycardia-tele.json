@@ -1,0 +1,34 @@
+{
+  "id": "skill-acls-bradycardia-tele",
+  "title": "Skill practice — Adult bradycardia algorithm (Tele)",
+  "version": 1,
+  "department": "tele",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Recognize symptomatic bradycardia with a pulse and signs of poor perfusion",
+    "Apply adult bradycardia algorithm steps (atropine, TCP, dopamine/epi infusions)"
+  ],
+  "patients": ["bode"],
+  "patientOverrides": {
+    "bode": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Symptomatic bradycardia with poor perfusion"
+    }
+  },
+  "scene": {
+    "theme": "tele",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": "events/incidents/acls-bradycardia-night-tele.json",
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

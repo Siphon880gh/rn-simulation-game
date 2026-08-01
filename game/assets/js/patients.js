@@ -1562,6 +1562,44 @@ const PatientsModule = (() => {
             },
             htmlFile: 'events/patients/tovah.html',
             pastHxFile: 'events/patients/tovah-past-hx.json'
+        },
+        bode: {
+            id: 'bode',
+            name: 'Bode Alvarez',
+            room: 'Tele-6',
+            age: 78,
+            sex: 'Male',
+            diagnosis: 'Symptomatic bradycardia — adult bradycardia algorithm',
+            skills: ['acls-bradycardia'],
+            vitals: {
+                hr: 38,
+                bp: '78/48',
+                temp: '97.9°F',
+                o2: '93% 2 L NC',
+                pain: '4/10 chest pressure',
+                rr: 22
+            },
+            htmlFile: 'events/patients/bode.html',
+            pastHxFile: 'events/patients/bode-past-hx.json'
+        },
+        sven: {
+            id: 'sven',
+            name: 'Sven Okonkwo',
+            room: 'Tele-7',
+            age: 62,
+            sex: 'Male',
+            diagnosis: 'Tachycardia with pulse — adult tachycardia algorithm',
+            skills: ['acls-tachycardia'],
+            vitals: {
+                hr: 178,
+                bp: '86/52',
+                temp: '98.6°F',
+                o2: '94% RA',
+                pain: '6/10 chest',
+                rr: 24
+            },
+            htmlFile: 'events/patients/sven.html',
+            pastHxFile: 'events/patients/sven-past-hx.json'
         }
     };
 

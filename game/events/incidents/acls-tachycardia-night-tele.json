@@ -1,0 +1,43 @@
+{
+  "id": "acls-tachycardia-night-tele",
+  "title": "Night Tele — Adult tachycardia with pulse incidents",
+  "version": 1,
+  "fictionalOnly": true,
+  "disclaimer": "Incident pack content is fictional practice — not a competency assessment.",
+  "dynamicTemplates": [
+    {
+      "id": "tachy-stability-check",
+      "weight": 3,
+      "type": "assessment",
+      "taskClass": "stat",
+      "name": "Tachycardia with pulse — stability / algorithm check",
+      "durationMins": 12,
+      "expire": "+25",
+      "patientScope": "random"
+    }
+  ],
+  "events": [
+    {
+      "id": "tachy-surge-2015",
+      "at": 2015,
+      "type": "emergency",
+      "message": "Sven: sudden HR ~180 with soft BP — adult tachycardia with pulse algorithm",
+      "injectTasks": [
+        {
+          "id": "evt-sven-tachy-algorithm",
+          "type": "assessment",
+          "name": "Tachycardia with pulse — algorithm response",
+          "patientId": "sven",
+          "scheduled": 2015,
+          "expire": "+30",
+          "durationMins": 15,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "acls-tachycardia"
+          }
+        }
+      ]
+    }
+  ]
+}

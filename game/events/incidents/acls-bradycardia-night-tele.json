@@ -1,0 +1,43 @@
+{
+  "id": "acls-bradycardia-night-tele",
+  "title": "Night Tele — Adult bradycardia algorithm incidents",
+  "version": 1,
+  "fictionalOnly": true,
+  "disclaimer": "Incident pack content is fictional practice — not a competency assessment.",
+  "dynamicTemplates": [
+    {
+      "id": "brady-perfusion-check",
+      "weight": 3,
+      "type": "assessment",
+      "taskClass": "stat",
+      "name": "Bradycardia — perfusion / algorithm check",
+      "durationMins": 12,
+      "expire": "+25",
+      "patientScope": "random"
+    }
+  ],
+  "events": [
+    {
+      "id": "brady-drop-2010",
+      "at": 2010,
+      "type": "emergency",
+      "message": "Bode: HR drop to low 30s with BP soft — adult bradycardia algorithm",
+      "injectTasks": [
+        {
+          "id": "evt-bode-brady-algorithm",
+          "type": "assessment",
+          "name": "Symptomatic bradycardia — algorithm response",
+          "patientId": "bode",
+          "scheduled": 2010,
+          "expire": "+30",
+          "durationMins": 15,
+          "taskClass": "stat",
+          "metadata": {
+            "challenge": "skill-mcq",
+            "skillId": "acls-bradycardia"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -663,6 +663,60 @@
       ]
     },
     {
+      "id": "acls-bradycardia",
+      "label": "Adult bradycardia algorithm",
+      "aliases": [
+        "brady with pulse",
+        "symptomatic bradycardia",
+        "ACLS bradycardia",
+        "atropine",
+        "TCP",
+        "transcutaneous pacing"
+      ],
+      "tags": [
+        "cardiac",
+        "emergency",
+        "tele"
+      ],
+      "blurb": "ACLS adult bradycardia (with pulse): perfusion check, atropine, TCP, dopamine/epi infusions.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "tele",
+      "pack": "events/scenarios/skill-acls-bradycardia-tele.json",
+      "patients": [
+        "bode"
+      ]
+    },
+    {
+      "id": "acls-tachycardia",
+      "label": "Adult tachycardia with pulse",
+      "aliases": [
+        "tachy with pulse",
+        "ACLS tachycardia",
+        "SVT",
+        "stable VT",
+        "synchronized cardioversion",
+        "adenosine"
+      ],
+      "tags": [
+        "cardiac",
+        "emergency",
+        "tele"
+      ],
+      "blurb": "ACLS adult tachycardia with a pulse: stable vs unstable, cardioversion, vagal/adenosine, wide-complex paths.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "tele",
+      "pack": "events/scenarios/skill-acls-tachycardia-tele.json",
+      "patients": [
+        "sven"
+      ]
+    },
+    {
       "id": "sbar",
       "label": "SBAR communication",
       "aliases": [
