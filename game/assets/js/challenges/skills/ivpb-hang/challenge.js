@@ -1,5 +1,6 @@
 /**
- * IVPB hang sequence mini-game — spike → secondary → Y-site → backprime → drip check.
+ * IVPB hang sequence mini-game — flash full flow, then build the next two steps
+ * from a random mid-sequence anchor (not start/end).
  * Author content: ./config.js (challenges/skills/ivpb-hang/)
  */
 import { GameConfig } from '../../../game-config.js';
@@ -16,12 +17,20 @@ export function getIvpbHangSequence() {
         : ivpbHangChallengeConfig.sequence;
 }
 
-export function getIvpbFlashPool() {
-    const seq = getIvpbHangSequence().map((s) => s.label);
-    const distractors = Array.isArray(cfg().distractors) && cfg().distractors.length
+export function getIvpbDistractors() {
+    return Array.isArray(cfg().distractors) && cfg().distractors.length
         ? cfg().distractors
         : ivpbHangChallengeConfig.distractors;
-    return [...seq, ...distractors];
+}
+
+export function getIvpbFlashPool() {
+    const seq = getIvpbHangSequence().map((s) => s.label);
+    return [...seq, ...getIvpbDistractors()];
+}
+
+export function getIvpbNextStepsCount() {
+    const n = Number(cfg().nextStepsCount);
+    return Number.isFinite(n) && n >= 1 ? Math.floor(n) : 2;
 }
 
 export function isIvpbTask(task) {
@@ -43,9 +52,45 @@ export function shuffle(list, random = Math.random) {
     return arr;
 }
 
-/** Compare player order of labels to correct sequence (case-insensitive). */
-export function gradeIvpbHangOrder(playerLabels, sequence = getIvpbHangSequence()) {
-    const expected = sequence.map((s) => String(s.label).trim().toLowerCase());
+/**
+ * Pick a mid-sequence anchor (not first/last) with room for the next N steps.
+ * Options = full sequence labels + distractors (shuffled).
+ */
+export function buildIvpbHangRound(random = Math.random) {
+    const sequence = getIvpbHangSequence();
+    const nextCount = getIvpbNextStepsCount();
+    // Exclude start (0) and ending (length-1); need `nextCount` steps after anchor.
+    const maxAnchor = sequence.length - 1 - nextCount;
+    const minAnchor = 1;
+    let anchorIndex = minAnchor;
+    if (maxAnchor >= minAnchor) {
+        anchorIndex = minAnchor + Math.floor(random() * (maxAnchor - minAnchor + 1));
+    } else if (sequence.length > 2) {
+        // Short sequences: best effort mid step that still has room for nextCount.
+        anchorIndex = Math.max(1, Math.min(sequence.length - 1 - nextCount, sequence.length - 2));
+        if (anchorIndex < 1) anchorIndex = 1;
+    }
+    const expectedNext = sequence
+        .slice(anchorIndex + 1, anchorIndex + 1 + nextCount)
+        .map((s) => s.label);
+    const distractors = getIvpbDistractors().map(String);
+    const options = shuffle([...new Set([...sequence.map((s) => s.label), ...distractors])], random);
+    const flashPool = shuffle(getIvpbFlashPool(), random);
+    return {
+        anchorIndex,
+        anchorLabel: sequence[anchorIndex]?.label || '',
+        expectedNext,
+        nextCount,
+        distractors,
+        options,
+        flashPool
+    };
+}
+
+/** Compare player order of labels to expected labels (case-insensitive). */
+export function gradeIvpbHangOrder(playerLabels, expectedLabels) {
+    const expected = (expectedLabels || getIvpbHangSequence().map((s) => s.label))
+        .map((s) => String(s).trim().toLowerCase());
     const got = (playerLabels || []).map((s) => String(s).trim().toLowerCase());
     const wrongIndexes = [];
     const max = Math.max(expected.length, got.length);
@@ -55,7 +100,7 @@ export function gradeIvpbHangOrder(playerLabels, sequence = getIvpbHangSequence(
     return {
         passed: wrongIndexes.length === 0 && got.length === expected.length,
         wrongIndexes,
-        expectedLabels: sequence.map((s) => s.label)
+        expectedLabels: (expectedLabels || getIvpbHangSequence().map((s) => s.label)).map(String)
     };
 }
 
@@ -67,13 +112,13 @@ function escapeHtml(text) {
         .replace(/"/g, '&quot;');
 }
 
-export function renderIvpbHangHtml(taskName) {
-    const sequence = getIvpbHangSequence();
-    const options = shuffle([...new Set(getIvpbFlashPool())]);
-    const optionHtml = options.map((label) => `
+export function renderIvpbHangHtml(taskName, round) {
+    const r = round || buildIvpbHangRound();
+    const optionHtml = r.options.map((label) => `
       <button type="button" class="ivpb-hang-pick px-2 py-1 rounded border border-gray-200 text-sm hover:bg-indigo-50"
         data-label="${escapeHtml(label)}">${escapeHtml(label)}</button>
     `).join('');
+    const nextWord = r.nextCount === 1 ? 'step' : 'steps';
 
     return `
       <div class="challenge-gate ivpb-hang-challenge space-y-3 text-left" data-challenge="ivpb-hang">
@@ -81,7 +126,7 @@ export function renderIvpbHangHtml(taskName) {
         <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
           || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
         <p class="text-sm text-gray-800">Hang IVPB: <strong>${escapeHtml(taskName || 'IVPB')}</strong></p>
-        <p class="text-xs text-gray-500">Watch the flash, then build the hang sequence in order.</p>
+        <p class="text-xs text-gray-500">Watch the flash for the full hang flow (some steps are distractors), then build the next ${r.nextCount} ${nextWord} from the given step.</p>
         <div class="rounded border border-indigo-200 bg-indigo-50 p-3 text-center">
           <div id="ivpb-hang-flash" class="text-lg font-semibold text-indigo-900 min-h-[1.75rem]">…</div>
           <p class="text-xs text-indigo-800 mt-1">
@@ -99,7 +144,10 @@ export function renderIvpbHangHtml(taskName) {
             class="mt-2 px-3 py-1 rounded bg-indigo-600 text-white text-sm hover:bg-indigo-700">Ready</button>
         </div>
         <div id="ivpb-hang-build" class="hidden space-y-2">
-          <p class="text-sm font-medium text-gray-800">Build the IVPB hang sequence (click in order)</p>
+          <p class="text-sm font-medium text-gray-800">
+            Given: <strong>${escapeHtml(r.anchorLabel)}</strong>
+          </p>
+          <p class="text-sm text-gray-800">Click the next ${r.nextCount} ${nextWord} in order. Some options are distractors.</p>
           <div id="ivpb-hang-chosen" class="min-h-[2rem] flex flex-wrap gap-1 text-sm"></div>
           <div id="ivpb-hang-options" class="flex flex-wrap gap-1">${optionHtml}</div>
           <button type="button" id="ivpb-hang-undo" class="text-xs text-gray-500 underline">Undo last</button>
@@ -112,8 +160,9 @@ export function renderIvpbHangHtml(taskName) {
 
 /**
  * Wire DOM after modal open. Calls onDone({ passed, grade, reason, expected? }).
+ * Pass the same `round` used in renderIvpbHangHtml when available.
  */
-export function wireIvpbHangHandlers({ onDone, random = Math.random } = {}) {
+export function wireIvpbHangHandlers({ onDone, random = Math.random, round } = {}) {
     const flashEl = document.querySelector('#ivpb-hang-flash');
     const hintsEl = document.querySelector('#ivpb-hang-hints');
     const readyBtn = document.querySelector('#ivpb-hang-ready');
@@ -125,11 +174,15 @@ export function wireIvpbHangHandlers({ onDone, random = Math.random } = {}) {
     const speedInput = document.querySelector('#ivpb-hang-speed');
     const speedLabel = document.querySelector('#ivpb-hang-speed-label');
 
+    const activeRound = round || buildIvpbHangRound(random);
+    const need = activeRound.expectedNext.length;
     let hintsLeft = Number(cfg().hintViews) || 3;
     let flashing = true;
     let flashTimer = null;
     let speedPct = Number(speedInput?.value) || 100;
-    const pool = shuffle(getIvpbFlashPool(), random);
+    const pool = activeRound.flashPool?.length
+        ? activeRound.flashPool
+        : shuffle(getIvpbFlashPool(), random);
     let flashIdx = 0;
     const chosen = [];
 
@@ -211,7 +264,7 @@ export function wireIvpbHangHandlers({ onDone, random = Math.random } = {}) {
     optionsEl?.querySelectorAll('.ivpb-hang-pick').forEach((btn) => {
         btn.addEventListener('click', () => {
             const label = btn.getAttribute('data-label');
-            if (!label || chosen.length >= getIvpbHangSequence().length) return;
+            if (!label || chosen.length >= need) return;
             chosen.push(label);
             paintChosen();
         });
@@ -224,7 +277,7 @@ export function wireIvpbHangHandlers({ onDone, random = Math.random } = {}) {
 
     window.ivpbHangSubmit = () => {
         stopFlash();
-        const grade = gradeIvpbHangOrder(chosen);
+        const grade = gradeIvpbHangOrder(chosen, activeRound.expectedNext);
         if (grade.passed) {
             if (feedback) {
                 feedback.classList.remove('hidden', 'text-rose-600');
@@ -256,20 +309,20 @@ export function wireIvpbHangHandlers({ onDone, random = Math.random } = {}) {
         });
     };
 
-    /** Practice aid: fill correct sequence; player still presses Submit. */
+    /** Practice aid: fill correct next steps; player still presses Submit. */
     window.ivpbHangCheat = () => {
         stopFlash();
         if (flashEl) flashEl.textContent = 'Sequence locked — assemble below';
         build?.classList.remove('hidden');
         chosen.length = 0;
-        getIvpbHangSequence().forEach((step) => {
-            chosen.push(step.label);
+        activeRound.expectedNext.forEach((label) => {
+            chosen.push(label);
         });
         paintChosen();
         if (feedback) {
             feedback.classList.remove('hidden', 'text-rose-600');
             feedback.classList.add('text-emerald-700');
-            feedback.textContent = 'Cheat filled the correct sequence — press Submit when ready.';
+            feedback.textContent = 'Cheat filled the next steps — press Submit when ready.';
         }
     };
 
@@ -283,6 +336,7 @@ export function wireIvpbHangHandlers({ onDone, random = Math.random } = {}) {
 const IvpbHangChallenge = {
     isIvpbTask,
     gradeIvpbHangOrder,
+    buildIvpbHangRound,
     renderIvpbHangHtml,
     wireIvpbHangHandlers,
     getIvpbHangSequence

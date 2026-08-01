@@ -37,7 +37,8 @@ import {
 import {
     isIvpbTask,
     renderIvpbHangHtml,
-    wireIvpbHangHandlers
+    wireIvpbHangHandlers,
+    buildIvpbHangRound
 } from './skills/ivpb-hang/challenge.js';
 import {
     renderCodeBlueHtml,
@@ -1004,11 +1005,12 @@ export function runChallengeGate(task) {
                 });
             }, 0);
         } else if (ivpbHang) {
+            const ivpbRound = buildIvpbHangRound();
             ModalModule.openModal({
                 title: 'IVPB hang sequence',
-                content: renderIvpbHangHtml(liveTask?.name),
+                content: renderIvpbHangHtml(liveTask?.name, ivpbRound),
                 footer: challengeModalFooter({
-                    submitLabel: 'Submit sequence',
+                    submitLabel: 'Submit next steps',
                     submitHandler: 'ivpbHangSubmit'
                 }),
                 overlay: true,
@@ -1016,6 +1018,7 @@ export function runChallengeGate(task) {
             });
             setTimeout(() => {
                 cleanupIvpbHang = wireIvpbHangHandlers({
+                    round: ivpbRound,
                     onDone: ({ passed, reason, expected }) => {
                         // On fail, omit expected so retry does not spoil the sequence.
                         finishAttempt(passed, reason, passed ? expected : undefined, { allowRetry: true });

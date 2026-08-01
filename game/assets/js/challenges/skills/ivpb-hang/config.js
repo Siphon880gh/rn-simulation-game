@@ -9,6 +9,8 @@ export const ivpbHangChallengeConfig = {
   /** Preview flash speed slider (% of flashMs). 50 = half speed (slower). */
   flashSpeedMinPct: 50,
   flashSpeedMaxPct: 150,
+  /** After a random mid-sequence anchor (not first/last), player builds this many next steps. */
+  nextStepsCount: 2,
   sequence: [
     { label: 'Spike the IVPB' },
     { label: 'Connect to secondary tubing' },

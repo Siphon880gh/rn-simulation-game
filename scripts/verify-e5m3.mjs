@@ -14,7 +14,8 @@ import {
 import {
   isIvpbTask,
   gradeIvpbHangOrder,
-  getIvpbHangSequence
+  getIvpbHangSequence,
+  buildIvpbHangRound
 } from '../game/assets/js/ivpb-hang-challenge.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -59,6 +60,8 @@ assert(bedSrc.includes('bed-prep-speed') && bedSrc.includes('paintNow'), 'bed-pr
 
 const ivpbSrc = readFileSync(join(root, 'game/assets/js/challenges/skills/ivpb-hang/challenge.js'), 'utf8');
 assert(ivpbSrc.includes('ivpb-hang-speed') && ivpbSrc.includes('paintNow'), 'ivpb preview speed + rewatch');
+assert(ivpbSrc.includes('Some options are distractors'), 'ivpb distractor copy');
+assert(ivpbSrc.includes('buildIvpbHangRound'), 'ivpb round builder');
 
 const seq = getIvpbHangSequence();
 assert(seq.length === 6, 'ivpb step count');
@@ -66,11 +69,22 @@ assert(isIvpbTask({ metadata: { challenge: 'ivpb' }, name: 'Ceftriaxone IVPB' })
 assert(isIvpbTask({ name: 'KCl IVPB' }), 'ivpb name detect');
 assert(!isIvpbTask({ type: 'med', name: 'Aspirin' }), 'aspirin not ivpb');
 const ivLabels = seq.map((s) => s.label);
-assert(gradeIvpbHangOrder(ivLabels).passed === true, 'ivpb correct order passes');
-assert(gradeIvpbHangOrder([...ivLabels].reverse()).passed === false, 'ivpb wrong order fails');
 assert(ivLabels[0].toLowerCase().includes('spike'), 'starts with spike');
 assert(ivLabels.some((l) => /backprime/i.test(l)), 'includes backprime');
 assert(ivLabels.some((l) => /y site/i.test(l)), 'includes Y site');
+
+const ivpbRound = buildIvpbHangRound(() => 0.42);
+assert(ivpbRound.anchorIndex >= 1, 'anchor not start');
+assert(ivpbRound.anchorIndex < seq.length - 1, 'anchor not ending');
+assert(ivpbRound.expectedNext.length === 2, 'asks for next two steps');
+assert(
+  ivpbRound.expectedNext[0] === seq[ivpbRound.anchorIndex + 1].label
+  && ivpbRound.expectedNext[1] === seq[ivpbRound.anchorIndex + 2].label,
+  'expected next matches sequence'
+);
+assert(ivpbRound.options.length > ivpbRound.expectedNext.length, 'options include distractors');
+assert(gradeIvpbHangOrder(ivpbRound.expectedNext, ivpbRound.expectedNext).passed === true, 'ivpb correct next steps pass');
+assert(gradeIvpbHangOrder([...ivpbRound.expectedNext].reverse(), ivpbRound.expectedNext).passed === false, 'ivpb wrong next steps fail');
 
 const gateSrc = readFileSync(join(root, 'game/assets/js/challenges/challenge-gate.js'), 'utf8');
 const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
@@ -78,7 +92,9 @@ const lin = readFileSync(join(root, 'game/events/patients/lin.html'), 'utf8');
 const maria = readFileSync(join(root, 'game/events/patients/maria.html'), 'utf8');
 assert(gateSrc.includes('skills/bed-prep/challenge'), 'gate wires bed prep');
 assert(gateSrc.includes('skills/ivpb-hang/challenge'), 'gate wires ivpb hang');
+assert(gateSrc.includes('buildIvpbHangRound'), 'gate builds ivpb round');
 assert(gateSrc.includes('Submit gather'), 'bed prep submit gather label');
+assert(gateSrc.includes('Submit next steps'), 'ivpb submit next steps label');
 assert(gateSrc.includes('challengeGateCheat'), 'cheat on challenge modal');
 assert(appSrc.includes('performBedPrepTask'), 'app complete-on-win path');
 assert(lin.includes('data-task-type="bedprep"'), 'lin has bedprep task');
