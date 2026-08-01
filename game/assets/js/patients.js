@@ -3,6 +3,7 @@ import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
 import SlotSystem from './slot-system.js';
+import { isPerformAllowed as isInPerformWindow } from './availability-windows.js';
 import { registerPatientIv } from './iv-system.js';
 import { loadPastHxPack, ensurePastHxTimeline } from './past-hx-timeline.js';
 import { inferMedSlotKind } from './media-placeholders.js';
@@ -2363,15 +2364,16 @@ const PatientsModule = (() => {
         return last ? `${first}.${last}` : `${first}.`;
     };
 
-    /** Incomplete work still in play — excludes completed and fallout / too-late. */
+    /**
+     * Tab badge: only currently chooseable work (ACTIVE + inside availability window).
+     * Uses window check without prerequisite so chart-assessment still counts while
+     * locked behind shift-assessment.
+     */
     function isOpenTaskForTabBadge(task, now) {
         if (!task) return false;
-        const status = task.status;
-        if (status === GameConfig.tasks.statuses.COMPLETED) return false;
-        if (status === GameConfig.tasks.statuses.OVERDUE) return false;
-        if (taskSystem.getWindowPhase?.(task, now) === 'after') return false;
-        return status === GameConfig.tasks.statuses.NOT_YET
-            || status === GameConfig.tasks.statuses.ACTIVE;
+        if (task.status !== GameConfig.tasks.statuses.ACTIVE) return false;
+        if (GameConfig.tasks.availability?.gatePerform === false) return true;
+        return isInPerformWindow(task, now);
     }
 
     function isGlobalTabTask(task) {

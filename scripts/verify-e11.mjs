@@ -62,6 +62,9 @@ assert(Array.isArray(GameConfig.doctorOrders.procedures?.byDiagnosis), 'diagnosi
 
 const taskSrc = readFileSync(join(root, 'game/assets/js/task-system.js'), 'utf8');
 assert(taskSrc.includes("taskProcessors.set('procedure'"), 'procedure processor');
+const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
+assert(appSrc.includes('data-task-type="procedure"'), 'procedure context menu selector');
+assert(appSrc.includes("kind === 'procedure'"), 'procedure Perform handler');
 
 // --- Carryover: missed check queues pack injections ---
 resetDoctorOrders();

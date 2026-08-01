@@ -361,7 +361,7 @@ class GameApplication {
     // Setup task context menus declaratively
     setupTaskContextMenus() {
         const contextMenuConfig = {
-            selector: '[data-task-type="med"][data-status="active"], [data-task-type="orders"][data-status="active"], [data-task-type="assessment"][data-status="active"], [data-task-type="bedprep"][data-status="active"], [data-task-type="iv"][data-status="active"], [data-task-type="criticallab"][data-status="active"], [data-task-type="admission"][data-status="active"]',
+            selector: '[data-task-type="med"][data-status="active"], [data-task-type="orders"][data-status="active"], [data-task-type="assessment"][data-status="active"], [data-task-type="bedprep"][data-status="active"], [data-task-type="iv"][data-status="active"], [data-task-type="criticallab"][data-status="active"], [data-task-type="admission"][data-status="active"], [data-task-type="procedure"][data-status="active"]',
             trigger: 'left',
             build: (triggerElement, e) => {
                 // Leave Accucheck / orders dice clicks alone (odds popover, not Perform)
@@ -542,6 +542,11 @@ class GameApplication {
                 }
                 if (kind === 'admission') {
                     this.performAdmissionTask(task);
+                    return;
+                }
+                // E11 consent / NPO / accompany + sepsis fluids — challenge then slot
+                if (kind === 'procedure') {
+                    this.performMedicationTask(task);
                     return;
                 }
                 console.log(`Performing medication: ${task.name}`);
