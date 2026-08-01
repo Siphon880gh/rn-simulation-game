@@ -1,0 +1,36 @@
+{
+  "id": "skill-protonix-drip-icu",
+  "title": "Skill practice — Protonix + Sandostatin drips / GI bleed (ICU)",
+  "version": 1,
+  "department": "icu",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Start and verify continuous pantoprazole (Protonix) after UGIB bolus dosing",
+    "Start and verify continuous octreotide (Sandostatin) for variceal bleed",
+    "Perform volume, abdominal, and bleed-output assessments while drips run",
+    "Trend serial H&H, coag, lactate, and blood-product readiness"
+  ],
+  "patients": ["glen"],
+  "patientOverrides": {
+    "glen": {
+      "clinicalStatus": "critical",
+      "acuityScore": 4,
+      "clinicalStatusReason": "Active variceal GI bleed — dual drips + hypovolemia risk"
+    }
+  },
+  "scene": {
+    "theme": "icu",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

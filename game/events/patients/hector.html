@@ -1,0 +1,138 @@
+<div class="patient bg-white p-4 rounded-lg shadow-md">
+    <div class="flex justify-between items-top mb-4">
+        <h3 class="text-lg font-bold">Hector Rivas</h3>
+        <span class="text-sm bg-gray-100 px-2 py-1 rounded">Tele-6</span>
+    </div>
+    <div class="mb-4">
+        <p class="text-sm text-gray-600">Age: 67</p>
+        <p class="text-sm text-gray-600">Sex: Male</p>
+        <p class="text-sm text-gray-600">Diagnosis: Acute decompensated HF — volume overload; continuous Lasix drip</p>
+        <p class="text-sm text-gray-600">Orders: furosemide 40 mg IV bolus → continuous drip 10 mg/hr; titrate to UOP / volume response per protocol</p>
+        <p class="text-sm text-gray-600">Strict I&amp;O; daily weight; BMP / Mag q6–12h while on drip; continuous telemetry</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+        <div>HR: 98</div>
+        <div>BP: 148/88</div>
+        <div>Temp: 98.4°F</div>
+        <div>O<sub>2</sub>: 93% 3 L NC</div>
+        <div>Pain: 0/10</div>
+        <div>RR: 24</div>
+        <div>Weight: +4.2 kg from dry</div>
+        <div>UOP last 2h: 40 mL</div>
+        <div>K: 3.4</div>
+        <div>Mg: 1.6</div>
+        <div>Cr: 1.4 (baseline 1.1)</div>
+        <div>BNP: 1240</div>
+        <div>Lasix drip: 10 mg/hr</div>
+        <div>Rhythm: NSR / rare PVCs</div>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-tint text-xl mr-1 text-amber-700"></i>
+            Lasix drip
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="lasix-drip" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="12" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-tint text-amber-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Start / verify Lasix drip + titration plan (furosemide 10 mg/hr)</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-challenge="skill-mcq" data-skill-id="lasix-drip" data-status="not-yet" data-scheduled="2100" data-expire="2200" data-duration-mins="12" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-sliders-h text-amber-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Reassess drip — adjust per UOP / BP / labs</span>
+                <span class="ml-auto text-sm text-gray-500">2100</span>
+            </li>
+            <li data-task-type="iv" data-challenge="iv-check" data-iv-line-id="hector-lasix" data-iv-drug="furosemide" data-iv-rate="10" data-iv-unit="mg/hr" data-status="not-yet" data-scheduled="1930" data-expire="2030" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-syringe text-amber-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Lasix drip — rate / line check</span>
+                <span class="ml-auto text-sm text-gray-500">1930</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-flask text-xl mr-1 text-amber-700"></i>
+            Labs (while on Lasix drip)
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="1900" data-expire="1945" data-duration-mins="8" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-flask text-amber-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Review BMP — K 3.4, Cr 1.4 (baseline 1.1)</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="1915" data-expire="2000" data-duration-mins="8" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-vial text-purple-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Review Mag 1.6 — replete if ordered before aggressive diuresis</span>
+                <span class="ml-auto text-sm text-gray-500">1915</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2000" data-expire="2100" data-duration-mins="8" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-flask text-amber-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Draw / review serial BMP + Mag (loop diuretic panel)</span>
+                <span class="ml-auto text-sm text-gray-500">2000</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2200" data-expire="2300" data-duration-mins="8" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-heartbeat text-rose-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Trend BNP 1240 + daily weight vs dry weight</span>
+                <span class="ml-auto text-sm text-gray-500">2200</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-stethoscope text-xl mr-1 text-blue-700"></i>
+            Assessments
+        </h4>
+        <ul class="assess-list space-y-3 hidden">
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="1900" data-expire="2000" data-duration-mins="10" data-task-class="urgent" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-lungs text-blue-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Volume / congestion exam (lungs, edema, JVD, SpO2)</span>
+                <span class="ml-auto text-sm text-gray-500">1900</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="1930" data-expire="2030" data-duration-mins="8" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-balance-scale text-teal-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Strict I&amp;O + bladder scan if UOP low</span>
+                <span class="ml-auto text-sm text-gray-500">1930</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2000" data-expire="2100" data-duration-mins="8" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-heartbeat text-rose-600 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Telemetry strip — rate / PVCs / hypotensive pauses</span>
+                <span class="ml-auto text-sm text-gray-500">2000</span>
+            </li>
+            <li data-task-type="assessment" data-status="not-yet" data-scheduled="2300" data-expire="0000" data-duration-mins="10" class="bg-white p-4 rounded-lg shadow flex items-center">
+                <data class="slot-label" value="1"></data>
+                <i class="fas fa-stethoscope text-blue-500 text-xl mr-3"></i>
+                <span class="font-medium text-gray-900">Reassess volume response to Lasix drip</span>
+                <span class="ml-auto text-sm text-gray-500">2300</span>
+            </li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100" onclick="$(this).next().toggleClass('hidden')">
+            <i class="fas fa-syringe text-xl mr-1 text-teal-600"></i>
+            IV / drips
+        </h4>
+        <ul class="iv-list space-y-3 hidden" data-iv-panel>
+            <li data-iv-line data-iv-id="hector-saline-lock" data-iv-kind="fluid" data-iv-name="Saline lock" data-iv-rate="0" data-iv-unit="mL/hr" data-iv-status="idle" data-iv-started="1800"></li>
+            <li data-iv-line data-iv-id="hector-lasix" data-iv-kind="drip" data-iv-drug="furosemide" data-iv-name="Lasix (furosemide)" data-iv-rate="10" data-iv-unit="mg/hr" data-iv-status="running" data-iv-started="1900"></li>
+        </ul>
+    </div>
+    <div class="space-y-2 mb-4" data-panel="past-hx">
+        <h4 class="font-semibold flex items-center gap-2 cursor-pointer hover:bg-gray-100 past-hx-toggle">
+            <i class="fas fa-history text-xl mr-1"></i>
+            Chart history (past hx)
+        </h4>
+        <div class="past-hx-panel hidden">
+            <div id="past-hx-timeline-hector" class="patient-past-hx-timeline w-full" data-past-hx-mount></div>
+        </div>
+    </div>
+</div>

@@ -934,6 +934,25 @@ const PatientsModule = (() => {
             htmlFile: 'events/patients/finn.html',
             pastHxFile: 'events/patients/finn-past-hx.json'
         },
+        glen: {
+            id: 'glen',
+            name: 'Glen Vargas',
+            room: 'ICU-14',
+            age: 59,
+            sex: 'Male',
+            diagnosis: 'Esophageal variceal bleed — Protonix + Sandostatin drips',
+            skills: ['protonix-drip', 'sandostatin-drip'],
+            vitals: {
+                hr: 118,
+                bp: '92/54',
+                temp: '98.2°F',
+                o2: '96% 2 L NC',
+                pain: 'abdomen 3/10',
+                rr: 22
+            },
+            htmlFile: 'events/patients/glen.html',
+            pastHxFile: 'events/patients/glen-past-hx.json'
+        },
         gwen: {
             id: 'gwen',
             name: 'Gwen Ibarra',
@@ -971,6 +990,25 @@ const PatientsModule = (() => {
             },
             htmlFile: 'events/patients/harp.html',
             pastHxFile: 'events/patients/harp-past-hx.json'
+        },
+        hector: {
+            id: 'hector',
+            name: 'Hector Rivas',
+            room: 'Tele-6',
+            age: 67,
+            sex: 'Male',
+            diagnosis: 'Acute decompensated HF — continuous Lasix drip',
+            skills: ['lasix-drip'],
+            vitals: {
+                hr: 98,
+                bp: '148/88',
+                temp: '98.4°F',
+                o2: '93% 3 L NC',
+                pain: '0/10',
+                rr: 24
+            },
+            htmlFile: 'events/patients/hector.html',
+            pastHxFile: 'events/patients/hector-past-hx.json'
         },
         ida: {
             id: 'ida',

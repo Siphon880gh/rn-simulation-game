@@ -1377,6 +1377,83 @@
       ]
     },
     {
+      "id": "protonix-drip",
+      "label": "Protonix drip (pantoprazole)",
+      "aliases": [
+        "pantoprazole drip",
+        "PPI drip",
+        "Protonix infusion",
+        "GI bleed PPI"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "gi"
+      ],
+      "blurb": "Continuous pantoprazole (Protonix) for upper GI bleed — bolus then 8 mg/hr infusion; clot stability and acid suppression.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-protonix-drip-icu.json",
+      "patients": [
+        "glen"
+      ]
+    },
+    {
+      "id": "sandostatin-drip",
+      "label": "Sandostatin drip (octreotide)",
+      "aliases": [
+        "octreotide drip",
+        "octreotide infusion",
+        "Sandostatin infusion",
+        "variceal bleed octreotide"
+      ],
+      "tags": [
+        "icu",
+        "meds",
+        "gi"
+      ],
+      "blurb": "Continuous octreotide (Sandostatin) for variceal GI bleed — bolus then 50 mcg/hr; splanchnic vasoconstriction / portal pressure reduction.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "icu",
+      "pack": "events/scenarios/skill-protonix-drip-icu.json",
+      "patients": [
+        "glen"
+      ]
+    },
+    {
+      "id": "lasix-drip",
+      "label": "Lasix drip (furosemide)",
+      "aliases": [
+        "furosemide drip",
+        "furosemide infusion",
+        "Lasix infusion",
+        "continuous Lasix",
+        "loop diuretic drip"
+      ],
+      "tags": [
+        "tele",
+        "meds",
+        "cardiac",
+        "hf"
+      ],
+      "blurb": "Continuous furosemide (Lasix) for ADHF — verify rate, titrate to UOP/volume response, and monitor K, Mag, creatinine, and weight.",
+      "games": [
+        "skill-mcq"
+      ],
+      "status": "active",
+      "unitHint": "tele",
+      "pack": "events/scenarios/skill-lasix-drip-tele.json",
+      "patients": [
+        "hector"
+      ]
+    },
+    {
       "id": "evd",
       "label": "EVD management",
       "aliases": [

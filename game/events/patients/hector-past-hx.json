@@ -1,0 +1,25 @@
+{
+  "displayName": "Hector Rivas",
+  "pastHx": [
+    {
+      "start": "2022-11-08",
+      "headline": "HFrEF — outpatient cardiology",
+      "text": "EF ~30% on last echo. Home meds include carvedilol, ACE inhibitor, and PRN oral furosemide. Fictional teaching record."
+    },
+    {
+      "start": "2026-07-31T14:20:00",
+      "headline": "ED — progressive dyspnea / 4+ kg gain",
+      "text": "Orthopnea, bilateral crackles, 2+ pitting edema. SpO2 90% on RA → 3 L NC. BNP 1240. Chest x-ray with pulmonary edema. Fictional teaching record."
+    },
+    {
+      "start": "2026-07-31T16:00:00",
+      "headline": "Labs — diuretic panel",
+      "text": "K 3.4, Mg 1.6, Cr 1.4 (baseline 1.1), BUN 28, Na 136. ECG NSR with rare PVCs. Fictional teaching record."
+    },
+    {
+      "start": "2026-07-31T18:15:00",
+      "headline": "Tele admit — continuous Lasix drip",
+      "text": "Furosemide 40 mg IV bolus given. Continuous Lasix drip started at 10 mg/hr with titration orders to urine output and clinical volume response. Strict I&O, daily weights, serial BMP/Mag. Fictional teaching record."
+    }
+  ]
+}

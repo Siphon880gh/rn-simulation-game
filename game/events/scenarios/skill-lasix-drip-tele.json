@@ -1,0 +1,36 @@
+{
+  "id": "skill-lasix-drip-tele",
+  "title": "Skill practice — Lasix drip titration + labs (Tele)",
+  "version": 1,
+  "department": "tele",
+  "fictionalOnly": true,
+  "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
+  "learningObjectives": [
+    "Start and verify a continuous furosemide (Lasix) drip for acute decompensated HF",
+    "Titrate the drip using urine output, blood pressure, and clinical volume response",
+    "Identify priority labs while on a loop diuretic drip (K, Mag, creatinine/BMP, BNP/weight trends)",
+    "Perform volume and telemetry assessments during aggressive diuresis"
+  ],
+  "patients": ["hector"],
+  "patientOverrides": {
+    "hector": {
+      "clinicalStatus": "watch",
+      "acuityScore": 3,
+      "clinicalStatusReason": "ADHF on continuous Lasix drip — electrolyte / renal / volume watch"
+    }
+  },
+  "scene": {
+    "theme": "tele",
+    "unitBackground": null,
+    "situationStills": {
+      "code-blue": null,
+      "bed-prep": null
+    }
+  },
+  "incidentPackUrl": null,
+  "orderInjections": {
+    "1900": [],
+    "default": []
+  },
+  "events": []
+}

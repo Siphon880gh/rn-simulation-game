@@ -982,6 +982,175 @@ export const skillMcqBanks = {
       }
     ]
   },
+  'protonix-drip': {
+    title: 'Protonix drip (pantoprazole)',
+    questions: [
+      {
+        id: 'indication',
+        prompt: 'Continuous IV pantoprazole (Protonix) is most often started for which GI bleed goal?',
+        correct: 'Acid suppression to stabilize clot after upper GI bleed (often after an IV bolus)',
+        choices: [
+          'Acid suppression to stabilize clot after upper GI bleed (often after an IV bolus)',
+          'Immediate sclerotherapy of esophageal varices at the bedside',
+          'Replacement of oral stool softeners',
+          'Treatment of lower GI bleed with diverticulosis only'
+        ]
+      },
+      {
+        id: 'rate',
+        prompt: 'A common pantoprazole continuous infusion rate after the IV bolus (per many UGIB protocols) is?',
+        correct: '8 mg/hr continuous IV',
+        choices: [
+          '8 mg/hr continuous IV',
+          '80 mg/hr continuous IV',
+          '8 mg PO once daily only',
+          '0.8 mg/min subcutaneous'
+        ]
+      },
+      {
+        id: 'bolus',
+        prompt: 'Before starting the continuous Protonix drip for UGIB, many orders include?',
+        correct: 'An 80 mg IV pantoprazole bolus, then start the continuous infusion',
+        choices: [
+          'An 80 mg IV pantoprazole bolus, then start the continuous infusion',
+          'Crushing enteric-coated tablets into the IV bag',
+          'Holding all IV access until endoscopy is finished tomorrow',
+          'Giving IM Protonix into the deltoid'
+        ]
+      },
+      {
+        id: 'monitor',
+        prompt: 'While a Protonix drip is running for GI bleed, nursing priorities include?',
+        correct: 'Confirm correct rate/line, watch for ongoing bleed / volume loss, and keep serial H&H / vitals trending',
+        choices: [
+          'Confirm correct rate/line, watch for ongoing bleed / volume loss, and keep serial H&H / vitals trending',
+          'Stop the drip whenever the patient eats crackers',
+          'Titrate the rate to MAP like a vasopressor',
+          'Ignore hematemesis because the PPI is running'
+        ]
+      }
+    ]
+  },
+  'sandostatin-drip': {
+    title: 'Sandostatin drip (octreotide)',
+    questions: [
+      {
+        id: 'indication',
+        prompt: 'Continuous octreotide (Sandostatin) is primarily indicated in GI bleed for?',
+        correct: 'Suspected or confirmed variceal bleeding (reduce splanchnic flow / portal pressure)',
+        choices: [
+          'Suspected or confirmed variceal bleeding (reduce splanchnic flow / portal pressure)',
+          'Uncomplicated hemorrhoids without bleeding',
+          'Routine stress-ulcer prophylaxis in every floor admit',
+          'Replacing type and screen before transfusion'
+        ]
+      },
+      {
+        id: 'rate',
+        prompt: 'A common octreotide continuous infusion after the IV bolus for variceal bleed is?',
+        correct: '50 mcg/hr continuous IV',
+        choices: [
+          '50 mcg/hr continuous IV',
+          '50 mg/hr continuous IV',
+          '5 units/hr like heparin',
+          '50 mcg PO three times daily only'
+        ]
+      },
+      {
+        id: 'bolus',
+        prompt: 'Typical first step when starting Sandostatin for variceal bleed?',
+        correct: 'Give an IV bolus (often 50 mcg), then start the continuous infusion',
+        choices: [
+          'Give an IV bolus (often 50 mcg), then start the continuous infusion',
+          'Start oral Sandostatin LAR depot in the GI lab',
+          'Inject into the varices at the bedside without an order',
+          'Hold until hemoglobin is above 12 without assessing bleed'
+        ]
+      },
+      {
+        id: 'monitor',
+        prompt: 'Extra monitoring tip while octreotide is infusing?',
+        correct: 'Watch glucose (can affect insulin/glucagon pathways) plus bleed signs and drip rate/line integrity',
+        choices: [
+          'Watch glucose (can affect insulin/glucagon pathways) plus bleed signs and drip rate/line integrity',
+          'Expect therapeutic aPTT titration like heparin',
+          'Discontinue if the patient has any bowel sounds',
+          'Only check the bag once at end of shift'
+        ]
+      }
+    ]
+  },
+  'lasix-drip': {
+    title: 'Lasix drip (furosemide)',
+    questions: [
+      {
+        id: 'indication',
+        prompt: 'A continuous IV furosemide (Lasix) drip is most often used for?',
+        correct: 'Acute decompensated HF / volume overload when intermittent IV doses are not enough',
+        choices: [
+          'Acute decompensated HF / volume overload when intermittent IV doses are not enough',
+          'Routine outpatient blood-pressure control without congestion',
+          'Replacing oral stool softeners',
+          'Treating hypokalemia as the primary therapy'
+        ]
+      },
+      {
+        id: 'adjust',
+        prompt: 'Best approach when adjusting a Lasix drip rate?',
+        correct: 'Titrate per order/protocol using urine output, BP, and clinical volume response — then recheck electrolytes/renal function',
+        choices: [
+          'Titrate per order/protocol using urine output, BP, and clinical volume response — then recheck electrolytes/renal function',
+          'Double the rate every 5 minutes like a pressor without assessing UOP',
+          'Stop diuresis permanently if the patient voids once',
+          'Change the rate based only on the clock, ignoring vitals and labs'
+        ]
+      },
+      {
+        id: 'hold-up',
+        prompt: 'Which finding should make you pause and call before increasing a Lasix drip?',
+        correct: 'Significant hypotension, marked creatinine rise, or severe electrolyte derangement',
+        choices: [
+          'Significant hypotension, marked creatinine rise, or severe electrolyte derangement',
+          'Mild orthopnea that is improving with diuresis',
+          'A single PVC on telemetry with stable BP',
+          'Patient requesting ice chips'
+        ]
+      },
+      {
+        id: 'labs',
+        prompt: 'Priority labs to trend while a patient is on a continuous Lasix drip?',
+        correct: 'Potassium, magnesium, and creatinine/BMP (plus weight / I&O; BNP as ordered)',
+        choices: [
+          'Potassium, magnesium, and creatinine/BMP (plus weight / I&O; BNP as ordered)',
+          'Only amylase and lipase every hour',
+          'Only type and screen',
+          'No labs needed if the drip rate looks correct on the pump'
+        ]
+      },
+      {
+        id: 'hypokalemia',
+        prompt: 'Why does low potassium matter during aggressive loop diuretic therapy?',
+        correct: 'Hypokalemia increases arrhythmia risk and may need repletion before or while continuing diuresis',
+        choices: [
+          'Hypokalemia increases arrhythmia risk and may need repletion before or while continuing diuresis',
+          'Low K always means the drip should be increased immediately',
+          'Potassium is irrelevant on telemetry units',
+          'Loop diuretics raise potassium, so hypokalemia rules out Lasix effect'
+        ]
+      },
+      {
+        id: 'monitor',
+        prompt: 'Nursing priorities while a Lasix drip is running include?',
+        correct: 'Confirm rate/line, strict I&O and daily weights, watch BP/volume status, and trend K/Mag/Cr',
+        choices: [
+          'Confirm rate/line, strict I&O and daily weights, watch BP/volume status, and trend K/Mag/Cr',
+          'Ignore urine output if the pump is green',
+          'Titrate only to SpO2 without assessing congestion or BP',
+          'Hold all electrolyte checks until discharge'
+        ]
+      }
+    ]
+  },
   evd: {
     title: 'EVD management',
     questions: [

@@ -1,0 +1,33 @@
+{
+  "skill": "add-shift-patient-pack",
+  "mode": "skill-driven",
+  "skillId": "lasix-drip",
+  "relatedSkillIds": [],
+  "shift": "night",
+  "unit": "tele",
+  "packFile": "game/events/scenarios/skill-lasix-drip-tele.json",
+  "patientId": "hector",
+  "milestones": {
+    "M0": "done",
+    "M1": "done",
+    "M2": "done",
+    "M3": "done",
+    "M4": "done",
+    "M5": "done"
+  },
+  "status": "complete",
+  "plan": [
+    {
+      "id": "hector",
+      "diagnosis": "ADHF / volume overload — continuous Lasix drip",
+      "tasks": [
+        "Lasix drip skill-mcq (start/verify + titration)",
+        "IV Lasix drip rate/line check",
+        "BMP / K / Mag / Cr lab review tasks",
+        "BNP + daily weight trend",
+        "Volume / I&O / tele assessments"
+      ]
+    }
+  ],
+  "updatedAt": "2026-08-01T07:20:00.000Z"
+}
