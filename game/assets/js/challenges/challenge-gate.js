@@ -41,6 +41,12 @@ import {
     buildIvpbHangRound
 } from './skills/ivpb-hang/challenge.js';
 import {
+    isIvReplaceTask,
+    renderIvReplaceHtml,
+    wireIvReplaceHandlers,
+    buildIvReplaceRound
+} from './skills/iv-replace/challenge.js';
+import {
     isPeritonealDialysisTask,
     renderPeritonealDialysisHtml,
     wirePeritonealDialysisHandlers,
@@ -98,7 +104,7 @@ import BoostersModule from '../boosters.js';
 import { applySituationStill, clearSituationStill } from '../scene-backdrop.js';
 import { revealChallengeAfterMedia } from '../media-placeholders.js';
 import { recordChallengeOutcome } from '../scoring.js';
-import { applyIvChallengeResult, syncIvTaskMetadata } from '../iv-system.js';
+import { applyIvChallengeResult, applyIvReplaceResult, syncIvTaskMetadata } from '../iv-system.js';
 
 const CHALLENGE = GameConfig.timer.pauseSources.CHALLENGE;
 
@@ -149,6 +155,7 @@ function revealSequenceChallengeActions({ submitLabel, submitHandler } = {}) {
 let activeSession = null;
 let cleanupBedPrep = null;
 let cleanupIvpbHang = null;
+let cleanupIvReplace = null;
 let cleanupPdSeq = null;
 let cleanupCodeBlue = null;
 let cleanupChallengeLevel = null;
@@ -176,6 +183,10 @@ function endSession(result) {
     if (typeof cleanupIvpbHang === 'function') {
         cleanupIvpbHang();
         cleanupIvpbHang = null;
+    }
+    if (typeof cleanupIvReplace === 'function') {
+        cleanupIvReplace();
+        cleanupIvReplace = null;
     }
     if (typeof cleanupPdSeq === 'function') {
         cleanupPdSeq();
@@ -706,6 +717,9 @@ function finishAttempt(passed, reason, expected, opts = {}) {
         if (activeSession?.ivPrompt && activeSession?.ivTask) {
             applyIvChallengeResult(activeSession.ivTask, activeSession.ivPrompt);
         }
+        if (activeSession?.ivReplace && activeSession?.ivReplaceTask) {
+            applyIvReplaceResult(activeSession.ivReplaceTask);
+        }
         showPassedAcknowledge(() => {
             endSession({ passed: true, reason });
         });
@@ -888,6 +902,12 @@ export function cheatChallenge() {
         }
         return;
     }
+    if (activeSession.ivReplace) {
+        if (typeof window.ivReplaceCheat === 'function') {
+            window.ivReplaceCheat();
+        }
+        return;
+    }
     if (activeSession.pdSeq) {
         if (typeof window.pdSeqCheat === 'function') {
             window.pdSeqCheat();
@@ -985,8 +1005,9 @@ export function runChallengeGate(task) {
     return new Promise((resolve) => {
         const liveTask = isIvTask(task) ? syncIvTaskMetadata(task) : task;
         const bedPrep = isBedPrepTask(liveTask);
-        const ivpbHang = !bedPrep && isIvpbTask(liveTask);
-        const pdSeq = !bedPrep && !ivpbHang && isPeritonealDialysisTask(liveTask);
+        const ivReplace = !bedPrep && isIvReplaceTask(liveTask);
+        const ivpbHang = !bedPrep && !ivReplace && isIvpbTask(liveTask);
+        const pdSeq = !bedPrep && !ivReplace && !ivpbHang && isPeritonealDialysisTask(liveTask);
 
         // Per-run shuffled decks so multi-question challenge levels are not bank order.
         let icpQuiz = null;
@@ -994,28 +1015,28 @@ export function runChallengeGate(task) {
         let skillMcq = null;
         let sepsisScreenPrompt = null;
         let quizDeck = null;
-        if (!bedPrep && !ivpbHang && !pdSeq && isIcpTask(liveTask)) {
+        if (!bedPrep && !ivReplace && !ivpbHang && !pdSeq && isIcpTask(liveTask)) {
             quizDeck = beginShuffledQuizDeck(getIcpQuestionIds());
             icpQuiz = buildIcpQuiz(liveTask, { questionId: quizDeck[0] });
-        } else if (!bedPrep && !ivpbHang && !pdSeq && isAlteplaseTask(liveTask)) {
+        } else if (!bedPrep && !ivReplace && !ivpbHang && !pdSeq && isAlteplaseTask(liveTask)) {
             quizDeck = beginShuffledQuizDeck(getAlteplaseQuestionIds(liveTask));
             alteplaseQuiz = buildAlteplaseQuiz(liveTask, { questionId: quizDeck[0] });
-        } else if (!bedPrep && !ivpbHang && !pdSeq && isSepsisScreenTask(liveTask)) {
+        } else if (!bedPrep && !ivReplace && !ivpbHang && !pdSeq && isSepsisScreenTask(liveTask)) {
             sepsisScreenPrompt = buildSepsisScreenPrompt(liveTask);
-        } else if (!bedPrep && !ivpbHang && !pdSeq && isSkillMcqTask(liveTask)) {
+        } else if (!bedPrep && !ivReplace && !ivpbHang && !pdSeq && isSkillMcqTask(liveTask)) {
             const skillId = String(liveTask?.metadata?.skillId || '').trim();
             quizDeck = beginShuffledQuizDeck(getSkillMcqQuestionIds(skillId));
             skillMcq = buildSkillMcqQuiz(liveTask, { questionId: quizDeck[0] });
         }
 
-        const admissionQuiz = !bedPrep && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz
+        const admissionQuiz = !bedPrep && !ivReplace && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz
             && !skillMcq && !sepsisScreenPrompt
             ? buildAdmissionQuiz(liveTask)
             : null;
-        const useIv = !bedPrep && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz && !skillMcq
+        const useIv = !bedPrep && !ivReplace && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz && !skillMcq
             && !sepsisScreenPrompt && !admissionQuiz && isIvTask(liveTask);
         const ivPrompt = useIv ? buildIvPrompt(liveTask) : null;
-        const isMed = !bedPrep && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz && !skillMcq
+        const isMed = !bedPrep && !ivReplace && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz && !skillMcq
             && !sepsisScreenPrompt && !admissionQuiz && !useIv
             && (!liveTask?.type || String(liveTask.type).toLowerCase() === 'med');
         const useAccucheck = isMed && isAccucheckTask(liveTask);
@@ -1032,6 +1053,8 @@ export function runChallengeGate(task) {
             ivPrompt,
             ivTask: useIv ? liveTask : null,
             bedPrep,
+            ivReplace,
+            ivReplaceTask: ivReplace ? liveTask : null,
             ivpbHang,
             pdSeq,
             icpQuiz: Boolean(icpQuiz),
@@ -1041,7 +1064,7 @@ export function runChallengeGate(task) {
             admissionQuiz: Boolean(admissionQuiz),
             quizDeck,
             quizDeckIndex: 0,
-            safety: !bedPrep && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz && !skillMcq
+            safety: !bedPrep && !ivReplace && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz && !skillMcq
                 && !sepsisScreenPrompt && !admissionQuiz
                 && !useIv && !accucheckPrompt && !useMedQuiz
         };
@@ -1054,9 +1077,12 @@ export function runChallengeGate(task) {
             ModalModule.openModal({
                 title: 'Bed prep for admission',
                 content: renderBedPrepHtml(task?.name, bedRound),
+                // Preview first — Submit / Cheat appear after Ready.
                 footer: challengeModalFooter({
                     submitLabel: 'Submit gather',
-                    submitHandler: 'bedPrepSubmit'
+                    submitHandler: 'bedPrepSubmit',
+                    showSubmit: false,
+                    showCheat: false
                 }),
                 overlay: true,
                 persistent: false
@@ -1064,8 +1090,50 @@ export function runChallengeGate(task) {
             setTimeout(() => {
                 cleanupBedPrep = wireBedPrepHandlers({
                     round: bedRound,
+                    onStarted: () => {
+                        revealSequenceChallengeActions({
+                            submitLabel: 'Submit gather',
+                            submitHandler: 'bedPrepSubmit'
+                        });
+                    },
                     onDone: ({ passed, reason, expected }) => {
                         finishAttempt(passed, reason, expected);
+                    }
+                });
+            }, 0);
+        } else if (ivReplace) {
+            const replaceRound = buildIvReplaceRound();
+            const lineKind = liveTask?.metadata?.lineKind || liveTask?.metadata?.ivKind || 'fluid';
+            ModalModule.openModal({
+                title: String(lineKind).toLowerCase() === 'ivpb'
+                    ? 'Replace IVPB'
+                    : 'Replace IV solution',
+                content: renderIvReplaceHtml(
+                    liveTask?.metadata?.ivLineName || liveTask?.name,
+                    replaceRound,
+                    { lineKind }
+                ),
+                // Preview first — Submit / Cheat appear after Ready.
+                footer: challengeModalFooter({
+                    submitLabel: 'Submit replace',
+                    submitHandler: 'ivReplaceSubmit',
+                    showSubmit: false,
+                    showCheat: false
+                }),
+                overlay: true,
+                persistent: false
+            });
+            setTimeout(() => {
+                cleanupIvReplace = wireIvReplaceHandlers({
+                    round: replaceRound,
+                    onStarted: () => {
+                        revealSequenceChallengeActions({
+                            submitLabel: 'Submit replace',
+                            submitHandler: 'ivReplaceSubmit'
+                        });
+                    },
+                    onDone: ({ passed, reason, expected }) => {
+                        finishAttempt(passed, reason, passed ? expected : undefined, { allowRetry: true });
                     }
                 });
             }, 0);

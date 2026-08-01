@@ -73,11 +73,26 @@ const maria = readFileSync(join(root, 'game/events/patients/maria.html'), 'utf8'
 const lyle = readFileSync(join(root, 'game/events/patients/lyle.html'), 'utf8');
 assert(aisha.includes('data-iv-panel') && aisha.includes('Insulin drip (regular)'), 'aisha IV + insulin clarity');
 assert(aisha.includes('data-challenge="iv-check"'), 'aisha insulin rate check task');
+assert(aisha.includes('data-iv-empty-at="2030"'), 'aisha NS empties mid-shift');
 assert(joe.includes('heparin-ptt') && joe.includes('data-iv-next-ptt="0100"'), 'joe heparin PTT');
+assert(joe.includes('data-iv-id="joe-vanco-ivpb"') && joe.includes('data-iv-empty-at="2115"'), 'joe IVPB empties mid-shift');
 assert(!maria.includes('levophed') && !maria.includes('neosynephrine'), 'maria med-surg — no pressors');
 assert(lyle.includes('levophed') && lyle.includes('neosynephrine'), 'lyle ICU pressors');
-assert(GameConfig.iv.titrationIncidents.every((i) => i.patientId === 'lyle'), 'pressor titration on ICU lyle');
+assert(
+  GameConfig.iv.titrationIncidents.every((i) => i.patientId === 'lyle' || i.patientId === 'nova'),
+  'pressor titration on ICU lyle/nova'
+);
 assert(joe.includes('data-iv-kind="fluid"') && joe.includes('data-iv-kind="ivpb"'), 'joe fluid+ivpb');
+
+const ivSysSrc = readFileSync(join(root, 'game/assets/js/iv-system.js'), 'utf8');
+assert(ivSysSrc.includes('processEmptyBags') && ivSysSrc.includes('bag empty'), 'empty-bag badge + processor');
+assert(ivSysSrc.includes('iv-replace') && ivSysSrc.includes('Replace IV'), 'replace task spawn');
+assert(existsSync(join(root, 'game/assets/js/challenges/skills/iv-replace/challenge.js')), 'iv-replace challenge');
+assert(existsSync(join(root, 'game/assets/js/challenges/skills/iv-replace/config.js')), 'iv-replace config');
+assert(GameConfig.ivReplaceChallenge?.tubingMcq?.correct, 'tubing MCQ authored');
+assert(Array.isArray(GameConfig.ivReplaceChallenge?.sequence) && GameConfig.ivReplaceChallenge.sequence.length >= 4, 'replace sequence');
+assert(gateSrc.includes('skills/iv-replace/challenge'), 'gate wires iv-replace');
+assert(gateSrc.includes('ivReplaceSubmit'), 'gate submit replace');
 
 if (failures.length) {
   console.error('IV AUTO FAIL');

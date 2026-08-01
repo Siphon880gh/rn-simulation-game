@@ -137,6 +137,18 @@ export function buildTestChallengeTask(kind, patientId = null, opts = {}) {
         type: 'med',
         metadata: { challenge: 'ivpb', route: 'ivpb' }
       };
+    case 'iv-replace':
+      return {
+        ...base,
+        name: 'Replace IV solution (0.9% NS) (test)',
+        type: 'iv',
+        metadata: {
+          challenge: 'iv-replace',
+          lineKind: 'fluid',
+          ivLineName: '0.9% NS',
+          lineId: 'test-ns'
+        }
+      };
     case 'peritoneal-dialysis':
       return {
         ...base,

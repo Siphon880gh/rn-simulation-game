@@ -151,7 +151,7 @@ export function renderBedPrepHtml(taskName, round) {
  * Wire DOM after modal open. Calls onDone({ passed, grade, reason }).
  * Pass the same `round` used in renderBedPrepHtml when available.
  */
-export function wireBedPrepHandlers({ onDone, random = Math.random, round } = {}) {
+export function wireBedPrepHandlers({ onDone, onStarted, random = Math.random, round } = {}) {
     const flashEl = document.querySelector('#bed-prep-flash');
     const hintsEl = document.querySelector('#bed-prep-hints');
     const readyBtn = document.querySelector('#bed-prep-ready');
@@ -169,12 +169,19 @@ export function wireBedPrepHandlers({ onDone, random = Math.random, round } = {}
     let flashing = true;
     let flashTimer = null;
     let speedPct = Number(speedInput?.value) || 100;
+    let hasStarted = false;
     const pool = activeRound.flashPool?.length
         ? activeRound.flashPool
         : shuffle([...activeRound.required, ...activeRound.distractors], random);
     let flashIdx = 0;
     /** @type {Set<string>} */
     const selected = new Set();
+
+    function markStarted() {
+        if (hasStarted) return;
+        hasStarted = true;
+        onStarted?.();
+    }
 
     function paintChosen() {
         if (!chosenEl) return;
@@ -245,6 +252,7 @@ export function wireBedPrepHandlers({ onDone, random = Math.random, round } = {}
             stopFlash();
             if (flashEl) flashEl.textContent = 'Gather the items you need below';
             build?.classList.remove('hidden');
+            markStarted();
             if (hintsLeft <= 0 && readyBtn) {
                 readyBtn.disabled = true;
                 readyBtn.textContent = 'No hint views left';
@@ -326,6 +334,7 @@ export function wireBedPrepHandlers({ onDone, random = Math.random, round } = {}
         stopFlash();
         if (flashEl) flashEl.textContent = 'Gather the items you need below';
         build?.classList.remove('hidden');
+        markStarted();
         selected.clear();
         activeRound.required.forEach((label) => selected.add(label));
         optionsEl?.querySelectorAll('.bed-prep-pick').forEach((btn) => paintOptionState(btn));

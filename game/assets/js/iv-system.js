@@ -59,6 +59,7 @@ export function extractIvLinesFromElement(root, patientId) {
                 cfg().heparinPttIntervalMins ?? 360
             );
         }
+        const emptyAtAttr = el.getAttribute('data-iv-empty-at');
         return {
             id: el.id || el.getAttribute('data-iv-id') || `${patientId}-iv-${index}`,
             kind,
@@ -71,6 +72,8 @@ export function extractIvLinesFromElement(root, patientId) {
             status: el.getAttribute('data-iv-status') || 'running',
             ranAt: el.getAttribute('data-iv-ran-at') || null,
             startedAt: startedAt != null ? Number(startedAt) : null,
+            emptyAt: emptyAtAttr != null && emptyAtAttr !== '' ? Number(emptyAtAttr) : null,
+            emptiedAt: null,
             protocol: protocol || null,
             nextPttAt,
             lastPtt: null,
@@ -89,13 +92,30 @@ export function registerPatientIv(patientId, root) {
 
 function statusBadge(status) {
     const s = String(status || 'running').toLowerCase();
+    if (s === 'empty' || s === 'run-out' || s === 'runout') {
+        return '<span class="text-xs px-1.5 py-0.5 rounded bg-rose-600 text-white font-semibold uppercase tracking-wide">bag empty</span>';
+    }
     if (s === 'complete' || s === 'ran') {
         return '<span class="text-xs px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">ran / complete</span>';
     }
     if (s === 'held') {
         return '<span class="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">held</span>';
     }
+    if (s === 'due') {
+        return '<span class="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">due</span>';
+    }
+    if (s === 'idle') {
+        return '<span class="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">idle</span>';
+    }
     return '<span class="text-xs px-1.5 py-0.5 rounded bg-sky-100 text-sky-800">running</span>';
+}
+
+function replaceTaskName(line) {
+    const label = line?.name || 'IV';
+    const kind = String(line?.kind || 'fluid').toLowerCase();
+    if (kind === 'ivpb') return `Replace IVPB (${label})`;
+    if (kind === 'drip') return `Replace IV solution (${label})`;
+    return `Replace IV solution (${label})`;
 }
 
 function kindIcon(kind) {
@@ -120,7 +140,13 @@ export function renderPatientIvPanel(patientId) {
         const rateText = line.rate != null && line.unit
             ? `${line.rate} ${line.unit}`
             : (line.rate != null ? String(line.rate) : '—');
+        const empty = ['empty', 'run-out', 'runout'].includes(String(line.status || '').toLowerCase());
         const extra = [];
+        if (empty) {
+            extra.push(line.emptiedAt != null
+                ? `Ran out ${formatHHMM(line.emptiedAt)} — replace needed`
+                : 'Ran out — replace needed');
+        }
         if (line.kind === 'ivpb' && line.ranAt) {
             extra.push(`IVPB ran ${formatHHMM(line.ranAt)}`);
         }
@@ -130,18 +156,22 @@ export function renderPatientIvPanel(patientId) {
         if (line.lastPttResult) {
             extra.push(`Last PTT: ${line.lastPttResult}`);
         }
+        const tileClass = empty
+            ? 'bg-rose-50 p-3 rounded-lg shadow border-2 border-rose-400 flex items-start gap-3 ring-2 ring-rose-200'
+            : 'bg-white p-3 rounded-lg shadow border border-gray-100 flex items-start gap-3';
         return `
-          <li class="bg-white p-3 rounded-lg shadow border border-gray-100 flex items-start gap-3"
-              data-iv-id="${line.id}" data-iv-drug="${line.drug}" data-iv-kind="${line.kind}">
-            <i class="fas ${kindIcon(line.kind)} text-xl mt-0.5"></i>
+          <li class="${tileClass}"
+              data-iv-id="${line.id}" data-iv-drug="${line.drug}" data-iv-kind="${line.kind}"
+              ${empty ? 'data-iv-empty="1"' : ''}>
+            <i class="fas ${empty ? 'fa-exclamation-triangle text-rose-600' : kindIcon(line.kind)} text-xl mt-0.5"></i>
             <div class="flex-1 min-w-0">
               <div class="flex flex-wrap items-center gap-2">
                 <span class="font-medium text-gray-900">${line.name}</span>
                 ${statusBadge(line.status)}
                 <span class="text-xs uppercase tracking-wide text-gray-400">${line.kind}</span>
               </div>
-              <p class="text-sm text-gray-700 mt-0.5">Rate: <strong class="iv-rate">${rateText}</strong></p>
-              ${extra.length ? `<p class="text-xs text-gray-500 mt-0.5">${extra.join(' · ')}</p>` : ''}
+              <p class="text-sm text-gray-700 mt-0.5">Rate: <strong class="iv-rate">${empty ? '—' : rateText}</strong></p>
+              ${extra.length ? `<p class="text-xs ${empty ? 'text-rose-700 font-medium' : 'text-gray-500'} mt-0.5">${extra.join(' · ')}</p>` : ''}
             </div>
           </li>`;
     }).join('');
@@ -184,7 +214,9 @@ function createIvTask(spec) {
             target: spec.target,
             pttResult: spec.pttResult,
             lineId: spec.lineId,
-            ivKind: spec.challenge,
+            lineKind: spec.lineKind,
+            ivLineName: spec.ivLineName,
+            ivKind: spec.lineKind || spec.challenge,
             incident: true
         }
     });
@@ -263,6 +295,51 @@ function processTitrationIncidents(currentTime) {
     });
 }
 
+/** Authored data-iv-empty-at: mark bag empty + spawn Replace IV solution / IVPB task. */
+function processEmptyBags(currentTime) {
+    const patients = gameState.getStateSlice('patients');
+    if (!patients) return;
+    patients.forEach((patient, patientId) => {
+        (patient.ivLines || []).forEach((line) => {
+            if (line.emptyAt == null) return;
+            if (!isAtOrAfterInShift(currentTime, line.emptyAt)) return;
+            const status = String(line.status || '').toLowerCase();
+            if (status === 'empty' || status === 'run-out' || status === 'runout') {
+                // Already empty — ensure replace task exists once.
+            } else if (status !== 'running' && status !== 'due') {
+                return;
+            } else {
+                gameState.dispatch('UPDATE_IV_LINE', {
+                    patientId,
+                    lineId: line.id,
+                    patch: {
+                        status: 'empty',
+                        emptiedAt: line.emptyAt,
+                        rate: line.kind === 'ivpb' ? null : line.rate
+                    }
+                });
+            }
+            const taskId = `${patientId}-iv-replace-${line.id}-${line.emptyAt}`;
+            if (spawnedKeys.has(taskId)) return;
+            createIvTask({
+                id: taskId,
+                patientId,
+                name: replaceTaskName(line),
+                scheduled: line.emptyAt,
+                expire: '+90',
+                challenge: 'iv-replace',
+                drug: line.drug,
+                unit: line.unit || '',
+                currentRate: line.rate,
+                lineId: line.id,
+                lineKind: line.kind,
+                ivLineName: line.name,
+                logMessage: `IV bag empty: ${line.name} — ${replaceTaskName(line)}`
+            });
+        });
+    });
+}
+
 /** After a successful IV challenge, apply new rate and advance Heparin PTT clock. */
 export function applyIvChallengeResult(task, prompt) {
     if (!task?.patientId || !prompt) return;
@@ -287,6 +364,30 @@ export function applyIvChallengeResult(task, prompt) {
     renderPatientIvPanel(task.patientId);
     gameState.dispatch('APPEND_SHIFT_LOG', {
         message: `IV updated: ${task.metadata?.drug || 'drip'} → ${newRate} ${task.metadata?.unit || ''}`.trim(),
+        timeLabel: formatHHMM(gameState.getStateSlice('currentTime'))
+    });
+}
+
+/** After a successful IV bag replace challenge, restore running status on the line. */
+export function applyIvReplaceResult(task) {
+    if (!task?.patientId) return;
+    const lineId = task.metadata?.lineId;
+    if (!lineId) return;
+    const line = getIvLine(task.patientId, lineId);
+    const patch = {
+        status: 'running',
+        emptyAt: null,
+        emptiedAt: null
+    };
+    if (line?.rate != null) patch.rate = line.rate;
+    gameState.dispatch('UPDATE_IV_LINE', {
+        patientId: task.patientId,
+        lineId,
+        patch
+    });
+    renderPatientIvPanel(task.patientId);
+    gameState.dispatch('APPEND_SHIFT_LOG', {
+        message: `IV replaced: ${task.metadata?.ivLineName || task.name || 'line'} running again`,
         timeLabel: formatHHMM(gameState.getStateSlice('currentTime'))
     });
 }
@@ -316,6 +417,7 @@ function onTime(currentTime) {
     if (currentTime == null) return;
     processHeparinPtt(currentTime);
     processTitrationIncidents(currentTime);
+    processEmptyBags(currentTime);
     const patients = gameState.getStateSlice('patients');
     patients?.forEach((_, patientId) => renderPatientIvPanel(patientId));
 }
@@ -337,6 +439,7 @@ const IvSystemModule = {
     extractIvLinesFromElement,
     renderPatientIvPanel,
     applyIvChallengeResult,
+    applyIvReplaceResult,
     syncIvTaskMetadata,
     getIvLine,
     _addMinutesToHhmm: addMinutesToHhmm,

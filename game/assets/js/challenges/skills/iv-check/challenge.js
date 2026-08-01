@@ -8,8 +8,10 @@ import { challengeMediaHtml } from '../../../media-placeholders.js';
 
 export function isIvTask(task) {
     if (!task) return false;
-    if (String(task.type).toLowerCase() === 'iv') return true;
     const challenge = String(task.metadata?.challenge || '').toLowerCase();
+    // Bag replace uses type=iv but has its own sequence + MCQ gate.
+    if (challenge === 'iv-replace' || challenge === 'iv-bag-replace') return false;
+    if (String(task.type).toLowerCase() === 'iv') return true;
     return challenge === 'iv-titration' || challenge === 'heparin-ptt' || challenge === 'iv-check';
 }
 

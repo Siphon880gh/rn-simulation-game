@@ -18,6 +18,7 @@ Test spawn (`Test` flask control) groups these as **Skills** and **Emergencies**
 | Challenge | Configure | Runtime |
 |-----------|-----------|---------|
 | IVPB hang | [`skills/ivpb-hang/config.js`](skills/ivpb-hang/config.js) | `skills/ivpb-hang/challenge.js` |
+| IV bag replace | [`skills/iv-replace/config.js`](skills/iv-replace/config.js) | `skills/iv-replace/challenge.js` (+ `iv-system` empty-at) |
 | Peritoneal dialysis | [`skills/peritoneal-dialysis/config.js`](skills/peritoneal-dialysis/config.js) | `skills/peritoneal-dialysis/challenge.js` |
 | Med identity | [`skills/med-identity/config.js`](skills/med-identity/config.js) | `skills/med-identity/challenge.js` |
 | Bed prep | [`skills/bed-prep/config.js`](skills/bed-prep/config.js) | `skills/bed-prep/challenge.js` |

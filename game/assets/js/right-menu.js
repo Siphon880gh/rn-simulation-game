@@ -225,24 +225,27 @@ function ivAttentionRows(patients, now) {
     const rows = [];
     patients?.forEach((patient) => {
         (patient.ivLines || []).forEach((line) => {
+            const status = String(line.status || '').toLowerCase();
+            const bagEmpty = status === 'empty' || status === 'run-out' || status === 'runout';
             const needsPtt = line.protocol === 'heparin-ptt'
                 && line.nextPttAt != null
                 && isAtOrAfterInShift(now, line.nextPttAt);
             const isDrip = line.kind === 'drip' || line.category === 'drip';
-            const held = line.status === 'held' || line.held === true;
-            if (!needsPtt && !held && !isDrip) return;
-            if (!needsPtt && !held && isDrip) {
+            const held = status === 'held' || line.held === true;
+            if (!bagEmpty && !needsPtt && !held && !isDrip) return;
+            if (!bagEmpty && !needsPtt && !held && isDrip) {
                 // Drips only surface when held or PTT due — skip quiet continuous drips
                 return;
             }
             let reason = 'IV attention';
-            if (needsPtt) reason = `PTT due ${formatHHMM(line.nextPttAt)}`;
+            if (bagEmpty) reason = 'Bag empty — replace';
+            else if (needsPtt) reason = `PTT due ${formatHHMM(line.nextPttAt)}`;
             else if (held) reason = 'IV held';
             rows.push({
                 id: `iv-${patient.id}-${line.id}`,
                 patientId: patient.id,
                 title: `${patient.name || patient.id}`,
-                meta: `${line.label || line.id || 'IV'} · ${reason}`
+                meta: `${line.name || line.label || line.id || 'IV'} · ${reason}`
             });
         });
     });

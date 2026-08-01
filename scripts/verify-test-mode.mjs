@@ -30,6 +30,10 @@ assert(
   'ivpb-hang under Skills'
 );
 assert(
+  GameConfig.testMode.incidents.some((i) => i.kind === 'iv-replace' && i.group === 'Skills'),
+  'iv-replace under Skills'
+);
+assert(
   GameConfig.testMode.incidents.some((i) => i.kind === 'med-identity' && i.group === 'Skills'),
   'med-identity under Skills'
 );

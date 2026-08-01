@@ -6,6 +6,7 @@ import { challengeCopyConfig } from './challenges/shared/copy-config.js';
 import { codeBlueChallengeConfig } from './challenges/emergencies/code-blue/config.js';
 import { bedPrepChallengeConfig } from './challenges/skills/bed-prep/config.js';
 import { ivpbHangChallengeConfig } from './challenges/skills/ivpb-hang/config.js';
+import { ivReplaceChallengeConfig } from './challenges/skills/iv-replace/config.js';
 import { peritonealDialysisChallengeConfig } from './challenges/skills/peritoneal-dialysis/config.js';
 import { medIdentityChallengeConfig } from './challenges/skills/med-identity/config.js';
 import { icpChallengeConfig } from './challenges/skills/icp/config.js';
@@ -606,6 +607,10 @@ export const GameConfig = {
         imageId: 'challenge-ivpb-hang',
         afterImageId: 'challenge-ivpb-hang-after'
       },
+      'iv-replace': {
+        imageId: 'challenge-ivpb-hang',
+        afterImageId: 'challenge-ivpb-hang-after'
+      },
       'iv-check': {
         imageId: 'challenge-iv-check',
         afterImageId: 'challenge-iv-check-after'
@@ -627,7 +632,8 @@ export const GameConfig = {
     challengeMediaAliases: {
       'admission-quiz': 'admission',
       'heparin-ptt': 'iv-check',
-      'iv-titration': 'iv-check'
+      'iv-titration': 'iv-check',
+      'iv-bag-replace': 'iv-replace'
     },
     /**
      * Optional per-id overrides merged onto the JSON catalog
@@ -641,6 +647,7 @@ export const GameConfig = {
   challengeCopy: challengeCopyConfig,
   bedPrepChallenge: bedPrepChallengeConfig,
   ivpbHangChallenge: ivpbHangChallengeConfig,
+  ivReplaceChallenge: ivReplaceChallengeConfig,
   peritonealDialysisChallenge: peritonealDialysisChallengeConfig,
   medIdentityChallenge: medIdentityChallengeConfig,
   icpChallenge: icpChallengeConfig,
@@ -692,6 +699,8 @@ export const GameConfig = {
     topCollapse: '#shell-top-collapse',
     leanPause: '#shell-lean-pause',
     clockLean: '#clock-lean',
+    clockIced: '#clock-iced',
+    clockIcedLean: '#clock-iced-lean',
     brandReadMore: '#shell-brand-read-more',
     slotsToggle: '#shell-slots-toggle',
     logToggle: '#shell-log-toggle',

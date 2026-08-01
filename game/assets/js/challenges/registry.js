@@ -18,6 +18,14 @@ export const CHALLENGE_REGISTRY = {
     modulePath: 'challenges/skills/ivpb-hang/challenge.js',
     testSpawnKind: 'ivpb-hang'
   },
+  'iv-replace': {
+    id: 'iv-replace',
+    category: 'skills',
+    label: 'IV bag replace (tubing + sequence)',
+    configPath: 'challenges/skills/iv-replace/config.js',
+    modulePath: 'challenges/skills/iv-replace/challenge.js',
+    testSpawnKind: 'iv-replace'
+  },
   'peritoneal-dialysis': {
     id: 'peritoneal-dialysis',
     category: 'skills',
