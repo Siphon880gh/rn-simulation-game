@@ -164,7 +164,7 @@ export function renderPeritonealDialysisHtml(taskName, round) {
  * Wire DOM after modal open. Calls onDone({ passed, grade, reason, expected? }).
  * Pass the same `round` used in renderPeritonealDialysisHtml when available.
  */
-export function wirePeritonealDialysisHandlers({ onDone, random = Math.random, round } = {}) {
+export function wirePeritonealDialysisHandlers({ onDone, onStarted, random = Math.random, round } = {}) {
     const flashEl = document.querySelector('#pd-seq-flash');
     const hintsEl = document.querySelector('#pd-seq-hints');
     const readyBtn = document.querySelector('#pd-seq-ready');
@@ -182,11 +182,18 @@ export function wirePeritonealDialysisHandlers({ onDone, random = Math.random, r
     let flashing = true;
     let flashTimer = null;
     let speedPct = Number(speedInput?.value) || 100;
+    let hasStarted = false;
     const pool = activeRound.flashPool?.length
         ? activeRound.flashPool
         : shuffle(getPeritonealDialysisFlashPool(), random);
     let flashIdx = 0;
     const chosen = [];
+
+    function markStarted() {
+        if (hasStarted) return;
+        hasStarted = true;
+        onStarted?.();
+    }
 
     function paintChosen() {
         if (!chosenEl) return;
@@ -246,6 +253,7 @@ export function wirePeritonealDialysisHandlers({ onDone, random = Math.random, r
             stopFlash();
             if (flashEl) flashEl.textContent = 'Sequence locked — assemble below';
             build?.classList.remove('hidden');
+            markStarted();
             if (hintsLeft <= 0 && readyBtn) {
                 readyBtn.disabled = true;
                 readyBtn.textContent = 'No hint views left';
@@ -316,6 +324,7 @@ export function wirePeritonealDialysisHandlers({ onDone, random = Math.random, r
         stopFlash();
         if (flashEl) flashEl.textContent = 'Sequence locked — assemble below';
         build?.classList.remove('hidden');
+        markStarted();
         chosen.length = 0;
         activeRound.expectedNext.forEach((label) => {
             chosen.push(label);

@@ -107,6 +107,7 @@ function challengeModalFooter({
     submitLabel = 'Submit',
     submitHandler = 'challengeGateSubmit',
     showSubmit = true,
+    showCheat = true,
     showRandom = false,
     randomHandler = 'codeBlueRandom',
     randomLabel = 'Random'
@@ -119,14 +120,30 @@ function challengeModalFooter({
         ? `<button type="button" class="px-4 py-2 rounded-lg font-medium bg-blue-500 text-white hover:bg-blue-600 mr-2"
             onclick="window.${submitHandler} && window.${submitHandler}()">${submitLabel}</button>`
         : '';
+    const cheatBtn = showCheat
+        ? `<button type="button" class="px-4 py-2 rounded-lg font-medium bg-amber-500 text-white hover:bg-amber-600 mr-2"
+            onclick="window.challengeGateCheat && window.challengeGateCheat()">Cheat</button>`
+        : '';
     return `
-      <button type="button" class="px-4 py-2 rounded-lg font-medium bg-amber-500 text-white hover:bg-amber-600 mr-2"
-        onclick="window.challengeGateCheat && window.challengeGateCheat()">Cheat</button>
+      ${cheatBtn}
       ${randomBtn}
       ${submitBtn}
       <button type="button" class="px-4 py-2 rounded-lg font-medium bg-gray-500 text-white hover:bg-gray-600"
         onclick="window.challengeGateCancel && window.challengeGateCancel()">Cancel</button>
     `;
+}
+
+/** Reveal Submit / Cheat after sequence preview — player has pressed Ready. */
+function revealSequenceChallengeActions({ submitLabel, submitHandler } = {}) {
+    if (activeSession?.closing) return;
+    const footer = document.querySelector(GameConfig.selectors.modalFooter || '#modal-footer');
+    if (!footer) return;
+    footer.innerHTML = challengeModalFooter({
+        submitLabel: submitLabel || 'Submit next steps',
+        submitHandler: submitHandler || 'challengeGateSubmit',
+        showSubmit: true,
+        showCheat: true
+    });
 }
 
 let activeSession = null;
@@ -1057,9 +1074,12 @@ export function runChallengeGate(task) {
             ModalModule.openModal({
                 title: 'IVPB hang sequence',
                 content: renderIvpbHangHtml(liveTask?.name, ivpbRound),
+                // Preview first — Submit / Cheat appear after Ready.
                 footer: challengeModalFooter({
                     submitLabel: 'Submit next steps',
-                    submitHandler: 'ivpbHangSubmit'
+                    submitHandler: 'ivpbHangSubmit',
+                    showSubmit: false,
+                    showCheat: false
                 }),
                 overlay: true,
                 persistent: false
@@ -1067,6 +1087,12 @@ export function runChallengeGate(task) {
             setTimeout(() => {
                 cleanupIvpbHang = wireIvpbHangHandlers({
                     round: ivpbRound,
+                    onStarted: () => {
+                        revealSequenceChallengeActions({
+                            submitLabel: 'Submit next steps',
+                            submitHandler: 'ivpbHangSubmit'
+                        });
+                    },
                     onDone: ({ passed, reason, expected }) => {
                         // On fail, omit expected so retry does not spoil the sequence.
                         finishAttempt(passed, reason, passed ? expected : undefined, { allowRetry: true });
@@ -1078,9 +1104,12 @@ export function runChallengeGate(task) {
             ModalModule.openModal({
                 title: 'Peritoneal dialysis sequence',
                 content: renderPeritonealDialysisHtml(liveTask?.name, pdRound),
+                // Preview first — Submit / Cheat appear after Ready.
                 footer: challengeModalFooter({
                     submitLabel: 'Submit next steps',
-                    submitHandler: 'pdSeqSubmit'
+                    submitHandler: 'pdSeqSubmit',
+                    showSubmit: false,
+                    showCheat: false
                 }),
                 overlay: true,
                 persistent: false
@@ -1088,6 +1117,12 @@ export function runChallengeGate(task) {
             setTimeout(() => {
                 cleanupPdSeq = wirePeritonealDialysisHandlers({
                     round: pdRound,
+                    onStarted: () => {
+                        revealSequenceChallengeActions({
+                            submitLabel: 'Submit next steps',
+                            submitHandler: 'pdSeqSubmit'
+                        });
+                    },
                     onDone: ({ passed, reason, expected }) => {
                         // On fail, omit expected so retry does not spoil the sequence.
                         finishAttempt(passed, reason, passed ? expected : undefined, { allowRetry: true });

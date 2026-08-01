@@ -162,7 +162,7 @@ export function renderIvpbHangHtml(taskName, round) {
  * Wire DOM after modal open. Calls onDone({ passed, grade, reason, expected? }).
  * Pass the same `round` used in renderIvpbHangHtml when available.
  */
-export function wireIvpbHangHandlers({ onDone, random = Math.random, round } = {}) {
+export function wireIvpbHangHandlers({ onDone, onStarted, random = Math.random, round } = {}) {
     const flashEl = document.querySelector('#ivpb-hang-flash');
     const hintsEl = document.querySelector('#ivpb-hang-hints');
     const readyBtn = document.querySelector('#ivpb-hang-ready');
@@ -180,11 +180,18 @@ export function wireIvpbHangHandlers({ onDone, random = Math.random, round } = {
     let flashing = true;
     let flashTimer = null;
     let speedPct = Number(speedInput?.value) || 100;
+    let hasStarted = false;
     const pool = activeRound.flashPool?.length
         ? activeRound.flashPool
         : shuffle(getIvpbFlashPool(), random);
     let flashIdx = 0;
     const chosen = [];
+
+    function markStarted() {
+        if (hasStarted) return;
+        hasStarted = true;
+        onStarted?.();
+    }
 
     function paintChosen() {
         if (!chosenEl) return;
@@ -244,6 +251,7 @@ export function wireIvpbHangHandlers({ onDone, random = Math.random, round } = {
             stopFlash();
             if (flashEl) flashEl.textContent = 'Sequence locked — assemble below';
             build?.classList.remove('hidden');
+            markStarted();
             if (hintsLeft <= 0 && readyBtn) {
                 readyBtn.disabled = true;
                 readyBtn.textContent = 'No hint views left';
@@ -314,6 +322,7 @@ export function wireIvpbHangHandlers({ onDone, random = Math.random, round } = {
         stopFlash();
         if (flashEl) flashEl.textContent = 'Sequence locked — assemble below';
         build?.classList.remove('hidden');
+        markStarted();
         chosen.length = 0;
         activeRound.expectedNext.forEach((label) => {
             chosen.push(label);
