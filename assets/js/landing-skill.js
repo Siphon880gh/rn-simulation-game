@@ -1,6 +1,6 @@
 /**
  * Landing skill library — parallel start path (not after department).
- * - Start a shift: library.pack / unitHint / random unit (no auto challenge).
+ * - Start a shift: library.packs (random) / pack / unitHint / random unit (no auto challenge).
  * - Test skill: blank census + ?skill=&skillMode=test → practice modal → return here.
  * Catalog: game/events/skills/library.json
  */
@@ -82,7 +82,7 @@
 
     if (!dialog || !listEl) return;
 
-    /** @type {{ id: string, label: string, aliases?: string[], tags?: string[], blurb?: string, games?: string[], status?: string, pack?: string, unitHint?: string, patients?: string[] }[]} */
+    /** @type {{ id: string, label: string, aliases?: string[], tags?: string[], blurb?: string, games?: string[], status?: string, pack?: string, packs?: string[], unitHint?: string, patients?: string[] }[]} */
     let skills = [];
     /** @type {string|null} */
     let selectedId = null;
@@ -311,9 +311,22 @@
         return RANDOM_UNIT_HREFS[idx] || RANDOM_UNIT_HREFS[0];
     }
 
+    function pickSkillPack(skill) {
+        const list = Array.isArray(skill?.packs)
+            ? skill.packs.map((p) => String(p || '').trim()).filter(Boolean)
+            : [];
+        if (list.length > 1) {
+            return list[Math.floor(Math.random() * list.length)];
+        }
+        if (list.length === 1) return list[0];
+        const single = String(skill?.pack || '').trim();
+        return single || '';
+    }
+
     function hrefForSkillShift(skill) {
-        if (skill?.pack) {
-            return `game/index.html?speed-factor=24&scenario=${encodeURIComponent(skill.pack)}`;
+        const pack = pickSkillPack(skill);
+        if (pack) {
+            return `game/index.html?speed-factor=24&scenario=${encodeURIComponent(pack)}`;
         }
         const hint = String(skill?.unitHint || '').toLowerCase();
         if (UNIT_SCENARIO[hint]) {

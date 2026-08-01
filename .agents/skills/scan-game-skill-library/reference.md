@@ -30,6 +30,7 @@
 | `status` | no | `active` (default) \| `planned` (listed but no launch if `games` empty) |
 | `unitHint` | for skill practice | `icu` \| `medsurg` \| `tele` — landing pack choice |
 | `pack` | for skill practice | Scenario path under `game/` (e.g. `events/scenarios/skill-icp-icu.json`) |
+| `packs` | optional | Multiple scenario paths; landing picks one at random for Start shift (e.g. medsurg + tele) |
 | `patients` | for skill practice | Patient ids that require this skill (must match `patientConfigs.skills`) |
 
 Player rules: **exactly one** skill may be selected on the Skills start path (not after department). Landing prefers library `pack` / `unitHint` when set; otherwise falls back to a random unit. The game module picks one entry from `games[]` and focuses an associated patient when tagged.
