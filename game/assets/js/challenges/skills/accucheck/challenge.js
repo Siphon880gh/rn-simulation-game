@@ -1,13 +1,15 @@
 /**
  * Accucheck / glucometer + sliding-scale insulin / finger-stick challenge.
  * Dice on the task shows outcome odds; Perform rolls a band (incl. critical lab).
- * Cheat fills the correct units; player still submits.
+ * Q1 is always sliding-scale units; extra challenge-level slots use AccuData Inform MCQs
+ * from ./config.js. Cheat fills the correct units / highlights MCQ; player still submits.
  */
 import { GameConfig } from '../../../game-config.js';
 import gameState from '../../../game-state.js';
 import taskSystem from '../../../task-system.js';
 import { showShellToast, spawnCriticalLabNow } from '../../../critical-labs.js';
 import { challengeMediaHtml } from '../../../media-placeholders.js';
+import { accucheckChallengeConfig } from './config.js';
 
 export const INSULIN_TYPES = ['regular', 'aspart', 'lispro'];
 
@@ -19,6 +21,87 @@ export const SLIDING_SCALE = [
     { min: 180, max: 250, units: 4, note: null },
     { min: 251, max: 399, units: 6, note: null }
 ];
+
+function cfg() {
+    return GameConfig.accucheckChallenge || accucheckChallengeConfig || {};
+}
+
+/** Always-first prompt id (units from sliding scale). */
+export function getAccucheckSlidingScaleQuestionId() {
+    return String(cfg().slidingScaleQuestionId || 'sliding-scale');
+}
+
+export function getAccucheckMcqQuestions() {
+    const list = cfg().questions;
+    return Array.isArray(list) && list.length ? list : accucheckChallengeConfig.questions;
+}
+
+/** Pool = sliding scale (1) + AccuData Inform MCQs. */
+export function getAccucheckPoolSize() {
+    return 1 + getAccucheckMcqQuestions().length;
+}
+
+/** MCQ ids only (caller shuffles for follow-up questions after sliding scale). */
+export function getAccucheckMcqQuestionIds() {
+    return getAccucheckMcqQuestions()
+        .map((q) => q?.id)
+        .filter((id) => id != null && id !== '')
+        .map(String);
+}
+
+export function pickAccucheckMcqQuestion(opts = {}) {
+    const pool = getAccucheckMcqQuestions();
+    if (!pool.length) return null;
+    if (opts.questionId != null && opts.questionId !== '') {
+        const wanted = String(opts.questionId);
+        const exact = pool.find((q) => String(q.id) === wanted);
+        if (exact) return exact;
+    }
+    const exclude = new Set(
+        [opts.excludeId, ...(Array.isArray(opts.excludeIds) ? opts.excludeIds : [])]
+            .filter((id) => id != null && id !== '')
+            .map(String)
+    );
+    let candidates = exclude.size ? pool.filter((q) => !exclude.has(String(q.id))) : pool;
+    if (!candidates.length && opts.excludeId != null) {
+        candidates = pool.filter((q) => String(q.id) !== String(opts.excludeId));
+    }
+    if (!candidates.length) candidates = pool;
+    const roll = typeof opts.random === 'function' ? opts.random() : Math.random();
+    const idx = Math.min(candidates.length - 1, Math.floor(roll * candidates.length));
+    return candidates[idx];
+}
+
+function shuffle(list, random = Math.random) {
+    const arr = [...list];
+    for (let i = arr.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+/**
+ * AccuData Inform competency MCQ (used after the sliding-scale prompt).
+ * @returns {{ title: string, prompt: string, choices: {label:string,correct:boolean}[], expected: string, questionId: string, category?: string }|null}
+ */
+export function buildAccucheckMcqQuiz(task, opts = {}) {
+    if (!isAccucheckTask(task) && !opts.force) return null;
+    const question = opts.question || pickAccucheckMcqQuestion(opts);
+    if (!question) return null;
+    const labels = shuffle(question.choices || [], opts.random);
+    return {
+        title: 'Accucheck / AccuData Inform',
+        prompt: question.prompt,
+        category: question.category || '',
+        choices: labels.map((label) => ({
+            label,
+            correct: String(label).trim() === String(question.correct).trim()
+        })),
+        expected: question.correct,
+        questionId: question.id
+    };
+}
 
 export function isAccucheckTask(task) {
     const challenge = String(task?.metadata?.challenge || '').toLowerCase();
@@ -279,12 +362,17 @@ function renderScaleTable() {
     `;
 }
 
-export function renderAccucheckHtml(prompt) {
+export function renderAccucheckHtml(prompt, opts = {}) {
     const insulin = escapeHtml(prompt.insulin);
     const bs = escapeHtml(String(prompt.bloodSugar));
     const taskName = escapeHtml(prompt.taskName);
+    const poolSize = Number(opts.poolSize) || getAccucheckPoolSize() || 1;
+    const levelHtml = poolSize > 1 ? (opts.levelHtml || '') : '';
+    const qid = escapeHtml(getAccucheckSlidingScaleQuestionId());
     return `
-      <div class="challenge-gate accucheck-challenge space-y-3 text-left" data-challenge="accucheck">
+      <div class="challenge-gate accucheck-challenge space-y-3 text-left" data-challenge="accucheck"
+        data-accucheck-phase="sliding-scale" data-question-id="${qid}" data-pool-size="${poolSize}">
+        ${levelHtml}
         ${challengeMediaHtml('accucheck')}
         <p class="text-sm text-gray-900 font-semibold">
           Accucheck / sliding scale / finger stick
@@ -292,6 +380,9 @@ export function renderAccucheckHtml(prompt) {
         <p class="text-sm text-gray-600">
           ${GameConfig.challengeCopy?.pauseBanner
             || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}
+        </p>
+        <p class="text-xs text-violet-800 bg-violet-50 border border-violet-100 rounded px-2 py-1.5">
+          Question 1 is always the sliding-scale dose. Extra questions cover AccuData Inform meter competency.
         </p>
         <p class="text-sm text-gray-800">
           Task: <strong>${taskName}</strong>
@@ -312,6 +403,38 @@ export function renderAccucheckHtml(prompt) {
         <input id="accucheck-answer" type="text" inputmode="numeric" autocomplete="off" spellcheck="false"
           class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
           placeholder="Enter units from sliding scale" />
+        <p id="challenge-feedback" class="text-sm font-medium rounded px-3 py-2 hidden" role="status" aria-live="polite"></p>
+      </div>
+    `;
+}
+
+export function renderAccucheckMcqHtml(quiz, taskName, opts = {}) {
+    if (!quiz) return '';
+    const poolSize = Number(opts.poolSize) || getAccucheckPoolSize() || 1;
+    const levelHtml = poolSize > 1 ? (opts.levelHtml || '') : '';
+    const category = quiz.category
+        ? `<p class="text-xs font-semibold text-slate-600">${escapeHtml(quiz.category)}</p>`
+        : '';
+    const choices = (quiz.choices || []).map((c, i) => `
+      <button type="button" class="challenge-choice px-3 py-2 rounded border border-gray-200 text-left text-sm hover:bg-gray-50"
+        data-challenge-correct="${c.correct ? '1' : '0'}" data-choice-index="${i}">${escapeHtml(c.label)}</button>
+    `).join('');
+    const randomHint = poolSize > 1
+        ? '<p class="text-xs text-gray-500">Give up on this prompt? Use <strong>Random</strong> for another AccuData Inform question.</p>'
+        : '';
+    return `
+      <div class="challenge-gate accucheck-challenge space-y-3 text-left" data-challenge="accucheck"
+        data-accucheck-phase="mcq" data-question-id="${escapeHtml(quiz.questionId || '')}" data-pool-size="${poolSize}">
+        ${levelHtml}
+        ${challengeMediaHtml('accucheck')}
+        <p class="text-sm text-gray-900 font-semibold">Accucheck / AccuData Inform</p>
+        ${category}
+        <p class="text-sm text-gray-900 font-semibold" data-quiz-prompt>${escapeHtml(quiz.prompt)}</p>
+        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
+          || 'Timer is paused. Complete this game/quiz.'}</p>
+        <p class="text-xs text-gray-500">Skill focus: ${escapeHtml(taskName || 'Accucheck')}.</p>
+        ${randomHint}
+        <div class="flex flex-col gap-2" data-quiz-choices>${choices}</div>
         <p id="challenge-feedback" class="text-sm font-medium rounded px-3 py-2 hidden" role="status" aria-live="polite"></p>
       </div>
     `;

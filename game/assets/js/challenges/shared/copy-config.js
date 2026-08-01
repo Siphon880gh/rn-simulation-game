@@ -34,12 +34,16 @@ function syncChallengeLevelSummary(host, selected) {
   if (el) el.textContent = challengeLevelSummaryText(selected, max);
 }
 
+/** Max selectable challenge intensity (pool can be larger; Random still draws from full bank). */
+const CHALLENGE_LEVEL_CAP = 10;
+
 /**
  * Collapsible number-of-questions control for quizzes with a randomizable pool (>1).
  * Default selection is 1; starts collapsed.
  */
 export function renderChallengeLevelControl(poolSize, selected = 1) {
-  const max = Math.max(0, Number(poolSize) || 0);
+  const pool = Math.max(0, Number(poolSize) || 0);
+  const max = Math.min(CHALLENGE_LEVEL_CAP, pool);
   if (max <= 1) return '';
   const current = Math.min(max, Math.max(1, Number(selected) || 1));
   const label = challengeCopyConfig.challengeLevelLabel || 'I want to feel challenged';

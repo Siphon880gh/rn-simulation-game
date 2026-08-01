@@ -22,7 +22,7 @@ Test spawn (`Test` flask control) groups these as **Skills** and **Emergencies**
 | Peritoneal dialysis | [`skills/peritoneal-dialysis/config.js`](skills/peritoneal-dialysis/config.js) | `skills/peritoneal-dialysis/challenge.js` |
 | Med identity | [`skills/med-identity/config.js`](skills/med-identity/config.js) | `skills/med-identity/challenge.js` |
 | Bed prep | [`skills/bed-prep/config.js`](skills/bed-prep/config.js) | `skills/bed-prep/challenge.js` |
-| Accucheck | (task attrs + logic) | `skills/accucheck/challenge.js` |
+| Accucheck | [`skills/accucheck/config.js`](skills/accucheck/config.js) (AccuData Inform MCQs; Q1 = sliding scale in challenge) | `skills/accucheck/challenge.js` |
 | IV check / titration | (task attrs + `GameConfig` IV) | `skills/iv-check/challenge.js` |
 | Admission quizzes | `GameConfig.admission` + quiz builder | `skills/admission/challenge.js` |
 | ICP monitoring | [`skills/icp/config.js`](skills/icp/config.js) | `skills/icp/challenge.js` |

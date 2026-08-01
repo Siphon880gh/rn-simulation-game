@@ -19,7 +19,12 @@ import {
     buildAccucheckPrompt,
     checkAccucheckAnswer,
     renderAccucheckHtml,
-    applyAccucheckCheat
+    renderAccucheckMcqHtml,
+    buildAccucheckMcqQuiz,
+    applyAccucheckCheat,
+    getAccucheckPoolSize,
+    getAccucheckMcqQuestionIds,
+    getAccucheckSlidingScaleQuestionId
 } from './skills/accucheck/challenge.js';
 import {
     isIvTask,
@@ -674,7 +679,9 @@ function mountPoolChoiceQuiz(next, task, poolSize, kind) {
         ? renderIcpQuizHtml(next.quiz, task?.name, { poolSize, levelHtml })
         : kind === 'alteplase'
             ? renderAlteplaseQuizHtml(next.quiz, task?.name, { poolSize, levelHtml })
-            : renderSkillMcqHtml(next.quiz, task?.name, { poolSize, levelHtml });
+            : kind === 'accucheck'
+                ? renderAccucheckMcqHtml(next.quiz, task?.name, { poolSize, levelHtml })
+                : renderSkillMcqHtml(next.quiz, task?.name, { poolSize, levelHtml });
 
     // Fresh DOM: re-bind or re-lock the challenge-level control
     if (typeof cleanupChallengeLevel === 'function') {
@@ -829,6 +836,102 @@ function wireAccucheckHandlers() {
     }
 }
 
+/**
+ * After sliding-scale pass with challenge level > 1: AccuData Inform MCQs.
+ * Does not re-init challenge level (preserves quizCorrect / quizTarget).
+ */
+function continueAccucheckAsMcqPool() {
+    if (!activeSession) return;
+    const task = activeSession.accucheckTask || {
+        metadata: { challenge: 'accucheck' },
+        name: activeSession.taskName
+    };
+    const poolSize = activeSession.quizPoolSize || getAccucheckPoolSize();
+    const rebuild = (opts) => {
+        const quiz = buildAccucheckMcqQuiz(task, { ...opts, force: true });
+        return quiz ? { quiz } : null;
+    };
+    const next = drawFromQuizDeck(rebuild, { excludeCurrentOnly: false });
+    if (!next?.quiz) {
+        finishAttempt(true, 'accucheck-correct', activeSession.accucheckPrompt?.expected, {
+            allowRetry: true
+        });
+        return;
+    }
+
+    activeSession.accucheckPrompt = null;
+    activeSession.accucheckMcq = true;
+    activeSession.quizExpected = next.quiz.expected;
+
+    const footer = document.querySelector(GameConfig.selectors.modalFooter || '#modal-footer');
+    if (footer) {
+        footer.innerHTML = challengeModalFooter({
+            showSubmit: false,
+            showRandom: poolSize > 1,
+            randomHandler: 'poolQuizRandom',
+            randomLabel: 'Random'
+        });
+    }
+
+    mountPoolChoiceQuiz(next, task, poolSize, 'accucheck');
+    wireAccucheckMcqChoices(task, poolSize, rebuild);
+    setChallengeFeedback(
+        `Correct — ${activeSession.quizCorrect} / ${activeSession.quizTarget}. Next question…`,
+        { ok: true }
+    );
+}
+
+function wireAccucheckMcqChoices(task, poolSize, rebuild) {
+    const bind = () => {
+        const gate = document.querySelector('.challenge-gate');
+        if (!gate) return;
+        gate.querySelectorAll('.challenge-choice').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                if (activeSession?.closing) return;
+                const ok = btn.getAttribute('data-challenge-correct') === '1';
+                const expected = activeSession?.quizExpected;
+                if (!ok) {
+                    finishAttempt(false, 'accucheck-incorrect', expected, { allowRetry: true });
+                    return;
+                }
+                noteQuizCorrectAndMaybeContinue({
+                    onComplete: () => {
+                        finishAttempt(true, 'accucheck-correct', expected, { allowRetry: true });
+                    },
+                    onNeedNext: () => {
+                        const next = drawFromQuizDeck(rebuild, { excludeCurrentOnly: false });
+                        if (!next?.quiz) {
+                            finishAttempt(true, 'accucheck-correct', expected, { allowRetry: true });
+                            return;
+                        }
+                        mountPoolChoiceQuiz(next, task, poolSize, 'accucheck');
+                        setChallengeFeedback(
+                            `Correct — ${activeSession.quizCorrect} / ${activeSession.quizTarget}. Next question…`,
+                            { ok: true }
+                        );
+                        bind();
+                    }
+                });
+            });
+        });
+    };
+    bind();
+
+    if (poolSize > 1) {
+        window.poolQuizRandom = () => {
+            if (!activeSession || activeSession.closing) return;
+            const next = drawFromQuizDeck(rebuild, { excludeCurrentOnly: true });
+            if (!next?.quiz) return;
+            mountPoolChoiceQuiz(next, task, poolSize, 'accucheck');
+            setChallengeFeedback('New question loaded — pick an answer.', { ok: true });
+            bind();
+        };
+        cleanupPoolQuizRandom = () => {
+            delete window.poolQuizRandom;
+        };
+    }
+}
+
 export function submitAccucheck() {
     if (!activeSession?.accucheckPrompt || activeSession.closing) return;
     const input = document.querySelector('#accucheck-answer');
@@ -838,13 +941,18 @@ export function submitAccucheck() {
         input?.focus();
         return;
     }
+    const expected = activeSession.accucheckPrompt.expected;
     const ok = checkAccucheckAnswer(answer, activeSession.accucheckPrompt);
-    finishAttempt(
-        ok,
-        ok ? 'accucheck-correct' : 'accucheck-incorrect',
-        activeSession.accucheckPrompt.expected,
-        { allowRetry: true }
-    );
+    if (!ok) {
+        finishAttempt(false, 'accucheck-incorrect', expected, { allowRetry: true });
+        return;
+    }
+    noteQuizCorrectAndMaybeContinue({
+        onComplete: () => {
+            finishAttempt(true, 'accucheck-correct', expected, { allowRetry: true });
+        },
+        onNeedNext: () => continueAccucheckAsMcqPool()
+    });
 }
 
 function cheatSafetyHighlight() {
@@ -877,6 +985,11 @@ export function cheatChallenge() {
     if (activeSession.accucheckPrompt) {
         applyAccucheckCheat(activeSession.accucheckPrompt);
         setChallengeFeedback('Cheat filled the correct units — press Submit when ready.', { ok: true });
+        return;
+    }
+    if (activeSession.accucheckMcq) {
+        cheatSafetyHighlight();
+        setChallengeFeedback('Cheat highlighted the correct answer — pick it when ready.', { ok: true });
         return;
     }
     if (activeSession.medPrompt) {
@@ -1328,14 +1441,38 @@ export function runChallengeGate(task) {
             });
             setTimeout(wireIvHandlers, 0);
         } else if (accucheckPrompt) {
+            const poolSize = getAccucheckPoolSize();
+            const slidingId = getAccucheckSlidingScaleQuestionId();
+            const mcqDeck = beginShuffledQuizDeck(getAccucheckMcqQuestionIds());
+            activeSession.accucheckTask = liveTask;
+            activeSession.quizPoolSize = poolSize;
+            activeSession.quizDeck = mcqDeck;
+            // -1 so the first drawFromQuizDeck step lands on mcqDeck[0]
+            activeSession.quizDeckIndex = -1;
+            activeSession.currentQuestionId = slidingId;
+            activeSession.quizSeenIds = new Set([slidingId]);
+            activeSession.quizExpected = accucheckPrompt.expected;
             ModalModule.openModal({
                 title: 'Accucheck / sliding scale / finger stick',
-                content: renderAccucheckHtml(accucheckPrompt),
+                content: renderAccucheckHtml(accucheckPrompt, {
+                    poolSize,
+                    levelHtml: renderChallengeLevelControl(poolSize, 1)
+                }),
                 footer: challengeModalFooter(),
                 overlay: true,
                 persistent: false
             });
-            setTimeout(wireAccucheckHandlers, 0);
+            setTimeout(() => {
+                initQuizChallengeLevel(poolSize);
+                if (activeSession) {
+                    activeSession.quizDeck = mcqDeck;
+                    activeSession.quizDeckIndex = -1;
+                    activeSession.currentQuestionId = slidingId;
+                    activeSession.quizSeenIds = new Set([slidingId]);
+                    activeSession.quizExpected = accucheckPrompt.expected;
+                }
+                wireAccucheckHandlers();
+            }, 0);
         } else if (useMedQuiz) {
             ModalModule.openModal({
                 title: 'Med identity challenge',

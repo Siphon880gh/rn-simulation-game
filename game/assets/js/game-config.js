@@ -11,6 +11,7 @@ import { peritonealDialysisChallengeConfig } from './challenges/skills/peritonea
 import { medIdentityChallengeConfig } from './challenges/skills/med-identity/config.js';
 import { icpChallengeConfig } from './challenges/skills/icp/config.js';
 import { alteplaseChallengeConfig } from './challenges/skills/alteplase/config.js';
+import { accucheckChallengeConfig } from './challenges/skills/accucheck/config.js';
 import { skillMcqChallengeConfig } from './challenges/skills/skill-mcq/config.js';
 import { getChallengeTestSpawnIncidents } from './challenges/test-spawn.js';
 
@@ -652,6 +653,7 @@ export const GameConfig = {
   medIdentityChallenge: medIdentityChallengeConfig,
   icpChallenge: icpChallengeConfig,
   alteplaseChallenge: alteplaseChallengeConfig,
+  accucheckChallenge: accucheckChallengeConfig,
   skillMcqChallenge: skillMcqChallengeConfig,
 
   /**
