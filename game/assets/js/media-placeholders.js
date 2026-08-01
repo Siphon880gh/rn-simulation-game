@@ -389,13 +389,80 @@ export function showCriticalLabMedia(opts = {}) {
 }
 
 /**
+ * Infer medication form kind for busy-slot thumbs.
+ * Honors authored metadata.kind / metadata.route, then challenge + name heuristics.
+ * Returns '' when the task is not a classifiable med (caller keeps type fallback).
+ */
+export function inferMedSlotKind(task) {
+    const type = String(task?.type || '').toLowerCase().trim();
+    if (type && type !== 'med') return '';
+
+    const existing = String(task?.kind || task?.metadata?.kind || '').toLowerCase().trim();
+    if (existing.startsWith('med-')) return existing;
+
+    const challenge = String(task?.metadata?.challenge || '').toLowerCase().trim();
+    if (challenge === 'accucheck') return '';
+
+    const route = String(task?.metadata?.route || '').toLowerCase().trim();
+    const name = String(task?.name || '');
+
+    if (
+        challenge === 'ivpb'
+        || challenge === 'ivpb-hang'
+        || route === 'ivpb'
+        || route === 'piggyback'
+        || /ivpb|piggyback|iv\s*piggy/i.test(name)
+    ) {
+        return 'med-ivpb';
+    }
+
+    if (
+        route === 'ivp'
+        || route === 'iv-push'
+        || route === 'ivpush'
+        || route === 'push'
+        || /\biv\s*push\b/i.test(name)
+        || /\bivp\b(?!b)/i.test(name)
+        || (/\bIV\b/i.test(name) && !/ivpb|piggy/i.test(name))
+    ) {
+        return 'med-iv-push';
+    }
+
+    if (
+        ['sq', 'subq', 'subcut', 'subcutaneous', 'im', 'injection', 'shot', 'syringe'].includes(route)
+        || /\b(sq|subq|subcut(?:aneous)?|\bim\b|injection|syringe|insulin)\b/i.test(name)
+        || /\(\s*sq/i.test(name)
+    ) {
+        return 'med-shot';
+    }
+
+    if (/\b(neb|nebulizer|inhaler|\bmdi\b)\b/i.test(name)) return '';
+
+    if (
+        ['po', 'oral', 'pill', 'pills', 'capsule', 'tablet', 'ng', 'peg'].includes(route)
+        || /\b(po|oral|tablet|capsule|chew|pill)\b/i.test(name)
+        || challenge === 'med-identity'
+    ) {
+        return 'med-pills';
+    }
+
+    // Most unlabeled pack meds are oral unit-dose → pills thumb.
+    return 'med-pills';
+}
+
+/**
  * Resolve busy-slot catalog id:
- * metadata.kind → slotByTaskKind, else task.type → slotByTaskType, else fallback.
+ * metadata.kind → slotByTaskKind, else inferred med form kind, else task.type →
+ * slotByTaskType, else fallback.
  * Typed thumbs are always stills; slotPreferVideo only applies to the fallback.
  */
 export function resolveSlotAssetId(task) {
-    const kind = String(task?.kind || task?.metadata?.kind || '').toLowerCase().trim();
     const kindMap = cfg().slotByTaskKind || {};
+    let kind = String(task?.kind || task?.metadata?.kind || '').toLowerCase().trim();
+    if (!kind || (String(task?.type || '').toLowerCase() === 'med' && !kind.startsWith('med-'))) {
+        const inferred = inferMedSlotKind(task);
+        if (inferred) kind = inferred;
+    }
     const kindId = kind && typeof kindMap[kind] === 'string' ? kindMap[kind].trim() : '';
     if (kindId) return kindId;
 
@@ -696,6 +763,7 @@ const MediaPlaceholdersModule = {
     videoAudioToggleHtml,
     wireMediaAudioToggles,
     showCriticalLabMedia,
+    inferMedSlotKind,
     resolveSlotAssetId,
     slotMediaHtml,
     challengeMediaHtml,

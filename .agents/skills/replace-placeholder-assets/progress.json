@@ -153,7 +153,27 @@
       "id": "slot-med",
       "status": "done",
       "file": "assets/media/slot-med.webp",
-      "higgsfieldJobId": "df43dabe-6eb3-4de7-8975-e94ff9e78fb1"
+      "higgsfieldJobId": "2b904719-29a5-4589-acd9-e0fc845839c3",
+      "note": "pills/capsules icon thumb"
+    },
+    {
+      "id": "slot-med-shot",
+      "status": "done",
+      "file": "assets/media/slot-med-shot.webp",
+      "higgsfieldJobId": "b1785907-6997-4925-9765-812507a09d51"
+    },
+    {
+      "id": "slot-med-ivpb",
+      "status": "done",
+      "file": "assets/media/slot-med-ivpb.webp",
+      "higgsfieldJobId": "3249df0f-b7cd-4774-a118-06e669b3b191",
+      "note": "cropped left panel from triptych to single bag"
+    },
+    {
+      "id": "slot-med-iv-push",
+      "status": "done",
+      "file": "assets/media/slot-med-iv-push.webp",
+      "higgsfieldJobId": "006e936d-1e2f-41cc-99db-2bff3f8d2ef0"
     },
     {
       "id": "slot-assessment",

@@ -39,7 +39,10 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 | `situation-bed-prep` | image | Bed prep | Bed-prep challenge modal still | Empty bed being made / wall O2-suction | `assets/media/situation-bed-prep.webp` |
 | `slot-perform` | image | Performing care | Busy task slot thumb (fallback) | Generic bedside-care thumb when task type has no `slotByTaskType` entry | `assets/media/slot-perform.webp` |
 | `slot-perform-video` | video | Performing care | Busy slot (optional video) | Short silent loop for fallback slot; enable via `slotPreferVideo: true` | `assets/media/slot-perform-video.mp4` |
-| `slot-med` | image | Medication | Busy slot · `med` | Med admin thumb for medication tasks in a queue slot | `assets/media/slot-med.webp` |
+| `slot-med` | image | Pills / capsules | Busy slot · `med-pills` / `med` | Oral pills/capsules thumb (also type=`med` fallback) | `assets/media/slot-med.webp` |
+| `slot-med-shot` | image | Injection / shot | Busy slot · `med-shot` | SQ/IM syringe shot thumb | `assets/media/slot-med-shot.webp` |
+| `slot-med-ivpb` | image | IVPB | Busy slot · `med-ivpb` | Secondary IV piggyback bag thumb | `assets/media/slot-med-ivpb.webp` |
+| `slot-med-iv-push` | image | IV push | Busy slot · `med-iv-push` | IV push syringe-into-line thumb | `assets/media/slot-med-iv-push.webp` |
 | `slot-assessment` | image | Shift assessment | Busy slot · `shift-assessment` / `assessment` | Bedside vitals / stethoscope thumb | `assets/media/slot-assessment.webp` |
 | `slot-chart-assessment` | image | Chart assessment | Busy slot · `chart-assessment` | Charting at a computer workstation (distinct from shift assess) | `assets/media/slot-chart-assessment.webp` |
 | `slot-turn-patient` | image | Turn patient | Busy slot · `turn-patient` | Q2H turn / reposition thumb | `assets/media/slot-turn-patient.webp` |
@@ -72,7 +75,7 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 
 Toggle challenge heroes: `GameConfig.mediaPlaceholders.mounts.challenges`. Per-game map: `mediaPlaceholders.challenges.<key>` (`imageId`/`videoId` = **before** during quiz; `afterImageId` swaps in after the last question / challenge-level target, on the Continue screen before the modal closes).
 
-Busy-slot thumbs: `mediaPlaceholders.slotByTaskKind` maps `metadata.kind` first (`chart-assessment`, `shift-assessment`, `turn-patient`, `chair-alarm`, `bed-alarm`, `call-light`, …), then `slotByTaskType` (`med` → `slot-med`, …). Type `assessment` is **not** mapped (too many non-assess tasks share it). Unmapped use `slotFallbackId` (`slot-perform`).
+Busy-slot thumbs: `mediaPlaceholders.slotByTaskKind` maps `metadata.kind` first (`chart-assessment`, `shift-assessment`, `turn-patient`, `chair-alarm`, `bed-alarm`, `call-light`, `med-pills`, `med-shot`, `med-ivpb`, `med-iv-push`, …), then `slotByTaskType` (`med` → `slot-med`, …). Med form kinds are stamped from pack `data-route` / `data-task-kind` or inferred (`data-challenge="ivpb"`, name markers like `SQ` / `IVPB` / `IV push`). Type `assessment` is **not** mapped (too many non-assess tasks share it). Unmapped use `slotFallbackId` (`slot-perform`).
 
 ---
 

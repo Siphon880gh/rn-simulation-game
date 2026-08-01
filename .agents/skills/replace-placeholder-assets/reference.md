@@ -26,8 +26,8 @@
 | `mounts.slots` | Busy slot thumbs |
 | `mounts.challenges` | In-modal heroes for games/quizzes |
 | `challenges.<key>` | `{ imageId, videoId?, preferVideo? }` — Code Blue prefers video |
-| `slotByTaskKind` | `metadata.kind` → catalog id (`chart-assessment`, `turn-patient`, `chair-alarm`, …) |
-| `slotByTaskType` | `task.type` → catalog id (`med` → `slot-med`, …) |
+| `slotByTaskKind` | `metadata.kind` → catalog id (`chart-assessment`, `med-pills`, `med-shot`, `med-ivpb`, `med-iv-push`, …) |
+| `slotByTaskType` | `task.type` → catalog id (`med` → `slot-med` pills fallback, …) |
 | `slotFallbackId` | Default `slot-perform` when kind/type unmapped |
 | `slotPreferVideo` | Use `slot-perform-video` for fallback only |
 | `assets` | Per-id patches merged onto catalog |

@@ -78,7 +78,8 @@ URL override: `game/index.html?scenario=events/scenarios/<file>.json&shift-start
 
 - `data-task-type`: `med` | `assessment` | `iv` | `bedprep` | …
 - `data-scheduled` / `data-expire` / `data-duration-mins` / `data-status="not-yet"`
-- Optional `data-challenge` (e.g. `accucheck`)
+- Optional `data-challenge` (e.g. `accucheck`, `ivpb`, `med-identity`)
+- Optional med route for queue thumbs: `data-route="po|sq|im|ivpb|iv-push"` (alias `data-med-form`) and/or `data-task-kind="med-pills|med-shot|med-ivpb|med-iv-push"`
 - Care schedule: on `.patient` root — `data-care-schedule="turn-q2h"` + `data-care-reason="…"`
 
 ### Config care schedules

@@ -85,12 +85,42 @@
     {
       "id": "slot-med",
       "kind": "image",
-      "title": "Medication",
+      "title": "Pills / capsules",
       "mount": "slot.busy.med",
       "w": 160,
       "h": 120,
-      "prompt": "Subject: tiny busy-slot thumb (~160×120) for medication administration — med cup / unit-dose packs on a tray (fictional labels OK), no faces. Caption \"Med\".",
+      "prompt": "Subject: busy-slot ICON thumb for oral PILLS / CAPSULES — fill 4:3 frame edge-to-edge with extreme close-up of a clear med cup filled with colorful tablets and capsules plus blister packs (fictional labels OK); no syringes, no IV bags; no faces; readable at 80px. Caption \"Pills\".",
       "replaceWith": "assets/media/slot-med.webp"
+    },
+    {
+      "id": "slot-med-shot",
+      "kind": "image",
+      "title": "Injection / shot",
+      "mount": "slot.busy.med-shot",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: busy-slot ICON thumb for SQ/IM injection SHOT — photorealistic clinical product photo, fill entire 4:3 frame edge-to-edge (NO letterbox, NO black bars, NO UI chrome panels). Extreme close-up of ONE prefilled syringe with needle capped lying diagonally across a teal med tray next to a round alcohol swab packet; bright hospital lighting; fictional pharmacy label OK. Absolutely no pills, no capsules, no IV bags, no faces, no gore, no glitch/pixel art, no multi-panel dashboard. Subtle caption \"Shot\" at bottom.",
+      "replaceWith": "assets/media/slot-med-shot.webp"
+    },
+    {
+      "id": "slot-med-ivpb",
+      "kind": "image",
+      "title": "IVPB",
+      "mount": "slot.busy.med-ivpb",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: busy-slot ICON thumb for IVPB piggyback — photorealistic clinical product photo, fill entire 4:3 frame edge-to-edge (NO letterbox, NO black bars, NO UI chrome panels). Extreme close-up of a small clear secondary IV medication bag hanging from a metal pole hook with drip chamber and tubing below; fictional pharmacy label reading IVPB; bright hospital lighting. Absolutely no oral pills, no injection syringes in frame, no faces, no gore, no glitch/pixel art, no multi-panel dashboard. Subtle caption \"IVPB\" at bottom.",
+      "replaceWith": "assets/media/slot-med-ivpb.webp"
+    },
+    {
+      "id": "slot-med-iv-push",
+      "kind": "image",
+      "title": "IV push",
+      "mount": "slot.busy.med-iv-push",
+      "w": 160,
+      "h": 120,
+      "prompt": "Subject: busy-slot ICON thumb for IV PUSH — photorealistic clinical product photo, fill entire 4:3 frame edge-to-edge (NO letterbox, NO black bars, NO UI chrome panels). Extreme close-up of a Luer-lock syringe barrel plunging into an IV saline lock / needleless Y-site connector with clear tubing; medication syringe only, no oral pills, no hanging secondary IV bag, no faces, no gore, no glitch/pixel art. Bright hospital lighting. Subtle caption \"IVP\" at bottom.",
+      "replaceWith": "assets/media/slot-med-iv-push.webp"
     },
     {
       "id": "slot-assessment",

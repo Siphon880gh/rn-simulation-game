@@ -5,6 +5,7 @@ import taskSystem from './task-system.js';
 import SlotSystem from './slot-system.js';
 import { registerPatientIv } from './iv-system.js';
 import { loadPastHxPack, ensurePastHxTimeline } from './past-hx-timeline.js';
+import { inferMedSlotKind } from './media-placeholders.js';
 
 const PatientsModule = (() => {
     console.log("Patients module initialized");
@@ -1992,6 +1993,10 @@ const PatientsModule = (() => {
             if (challenge) metadata.challenge = challenge;
             const skillId = element.getAttribute('data-skill-id');
             if (skillId) metadata.skillId = skillId;
+            const route = element.getAttribute('data-route') || element.getAttribute('data-med-form');
+            if (route) metadata.route = route;
+            const authoredKind = element.getAttribute('data-task-kind');
+            if (authoredKind) metadata.kind = authoredKind;
             if (element.getAttribute('data-iv-drug')) {
                 metadata.drug = element.getAttribute('data-iv-drug');
             }
@@ -2006,10 +2011,16 @@ const PatientsModule = (() => {
             }
             const delegateMode = element.getAttribute('data-delegate-mode');
             if (delegateMode) metadata.delegateMode = delegateMode;
+            const name = element.querySelector('.font-medium')?.textContent || 'Unknown Task';
+            const type = element.getAttribute('data-task-type');
+            if (type === 'med' && !metadata.kind) {
+                const medKind = inferMedSlotKind({ type, name, metadata });
+                if (medKind) metadata.kind = medKind;
+            }
             return {
                 id: element.id || `${patientId}-task-${index}`,
-                name: element.querySelector('.font-medium')?.textContent || 'Unknown Task',
-                type: element.getAttribute('data-task-type'),
+                name,
+                type,
                 taskClass: element.getAttribute('data-task-class') || GameConfig.tasks.classes.ROUTINE,
                 scheduled: element.getAttribute('data-scheduled'),
                 expire: element.getAttribute('data-expire'),
