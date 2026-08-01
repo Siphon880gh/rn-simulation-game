@@ -11,7 +11,12 @@
     "Respond to rhythm / bedside alarms without losing routine meds",
     "Sequence work when multiple patients share similar urgency cues"
   ],
-  "patients": ["derek", "maria", "robert", "aisha"],
+  "patients": [
+    "derek",
+    "maria",
+    "robert",
+    "aisha"
+  ],
   "scene": {
     "theme": "tele",
     "unitBackground": null,
@@ -25,28 +30,6 @@
     "1900": [],
     "default": []
   },
-  "events": [
-    {
-      "id": "tele-alarm-1915",
-      "at": 1915,
-      "type": "emergency",
-      "message": "Central tele: new irregular rhythm — bedside strip check",
-      "injectTasks": [
-        {
-          "id": "evt-tele-rhythm-1915",
-          "type": "assessment",
-          "name": "Central tele alarm — rhythm strip analysis",
-          "patientId": "derek",
-          "scheduled": 1915,
-          "expire": "+35",
-          "durationMins": 12,
-          "taskClass": "urgent",
-          "metadata": {
-            "challenge": "skill-mcq",
-            "skillId": "ecg-basics"
-          }
-        }
-      ]
-    }
-  ]
+  "events": []
 }
+

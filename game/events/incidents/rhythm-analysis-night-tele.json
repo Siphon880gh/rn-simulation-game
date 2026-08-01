@@ -1,9 +1,18 @@
 {
   "id": "rhythm-analysis-night-tele",
   "title": "Night Tele — Rhythm strip analysis incidents",
-  "version": 1,
+  "version": 3,
   "fictionalOnly": true,
   "disclaimer": "Incident pack content is fictional practice — not a competency assessment.",
+  "spawnPlan": {
+    "id": "rhythm-strip",
+    "matchSkillId": "ecg-basics",
+    "matchKind": "rhythm-strip",
+    "firstHourPerPatient": true,
+    "firstHourWindowGameMinutes": 60,
+    "ongoingEveryGameMinutes": 120,
+    "ongoingStartAfterGameMinutes": 120
+  },
   "dynamicTemplates": [
     {
       "id": "rhythm-strip-analysis",
@@ -11,12 +20,13 @@
       "type": "assessment",
       "taskClass": "urgent",
       "name": "Telemetry alarm — rhythm strip analysis",
-      "durationMins": 12,
+      "durationMins": 2,
       "expire": "+30",
       "patientScope": "random",
       "metadata": {
         "challenge": "skill-mcq",
-        "skillId": "ecg-basics"
+        "skillId": "ecg-basics",
+        "kind": "rhythm-strip"
       }
     },
     {
@@ -25,12 +35,14 @@
       "type": "assessment",
       "taskClass": "stat",
       "name": "Irregular tachy on tele — identify rhythm",
-      "durationMins": 12,
+      "durationMins": 2,
       "expire": "+25",
       "patientScope": "random",
       "metadata": {
         "challenge": "skill-mcq",
-        "skillId": "ecg-basics"
+        "skillId": "ecg-basics",
+        "kind": "rhythm-strip",
+        "rhythmPool": "irregular-tachy"
       }
     },
     {
@@ -39,113 +51,16 @@
       "type": "assessment",
       "taskClass": "stat",
       "name": "Pause / drop on tele — strip check",
-      "durationMins": 12,
+      "durationMins": 2,
       "expire": "+25",
       "patientScope": "random",
       "metadata": {
         "challenge": "skill-mcq",
-        "skillId": "ecg-basics"
+        "skillId": "ecg-basics",
+        "kind": "rhythm-strip",
+        "rhythmPool": "pause-drop"
       }
-    },
-    {
-      "id": "oxygen-desat",
-      "weight": 1,
-      "type": "assessment",
-      "taskClass": "stat",
-      "name": "Desaturation — oxygen / reposition",
-      "durationMins": 12,
-      "expire": "+25",
-      "patientScope": "random"
     }
   ],
-  "events": [
-    {
-      "id": "tele-rhythm-pvc-1930",
-      "at": 1930,
-      "type": "emergency",
-      "message": "Derek: frequent PVCs on tele — print strip and identify rhythm",
-      "injectTasks": [
-        {
-          "id": "evt-derek-rhythm-1930",
-          "type": "assessment",
-          "name": "Telemetry PVC alarm — rhythm strip analysis",
-          "patientId": "derek",
-          "scheduled": 1930,
-          "expire": "+35",
-          "durationMins": 12,
-          "taskClass": "urgent",
-          "metadata": {
-            "challenge": "skill-mcq",
-            "skillId": "ecg-basics"
-          }
-        }
-      ]
-    },
-    {
-      "id": "tele-rhythm-afib-2000",
-      "at": 2000,
-      "type": "emergency",
-      "message": "Maria: irregular narrow-complex tachy on tele — identify the rhythm",
-      "injectTasks": [
-        {
-          "id": "evt-maria-rhythm-2000",
-          "type": "assessment",
-          "name": "Irregular tachy — rhythm strip analysis",
-          "patientId": "maria",
-          "scheduled": 2000,
-          "expire": "+30",
-          "durationMins": 12,
-          "taskClass": "stat",
-          "metadata": {
-            "challenge": "skill-mcq",
-            "skillId": "ecg-basics"
-          }
-        }
-      ]
-    },
-    {
-      "id": "tele-rhythm-block-2045",
-      "at": 2045,
-      "type": "emergency",
-      "message": "Robert: HR drop with dropped beats on tele — strip analysis",
-      "injectTasks": [
-        {
-          "id": "evt-robert-rhythm-2045",
-          "type": "assessment",
-          "name": "Bradycardia / dropped beats — rhythm strip analysis",
-          "patientId": "robert",
-          "scheduled": 2045,
-          "expire": "+30",
-          "durationMins": 12,
-          "taskClass": "stat",
-          "metadata": {
-            "challenge": "skill-mcq",
-            "skillId": "ecg-basics"
-          }
-        }
-      ]
-    },
-    {
-      "id": "tele-rhythm-svt-2130",
-      "at": 2130,
-      "type": "emergency",
-      "message": "Aisha: sudden narrow-complex tachy on tele — identify rhythm",
-      "injectTasks": [
-        {
-          "id": "evt-aisha-rhythm-2130",
-          "type": "assessment",
-          "name": "Sudden tachy — rhythm strip analysis",
-          "patientId": "aisha",
-          "scheduled": 2130,
-          "expire": "+30",
-          "durationMins": 12,
-          "taskClass": "stat",
-          "metadata": {
-            "challenge": "skill-mcq",
-            "skillId": "ecg-basics"
-          }
-        }
-      ]
-    }
-  ]
+  "events": []
 }

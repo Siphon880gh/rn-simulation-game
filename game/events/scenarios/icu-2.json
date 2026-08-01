@@ -11,7 +11,10 @@
     "Protect high-risk windows when both patients can deteriorate",
     "Practice Code Blue / escalate cues under compressed census"
   ],
-  "patients": ["lyle", "robert"],
+  "patients": [
+    "lyle",
+    "robert"
+  ],
   "patientOverrides": {
     "lyle": {
       "clinicalStatus": "watch",
@@ -51,28 +54,6 @@
           "expire": "+30",
           "durationMins": 15,
           "taskClass": "stat"
-        }
-      ]
-    },
-    {
-      "id": "icu-rhythm-open-1945",
-      "at": 1945,
-      "type": "emergency",
-      "message": "Bedside monitor: new arrhythmia alarm — identify the strip",
-      "injectTasks": [
-        {
-          "id": "evt-icu-lyle-rhythm-1945",
-          "type": "assessment",
-          "name": "New arrhythmia alarm — rhythm strip analysis",
-          "patientId": "lyle",
-          "scheduled": 1945,
-          "expire": "+30",
-          "durationMins": 12,
-          "taskClass": "stat",
-          "metadata": {
-            "challenge": "skill-mcq",
-            "skillId": "ecg-basics"
-          }
         }
       ]
     },

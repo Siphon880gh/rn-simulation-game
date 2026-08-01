@@ -86,9 +86,9 @@ import {
 import {
     isSkillMcqTask,
     buildSkillMcqQuiz,
+    buildSkillMcqQuizDeckIds,
     renderSkillMcqHtml,
     getSkillMcqPoolSize,
-    getSkillMcqQuestionIds,
     wireSkillMcqInteractions,
     applySkillMcqCheat
 } from './skills/skill-mcq/challenge.js';
@@ -1138,9 +1138,11 @@ export function runChallengeGate(task) {
         } else if (!bedPrep && !ivReplace && !ivpbHang && !pdSeq && isSepsisScreenTask(liveTask)) {
             sepsisScreenPrompt = buildSepsisScreenPrompt(liveTask);
         } else if (!bedPrep && !ivReplace && !ivpbHang && !pdSeq && isSkillMcqTask(liveTask)) {
-            const skillId = String(liveTask?.metadata?.skillId || '').trim();
-            quizDeck = beginShuffledQuizDeck(getSkillMcqQuestionIds(skillId));
-            skillMcq = buildSkillMcqQuiz(liveTask, { questionId: quizDeck[0] });
+            // Rhythm-strip: opener matches metadata.rhythmPool when set; rest = any strip (boosters).
+            quizDeck = buildSkillMcqQuizDeckIds(liveTask);
+            skillMcq = quizDeck.length
+                ? buildSkillMcqQuiz(liveTask, { questionId: quizDeck[0] })
+                : buildSkillMcqQuiz(liveTask);
         }
 
         const admissionQuiz = !bedPrep && !ivReplace && !ivpbHang && !pdSeq && !icpQuiz && !alteplaseQuiz
@@ -1386,7 +1388,8 @@ export function runChallengeGate(task) {
             }, 0);
         } else if (skillMcq) {
             const skillId = String(liveTask?.metadata?.skillId || '').trim();
-            const poolSize = getSkillMcqPoolSize(skillId);
+            const stripOnly = String(liveTask?.metadata?.kind || '').toLowerCase() === 'rhythm-strip';
+            const poolSize = getSkillMcqPoolSize(skillId, stripOnly ? { types: ['image'] } : {});
             activeSession.quizExpected = skillMcq.expected;
             activeSession.quizExpectedLabels = Array.isArray(skillMcq.expectedLabels)
                 ? skillMcq.expectedLabels

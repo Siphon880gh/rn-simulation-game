@@ -39,6 +39,7 @@ export function normalizePack(raw, sourceUrl) {
             ? raw.orderInjections
             : {},
         dynamicTemplates: Array.isArray(raw.dynamicTemplates) ? raw.dynamicTemplates : [],
+        spawnPlan: raw.spawnPlan && typeof raw.spawnPlan === 'object' ? raw.spawnPlan : null,
         scene: raw.scene && typeof raw.scene === 'object' ? raw.scene : null,
         incidentPackUrl: typeof raw.incidentPackUrl === 'string' ? raw.incidentPackUrl : null,
         shiftStart: Number.isFinite(Number(raw.shiftStart)) ? Number(raw.shiftStart) : null,
@@ -66,10 +67,14 @@ export function mergeIncidentPack(pack, incidentRaw) {
         ...(pack.dynamicTemplates || []),
         ...extraTemplates.filter((t) => t?.id && !seenTpl.has(t.id))
     ];
+    const spawnPlan = (incidentRaw.spawnPlan && typeof incidentRaw.spawnPlan === 'object')
+        ? incidentRaw.spawnPlan
+        : (pack.spawnPlan || null);
     return {
         ...pack,
         events: mergedEvents,
         dynamicTemplates: mergedTemplates,
+        spawnPlan,
         incidentPackId: String(incidentRaw.id || 'incident-pack'),
         incidentPackTitle: String(incidentRaw.title || 'Incident pack')
     };

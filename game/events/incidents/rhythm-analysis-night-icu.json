@@ -1,9 +1,18 @@
 {
   "id": "rhythm-analysis-night-icu",
   "title": "Night ICU — Rhythm strip analysis incidents",
-  "version": 1,
+  "version": 3,
   "fictionalOnly": true,
   "disclaimer": "Incident pack content is fictional practice — not a competency assessment.",
+  "spawnPlan": {
+    "id": "rhythm-strip",
+    "matchSkillId": "ecg-basics",
+    "matchKind": "rhythm-strip",
+    "firstHourPerPatient": true,
+    "firstHourWindowGameMinutes": 60,
+    "ongoingEveryGameMinutes": 120,
+    "ongoingStartAfterGameMinutes": 120
+  },
   "dynamicTemplates": [
     {
       "id": "rhythm-strip-analysis-icu",
@@ -11,12 +20,13 @@
       "type": "assessment",
       "taskClass": "stat",
       "name": "Monitor alarm — rhythm strip analysis",
-      "durationMins": 12,
+      "durationMins": 2,
       "expire": "+25",
       "patientScope": "random",
       "metadata": {
         "challenge": "skill-mcq",
-        "skillId": "ecg-basics"
+        "skillId": "ecg-basics",
+        "kind": "rhythm-strip"
       }
     },
     {
@@ -25,12 +35,14 @@
       "type": "assessment",
       "taskClass": "stat",
       "name": "Unstable-looking rhythm on monitor — identify strip",
-      "durationMins": 12,
+      "durationMins": 2,
       "expire": "+20",
       "patientScope": "random",
       "metadata": {
         "challenge": "skill-mcq",
-        "skillId": "ecg-basics"
+        "skillId": "ecg-basics",
+        "kind": "rhythm-strip",
+        "rhythmPool": "unstable"
       }
     },
     {
@@ -39,91 +51,16 @@
       "type": "assessment",
       "taskClass": "urgent",
       "name": "Pacer / capture concern — strip analysis",
-      "durationMins": 12,
+      "durationMins": 2,
       "expire": "+30",
       "patientScope": "random",
       "metadata": {
         "challenge": "skill-mcq",
-        "skillId": "ecg-basics"
+        "skillId": "ecg-basics",
+        "kind": "rhythm-strip",
+        "rhythmPool": "pacer"
       }
-    },
-    {
-      "id": "oxygen-desat",
-      "weight": 1,
-      "type": "assessment",
-      "taskClass": "stat",
-      "name": "Desaturation — oxygen / escalate",
-      "durationMins": 12,
-      "expire": "+25",
-      "patientScope": "random"
     }
   ],
-  "events": [
-    {
-      "id": "icu-rhythm-lyle-1935",
-      "at": 1935,
-      "type": "emergency",
-      "message": "Lyle: new monitor alarm — wide vs narrow? Identify the rhythm",
-      "injectTasks": [
-        {
-          "id": "evt-lyle-rhythm-1935",
-          "type": "assessment",
-          "name": "ICU monitor alarm — rhythm strip analysis",
-          "patientId": "lyle",
-          "scheduled": 1935,
-          "expire": "+30",
-          "durationMins": 12,
-          "taskClass": "stat",
-          "metadata": {
-            "challenge": "skill-mcq",
-            "skillId": "ecg-basics"
-          }
-        }
-      ]
-    },
-    {
-      "id": "icu-rhythm-robert-2015",
-      "at": 2015,
-      "type": "emergency",
-      "message": "Robert: rate change on arterial/ECG monitor — strip analysis",
-      "injectTasks": [
-        {
-          "id": "evt-robert-rhythm-2015",
-          "type": "assessment",
-          "name": "Rate change — rhythm strip analysis",
-          "patientId": "robert",
-          "scheduled": 2015,
-          "expire": "+30",
-          "durationMins": 12,
-          "taskClass": "stat",
-          "metadata": {
-            "challenge": "skill-mcq",
-            "skillId": "ecg-basics"
-          }
-        }
-      ]
-    },
-    {
-      "id": "icu-rhythm-lyle-2110",
-      "at": 2110,
-      "type": "emergency",
-      "message": "Lyle: possible heart block pattern on monitor — confirm strip",
-      "injectTasks": [
-        {
-          "id": "evt-lyle-rhythm-2110",
-          "type": "assessment",
-          "name": "Possible AV block — rhythm strip analysis",
-          "patientId": "lyle",
-          "scheduled": 2110,
-          "expire": "+30",
-          "durationMins": 12,
-          "taskClass": "stat",
-          "metadata": {
-            "challenge": "skill-mcq",
-            "skillId": "ecg-basics"
-          }
-        }
-      ]
-    }
-  ]
+  "events": []
 }

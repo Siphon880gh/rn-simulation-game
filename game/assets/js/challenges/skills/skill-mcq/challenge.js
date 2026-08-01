@@ -46,36 +46,102 @@ function questionAllowedForUnit(question, unit) {
   return allowed.includes(unit);
 }
 
-function visibleQuestions(bank, unit = '') {
+function normalizeQuestionType(question) {
+  const t = String(question?.type || 'choice').toLowerCase();
+  if (t === 'strip') return 'image';
+  if (t === 'video' || t === 'audio') return 'audio';
+  return t;
+}
+
+/** Optional filters: types (e.g. image), rhythmPool (question.pools / tags). */
+function questionMatchesOpts(question, opts = {}) {
+  const types = Array.isArray(opts.types)
+    ? opts.types.map((t) => String(t).toLowerCase()).filter(Boolean)
+    : [];
+  if (types.length && !types.includes(normalizeQuestionType(question))) return false;
+
+  const rhythmPool = String(opts.rhythmPool || '').trim().toLowerCase();
+  if (rhythmPool) {
+    const pools = [
+      ...(Array.isArray(question?.pools) ? question.pools : []),
+      ...(Array.isArray(question?.tags) ? question.tags : [])
+    ].map((p) => String(p).toLowerCase());
+    if (!pools.includes(rhythmPool)) return false;
+  }
+  return true;
+}
+
+function visibleQuestions(bank, opts = {}) {
+  const unit = typeof opts === 'string' ? opts : resolveSkillMcqUnit(opts);
+  const filterOpts = typeof opts === 'string' ? {} : opts;
   const pool = Array.isArray(bank?.questions) ? bank.questions : [];
   return pool.filter(
-    (q) => q && q.rank !== -1 && q.hidden !== true && questionAllowedForUnit(q, unit)
+    (q) => q
+      && q.rank !== -1
+      && q.hidden !== true
+      && questionAllowedForUnit(q, unit)
+      && questionMatchesOpts(q, filterOpts)
   );
 }
 
+function shuffleIds(ids, random = Math.random) {
+  const arr = [...(ids || [])].map(String).filter(Boolean);
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export function getSkillMcqPoolSize(skillId, opts = {}) {
-  const unit = resolveSkillMcqUnit(opts);
-  return visibleQuestions(getSkillMcqBank(skillId), unit).length;
+  return visibleQuestions(getSkillMcqBank(skillId), opts).length;
 }
 
 /** Visible question ids in bank order (caller should shuffle for a run). */
 export function getSkillMcqQuestionIds(skillId, opts = {}) {
-  const unit = resolveSkillMcqUnit(opts);
-  return visibleQuestions(getSkillMcqBank(skillId), unit)
+  return visibleQuestions(getSkillMcqBank(skillId), opts)
     .map((q) => q?.id)
     .filter((id) => id != null && id !== '')
     .map(String);
 }
 
+/**
+ * Per-run deck for skill-mcq. Rhythm-strip tasks use strip images only.
+ * When metadata.rhythmPool is set, the opener is drawn from that pool; remaining
+ * strips stay available for “I want to feel challenged” boosters / Random.
+ */
+export function buildSkillMcqQuizDeckIds(task, opts = {}) {
+  const skillId = String(task?.metadata?.skillId || opts.skillId || '').trim();
+  if (!skillId) return [];
+  const kind = String(task?.metadata?.kind || opts.kind || '').trim().toLowerCase();
+  const rhythmPool = String(task?.metadata?.rhythmPool || opts.rhythmPool || '').trim().toLowerCase();
+  const random = typeof opts.random === 'function' ? opts.random : Math.random;
+  const stripOnly = kind === 'rhythm-strip';
+  const baseOpts = stripOnly ? { ...opts, types: ['image'] } : { ...opts };
+  delete baseOpts.rhythmPool;
+  const allIds = getSkillMcqQuestionIds(skillId, baseOpts);
+  if (!allIds.length) return [];
+  if (!rhythmPool || !stripOnly) return shuffleIds(allIds, random);
+
+  const matched = getSkillMcqQuestionIds(skillId, { ...baseOpts, rhythmPool });
+  if (!matched.length) return shuffleIds(allIds, random);
+  const opener = matched[Math.min(matched.length - 1, Math.floor(random() * matched.length))];
+  const rest = shuffleIds(allIds.filter((id) => id !== opener), random);
+  return [opener, ...rest];
+}
+
 export function pickSkillMcqQuestion(skillId, opts = {}) {
   const bank = getSkillMcqBank(skillId);
-  const unit = resolveSkillMcqUnit(opts);
-  const pool = visibleQuestions(bank, unit);
+  const pool = visibleQuestions(bank, opts);
   if (!pool.length) return null;
   if (opts.questionId != null && opts.questionId !== '') {
+    // Exact id may sit outside a rhythmPool filter (booster / Random follow-ups).
+    const unit = resolveSkillMcqUnit(opts);
+    const wide = visibleQuestions(bank, { unit, types: opts.types });
     const wanted = String(opts.questionId);
-    const exact = pool.find((q) => String(q.id) === wanted);
-    if (exact) return { bank, question: exact };
+    const exact = (wide.length ? wide : pool).find((q) => String(q.id) === wanted)
+      || (Array.isArray(bank?.questions) ? bank.questions : []).find((q) => String(q?.id) === wanted);
+    if (exact && exact.rank !== -1 && exact.hidden !== true) return { bank, question: exact };
   }
   const exclude = new Set(
     [opts.excludeId, ...(Array.isArray(opts.excludeIds) ? opts.excludeIds : [])]
@@ -815,6 +881,7 @@ export function wireSkillMcqInteractions(onGraded) {
 export default {
   isSkillMcqTask,
   buildSkillMcqQuiz,
+  buildSkillMcqQuizDeckIds,
   renderSkillMcqHtml,
   wireSkillMcqInteractions,
   applySkillMcqCheat,

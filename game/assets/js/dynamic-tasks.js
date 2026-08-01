@@ -13,6 +13,8 @@ import { decorateSepsisScreenDice } from './challenges/skills/sepsis-recognition
 const spawnedCadenceKeys = new Set();
 /** Task ids whose spawnTasksOnComplete chain already fired */
 const spawnedOnCompleteKeys = new Set();
+/** Patient ids already given a first-hour spawnPlan task */
+const spawnedFirstHourPatients = new Set();
 let spawnCount = 0;
 let shiftStart = GameConfig.timer.defaultShiftStart;
 /** @type {{ showPatientPanel?: Function } | null} */
@@ -40,6 +42,112 @@ function getTemplates() {
     const fromPack = pack?.dynamicTemplates;
     if (Array.isArray(fromPack) && fromPack.length) return fromPack;
     return GameConfig.dynamicTasks?.templates || [];
+}
+
+function getSpawnPlan() {
+    const pack = gameState.getStateSlice('scenarioPack');
+    const plan = pack?.spawnPlan;
+    return plan && typeof plan === 'object' ? plan : null;
+}
+
+/** Templates matched by spawnPlan (e.g. rhythm-strip / ecg-basics). */
+function getSpawnPlanTemplates(plan) {
+    const all = getTemplates();
+    const skillId = String(plan?.matchSkillId || '').trim().toLowerCase();
+    const kind = String(plan?.matchKind || '').trim().toLowerCase();
+    if (!skillId && !kind) return all;
+    return all.filter((t) => {
+        const meta = t?.metadata && typeof t.metadata === 'object' ? t.metadata : {};
+        if (skillId && String(meta.skillId || t.skillId || '').toLowerCase() === skillId) return true;
+        if (kind && String(meta.kind || t.kind || '').toLowerCase() === kind) return true;
+        return false;
+    });
+}
+
+function templateMatchesSpawnPlan(template, plan) {
+    if (!plan || !template) return false;
+    const skillId = String(plan.matchSkillId || '').trim().toLowerCase();
+    const kind = String(plan.matchKind || '').trim().toLowerCase();
+    if (!skillId && !kind) return false;
+    const meta = template.metadata && typeof template.metadata === 'object' ? template.metadata : {};
+    if (skillId && String(meta.skillId || template.skillId || '').toLowerCase() === skillId) return true;
+    if (kind && String(meta.kind || template.kind || '').toLowerCase() === kind) return true;
+    return false;
+}
+
+function censusPatientIds() {
+    const patients = gameState.getStateSlice('patients');
+    if (patients?.size) return [...patients.keys()];
+    const pack = gameState.getStateSlice('scenarioPack');
+    return Array.isArray(pack?.patients) ? pack.patients.map(String).filter(Boolean) : [];
+}
+
+/**
+ * Spawn plan: first hour = one task per census patient (staggered),
+ * then one task every ongoingEveryGameMinutes.
+ */
+function processSpawnPlan(currentTime, opts = {}) {
+    const plan = getSpawnPlan();
+    if (!plan) return null;
+
+    const into = minutesIntoShift(currentTime, shiftStart);
+    const templates = getSpawnPlanTemplates(plan);
+    if (!templates.length) return null;
+
+    const windowMins = Math.max(1, Number(plan.firstHourWindowGameMinutes) || 60);
+    const every = Math.max(1, Number(plan.ongoingEveryGameMinutes) || 120);
+    const ongoingStart = Number.isFinite(Number(plan.ongoingStartAfterGameMinutes))
+        ? Number(plan.ongoingStartAfterGameMinutes)
+        : every;
+
+    // --- First hour: one per patient (staggered; catch up if clock jumped) ---
+    if (plan.firstHourPerPatient !== false && into < windowMins) {
+        const ids = censusPatientIds();
+        if (!ids.length) return null;
+        const n = ids.length;
+        let last = null;
+        for (let i = 0; i < n; i += 1) {
+            const patientId = ids[i];
+            if (spawnedFirstHourPatients.has(patientId)) continue;
+            const targetMin = n <= 1 ? 0 : Math.floor((i * windowMins) / n);
+            if (into < targetMin) continue;
+            const key = `plan-first-${plan.id || 'spawn'}-${patientId}`;
+            if (spawnedCadenceKeys.has(key)) {
+                spawnedFirstHourPatients.add(patientId);
+                continue;
+            }
+            const template = weightedPick(templates, opts.random);
+            if (!template) break;
+            spawnedCadenceKeys.add(key);
+            spawnedFirstHourPatients.add(patientId);
+            last = spawnFromTemplate(template, currentTime, {
+                ...opts,
+                patientId,
+                focusPatient: opts.focusPatient === true
+            });
+        }
+        return last;
+    }
+
+    // --- Ongoing: one every N game minutes ---
+    if (into < ongoingStart) return null;
+    const bucket = Math.floor(into / every);
+    const key = `plan-ongoing-${plan.id || 'spawn'}-${bucket}`;
+    if (spawnedCadenceKeys.has(key)) return null;
+    // Skip the bucket that overlaps the first-hour window when ongoingStart === every
+    // and first-hour already covered that period (bucket 0 at into 0–every).
+    if (bucket === 0 && plan.firstHourPerPatient !== false && windowMins > 0) {
+        spawnedCadenceKeys.add(key);
+        return null;
+    }
+
+    const template = weightedPick(templates, opts.random);
+    if (!template) {
+        spawnedCadenceKeys.add(key);
+        return null;
+    }
+    spawnedCadenceKeys.add(key);
+    return spawnFromTemplate(template, currentTime, opts);
 }
 
 export function weightedPick(templates, random = Math.random) {
@@ -465,6 +573,14 @@ export function processDynamicTasksTime(currentTime, opts = {}) {
     if (gameState.getStateSlice('isPaused')) return null;
     if (gameState.getStateSlice('gameStatus') !== GameConfig.gameStates.RUNNING) return null;
 
+    // Pack spawnPlan (e.g. rhythm-strip: first hour × census, then every 2h)
+    const planned = processSpawnPlan(currentTime, opts);
+    if (planned) {
+        refreshIncidentTabs();
+        return planned;
+    }
+
+    const plan = getSpawnPlan();
     const cfg = GameConfig.dynamicTasks || {};
     const cadence = Number(cfg.cadenceGameMinutes) || 60;
     const maxActive = Number(cfg.maxActive) || 2;
@@ -490,9 +606,12 @@ export function processDynamicTasksTime(currentTime, opts = {}) {
         return null;
     }
 
-    const template = weightedPick(getTemplates(), opts.random);
+    // When a spawnPlan owns matching templates, keep generic cadence for the rest only
+    const templates = getTemplates().filter((t) => !templateMatchesSpawnPlan(t, plan));
+    const template = weightedPick(templates, opts.random);
     if (!template) {
         spawnedCadenceKeys.add(key);
+        refreshIncidentTabs();
         return null;
     }
 
@@ -511,6 +630,7 @@ function refreshIncidentTabs() {
 export function resetDynamicTasks() {
     spawnedCadenceKeys.clear();
     spawnedOnCompleteKeys.clear();
+    spawnedFirstHourPatients.clear();
     spawnCount = 0;
 }
 

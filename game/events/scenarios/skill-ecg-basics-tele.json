@@ -10,7 +10,9 @@
     "Recognize atrial fibrillation, blocks, and paced rhythms on a strip",
     "Describe rate, regularity, P waves, and QRS on a strip"
   ],
-  "patients": ["clyde"],
+  "patients": [
+    "clyde"
+  ],
   "patientOverrides": {
     "clyde": {
       "clinicalStatus": "watch",
@@ -31,28 +33,6 @@
     "1900": [],
     "default": []
   },
-  "events": [
-    {
-      "id": "clyde-rhythm-alarm-2000",
-      "at": 2000,
-      "type": "emergency",
-      "message": "Clyde: tele alarm — identify the rhythm strip",
-      "injectTasks": [
-        {
-          "id": "evt-clyde-rhythm-2000",
-          "type": "assessment",
-          "name": "Telemetry alarm — rhythm strip analysis",
-          "patientId": "clyde",
-          "scheduled": 2000,
-          "expire": "+30",
-          "durationMins": 12,
-          "taskClass": "stat",
-          "metadata": {
-            "challenge": "skill-mcq",
-            "skillId": "ecg-basics"
-          }
-        }
-      ]
-    }
-  ]
+  "events": []
 }
+
