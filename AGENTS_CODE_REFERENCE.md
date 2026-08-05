@@ -78,7 +78,7 @@ rngame/
 ├── config/
 │   ├── test.json                      # `{ enabled, testGameOver }` QA gates
 │   └── app.config.json                # unused-by-app presets / speed catalog
-├── index.html                         # assignment picker (+ optional game-over test links)
+├── index.html                         # assignment picker + challenge games + optional game-over tests
 ├── game/
 │   ├── index.html                     # shell chrome (#shell regions + hour tabs + history)
 │   ├── assets/js/

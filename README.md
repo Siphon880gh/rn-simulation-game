@@ -60,7 +60,7 @@ Packs: `game/events/scenarios/tele-4.json`, `medsurg-5.json`, `icu-2.json`.
 | Quick day shift | `http://localhost:8765/game/index.html?speed-factor=48&scenario=events/scenarios/day-shift-medsurg.json` |
 | Slower teaching pace | `http://localhost:8765/game/index.html?speed-factor=12` |
 
-Legacy packs: `night-shift-default.json` (default six-patient), `day-shift-medsurg.json`. Chaos incidents merge from `events/incidents/chaos-night-medsurg.json`.
+Challenge pack (quiet link under Unit assignment): `night-shift-default.json` — six-patient night with one ICU acuity patient (Lyle: central line / vasopressors), chaos incidents. Also available: `day-shift-medsurg.json`. Chaos incidents merge from `events/incidents/chaos-night-medsurg.json`.
 
 ## Hospital Shifts
 

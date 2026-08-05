@@ -9,7 +9,7 @@ Read from [SKILL.md](SKILL.md) only when authoring packs.
 | `game/events/scenarios/tele-4.json` | tele | night-style (default 1900) | 4 |
 | `game/events/scenarios/medsurg-5.json` | medsurg | night-style | 5 |
 | `game/events/scenarios/icu-2.json` | icu | night-style | 2 |
-| `game/events/scenarios/night-shift-default.json` | medsurg | night | 6 |
+| `game/events/scenarios/night-shift-default.json` | medsurg (+ ICU acuity) | night | 6 (includes Lyle) |
 | `game/events/scenarios/day-shift-medsurg.json` | medsurg | day (`shiftStart: 700`) | 6 |
 
 Landing tiles (`index.html`) point at tele-4 / medsurg-5 / icu-2.

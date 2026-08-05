@@ -38,7 +38,7 @@ Adding a patient = new config entry + HTML under `game/events/patients/` (+ opti
 
 **E12 care schedules:** Opt in with `careSchedules: ['turnQ2h']` and/or HTML `data-care-schedule="turn-q2h"` (+ optional `data-care-reason`). `patients.js` expands Q2H turn tasks from `GameConfig.careSchedules` and mounts a **Turning / skin care** list. High-risk examples: joe (obesity/post-op), maria (bedbound), derek (obesity + CVA weakness).
 
-**E4.M1 packs:** `game/events/scenarios/*.json` lists patient ids + optional `disclaimer` / `learningObjectives`. `ScenarioPackModule` loads before `patients.init()`; census order follows pack `patients[]`. Shell `#fiction-disclaimer` is not replaced by pack text.
+**E4.M1 packs:** `game/events/scenarios/*.json` lists patient ids + optional `disclaimer` / `learningObjectives`. `ScenarioPackModule` loads before `patients.init()`; census order follows pack `patients[]`. Shell `#fiction-disclaimer` is not replaced by pack text. Landing challenge pack `night-shift-default.json` is six patients including ICU acuity **lyle** (central line / vasopressors) mixed with Med-Surg.
 
 **E9 census hold / admit:** Landing choice → `?census=` omitted/`full` (full load), `minus1` (N−1, no admit), `admitStart` / `admitMiddle` (hold last pack patient + spawn in that band). Legacy `openAdmit` still randomizes start/middle/near-end. Spawn via `admission-system.js`; new patient gets `admissionPhase: 'admitting'` (left-tab **Admitting** badge) + config-driven checklist.
 

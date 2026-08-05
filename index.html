@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/landing.css?v=1.1">
+    <link rel="stylesheet" href="assets/css/landing.css?v=1.5">
 </head>
 <body class="landing">
     <div class="landing-atmosphere" aria-hidden="true"></div>
@@ -59,6 +59,30 @@
                     <span class="unit-tile__cta">Start ICU</span>
                 </button>
             </div>
+
+            <details class="landing-challenge">
+                <summary class="landing-challenge__toggle">I want something more challenging</summary>
+                <div class="landing-challenge__games" role="list">
+                    <article class="landing-challenge-game" role="listitem">
+                        <h3 class="landing-challenge-game__title">Six-patient night</h3>
+                        <p class="landing-challenge-game__lede">
+                            Same teaching clock as the unit tiles — more patients, mixed acuity, and night chaos.
+                        </p>
+                        <p class="landing-challenge-game__why">Why it’s harder</p>
+                        <ul class="landing-challenge-game__reasons">
+                            <li><strong>Six patients</strong> — largest census on the front page (vs 5 / 4 / 2 on the unit tiles).</li>
+                            <li><strong>ICU-type skills in the mix</strong> — one ICU patient (central line / vasopressors) alongside Med-Surg work.</li>
+                            <li><strong>Night Med-Surg windows</strong> — meds, assessments, and slot pressure stack across the census.</li>
+                            <li><strong>Chaos incidents</strong> — random urgent interrupts (near-fall, desat, IV infiltrate, equipment).</li>
+                            <li><strong>Scripted pressure</strong> — rapid-response admit and a critical lab call land mid-shift.</li>
+                        </ul>
+                        <a class="landing-challenge-game__start"
+                           href="game/index.html?speed-factor=24&amp;scenario=events/scenarios/night-shift-default.json">
+                            Start
+                        </a>
+                    </article>
+                </div>
+            </details>
         </section>
 
         <section class="landing-path landing-path--skills" aria-labelledby="landing-skills-title">
@@ -78,11 +102,6 @@
                 <span class="skills-panel__cta">Open skill library</span>
             </button>
         </section>
-
-        <p class="landing-foot">
-            Legacy six-patient night pack:
-            <a href="game/index.html?speed-factor=24&amp;scenario=events/scenarios/night-shift-default.json">open demo</a>.
-        </p>
 
         <section id="landing-game-over-tests" class="landing-path landing-path--gotest" hidden
                  aria-labelledby="landing-gotest-title"></section>

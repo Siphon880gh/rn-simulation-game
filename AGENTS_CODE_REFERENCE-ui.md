@@ -27,6 +27,7 @@ Browser chrome around the sim: locked shell regions (E1.M2), patient main mount,
 | `game/assets/js/media-placeholders.js` | ~ESM | Catalog + titled placeholders (data-url or PHP); challenge/slot/critical-lab mounts |
 | `game/assets/js/media-placeholder-catalog.json` | — | Asset ids, dimensions, prompts, `replaceWith` |
 | `assets/js/landing-media.js` | ~classic | Landing department tile media (`dept-*`) |
+| `assets/css/landing.css` | — | Front-door unit tiles + muted challenge games expand |
 | `placeholders/` | PHP | Optional `image.php` / `video.php` titled SVG service |
 | `game/assets/css/declarative-tasks.css` | ~150 | Task status + type styles (+ `.task-slot-media*`) |
 | `game/assets/css/app.css` | — | App-level + `.challenge-media-wrap` |
@@ -81,6 +82,12 @@ API: `openModal(typeOrConfig)`, `closeModal()`, `modifyModal(title, content, foo
 - End UI (`debrief.js`): short **Game Over — Won/Lost** with 4-tier meter (Off pace / Getting by / Steady charge / Sharp shift; average-or-below = lost), score + too-late / completed / missed / cheated counts; **Show debrief** expands teaching lists + perform challenge fail/pass counts. Score lives only here (no live `#shell-score`).  
 - QA seed path: `game-over-test.js` + `?game-over=<preset>` when `config/test.json` has `"testGameOver": true` (homepage section `#landing-game-over-tests` via `assets/js/landing-game-over-test.js`). App skips census/timer and opens the debrief immediately. Presets cover perfection / near-perfection / lots-of-cheats / lots-of-late / few-late / no-late / getting-by / off-pace. `SET_SCORE` + `testSeeded` skip miss rewrites in `finalizeShiftScore`. ≥3 late demotes one meter tier. AUTO: `node scripts/verify-game-over-test.mjs`.
 - Globals also exposed from `app.exposeGlobals`: `openModal`, `closeModal`, `modifyModal`.
+
+---
+
+## Landing challenge games (`index.html`)
+
+Muted expand under Unit assignment: **I want something more challenging** → `.landing-challenge__games` grid of `.landing-challenge-game` cards (reasons always visible + **Start**). First card: six-patient night → `night-shift-default.json` (Med-Surg + Lyle ICU acuity). Single card spans full width via `:has(:only-child)`.
 
 ---
 
