@@ -480,16 +480,12 @@ function openBrandReadMoreModal() {
 
     const disclaimer = document.getElementById('fiction-disclaimer')?.textContent?.trim() || '';
     const packTitle = document.getElementById('scenario-pack-title')?.textContent?.trim() || '';
-    const packNote = document.getElementById('scenario-pack-note');
-    const noteText = packNote && !packNote.hidden ? (packNote.textContent?.trim() || '') : '';
-    const demo = document.getElementById('demo-preset-links');
     const objectivesHost = document.querySelector('[data-scenario-objectives]');
     const objectivesList = document.getElementById('scenario-pack-objectives');
 
-    const demoHtml = demo ? demo.innerHTML : '';
     const objectivesHtml = objectivesHost && !objectivesHost.hidden && objectivesList
-        ? `<div class="mt-3"><p class="text-xs font-medium text-gray-500 mb-1">Pack learning objectives</p>
-             <ul class="text-sm text-gray-600 list-disc pl-4">${objectivesList.innerHTML}</ul></div>`
+        ? `<div class="mt-3"><p class="text-xs text-gray-400 mb-1">Pack learning objectives</p>
+             <ul class="text-sm text-gray-500 list-disc pl-4">${objectivesList.innerHTML}</ul></div>`
         : '';
 
     brandReadMoreModalOpen = true;
@@ -497,10 +493,8 @@ function openBrandReadMoreModal() {
         title: 'Shift details',
         content: `
             <div class="shell-brand-read-more-modal space-y-2 text-left">
-                ${packTitle ? `<p class="text-sm font-semibold text-gray-800">${escapeHtml(packTitle)}</p>` : ''}
-                <p class="text-sm text-gray-600">${escapeHtml(disclaimer)}</p>
-                ${noteText ? `<p class="text-sm text-gray-500">${escapeHtml(noteText)}</p>` : ''}
-                ${demoHtml ? `<div class="text-sm text-gray-500 pt-1">${demoHtml}</div>` : ''}
+                <p class="text-sm text-gray-400">${escapeHtml(disclaimer)}</p>
+                ${packTitle ? `<p class="text-sm font-semibold text-gray-700">${escapeHtml(packTitle)}</p>` : ''}
                 ${objectivesHtml}
             </div>
         `,

@@ -10,18 +10,22 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const failures = [];
 const assert = (cond, msg) => { if (!cond) failures.push(msg); };
 
-assert(GameConfig.demo?.presets?.quickNight, 'quickNight preset');
-assert(GameConfig.demo?.presets?.quickDay, 'quickDay preset');
+assert(GameConfig.demo && typeof GameConfig.demo.presets === 'object', 'demo.presets object');
+assert(!GameConfig.demo.presets.quickNight, 'no quickNight preset');
+assert(!GameConfig.demo.presets.quickDay, 'no quickDay preset');
 assert(existsSync(join(root, 'game/events/scenarios/day-shift-medsurg.json')), 'day pack');
 
 const readme = readFileSync(join(root, 'README.md'), 'utf8');
-assert(/Demo presets/i.test(readme), 'README demo section');
 assert(/python3 -m http\.server/.test(readme), 'README run locally');
 assert(/day-shift-medsurg/.test(readme), 'README day pack');
 
 const index = readFileSync(join(root, 'game/index.html'), 'utf8');
-assert(index.includes('demo-preset-links'), 'shell demo links');
-assert(index.includes('speed-factor=48'), 'quick night href');
+assert(index.includes('id="shell-disclaimers"'), 'collapsed shell disclaimer');
+assert(index.includes('id="shell-brand-title"'), 'brand title (unit picker)');
+assert(!index.includes('demo-preset-links'), 'no demo-preset-links');
+assert(!/Change unit/i.test(index), 'no Change unit link');
+assert(!/quick night/i.test(index), 'no quick night link');
+assert(!/quick day/i.test(index), 'no quick day link');
 
 if (failures.length) {
   console.error('E8.M1 AUTO FAIL');

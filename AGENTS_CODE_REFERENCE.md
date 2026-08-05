@@ -60,7 +60,7 @@ URL params (?speed-factor=&shift-starts=&shift-duration=)
 **Config sources (do not confuse):**
 - `game/assets/js/game-config.js` — **used** by modules (selectors, statuses, defaults, `mediaPlaceholders`)
 - `config/app.config.json` — alternate preset/speed catalog; **not wired** into `app.js` today
-- `config/test.json` — QA gates (`enabled`, `testGameOver`)
+- `config/test.json` — QA gates (`testIncidents`, `testGameOver`)
 - URL query params override defaults in `AppConfig` inside `app.js` (`?placeholders=0` disables media placeholders)
 - Secret QA: `?game-over=<preset>` (when `config/test.json` has `"testGameOver": true`) skips census/timer and opens the debrief immediately — see `game-over-test.js`; homepage links appear only with that flag
 
@@ -76,7 +76,7 @@ rngame/
 ├── AGENTS_POSSIBLE_DECISIONS__*.md      # engine, context menu, mini-game specs
 ├── EPIC_MAP.md / IMPLEMENTATION_STORIES.md / .agents/state.json
 ├── config/
-│   ├── test.json                      # `{ enabled, testGameOver }` QA gates
+│   ├── test.json                      # `{ testIncidents, testGameOver }` QA gates
 │   └── app.config.json                # unused-by-app presets / speed catalog
 ├── index.html                         # assignment picker + challenge games + optional game-over tests
 ├── game/
@@ -93,8 +93,9 @@ rngame/
 │   │   ├── debrief.js                 # E6 Won/Lost meter + optional teaching debrief expand
 │   │   ├── scoring.js                 # E6 score hooks, cheats/fails counters, performance bands
 │   │   ├── game-over-test.js          # secret ?game-over= presets (gated by testGameOver)
-│   │   ├── test-mode.js               # flask Test control (gated by enabled)
+│   │   ├── test-mode.js               # flask Test control (gated by testIncidents)
 │   │   ├── scenario-pack.js           # E4.M1 JSON scenario pack loader
+│   │   ├── shift-kind.js              # day|night kind + HHMM remap when landing flips pack
 │   │   ├── event-drip.js              # E4.M2 events + deterioration; defer/skip admit-held targets
 │   │   ├── challenges/                # E5 perform mini-games (see challenges/README.md)
 │   │   │   ├── challenge-gate.js      # pause + modal routing
@@ -130,7 +131,7 @@ rngame/
 │       ├── scenarios/*.json           # night + day packs (census, scene, incidentPackUrl)
 │       ├── incidents/*.json           # E7.M2 chaos templates + events (merged into pack)
 │       └── patients/*.html            # six census packs (+ optional *-past-hx.json)
-├── assets/js/landing-census.js        # root picker census −1 / open-to-admit modal
+├── assets/js/landing-census.js        # root picker census −1 / open-to-admit + day|night shift
 ├── assets/js/landing-skill.js         # skill library: start shift pack OR Test skill (?skill=&skillMode=test)
 ├── assets/js/landing-media.js         # root picker department tile placeholders
 ├── assets/js/landing-game-over-test.js # homepage ?game-over= links when testGameOver
@@ -148,7 +149,7 @@ Line counts are approximate totals to help decide whether to load a whole file.
 ## High-level code flow
 
 1. **Boot** — `app.js` constructs `GameApplication`, runs `initialize()` on DOM ready.
-2. **Scenario pack** — `ScenarioPackModule.init()` loads JSON (`?scenario=` or default), optionally merges `incidentPackUrl` / default chaos pack, stores `scenarioPack`, paints pack title/objectives (shell `#fiction-disclaimer` stays default). `scene-backdrop` applies unit theme.
+2. **Scenario pack** — `ScenarioPackModule.init()` loads JSON (`?scenario=` or default), optionally merges `incidentPackUrl` / default chaos pack, stores `scenarioPack`, applies landing `?shift=` via `shift-kind.js`, paints pack title/objectives (shell `#shell-disclaimers` stays collapsed default copy). `scene-backdrop` applies unit theme.
 3. **Patients** — `PatientsModule.init()` loads census from pack `patients[]` (fallback: all configs). With `?census=minus1|openAdmit`, holds last pack patient (`admitHold`) and boots N−1. Parses `[data-task-type]`, registers into state/DOM.
 4. **Subscriptions** — `currentTime` → `taskSystem.processTasks()`; also patients refresh DOM status classes.
 5. **Start** — URL params (or pack `shiftStart`) → `INITIALIZE_GAME` → pack log line → `admission.init` (schedules open-to-admit HHMM) → `GameTimerModule.start(...)`.

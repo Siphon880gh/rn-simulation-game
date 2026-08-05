@@ -571,6 +571,68 @@ body.is-test-mode #shell-brand-title::after {
     }
 }
 
+.shell-disclaimers {
+    margin-top: 0.25rem;
+    margin-bottom: 0.55rem;
+    color: #9ca3af;
+    font-size: 0.75rem;
+    line-height: 1.35;
+}
+
+.shell-disclaimers__summary {
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    color: #9ca3af;
+}
+
+.shell-disclaimers__summary::-webkit-details-marker {
+    display: none;
+}
+
+.shell-disclaimers__summary::before {
+    content: '▸';
+    display: inline-block;
+    margin-right: 0.35rem;
+    color: #9ca3af;
+    transition: transform 0.12s ease;
+}
+
+.shell-disclaimers[open] > .shell-disclaimers__summary::before {
+    transform: rotate(90deg);
+}
+
+.shell-disclaimers__body {
+    margin-top: 0.25rem;
+    color: #9ca3af;
+}
+
+.scenario-pack-title {
+    margin-top: 0;
+    max-width: 36rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #374151;
+}
+
+.scenario-pack-objectives {
+    max-width: 36rem;
+}
+
+.scenario-pack-objectives__heading {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #9ca3af;
+}
+
+.scenario-pack-objectives__list {
+    margin-top: 0.15rem;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
 .shell-brand-read-more {
     display: none;
     margin-top: 0.35rem;
@@ -1650,15 +1712,7 @@ body.shell-bottom-resizing {
         font-size: 1.1rem;
     }
 
-    /* Expanded mobile: condense brand copy; full text via Read more modal */
-    #shell-top-primary:not(.is-collapsed) #fiction-disclaimer {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 1;
-        overflow: hidden;
-        margin-top: 0.2rem;
-    }
-
+    /* Expanded mobile: pack title stays visible; disclaimers stay collapsed in <details> */
     #shell-top-primary:not(.is-collapsed) #scenario-pack-title {
         display: block;
         white-space: nowrap;
@@ -1667,8 +1721,6 @@ body.shell-bottom-resizing {
         margin-top: 0.15rem;
     }
 
-    #shell-top-primary:not(.is-collapsed) #scenario-pack-note,
-    #shell-top-primary:not(.is-collapsed) #demo-preset-links,
     #shell-top-primary:not(.is-collapsed) [data-scenario-objectives] {
         display: none;
     }

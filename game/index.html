@@ -40,25 +40,16 @@
                     <h1 id="shell-brand-title" class="text-2xl font-bold text-gray-800">RN Shift Simulator</h1>
                     <div id="shell-test-mode" class="shell-test-mode hidden" hidden></div>
                 </div>
-                <p id="fiction-disclaimer" class="text-xs text-gray-600 mt-1 max-w-xl">
-                    Names and scenarios are fictional. Any resemblance to actual events are coincidental.
-                    Educational training use only — not a substitute for supervised clinical practice.
-                </p>
-                <p id="scenario-pack-title" class="text-xs text-gray-500 mt-1"></p>
-                <p id="scenario-pack-note" class="text-xs text-gray-400 mt-0.5 max-w-xl" hidden></p>
-                <p id="demo-preset-links" class="text-xs text-gray-500 mt-1 max-w-xl">
-                    <a class="underline text-blue-700 hover:text-blue-900" href="../index.html">Change unit</a>
-                    ·
-                    Demo:
-                    <a class="underline text-blue-700 hover:text-blue-900"
-                       href="?speed-factor=24&amp;scenario=events/scenarios/night-shift-default.json">quick night</a>
-                    ·
-                    <a class="underline text-blue-700 hover:text-blue-900"
-                       href="?speed-factor=24&amp;scenario=events/scenarios/day-shift-medsurg.json">quick day</a>
-                </p>
-                <div data-scenario-objectives hidden class="mt-1 max-w-xl">
-                    <p class="text-xs font-medium text-gray-500">Pack learning objectives</p>
-                    <ul id="scenario-pack-objectives" class="text-xs text-gray-500 list-disc pl-4"></ul>
+                <details id="shell-disclaimers" class="shell-disclaimers mt-1 max-w-xl">
+                    <summary class="shell-disclaimers__summary">Disclaimer</summary>
+                    <p id="fiction-disclaimer" class="shell-disclaimers__body">
+                        Fictional scenarios for educational practice only — not a substitute for supervised clinical training.
+                    </p>
+                </details>
+                <p id="scenario-pack-title" class="scenario-pack-title"></p>
+                <div data-scenario-objectives hidden class="scenario-pack-objectives mt-1 max-w-xl">
+                    <p class="scenario-pack-objectives__heading">Pack learning objectives</p>
+                    <ul id="scenario-pack-objectives" class="scenario-pack-objectives__list list-disc pl-4"></ul>
                 </div>
                 <button type="button" id="shell-brand-read-more" class="shell-brand-read-more"
                         title="Shift details">
