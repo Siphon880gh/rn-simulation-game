@@ -75,7 +75,7 @@ assert(
 );
 
 const json = JSON.parse(readFileSync(join(root, 'config/test.json'), 'utf8'));
-assert(typeof json.enabled === 'boolean', 'json.enabled boolean');
+assert(typeof json.testIncidents === 'boolean', 'json.testIncidents boolean');
 
 const html = readFileSync(join(root, 'game/index.html'), 'utf8');
 assert(html.includes('id="shell-test-mode"'), 'shell-test-mode host');
@@ -110,7 +110,7 @@ assert(css.includes('.shell-test-mode__group.is-collapsed'), 'collapsed group CS
 const critSrc = readFileSync(join(root, 'game/assets/js/critical-labs.js'), 'utf8');
 assert(critSrc.includes('spawnCriticalLabNow'), 'critical lab test spawn');
 
-assert(isTestModeEnabled() === false, 'enabled false before init/load');
+assert(isTestModeEnabled() === false, 'testIncidents false before init/load');
 
 if (failures.length) {
   console.error('TEST MODE AUTO FAIL');

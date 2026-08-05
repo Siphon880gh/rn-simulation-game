@@ -68,6 +68,23 @@ Optional query params:
 - `?speed-factor=4&shift-starts=1700`
 - `?scenario=events/scenarios/day-shift-medsurg.json`
 
+## QA flags (`config/test.json`)
+
+Dev/QA gates loaded by the game shell (no URL query for incident insert):
+
+| Flag | Default in repo | Effect |
+|------|-----------------|--------|
+| `testIncidents` | `false` | When `true`, shows a brand **Test** flask control that opens a modal to insert/spawn incidents (critical labs, call light, bed alarm, dynamic urgents, skills/emergencies). Leave `false` for normal play. |
+| `testGameOver` | `true` | When `true`, allows secret `?game-over=<preset>` instant debrief seeds and homepage game-over test links. |
+
+Example — turn on incident insert for local QA:
+
+```json
+{
+  "testIncidents": true,
+  "testGameOver": true
+}
+```
 
 ## Tasks
 

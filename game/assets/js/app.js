@@ -1086,7 +1086,7 @@ class GameApplication {
             shell.init(gameConfig);
         }
 
-        // Dev/QA: Test control next to brand when config/test.json enabled
+        // Dev/QA: Test control next to brand when config/test.json testIncidents
         const testMode = this.modules.get('testMode');
         if (testMode && testMode.init) {
             Promise.resolve(testMode.init()).catch((err) => {

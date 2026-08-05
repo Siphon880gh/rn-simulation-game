@@ -1,6 +1,6 @@
 /**
- * Test mode — `config/test.json` `{ "enabled": true }` shows a brand Test
- * control that opens a modal to spawn incidents. No URL query.
+ * Test mode — `config/test.json` `{ "testIncidents": true }` shows a brand Test
+ * control that opens a modal to insert/spawn incidents. No URL query.
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
@@ -24,16 +24,16 @@ async function getChallengeGate() {
     return import('./challenge-gate.js');
 }
 
-let enabledFromJson = false;
+let testIncidentsFromJson = false;
 let jsonLoaded = false;
 
 function testCfg() {
     return GameConfig.testMode || {};
 }
 
-/** True after init when `config/test.json` has `"enabled": true`. */
+/** True after init when `config/test.json` has `"testIncidents": true`. */
 export function isTestModeEnabled() {
-    return jsonLoaded && enabledFromJson === true;
+    return jsonLoaded && testIncidentsFromJson === true;
 }
 
 async function loadTestModeJson() {
@@ -42,13 +42,13 @@ async function loadTestModeJson() {
         const response = await fetch(url, { cache: 'no-cache' });
         if (!response.ok) {
             console.warn(`Test mode: could not load ${url} (${response.status})`);
-            return { enabled: false };
+            return { testIncidents: false };
         }
         const data = await response.json();
-        return data && typeof data === 'object' ? data : { enabled: false };
+        return data && typeof data === 'object' ? data : { testIncidents: false };
     } catch (err) {
         console.warn('Test mode: failed to load config JSON', err);
-        return { enabled: false };
+        return { testIncidents: false };
     }
 }
 
@@ -390,10 +390,10 @@ function mountTestControl() {
 
 export async function initTestMode() {
     const data = await loadTestModeJson();
-    enabledFromJson = data.enabled === true;
+    testIncidentsFromJson = data.testIncidents === true;
     jsonLoaded = true;
 
-    if (!enabledFromJson) return { enabled: false };
+    if (!testIncidentsFromJson) return { testIncidents: false };
 
     mountTestControl();
     gameState.dispatch('APPEND_SHIFT_LOG', {
@@ -402,7 +402,7 @@ export async function initTestMode() {
             gameState.getStateSlice('currentTime') ?? GameConfig.timer.defaultShiftStart
         )
     });
-    return { enabled: true };
+    return { testIncidents: true };
 }
 
 const TestModeModule = {
