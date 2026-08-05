@@ -1646,6 +1646,7 @@ body.shell-bottom-resizing {
 }
 
 #modal .modal-panel {
+    position: relative;
     max-height: calc(100vh - 2rem);
     max-height: calc(100dvh - 2rem);
     max-height: calc(100svh - 2rem);
@@ -1654,6 +1655,43 @@ body.shell-bottom-resizing {
     min-width: 0;
     min-height: 0;
     overflow: hidden;
+}
+
+/* Challenge modals: compact corner cue that the shift clock is paused */
+#modal .modal-panel.modal-panel--timer-paused #modal-title {
+    padding-right: 6.5rem;
+}
+
+.challenge-timer-paused {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid #c7d2fe;
+    background: #eef2ff;
+    color: #3730a3;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    pointer-events: none;
+}
+
+.challenge-timer-paused i {
+    font-size: 0.85rem;
+}
+
+.challenge-failure-note {
+    margin: 0;
+}
+
+.challenge-level-control summary {
+    color: #1f2937;
 }
 
 #modal-title,

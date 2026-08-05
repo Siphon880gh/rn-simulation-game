@@ -1,6 +1,7 @@
 // modal.js - Declarative modal system
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
+import { syncChallengeModalChrome } from './challenges/shared/copy-config.js';
 
 const ModalModule = (() => {
     // Modal state
@@ -45,6 +46,7 @@ const ModalModule = (() => {
             updateModalContent(config);
             modal.classList.remove('hidden');
             currentModal = config;
+            syncChallengeModalChrome();
             
             // Add overlay effects if configured
             if (config.overlay) {
@@ -63,6 +65,7 @@ const ModalModule = (() => {
             // Remove overlay effects
             document.querySelector(GameConfig.selectors.shell)?.classList.remove("opacity-40");
             currentModal = null;
+            syncChallengeModalChrome();
             
             return true;
         },
@@ -73,6 +76,7 @@ const ModalModule = (() => {
             const mergedConfig = { ...currentModal, ...config };
             updateModalContent(mergedConfig);
             currentModal = mergedConfig;
+            syncChallengeModalChrome();
             
             return true;
         }

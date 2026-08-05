@@ -377,10 +377,6 @@ export function renderAccucheckHtml(prompt, opts = {}) {
         <p class="text-sm text-gray-900 font-semibold">
           Accucheck / sliding scale / finger stick
         </p>
-        <p class="text-sm text-gray-600">
-          ${GameConfig.challengeCopy?.pauseBanner
-            || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}
-        </p>
         <p class="text-xs text-violet-800 bg-violet-50 border border-violet-100 rounded px-2 py-1.5">
           Question 1 is always the sliding-scale dose. Extra questions cover AccuData Inform meter competency.
         </p>
@@ -430,8 +426,6 @@ export function renderAccucheckMcqHtml(quiz, taskName, opts = {}) {
         <p class="text-sm text-gray-900 font-semibold">Accucheck / AccuData Inform</p>
         ${category}
         <p class="text-sm text-gray-900 font-semibold" data-quiz-prompt>${escapeHtml(quiz.prompt)}</p>
-        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
-          || 'Timer is paused. Complete this game/quiz.'}</p>
         <p class="text-xs text-gray-500">Skill focus: ${escapeHtml(taskName || 'Accucheck')}.</p>
         ${randomHint}
         <div class="flex flex-col gap-2" data-quiz-choices>${choices}</div>

@@ -114,8 +114,6 @@ export function renderBedPrepHtml(taskName, round) {
     return `
       <div class="challenge-gate bed-prep-challenge space-y-3 text-left" data-challenge="bed-prep">
         ${challengeMediaHtml('bed-prep')}
-        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
-          || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
         <p class="text-sm text-gray-800">Get a bed ready for admission: <strong>${escapeHtml(taskName || 'Bed prep')}</strong></p>
         <p class="text-xs text-gray-500">Watch the flash for what you need, then gather the items (order does not matter).</p>
         <div class="rounded border border-amber-200 bg-amber-50 p-3 text-center">

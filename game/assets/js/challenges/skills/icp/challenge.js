@@ -99,8 +99,6 @@ export function renderIcpQuizHtml(quiz, taskName, opts = {}) {
         ${levelHtml}
         ${challengeMediaHtml('icp')}
         <p class="text-sm text-gray-900 font-semibold" data-quiz-prompt>${quiz.prompt}</p>
-        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
-          || 'Timer is paused. Complete this game/quiz.'}</p>
         <p class="text-xs text-gray-500">Skill focus: ${taskName || 'ICP monitoring'}.</p>
         ${randomHint}
         <div class="flex flex-col gap-2" data-quiz-choices>${choices}</div>

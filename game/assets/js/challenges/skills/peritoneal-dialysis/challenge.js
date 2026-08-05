@@ -125,8 +125,6 @@ export function renderPeritonealDialysisHtml(taskName, round) {
     return `
       <div class="challenge-gate pd-seq-challenge space-y-3 text-left" data-challenge="peritoneal-dialysis">
         ${challengeMediaHtml('peritoneal-dialysis') || challengeMediaHtml('skill-mcq') || ''}
-        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
-          || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
         <p class="text-sm text-gray-800">PD exchange: <strong>${escapeHtml(taskName || 'Peritoneal dialysis')}</strong></p>
         <p class="text-xs text-gray-500">Watch the flash for the full exchange flow (some steps are distractors), then build the next ${r.nextCount} ${nextWord} from the given step.</p>
         <div class="rounded border border-indigo-200 bg-indigo-50 p-3 text-center">

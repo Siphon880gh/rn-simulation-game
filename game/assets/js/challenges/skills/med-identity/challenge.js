@@ -4,7 +4,6 @@
  * Brand task names ask for generic.
  * Author content: ./config.js (challenges/skills/med-identity/)
  */
-import { GameConfig } from '../../../game-config.js';
 import { medIdentityPairs } from './config.js';
 import { challengeMediaHtml } from '../../../media-placeholders.js';
 
@@ -294,10 +293,6 @@ export function renderMedIdentityHtml(prompt, taskName) {
         ${challengeMediaHtml('med-identity')}
         <p class="text-sm text-gray-900 font-semibold">
           Complete this challenge to perform the task.
-        </p>
-        <p class="text-sm text-gray-600">
-          ${GameConfig.challengeCopy?.pauseBanner
-            || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}
         </p>
         <p class="text-sm text-gray-800">
           Medication task: <strong>${escapeHtml(taskName || 'med')}</strong>

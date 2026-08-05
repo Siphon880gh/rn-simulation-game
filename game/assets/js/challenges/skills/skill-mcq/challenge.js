@@ -587,8 +587,6 @@ export function renderSkillMcqHtml(quiz, taskName, opts = {}) {
         ${levelHtml}
         ${instructionHtml(quiz)}
         <p class="text-sm text-gray-900 font-semibold" data-quiz-prompt>${escapeHtml(quiz.prompt)}</p>
-        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
-          || 'Timer is paused. Complete this game/quiz.'}</p>
         <p class="text-xs text-gray-500">Skill focus: ${escapeHtml(taskName || quiz.title)}.</p>
         ${randomHint}
         ${body}

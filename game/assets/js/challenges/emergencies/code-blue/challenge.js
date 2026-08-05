@@ -151,11 +151,9 @@ export function renderCodeBlueHtml(patientName, question, opts = {}) {
       <div class="challenge-gate code-blue-challenge space-y-3 text-left" data-challenge="code-blue" data-question-id="${escapeHtml(q.id)}" data-pool-size="${poolSize}">
         ${levelHtml}
         ${mediaHtml}
-        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
-          || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
         <p class="text-sm text-sky-800 font-medium">Code Blue — ${escapeHtml(patientName || 'patient')}</p>
-        <p class="text-xs text-gray-500">Give up on this prompt? Use <strong>Random</strong> for another Code Blue question.</p>
         <div id="code-blue-body">${body}</div>
+        <p class="text-xs text-gray-500">Give up on this prompt? Use <strong>Random</strong> for another Code Blue question.</p>
         <p id="challenge-feedback" class="text-sm hidden" role="status" aria-live="polite"></p>
         <ol id="code-blue-answer-key" class="hidden text-xs text-gray-600 list-decimal pl-5"></ol>
       </div>

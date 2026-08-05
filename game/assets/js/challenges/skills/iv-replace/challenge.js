@@ -153,8 +153,6 @@ export function renderIvReplaceHtml(taskName, round, meta = {}) {
     return `
       <div class="challenge-gate iv-replace-challenge space-y-3 text-left" data-challenge="iv-replace">
         ${challengeMediaHtml('iv-replace') || challengeMediaHtml('ivpb-hang') || ''}
-        <p class="text-sm text-gray-600">${GameConfig.challengeCopy?.pauseBanner
-          || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list'}</p>
         <p class="text-sm text-gray-800">${escapeHtml(replaceTitleForKind(kind))}: <strong>${escapeHtml(taskName || 'IV')}</strong></p>
         <p class="text-xs text-gray-500">Watch the flash for primary bag setup (some steps are distractors). After Ready: answer the tubing sticker question, then build the next ${r.nextCount} ${nextWord}.</p>
         <div class="rounded border border-rose-200 bg-rose-50 p-3 text-center">
