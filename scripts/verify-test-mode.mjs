@@ -12,9 +12,9 @@ const failures = [];
 const assert = (cond, msg) => { if (!cond) failures.push(msg); };
 
 assert(existsSync(join(root, 'game/assets/js/test-mode.js')), 'test-mode.js');
-assert(existsSync(join(root, 'game/test-mode.json')), 'test-mode.json');
+assert(existsSync(join(root, 'config/test.json')), 'config/test.json');
 assert(typeof GameConfig.testMode === 'object', 'testMode config');
-assert(GameConfig.testMode.configUrl === 'test-mode.json', 'configUrl');
+assert(GameConfig.testMode.configUrl === '../config/test.json', 'configUrl');
 assert(GameConfig.urlParams.testMode == null, 'no URL param for test mode');
 assert(
   Array.isArray(GameConfig.testMode.incidents)
@@ -74,7 +74,7 @@ assert(
   'at least two spawn groups'
 );
 
-const json = JSON.parse(readFileSync(join(root, 'game/test-mode.json'), 'utf8'));
+const json = JSON.parse(readFileSync(join(root, 'config/test.json'), 'utf8'));
 assert(typeof json.enabled === 'boolean', 'json.enabled boolean');
 
 const html = readFileSync(join(root, 'game/index.html'), 'utf8');

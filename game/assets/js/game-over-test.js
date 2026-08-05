@@ -1,6 +1,6 @@
 /**
  * Secret URL game-over presets (?game-over=<id>).
- * Active only when game/test-mode.json has `"testGameOver": true`.
+ * Active only when config/test.json has `"testGameOver": true`.
  * Seeds task/score state then ends the shift so debrief / performance logic can be inspected.
  */
 import { GameConfig } from './game-config.js';
@@ -134,7 +134,7 @@ export function isTestGameOverEnabled() {
 }
 
 export async function loadTestGameOverConfig() {
-    const url = testCfg().configUrl || 'test-mode.json';
+    const url = testCfg().configUrl || '../config/test.json';
     try {
         const response = await fetch(url, { cache: 'no-cache' });
         if (!response.ok) {
@@ -230,18 +230,18 @@ export function applyGameOverTestPreset(presetId) {
 }
 
 /**
- * If URL has ?game-over=<id> and config allows it, seed + end shift.
+ * If URL has ?game-over=<id> and config allows it, seed + end shift immediately.
  * @param {{ handleGameOver: Function }} app
+ * @param {string} [presetId] — when omitted, read from the URL
  * @returns {Promise<{ applied: boolean, preset?: object, reason?: string }>}
  */
-export async function maybeRunGameOverTest(app) {
-    const params = new URLSearchParams(window.location.search);
-    const raw = params.get(paramKey());
+export async function runImmediateGameOverTest(app, presetId) {
+    const raw = presetId || peekGameOverTestParam();
     if (!raw) return { applied: false, reason: 'no-param' };
 
     await loadTestGameOverConfig();
     if (!isTestGameOverEnabled()) {
-        console.warn(`Game-over test ignored — set testGameOver: true in ${testCfg().configUrl || 'test-mode.json'}`);
+        console.warn(`Game-over test ignored — set testGameOver: true in ${testCfg().configUrl || '../config/test.json'}`);
         return { applied: false, reason: 'disabled' };
     }
 
@@ -250,11 +250,6 @@ export async function maybeRunGameOverTest(app) {
         console.warn(`Game-over test: unknown preset "${raw}"`);
         return { applied: false, reason: 'unknown-preset' };
     }
-
-    // Let the first paint settle, then end via the real game-over path
-    await new Promise((resolve) => {
-        requestAnimationFrame(() => resolve());
-    });
 
     if (typeof app?.handleGameOver === 'function') {
         app.handleGameOver();
@@ -265,11 +260,23 @@ export async function maybeRunGameOverTest(app) {
     return { applied: true, preset };
 }
 
+/** @deprecated prefer runImmediateGameOverTest — kept for callers that expect maybe* naming */
+export async function maybeRunGameOverTest(app) {
+    return runImmediateGameOverTest(app);
+}
+
+export function peekGameOverTestParam() {
+    if (typeof window === 'undefined' || !window.location?.search) return null;
+    return new URLSearchParams(window.location.search).get(paramKey());
+}
+
 const GameOverTestModule = {
-    init: async (app) => maybeRunGameOverTest(app),
+    init: async (app) => runImmediateGameOverTest(app),
+    runImmediate: runImmediateGameOverTest,
     applyGameOverTestPreset,
     listGameOverTestPresets,
     getGameOverTestPreset,
+    peekGameOverTestParam,
     isTestGameOverEnabled,
     loadTestGameOverConfig,
     GAME_OVER_TEST_PRESETS

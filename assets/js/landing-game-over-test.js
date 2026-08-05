@@ -1,9 +1,9 @@
 /**
  * Homepage links for secret ?game-over=<preset> modes.
- * Shown only when game/test-mode.json has `"testGameOver": true`.
+ * Shown only when config/test.json has `"testGameOver": true`.
  */
 (function () {
-    const CONFIG_URL = 'game/test-mode.json';
+    const CONFIG_URL = 'config/test.json';
     const HOST_ID = 'landing-game-over-tests';
 
     /** Keep ids in sync with game/assets/js/game-over-test.js */
@@ -39,7 +39,7 @@
                 <h2 id="landing-gotest-title" class="landing-path__title">Game-over test presets</h2>
                 <p class="landing-path__lede">
                     Instant shift end with seeded score / late / cheat counts
-                    (<code>test-mode.json</code> → <code>testGameOver</code>).
+                    (<code>config/test.json</code> → <code>testGameOver</code>).
                 </p>
             </div>
             <div class="landing-gotest__grid" role="list">${links}</div>`;

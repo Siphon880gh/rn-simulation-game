@@ -123,6 +123,18 @@ class GameApplication {
             
             // Setup application state
             this.setupGlobalState();
+
+            // ?game-over=<preset> — skip full shift boot and open debrief immediately
+            const gameOverParam = GameOverTestModule.peekGameOverTestParam?.()
+                || new URLSearchParams(window.location.search).get(this.config.urlParams.gameOver || 'game-over');
+            if (gameOverParam) {
+                const jumped = await this.bootImmediateGameOverTest(gameOverParam);
+                if (jumped) {
+                    this.initialized = true;
+                    console.log('Game-over test preset applied immediately');
+                    return;
+                }
+            }
             
             // Initialize modules in dependency order
             await this.initializeModules();
@@ -140,6 +152,32 @@ class GameApplication {
             console.error('Failed to initialize application:', error);
             throw error;
         }
+    }
+
+    /**
+     * Slim boot for secret game-over presets — no census/timer/scenario load.
+     * @returns {Promise<boolean>} true when the debrief was shown
+     */
+    async bootImmediateGameOverTest(presetId) {
+        const { modal, debrief, scoring, gameOverTest } = this.config.modules;
+        this.modules.set('modal', modal);
+        this.modules.set('debrief', debrief);
+        this.modules.set('scoring', scoring);
+        this.modules.set('gameOverTest', gameOverTest);
+
+        if (scoring?.init) scoring.init();
+        if (debrief?.init) debrief.init();
+        this.exposeGlobals();
+
+        gameState.dispatch('INITIALIZE_GAME', {
+            startTime: this.config.defaults.shiftStarts
+                ?? GameConfig.timer.defaultShiftStart
+        });
+
+        const run = gameOverTest?.runImmediate || gameOverTest?.init;
+        if (!run) return false;
+        const result = await run.call(gameOverTest, this, presetId);
+        return result?.applied === true;
     }
 
     // Setup global application state
@@ -1048,7 +1086,7 @@ class GameApplication {
             shell.init(gameConfig);
         }
 
-        // Dev/QA: Test control next to brand when game/test-mode.json enabled
+        // Dev/QA: Test control next to brand when config/test.json enabled
         const testMode = this.modules.get('testMode');
         if (testMode && testMode.init) {
             Promise.resolve(testMode.init()).catch((err) => {
@@ -1119,14 +1157,6 @@ class GameApplication {
         if (skillFocus && skillFocus.init) {
             Promise.resolve(skillFocus.init()).catch((err) => {
                 console.warn('Skill focus init failed', err);
-            });
-        }
-
-        // Secret ?game-over=<preset> when test-mode.json has testGameOver: true
-        const gameOverTest = this.modules.get('gameOverTest');
-        if (gameOverTest && gameOverTest.init) {
-            Promise.resolve(gameOverTest.init(this)).catch((err) => {
-                console.warn('Game-over test init failed', err);
             });
         }
     }

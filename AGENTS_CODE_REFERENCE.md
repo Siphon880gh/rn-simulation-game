@@ -59,9 +59,10 @@ URL params (?speed-factor=&shift-starts=&shift-duration=)
 
 **Config sources (do not confuse):**
 - `game/assets/js/game-config.js` — **used** by modules (selectors, statuses, defaults, `mediaPlaceholders`)
-- `game/app.config.js` — alternate preset/speed helper; **not wired** into `app.js` today
+- `config/app.config.json` — alternate preset/speed catalog; **not wired** into `app.js` today
+- `config/test.json` — QA gates (`enabled`, `testGameOver`)
 - URL query params override defaults in `AppConfig` inside `app.js` (`?placeholders=0` disables media placeholders)
-- Secret QA: `?game-over=<preset>` (when `game/test-mode.json` has `"testGameOver": true`) seeds score/late/cheats and ends the shift — see `game-over-test.js`; homepage links appear only with that flag
+- Secret QA: `?game-over=<preset>` (when `config/test.json` has `"testGameOver": true`) skips census/timer and opens the debrief immediately — see `game-over-test.js`; homepage links appear only with that flag
 
 ---
 
@@ -74,11 +75,12 @@ rngame/
 ├── AGENTS_POSSIBLE_DECISIONS_INDEX.md   # decision doc routing by milestone
 ├── AGENTS_POSSIBLE_DECISIONS__*.md      # engine, context menu, mini-game specs
 ├── EPIC_MAP.md / IMPLEMENTATION_STORIES.md / .agents/state.json
+├── config/
+│   ├── test.json                      # `{ enabled, testGameOver }` QA gates
+│   └── app.config.json                # unused-by-app presets / speed catalog
 ├── index.html                         # assignment picker (+ optional game-over test links)
 ├── game/
 │   ├── index.html                     # shell chrome (#shell regions + hour tabs + history)
-│   ├── test-mode.json                 # `{ enabled, testGameOver }` QA gates
-│   ├── app.config.js                  # unused-by-app presets (~53)
 │   ├── assets/js/
 │   │   ├── app.js                     # GameApplication entry (~355)
 │   │   ├── game-config.js             # GameConfig constants (~69)
@@ -178,7 +180,7 @@ gameState.subscribe('currentTime', (t) => taskSystem.processTasks(t));
 
 | Do | Avoid |
 |----|--------|
-| Extend via `GameConfig`, `gameState` actions, patient HTML packs | Assuming `app.config.js` drives runtime |
+| Extend via `GameConfig`, `gameState` actions, patient HTML packs | Assuming `config/app.config.json` drives runtime |
 | Keep military HHMM integers (e.g. `1900`) consistent | Introducing React/bundler without approval |
 | Prefer modules under `game/assets/js/` | Breaking `#` selectors listed in `GameConfig.selectors` |
 | Read feature `AGENTS_CODE_REFERENCE-*.md` before deep edits | Treating `#task-queue-bar` as fully implemented slots |

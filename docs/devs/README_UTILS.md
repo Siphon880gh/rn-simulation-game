@@ -171,7 +171,7 @@ For game integration, consider using these utilities alongside your game state m
 
 ## Overview
 
-The game uses a centralized configuration system in `game/app.config.js` that allows developers to easily adjust time mechanics without diving into individual game modules.
+The game uses a centralized configuration system in `config/app.config.json` that allows developers to easily adjust time mechanics without diving into individual game modules.
 
 ## Quick Start
 
@@ -232,7 +232,7 @@ gameConfig.currentConfig;
 
 ## Creating Custom Presets
 
-Add new presets to the `PRESETS` object in `app.config.js`:
+Add new presets to the `PRESETS` object in `config/app.config.json`:
 
 ```javascript
 PRESETS: {
@@ -284,7 +284,7 @@ The system still supports legacy URL parameters that override config values:
 
 If you have existing hardcoded values:
 
-1. Move time constants to `app.config.js`
+1. Move time constants to `config/app.config.json`
 2. Import and use `appConfig` in your modules
 3. Use `appConfig.CALCULATED_SPEED_FACTOR` instead of manual calculations
 4. Test with different presets to ensure flexibility

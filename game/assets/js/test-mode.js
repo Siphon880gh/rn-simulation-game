@@ -1,5 +1,5 @@
 /**
- * Test mode — `game/test-mode.json` `{ "enabled": true }` shows a brand Test
+ * Test mode — `config/test.json` `{ "enabled": true }` shows a brand Test
  * control that opens a modal to spawn incidents. No URL query.
  */
 import { GameConfig } from './game-config.js';
@@ -31,13 +31,13 @@ function testCfg() {
     return GameConfig.testMode || {};
 }
 
-/** True after init when `test-mode.json` has `"enabled": true`. */
+/** True after init when `config/test.json` has `"enabled": true`. */
 export function isTestModeEnabled() {
     return jsonLoaded && enabledFromJson === true;
 }
 
 async function loadTestModeJson() {
-    const url = testCfg().configUrl || 'test-mode.json';
+    const url = testCfg().configUrl || '../config/test.json';
     try {
         const response = await fetch(url, { cache: 'no-cache' });
         if (!response.ok) {

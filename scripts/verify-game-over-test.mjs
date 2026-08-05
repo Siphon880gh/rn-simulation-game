@@ -33,8 +33,8 @@ assert(existsSync(join(root, 'game/assets/js/game-over-test.js')), 'game-over-te
 assert(existsSync(join(root, 'assets/js/landing-game-over-test.js')), 'landing-game-over-test.js');
 assert(GameConfig.urlParams.gameOver === 'game-over', 'url param key');
 
-const cfgJson = JSON.parse(readFileSync(join(root, 'game/test-mode.json'), 'utf8'));
-assert(cfgJson.testGameOver === true, 'test-mode.json testGameOver true');
+const cfgJson = JSON.parse(readFileSync(join(root, 'config/test.json'), 'utf8'));
+assert(cfgJson.testGameOver === true, 'config/test.json testGameOver true');
 
 const landingHtml = readFileSync(join(root, 'index.html'), 'utf8');
 assert(landingHtml.includes('landing-game-over-tests'), 'homepage host');
@@ -46,7 +46,12 @@ assert(landingJs.includes('game-over'), 'landing builds game-over urls');
 
 const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
 assert(appSrc.includes('GameOverTestModule'), 'app wires game-over test');
+assert(appSrc.includes('bootImmediateGameOverTest'), 'immediate game-over boot');
 assert(appSrc.includes('gameOverTest'), 'app registers module');
+
+const gotSrc = readFileSync(join(root, 'game/assets/js/game-over-test.js'), 'utf8');
+assert(gotSrc.includes('runImmediateGameOverTest'), 'immediate runner');
+assert(!/requestAnimationFrame/.test(gotSrc), 'no paint delay before game over');
 
 const presets = listGameOverTestPresets();
 assert(presets.length >= 6, 'preset catalog size');

@@ -1,0 +1,39 @@
+{
+  "TOTAL_DAYS": 1,
+  "GAME_MINUTES_PER_SHIFT": 10,
+  "TIME_PER_DAY": 720,
+  "SHIFT_START": 1900,
+  "SHIFT_END": 700,
+  "GAME_MINUTES_PER_REAL_SECOND": 1,
+  "TASK_INTERVAL_MINUTES": 15,
+  "PRESETS": {
+    "DEMO": {
+      "GAME_MINUTES_PER_SHIFT": 2,
+      "TIME_PER_DAY": 60,
+      "SHIFT_START": 1900
+    },
+    "QUICK_PRACTICE": {
+      "GAME_MINUTES_PER_SHIFT": 5,
+      "TIME_PER_DAY": 240,
+      "SHIFT_START": 1900
+    },
+    "FULL_SHIFT": {
+      "GAME_MINUTES_PER_SHIFT": 30,
+      "TIME_PER_DAY": 720,
+      "SHIFT_START": 1900
+    },
+    "EXTENDED_SHIFT": {
+      "GAME_MINUTES_PER_SHIFT": 45,
+      "TIME_PER_DAY": 960,
+      "SHIFT_START": 1500
+    }
+  },
+  "CALCULATED_SPEED_FACTOR": 72,
+  "SHIFT_DURATION_HOURS": 12,
+  "_notes": {
+    "wired": false,
+    "runtime": "Runtime timer defaults live in game/assets/js/game-config.js; this file is a reference/preset catalog only.",
+    "CALCULATED_SPEED_FACTOR": "TIME_PER_DAY / GAME_MINUTES_PER_SHIFT (default 720 / 10)",
+    "SHIFT_DURATION_HOURS": "TIME_PER_DAY / 60"
+  }
+}

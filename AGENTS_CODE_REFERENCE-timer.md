@@ -20,7 +20,7 @@ Accelerated military clock for one shift: tick display, pause/resume with **owne
 | `game/assets/js/game-state.js` | ~200 | `SET_PAUSE` / `UPDATE_TIME` / `INITIALIZE_GAME` / `GAME_OVER` |
 | `game/assets/js/event-drip.js` | ~220 | E4.M2: pack events on `currentTime` (pause-safe); thin deterioration |
 | `game/assets/js/events.js` | ~23 | Legacy `signals.Signal` reveal (largely superseded) |
-| `game/app.config.js` | ~53 | Presets / `CALCULATED_SPEED_FACTOR` — **not imported by app.js** (legacy) |
+| `config/app.config.json` | ~preset catalog | Presets / `CALCULATED_SPEED_FACTOR` — **not imported by app.js** (legacy) |
 
 ---
 
@@ -76,4 +76,4 @@ Called from `app.js` `startGame()` with `GameConfig.selectors` and URL-parsed co
 - Keep HHMM integer math consistent with `task-system` comparisons.
 - `#reveal-scheduled-tasks` empty `<style>` in `game/index.html` is required for CSS reveal.
 - Prefer `SET_PAUSE` with an explicit source over mutating `timerState.isPaused` directly.
-- Leave `game/app.config.js` unwired unless a milestone deliberately migrates presets.
+- Leave `config/app.config.json` unwired unless a milestone deliberately migrates presets.

@@ -1,6 +1,6 @@
 // game-config.js - Declarative game configuration
 // Canonical timer defaults for the live app (app.js / timer_ingame.js).
-// Note: game/app.config.js presets are NOT wired into app.js — treat as legacy/reference only.
+// Note: config/app.config.json presets are NOT wired into app.js — treat as legacy/reference only.
 // Challenge content lives under assets/js/challenges/{skills,emergencies}/<id>/config.js
 import { challengeCopyConfig } from './challenges/shared/copy-config.js';
 import { codeBlueChallengeConfig } from './challenges/emergencies/code-blue/config.js';
@@ -738,7 +738,7 @@ export const GameConfig = {
     skillMode: 'skillMode',
     /**
      * Secret game-over preset id (see game-over-test.js).
-     * Honored only when test-mode.json has `"testGameOver": true`.
+     * Honored only when config/test.json has `"testGameOver": true`.
      */
     gameOver: 'game-over'
   },
@@ -944,9 +944,10 @@ export const GameConfig = {
    * On/off is loaded from `configUrl` JSON (`enabled: true|false`). No URL query.
    * `testGameOver: true` in the same JSON enables secret `?game-over=<preset>`
    * instant end-of-shift seeds (game-over-test.js) and homepage preset links.
+   * Paths are relative to the game page (`game/index.html`).
    */
   testMode: {
-    configUrl: 'test-mode.json',
+    configUrl: '../config/test.json',
     /** Incident menu entries (handlers resolved in test-mode.js). Skills/Emergencies from challenges/test-spawn.js */
     incidents: [
       {
@@ -996,6 +997,14 @@ export const GameConfig = {
       quickNight: 'game/index.html?speed-factor=24&scenario=events/scenarios/night-shift-default.json',
       quickDay: 'game/index.html?speed-factor=24&scenario=events/scenarios/day-shift-medsurg.json&shift-starts=0700'
     }
+  },
+
+  /**
+   * Reference/preset catalog at repo `config/app.config.json`.
+   * Not loaded by app.js — runtime defaults stay in `GameConfig.timer`.
+   */
+  appConfig: {
+    configUrl: '../config/app.config.json'
   },
 
   // Hourly check-doctor-orders (E4.M3) + E11 carryover / sudden procedures

@@ -79,7 +79,7 @@ API: `openModal(typeOrConfig)`, `closeModal()`, `modifyModal(title, content, foo
 - `window.confirmAction` used by medication confirm footer.  
 - Does **not** auto-open on `GAME_OVER`; `app.handleGameOver` → `debrief.showPrioritizationDebrief()`.  
 - End UI (`debrief.js`): short **Game Over — Won/Lost** with 4-tier meter (Off pace / Getting by / Steady charge / Sharp shift; average-or-below = lost), score + too-late / completed / missed / cheated counts; **Show debrief** expands teaching lists + perform challenge fail/pass counts. Score lives only here (no live `#shell-score`).  
-- QA seed path: `game-over-test.js` + `?game-over=<preset>` when `game/test-mode.json` has `"testGameOver": true` (homepage section `#landing-game-over-tests` via `assets/js/landing-game-over-test.js`). Presets cover perfection / near-perfection / lots-of-cheats / lots-of-late / few-late / no-late / getting-by / off-pace. `SET_SCORE` + `testSeeded` skip miss rewrites in `finalizeShiftScore`. ≥3 late demotes one meter tier. AUTO: `node scripts/verify-game-over-test.mjs`.  
+- QA seed path: `game-over-test.js` + `?game-over=<preset>` when `config/test.json` has `"testGameOver": true` (homepage section `#landing-game-over-tests` via `assets/js/landing-game-over-test.js`). App skips census/timer and opens the debrief immediately. Presets cover perfection / near-perfection / lots-of-cheats / lots-of-late / few-late / no-late / getting-by / off-pace. `SET_SCORE` + `testSeeded` skip miss rewrites in `finalizeShiftScore`. ≥3 late demotes one meter tier. AUTO: `node scripts/verify-game-over-test.mjs`.
 - Globals also exposed from `app.exposeGlobals`: `openModal`, `closeModal`, `modifyModal`.
 
 ---
