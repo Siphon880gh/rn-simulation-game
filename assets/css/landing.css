@@ -435,6 +435,50 @@ body.landing {
     color: var(--accent-deep);
 }
 
+.landing-path--gotest {
+    margin-top: 0.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px dashed rgba(61, 81, 96, 0.35);
+    animation: rise-in 1s ease-out 0.25s both;
+}
+
+.landing-gotest__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+    gap: 0.65rem;
+}
+
+.landing-gotest__link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.7rem 0.8rem;
+    text-decoration: none;
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(61, 81, 96, 0.22);
+    border-radius: 0.4rem;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.landing-gotest__link:hover,
+.landing-gotest__link:focus-visible {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.85);
+    outline: none;
+}
+
+.landing-gotest__name {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.landing-gotest__blurb {
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--muted);
+}
+
 /* Skill library picker (parallel start path) */
 .skill-choice-warning {
     margin: 0;

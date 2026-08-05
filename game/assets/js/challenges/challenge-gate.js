@@ -108,7 +108,7 @@ import {
 import BoostersModule from '../boosters.js';
 import { applySituationStill, clearSituationStill } from '../scene-backdrop.js';
 import { revealChallengeAfterMedia } from '../media-placeholders.js';
-import { recordChallengeOutcome } from '../scoring.js';
+import { recordChallengeOutcome, recordCheatUsed } from '../scoring.js';
 import { applyIvChallengeResult, applyIvReplaceResult, syncIvTaskMetadata } from '../iv-system.js';
 
 const CHALLENGE = GameConfig.timer.pauseSources.CHALLENGE;
@@ -976,6 +976,8 @@ function cheatSafetyHighlight() {
  */
 export function cheatChallenge() {
     if (!activeSession || activeSession.closing) return;
+
+    recordCheatUsed();
 
     if (activeSession.ivPrompt) {
         applyIvCheat(activeSession.ivPrompt);

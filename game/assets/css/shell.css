@@ -10,12 +10,12 @@ body.shell-body {
 
 #shell {
     display: grid;
-    grid-template-rows: auto auto 1fr var(--shell-bottom-height, 11rem);
+    grid-template-rows: auto auto 1fr var(--shell-bottom-height, 9.5rem);
     min-height: 100vh;
     max-height: 100vh;
     max-width: 100%;
     overflow: hidden;
-    --shell-bottom-height: 11rem;
+    --shell-bottom-height: 9.5rem;
 }
 
 #shell-top-primary {
@@ -678,7 +678,7 @@ body.is-test-mode #shell-brand-title::after {
     left: auto;
     top: auto;
     right: 8px;
-    bottom: calc(var(--shell-bottom-height, 11rem) + 8px);
+    bottom: calc(var(--shell-bottom-height, 9.5rem) + 8px);
 }
 
 #shell-top-primary.is-collapsed .shell-clock-cluster__chrome {
@@ -945,37 +945,6 @@ body.shell-clock-dragging #shell-clock-cluster {
     margin: 0.2rem 0;
 }
 
-/* E6.M2 — lightweight live score cues */
-#shell-score {
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    color: #1e3a8a;
-    transition: color 200ms ease, transform 200ms ease;
-}
-
-#shell-score.score-cue-up {
-    color: #047857;
-    animation: score-pulse-up 600ms ease;
-}
-
-#shell-score.score-cue-down {
-    color: #b91c1c;
-    animation: score-pulse-down 600ms ease;
-}
-
-@keyframes score-pulse-up {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.08); }
-    100% { transform: scale(1); }
-}
-
-@keyframes score-pulse-down {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-2px); }
-    50% { transform: translateX(2px); }
-    100% { transform: translateX(0); }
-}
-
 /* E3.M5 — emergent incident tabs (no clock time on label) */
 .incident-tabs {
     display: flex;
@@ -1052,7 +1021,7 @@ body.shell-clock-dragging #shell-clock-cluster {
     position: relative;
     display: grid;
     grid-template-columns: 1fr minmax(12rem, auto);
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr);
     gap: 0.5rem 1rem;
     padding: 0.65rem 1rem 0.75rem;
     background: #f9fafb;
@@ -1148,18 +1117,6 @@ body.shell-bottom-resizing {
     bottom: auto;
     display: flex;
     gap: 0.5rem;
-    flex-shrink: 0;
-}
-
-#shell-status-bar {
-    grid-column: 1 / -1;
-    grid-row: 2 / 3;
-    font-size: 0.8rem;
-    color: #4b5563;
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: center;
     flex-shrink: 0;
 }
 
@@ -1676,7 +1633,7 @@ body.shell-bottom-resizing {
     }
 
     #shell {
-        --shell-bottom-height: 2.75rem;
+        --shell-bottom-height: 0px;
     }
 
     #shell-top-primary {
@@ -1943,7 +1900,7 @@ body.shell-bottom-resizing {
         position: fixed;
         left: 0.5rem;
         right: 3.25rem;
-        bottom: calc(var(--shell-bottom-height, 2.75rem) + 3.15rem);
+        bottom: calc(var(--shell-bottom-height, 0px) + 3.15rem);
         z-index: 46;
         max-height: min(40vh, 14rem);
         height: auto;
@@ -1976,7 +1933,7 @@ body.shell-bottom-resizing {
         position: fixed;
         left: 0.5rem;
         right: 3.25rem;
-        bottom: calc(var(--shell-bottom-height, 2.75rem) + 3.15rem);
+        bottom: calc(var(--shell-bottom-height, 0px) + 3.15rem);
         z-index: 45;
         justify-self: stretch;
         align-self: start;
@@ -2016,15 +1973,6 @@ body.shell-bottom-resizing {
         padding: 0.3rem;
     }
 
-    #shell-status-bar {
-        grid-column: 1;
-        grid-row: 1;
-        font-size: 0.68rem;
-        gap: 0.4rem;
-        flex-wrap: wrap;
-        padding: 0 2.75rem;
-    }
-
     .shell-slots-toggle,
     .shell-log-toggle {
         display: inline-flex;
@@ -2032,7 +1980,7 @@ body.shell-bottom-resizing {
         justify-content: center;
         gap: 0.25rem;
         position: fixed;
-        bottom: calc(var(--shell-bottom-height, 2.75rem) + 0.45rem);
+        bottom: 0.45rem;
         z-index: 55;
         width: 2.5rem;
         height: 2.5rem;

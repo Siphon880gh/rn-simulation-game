@@ -61,6 +61,7 @@ URL params (?speed-factor=&shift-starts=&shift-duration=)
 - `game/assets/js/game-config.js` — **used** by modules (selectors, statuses, defaults, `mediaPlaceholders`)
 - `game/app.config.js` — alternate preset/speed helper; **not wired** into `app.js` today
 - URL query params override defaults in `AppConfig` inside `app.js` (`?placeholders=0` disables media placeholders)
+- Secret QA: `?game-over=<preset>` (when `game/test-mode.json` has `"testGameOver": true`) seeds score/late/cheats and ends the shift — see `game-over-test.js`; homepage links appear only with that flag
 
 ---
 
@@ -73,9 +74,10 @@ rngame/
 ├── AGENTS_POSSIBLE_DECISIONS_INDEX.md   # decision doc routing by milestone
 ├── AGENTS_POSSIBLE_DECISIONS__*.md      # engine, context menu, mini-game specs
 ├── EPIC_MAP.md / IMPLEMENTATION_STORIES.md / .agents/state.json
-├── index.html                         # repo root stub (game lives under game/)
+├── index.html                         # assignment picker (+ optional game-over test links)
 ├── game/
 │   ├── index.html                     # shell chrome (#shell regions + hour tabs + history)
+│   ├── test-mode.json                 # `{ enabled, testGameOver }` QA gates
 │   ├── app.config.js                  # unused-by-app presets (~53)
 │   ├── assets/js/
 │   │   ├── app.js                     # GameApplication entry (~355)
@@ -86,8 +88,10 @@ rngame/
 │   │   ├── task-system.js             # tasks (~261)
 │   │   ├── patients.js                # census loader (~263)
 │   │   ├── modal.js                   # modals (GAME_OVER UI owned by app/debrief)
-│   │   ├── debrief.js                 # E6.M0/M2 practice outcome debrief + by-patient notes
-│   │   ├── scoring.js                 # E6.M1–M2 score hooks, live cues, outcome bands
+│   │   ├── debrief.js                 # E6 Won/Lost meter + optional teaching debrief expand
+│   │   ├── scoring.js                 # E6 score hooks, cheats/fails counters, performance bands
+│   │   ├── game-over-test.js          # secret ?game-over= presets (gated by testGameOver)
+│   │   ├── test-mode.js               # flask Test control (gated by enabled)
 │   │   ├── scenario-pack.js           # E4.M1 JSON scenario pack loader
 │   │   ├── event-drip.js              # E4.M2 events + deterioration; defer/skip admit-held targets
 │   │   ├── challenges/                # E5 perform mini-games (see challenges/README.md)
@@ -127,6 +131,7 @@ rngame/
 ├── assets/js/landing-census.js        # root picker census −1 / open-to-admit modal
 ├── assets/js/landing-skill.js         # skill library: start shift pack OR Test skill (?skill=&skillMode=test)
 ├── assets/js/landing-media.js         # root picker department tile placeholders
+├── assets/js/landing-game-over-test.js # homepage ?game-over= links when testGameOver
 ├── placeholders/                      # optional PHP titled SVG image/video (image.php|video.php)
 ├── PLACEHOLDER_ASSETS.md              # inventory for art handoff / replace skill
 ├── scripts/verify-placeholder-assets.mjs
@@ -147,7 +152,7 @@ Line counts are approximate totals to help decide whether to load a whole file.
 5. **Start** — URL params (or pack `shiftStart`) → `INITIALIZE_GAME` → pack log line → `admission.init` (schedules open-to-admit HHMM) → `GameTimerModule.start(...)`.
 6. **Tick** — timer interval (scaled by speed factor) updates `#clock`, `UPDATE_TIME`, reveals scheduled tasks at 15-min poll marks (CSS + `data-status="active"`). `event-drip` fires pack events (patient-bound injects defer while target is open-admit held; `minus1` held targets are dropped); `doctor-orders` spawns a per-hour check (5 min; complete injects pack + carryover + ≤1 sudden procedure); `admission-system` may spawn held patient + checklist; overdue work bumps `clinicalStatus` / `acuityScore` and may open Code Blue via `codeBlueHook` subscribe.
 7. **Interact** — contextMenu Perform → `challenge-gate` (pause `challenge`; med quiz / IVPB hang sequence / bed-prep gather / admission quizzes / safety; bed-prep + admission steps must win to `completeTask`) → pass → slot (most types) or complete (bed-prep / admission). Find-nurse + admitting call/callback follow critical-lab-style recall.
-8. **End** — timer seconds exhausted → `GAME_OVER` → finalize score → practice **outcome** debrief (bands + by-patient notes + ethics framing) + dimmed shell.
+8. **End** — timer seconds exhausted → `GAME_OVER` → finalize score → short **Won/Lost** performance meter (Off pace / Getting by / Steady charge / Sharp shift; average-or-below = lost) with score + too-late / cheated counts → optional **Show debrief** (by-patient notes + challenge fails + ethics framing) + dimmed shell.
 
 ### Snippet — entry pipeline (near top / middle of `app.js`)
 

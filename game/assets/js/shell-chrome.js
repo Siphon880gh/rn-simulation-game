@@ -1056,9 +1056,8 @@ function renderShiftLog(entries) {
     host.scrollTop = host.scrollHeight;
 }
 
-function setStatusMessage(text) {
-    const el = document.querySelector(GameConfig.selectors.statusMessage);
-    if (el) el.textContent = text;
+function setStatusMessage(_text) {
+    /* Footer status bar removed — score/status live only on game-over debrief. */
 }
 
 function timeLabelFromState() {

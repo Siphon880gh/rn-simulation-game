@@ -22,7 +22,7 @@ http://localhost:8765/game/index.html?speed-factor=48
 | Task Perform | **Left-click** an active task tile | Opens menu: **Perform** / **Details** (not right-click) |
 | Slots / wait queue | Bottom `#task-queue-bar` / `#slot-waiting-queue` | Max 3 concurrent; overflow FIFO |
 | Shift log | Bottom `#shift-history-log` | Append-only event history |
-| Score | `#shell-score` | Practice score live cue |
+| Score | Game Over modal | Final practice score + performance meter (no live footer score) |
 | Docs FAB | Bottom-right Docs chip | Players / Learning / Developers MD |
 | Debrief | Auto at shift end | Modal: outcome bands + by-patient notes |
 

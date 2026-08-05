@@ -693,7 +693,7 @@ export const GameConfig = {
     delegateHint: '#shell-delegate-hint',
     main: '#shell-main',
     bottom: '#shell-bottom',
-    statusBar: '#shell-status-bar',
+    /** Legacy live-status writers; footer bar removed — queries resolve to null. */
     statusMessage: '#shell-status-message',
     awaitingCallbackToast: '#shell-awaiting-callback-toast',
     hourTabs: '#shell-hour-tabs',
@@ -735,7 +735,12 @@ export const GameConfig = {
     /** Skill library: single skill id from events/skills/library.json */
     skill: 'skill',
     /** Skill library mode: omit | test (blank census + modal → landing) */
-    skillMode: 'skillMode'
+    skillMode: 'skillMode',
+    /**
+     * Secret game-over preset id (see game-over-test.js).
+     * Honored only when test-mode.json has `"testGameOver": true`.
+     */
+    gameOver: 'game-over'
   },
 
   /**
@@ -937,6 +942,8 @@ export const GameConfig = {
   /**
    * Dev / QA test mode — brand Test control opens a spawn-incident modal.
    * On/off is loaded from `configUrl` JSON (`enabled: true|false`). No URL query.
+   * `testGameOver: true` in the same JSON enables secret `?game-over=<preset>`
+   * instant end-of-shift seeds (game-over-test.js) and homepage preset links.
    */
   testMode: {
     configUrl: 'test-mode.json',
@@ -1388,6 +1395,7 @@ export const GameConfig = {
   },
 
   // Scoring hooks (E6.M1) — practice points, not competency claims
+  // E6 — practice score + end-of-shift performance meter (not competency grades)
   scoring: {
     startingTotal: 100,
     tasks: {
@@ -1404,13 +1412,18 @@ export const GameConfig = {
       watch: -3,
       worsening: -8
     },
-    // E6.M2 practice outcome bands (not competency grades)
+    /**
+     * Performance meter tiers. Average-or-below = lost; professional-or-above = won.
+     * Late pressure (≥3 too-lates) can demote one tier when not already off-pace.
+     */
     outcomes: {
-      strong: { min: 110, id: 'strong-pacing', label: 'Strong practice pacing' },
-      pass: { min: 90, id: 'on-track', label: 'On track — keep practicing' },
-      needsPractice: { min: 70, id: 'needs-practice', label: 'Needs more practice' },
-      overtimeRisk: { min: 0, id: 'overtime-risk', label: 'Overtime / miss risk framing' }
-    }
+      sharpShift: { min: 110, id: 'sharp-shift', label: 'Sharp shift', result: 'won' },
+      steadyCharge: { min: 90, id: 'steady-charge', label: 'Steady charge', result: 'won' },
+      gettingBy: { min: 70, id: 'getting-by', label: 'Getting by', result: 'lost' },
+      offPace: { min: 0, id: 'off-pace', label: 'Off pace', result: 'lost' }
+    },
+    /** Ordered low → high for meter UI */
+    meterOrder: ['off-pace', 'getting-by', 'steady-charge', 'sharp-shift']
   },
 
   /**

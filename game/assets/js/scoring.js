@@ -19,6 +19,10 @@ function emptyScore() {
         taskPoints: 0,
         challengePoints: 0,
         satisfactionPoints: 0,
+        cheatsUsed: 0,
+        challengeFails: 0,
+        challengePasses: 0,
+        testSeeded: false,
         events: []
     };
 }
@@ -27,67 +31,78 @@ export function getScore() {
     return gameState.getStateSlice('score') || emptyScore();
 }
 
-function showLiveScoreCue(delta, reason) {
-    const status = document.querySelector?.(GameConfig.selectors.statusMessage);
-    const scoreEl = document.querySelector?.('#shell-score');
-    const sign = delta > 0 ? `+${delta}` : String(delta);
-    const short = (reason || '').replace(/^task\s+/i, '').slice(0, 48);
-    if (status) {
-        status.textContent = `Score ${sign}${short ? ` · ${short}` : ''}`;
-    }
-    if (scoreEl?.classList) {
-        scoreEl.classList.remove('score-cue-up', 'score-cue-down');
-        void scoreEl.offsetWidth;
-        scoreEl.classList.add(delta >= 0 ? 'score-cue-up' : 'score-cue-down');
-    }
+export function recordCheatUsed() {
+    gameState.dispatch('RECORD_CHEAT');
+    return getScore();
 }
 
 /**
- * Practice outcome band from final score (+ thin miss/late pressure).
+ * Performance meter band from final score (+ thin late demotion).
  * Labels are training language — not clinical competency claims.
  */
-export function resolvePracticeOutcome(score, counts = {}) {
+export function resolvePerformanceBand(score, counts = {}) {
     const total = Number(score?.total ?? cfg().startingTotal ?? 100);
     const bands = cfg().outcomes || {};
     const missed = Number(counts.missed) || 0;
     const late = Number(counts.late) || 0;
 
-    let band = bands.overtimeRisk || {
-        id: 'overtime-risk',
-        label: 'Overtime / miss risk framing',
-        min: 0
-    };
-    if (total >= (bands.strong?.min ?? 110)) band = bands.strong;
-    else if (total >= (bands.pass?.min ?? 90)) band = bands.pass;
-    else if (total >= (bands.needsPractice?.min ?? 70)) band = bands.needsPractice;
+    const ordered = [
+        bands.offPace || { min: 0, id: 'off-pace', label: 'Off pace', result: 'lost' },
+        bands.gettingBy || { min: 70, id: 'getting-by', label: 'Getting by', result: 'lost' },
+        bands.steadyCharge || { min: 90, id: 'steady-charge', label: 'Steady charge', result: 'won' },
+        bands.sharpShift || { min: 110, id: 'sharp-shift', label: 'Sharp shift', result: 'won' }
+    ];
 
-    // Heavy open/late work nudges framing even if points are mid-band
-    if ((missed >= 3 || late >= 3) && total < (bands.strong?.min ?? 110)) {
-        band = bands.overtimeRisk || band;
+    let band = ordered[0];
+    for (let i = ordered.length - 1; i >= 0; i -= 1) {
+        if (total >= (ordered[i].min ?? 0)) {
+            band = ordered[i];
+            break;
+        }
     }
 
+    // ≥3 too-lates demote one tier when not already off-pace
+    if (late >= 3 && band.id !== 'off-pace') {
+        const idx = ordered.findIndex((b) => b.id === band.id);
+        if (idx > 0) band = ordered[idx - 1];
+    }
+
+    const result = band.result === 'won' ? 'won' : 'lost';
+
     return {
-        id: band.id || 'on-track',
-        label: band.label || 'On track — keep practicing',
+        id: band.id || 'off-pace',
+        label: band.label || 'Off pace',
+        result,
         total,
         framing: 'Practice outcome for training — not a clinical competency assessment.',
         guidance: missed || late
             ? 'Review late/missed items and whether slot pressure blocked higher-acuity work.'
-            : 'Solid completion pattern — try a denser hour or tighter windows next run.'
+            : 'Solid completion pattern — try a denser hour or tighter windows next run.',
+        meter: ordered.map((b) => ({
+            id: b.id,
+            label: b.label,
+            result: b.result === 'won' ? 'won' : 'lost',
+            min: b.min,
+            active: b.id === (band.id || 'off-pace')
+        }))
     };
 }
 
-export function adjustScore({ delta, reason, dimension = 'task', silent = false } = {}) {
+/** @deprecated use resolvePerformanceBand */
+export function resolvePracticeOutcome(score, counts = {}) {
+    return resolvePerformanceBand(score, counts);
+}
+
+export function adjustScore({ delta, reason, dimension = 'task', silent = false, challengePass, challengeFail } = {}) {
     const amount = Number(delta) || 0;
-    if (!amount && reason !== 'init') return getScore();
+    if (!amount && reason !== 'init' && !challengePass && !challengeFail) return getScore();
     gameState.dispatch('ADJUST_SCORE', {
         delta: amount,
         reason: reason || 'adjust',
-        dimension
+        dimension,
+        challengePass: !!challengePass,
+        challengeFail: !!challengeFail
     });
-    if (!silent && amount) {
-        showLiveScoreCue(amount, reason);
-    }
     return getScore();
 }
 
@@ -97,7 +112,8 @@ export function recordChallengeOutcome({ passed, reason, expected } = {}) {
         adjustScore({
             delta: Number(weights.pass) || 5,
             reason: `challenge pass (${reason || 'ok'})`,
-            dimension: 'challenge'
+            dimension: 'challenge',
+            challengePass: true
         });
         return;
     }
@@ -105,7 +121,8 @@ export function recordChallengeOutcome({ passed, reason, expected } = {}) {
     adjustScore({
         delta: Number(weights.fail) || -8,
         reason: `challenge fail (${reason || 'incorrect'})${cite}`,
-        dimension: 'challenge'
+        dimension: 'challenge',
+        challengeFail: true
     });
 }
 
@@ -184,18 +201,6 @@ function scoreSatisfactionFromPatients() {
     });
 }
 
-function paintScoreChrome() {
-    const el = document.querySelector('#shell-score');
-    if (!el) return;
-    const score = getScore();
-    el.textContent = `Score ${score.total}`;
-    el.title = [
-        `Tasks ${score.taskPoints >= 0 ? '+' : ''}${score.taskPoints}`,
-        `Challenges ${score.challengePoints >= 0 ? '+' : ''}${score.challengePoints}`,
-        `Satisfaction ${score.satisfactionPoints >= 0 ? '+' : ''}${score.satisfactionPoints}`
-    ].join(' · ');
-}
-
 function onTasksChanged(tasks) {
     if (!tasks) return;
     const nextSnap = new Map();
@@ -207,13 +212,13 @@ function onTasksChanged(tasks) {
         }
     });
     prevTaskSnap = nextSnap;
-    paintScoreChrome();
 }
 
 export function finalizeShiftScore() {
+    // Preset seeds lock the snapshot so miss/satisfaction hooks do not rewrite QA totals
+    if (getScore()?.testSeeded) return getScore();
     scoreMissedOpenTasks();
     scoreSatisfactionFromPatients();
-    paintScoreChrome();
     return getScore();
 }
 
@@ -222,14 +227,15 @@ export function resetScoring() {
     scoredSatisfaction.clear();
     prevTaskSnap = new Map();
     gameState.dispatch('RESET_SCORE');
-    paintScoreChrome();
 }
 
 const ScoringModule = {
     getScore,
     adjustScore,
+    recordCheatUsed,
     recordChallengeOutcome,
     finalizeShiftScore,
+    resolvePerformanceBand,
     resolvePracticeOutcome,
     resetScoring,
     init() {
@@ -237,15 +243,12 @@ const ScoringModule = {
         gameState.subscribe('tasks', (tasks) => onTasksChanged(tasks));
         gameState.subscribe('patients', () => {
             scoreSatisfactionFromPatients();
-            paintScoreChrome();
         });
-        gameState.subscribe('score', () => paintScoreChrome());
         gameState.subscribe('gameStatus', (status) => {
             if (status === GameConfig.gameStates.GAME_OVER) {
                 finalizeShiftScore();
             }
         });
-        paintScoreChrome();
     }
 };
 

@@ -28,6 +28,7 @@ import AlteplaseSystemModule, {
 import SepsisSystemModule from './sepsis-system.js';
 import { initSepsisScreenDiceUi } from './challenges/skills/sepsis-recognition/challenge.js';
 import TestModeModule from './test-mode.js';
+import GameOverTestModule from './game-over-test.js';
 import SoundModule from './sound.js';
 import NurseAlertsModule from './nurse-alerts.js';
 import AdmissionSystemModule from './admission-system.js';
@@ -79,6 +80,7 @@ const AppConfig = {
         alteplase: AlteplaseSystemModule,
         sepsis: SepsisSystemModule,
         testMode: TestModeModule,
+        gameOverTest: GameOverTestModule,
         sound: SoundModule,
         nurseAlerts: NurseAlertsModule,
         admission: AdmissionSystemModule,
@@ -151,7 +153,7 @@ class GameApplication {
 
     // Initialize modules with dependency management
     async initializeModules() {
-        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, mediaPlaceholders, scene, iv, criticalLabs, alteplase, sepsis, testMode, sound, nurseAlerts, admission, rightMenu, delegation, skillFocus, boosters } = this.config.modules;
+        const { modal, patients, timer, tasks, shell, slots, debrief, scenario, eventDrip, challengeGate, doctorOrders, dynamicTasks, scoring, mediaPlaceholders, scene, iv, criticalLabs, alteplase, sepsis, testMode, gameOverTest, sound, nurseAlerts, admission, rightMenu, delegation, skillFocus, boosters } = this.config.modules;
         
         // Register modules
         this.modules.set('modal', modal);
@@ -174,6 +176,7 @@ class GameApplication {
         this.modules.set('alteplase', alteplase);
         this.modules.set('sepsis', sepsis);
         this.modules.set('testMode', testMode);
+        this.modules.set('gameOverTest', gameOverTest);
         this.modules.set('sound', sound);
         this.modules.set('nurseAlerts', nurseAlerts);
         this.modules.set('admission', admission);
@@ -1116,6 +1119,14 @@ class GameApplication {
         if (skillFocus && skillFocus.init) {
             Promise.resolve(skillFocus.init()).catch((err) => {
                 console.warn('Skill focus init failed', err);
+            });
+        }
+
+        // Secret ?game-over=<preset> when test-mode.json has testGameOver: true
+        const gameOverTest = this.modules.get('gameOverTest');
+        if (gameOverTest && gameOverTest.init) {
+            Promise.resolve(gameOverTest.init(this)).catch((err) => {
+                console.warn('Game-over test init failed', err);
             });
         }
     }

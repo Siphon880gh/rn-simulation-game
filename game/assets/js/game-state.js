@@ -43,6 +43,9 @@ class GameState {
         taskPoints: 0,
         challengePoints: 0,
         satisfactionPoints: 0,
+        cheatsUsed: 0,
+        challengeFails: 0,
+        challengePasses: 0,
         events: []
       }
     };
@@ -83,6 +86,9 @@ class GameState {
         taskPoints: 0,
         challengePoints: 0,
         satisfactionPoints: 0,
+        cheatsUsed: 0,
+        challengeFails: 0,
+        challengePasses: 0,
         events: []
       }
     }));
@@ -409,9 +415,66 @@ class GameState {
         taskPoints: 0,
         challengePoints: 0,
         satisfactionPoints: 0,
+        cheatsUsed: 0,
+        challengeFails: 0,
+        challengePasses: 0,
+        testSeeded: false,
         events: []
       }
     }));
+
+    /** Absolute score snapshot (dev/QA game-over presets). */
+    this.actions.set('SET_SCORE', (payload) => {
+      const prev = this.state.score || {};
+      return {
+        ...this.state,
+        score: {
+          total: Number(payload?.total ?? prev.total) || 0,
+          taskPoints: Number(payload?.taskPoints ?? prev.taskPoints) || 0,
+          challengePoints: Number(payload?.challengePoints ?? prev.challengePoints) || 0,
+          satisfactionPoints: Number(payload?.satisfactionPoints ?? prev.satisfactionPoints) || 0,
+          cheatsUsed: Number(payload?.cheatsUsed ?? prev.cheatsUsed) || 0,
+          challengeFails: Number(payload?.challengeFails ?? prev.challengeFails) || 0,
+          challengePasses: Number(payload?.challengePasses ?? prev.challengePasses) || 0,
+          testSeeded: payload?.testSeeded === true,
+          events: Array.isArray(payload?.events) ? payload.events.slice(-40) : (prev.events || [])
+        }
+      };
+    });
+
+    /** Replace the whole task map (dev/QA game-over presets). */
+    this.actions.set('REPLACE_TASKS', (payload) => {
+      const list = Array.isArray(payload?.tasks) ? payload.tasks : [];
+      const tasks = new Map();
+      list.forEach((task) => {
+        if (task?.id) tasks.set(task.id, task);
+      });
+      return {
+        ...this.state,
+        tasks,
+        activeTasks: new Set()
+      };
+    });
+
+    this.actions.set('RECORD_CHEAT', () => {
+      const prev = this.state.score || {
+        total: Number(GameConfig.scoring?.startingTotal) || 100,
+        taskPoints: 0,
+        challengePoints: 0,
+        satisfactionPoints: 0,
+        cheatsUsed: 0,
+        challengeFails: 0,
+        challengePasses: 0,
+        events: []
+      };
+      return {
+        ...this.state,
+        score: {
+          ...prev,
+          cheatsUsed: (Number(prev.cheatsUsed) || 0) + 1
+        }
+      };
+    });
 
     this.actions.set('ADJUST_SCORE', (payload) => {
       const delta = Number(payload.delta) || 0;
@@ -421,6 +484,9 @@ class GameState {
         taskPoints: 0,
         challengePoints: 0,
         satisfactionPoints: 0,
+        cheatsUsed: 0,
+        challengeFails: 0,
+        challengePasses: 0,
         events: []
       };
       const next = {
@@ -429,6 +495,8 @@ class GameState {
         taskPoints: prev.taskPoints + (dimension === 'task' ? delta : 0),
         challengePoints: prev.challengePoints + (dimension === 'challenge' ? delta : 0),
         satisfactionPoints: prev.satisfactionPoints + (dimension === 'satisfaction' ? delta : 0),
+        challengeFails: (Number(prev.challengeFails) || 0) + (payload.challengeFail ? 1 : 0),
+        challengePasses: (Number(prev.challengePasses) || 0) + (payload.challengePass ? 1 : 0),
         events: [
           ...prev.events,
           {

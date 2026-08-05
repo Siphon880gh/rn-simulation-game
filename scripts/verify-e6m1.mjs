@@ -29,7 +29,9 @@ const gateSrc = readFileSync(join(root, 'game/assets/js/challenges/challenge-gat
 const html = readFileSync(join(root, 'game/index.html'), 'utf8');
 assert(appSrc.includes('ScoringModule'), 'app wires scoring');
 assert(gateSrc.includes('recordChallengeOutcome'), 'challenge docks/awards');
-assert(html.includes('id="shell-score"'), 'score chrome');
+assert(gateSrc.includes('recordCheatUsed'), 'cheat counter wired');
+assert(!html.includes('id="shell-score"'), 'live score chrome removed');
+assert(html.includes('id="shell-bottom"'), 'bottom chrome remains');
 
 ScoringModule.init();
 gameState.dispatch('INITIALIZE_GAME', { startTime: 1900 });
@@ -65,12 +67,14 @@ assert(getScore().total === 104, `overdue -6 got ${getScore().total}`);
 
 recordChallengeOutcome({ passed: false, reason: 'incorrect', expected: 'lipitor' });
 assert(getScore().total === 96, `challenge fail -8 got ${getScore().total}`);
+assert(getScore().challengeFails === 1, 'challenge fail counted');
 assert(
   getScore().events.some((e) => /expected/.test(e.reason)),
   'fail cites expected'
 );
 recordChallengeOutcome({ passed: true, reason: 'correct' });
 assert(getScore().total === 101, `challenge pass +5 got ${getScore().total}`);
+assert(getScore().challengePasses === 1, 'challenge pass counted');
 
 gameState.dispatch('REGISTER_PATIENT', {
   patient: { id: 'joe', name: 'Joe', clinicalStatus: 'stable' }

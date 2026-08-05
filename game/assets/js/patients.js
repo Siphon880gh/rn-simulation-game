@@ -2480,10 +2480,6 @@ const PatientsModule = (() => {
     const updateCensusMeta = () => {
         const patients = gameState.getStateSlice('patients');
         const count = patients ? patients.size : 0;
-        const meta = document.querySelector('#shell-status-meta');
-        if (meta) {
-            meta.textContent = `Census: ${count} · Slots: 3`;
-        }
         const badge = document.querySelector('#census-count-badge');
         if (badge) {
             badge.textContent = String(count);

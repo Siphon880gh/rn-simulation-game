@@ -55,9 +55,14 @@ assert(report.notes.some((n) => /practice feedback/i.test(n)), 'ethics framing n
 assert(report.logLines.some((e) => /Test log line/.test(e.message)), 'includes shift log');
 
 const html = renderDebriefHtml(report);
-assert(/Completed/.test(html) && /Late/.test(html) && /Missed/.test(html), 'html sections');
+assert(/Completed/.test(html) && (/Late/.test(html) || /Too late/.test(html)) && /Missed/.test(html), 'html sections');
+assert(/Perform challenges/.test(html), 'challenge section');
 assert(/Recent shift log/.test(html), 'log section');
 assert(GameConfig.gameStates.GAME_OVER === 'game_over', 'game over status key');
+
+const shortSrc = readFileSync(join(root, 'game/assets/js/debrief.js'), 'utf8');
+assert(shortSrc.includes('renderShortGameOverHtml'), 'short game over screen');
+assert(shortSrc.includes('Show debrief'), 'expandable debrief');
 
 if (failures.length) {
   console.error('E6.M0 AUTO FAIL');

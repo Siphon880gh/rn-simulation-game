@@ -1,10 +1,10 @@
 /**
- * Shift debrief (E6.M0 + E6.M2) — prioritization lists, practice score/outcome, ethics framing.
+ * Shift debrief (E6) — short Won/Lost performance meter, optional teaching expand.
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import ModalModule from './modal.js';
-import { finalizeShiftScore, resolvePracticeOutcome } from './scoring.js';
+import { finalizeShiftScore, resolvePerformanceBand } from './scoring.js';
 
 function classifyTasks(tasksMap) {
     const summary = {
@@ -94,7 +94,7 @@ export function buildDebriefReport() {
         missed: summary.missed.length
     };
     const score = finalizeShiftScore();
-    const outcome = resolvePracticeOutcome(score, counts);
+    const outcome = resolvePerformanceBand(score, counts);
     const notes = buildTeachingNotes(summary, outcome);
     const byPatient = buildPatientNotes(summary);
     const logLines = recentLogLines();
@@ -106,7 +106,10 @@ export function buildDebriefReport() {
         score,
         outcome,
         byPatient,
-        counts
+        counts,
+        cheatsUsed: Number(score?.cheatsUsed) || 0,
+        challengeFails: Number(score?.challengeFails) || 0,
+        challengePasses: Number(score?.challengePasses) || 0
     };
 }
 
@@ -139,12 +142,98 @@ function renderPatientBreakdown(byPatient) {
     `;
 }
 
+function renderPerformanceMeter(outcome) {
+    const steps = outcome?.meter || [];
+    if (!steps.length) return '';
+    const cells = steps.map((step) => {
+        const active = step.active
+            ? 'ring-2 ring-offset-1 ring-blue-600 bg-blue-100 border-blue-400 font-semibold'
+            : 'bg-gray-50 border-gray-200 text-gray-500';
+        const wonTint = step.result === 'won' ? 'text-emerald-800' : 'text-rose-800';
+        return `
+          <div class="flex-1 min-w-0 rounded border px-1.5 py-2 text-center ${active} ${step.active ? wonTint : ''}"
+               data-meter-id="${step.id}" ${step.active ? 'aria-current="true"' : ''}>
+            <div class="text-[0.65rem] uppercase tracking-wide leading-tight">${step.label}</div>
+          </div>`;
+    }).join('');
+    return `
+      <div class="game-over-meter" role="group" aria-label="Performance meter">
+        <div class="flex gap-1 sm:gap-2">${cells}</div>
+        <p class="text-xs text-gray-500 mt-2 text-center">
+          Getting by and below = Lost · Steady charge and above = Won
+        </p>
+      </div>`;
+}
+
+export function renderShortGameOverHtml(report) {
+    const { counts, score, outcome, cheatsUsed } = report;
+    const won = outcome?.result === 'won';
+    const bannerClass = won
+        ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+        : 'border-rose-200 bg-rose-50 text-rose-900';
+    return `
+      <div class="space-y-4 text-left" data-game-over-view="short">
+        <div class="rounded border p-3 ${bannerClass}">
+          <div class="text-xs uppercase tracking-wide opacity-80 mb-1">Performance</div>
+          <div class="text-xl font-bold">${outcome.label}</div>
+          <p class="text-sm mt-1">${won ? 'You won this practice shift.' : 'You lost this practice shift.'}</p>
+        </div>
+        ${renderPerformanceMeter(outcome)}
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+          <div class="rounded bg-blue-50 border border-blue-100 p-2">
+            <div class="text-lg font-bold text-blue-800">${outcome.total}</div>
+            <div class="text-xs text-blue-900">Score</div>
+          </div>
+          <div class="rounded bg-amber-50 border border-amber-100 p-2">
+            <div class="text-lg font-bold text-amber-700">${counts.late}</div>
+            <div class="text-xs text-amber-800">Too late</div>
+          </div>
+          <div class="rounded bg-emerald-50 border border-emerald-100 p-2">
+            <div class="text-lg font-bold text-emerald-700">${counts.completed}</div>
+            <div class="text-xs text-emerald-800">Completed</div>
+          </div>
+          <div class="rounded bg-rose-50 border border-rose-100 p-2">
+            <div class="text-lg font-bold text-rose-700">${counts.missed}</div>
+            <div class="text-xs text-rose-800">Missed</div>
+          </div>
+          <div class="rounded bg-violet-50 border border-violet-100 p-2 col-span-2 sm:col-span-1">
+            <div class="text-lg font-bold text-violet-800">${cheatsUsed}</div>
+            <div class="text-xs text-violet-900">Cheated</div>
+          </div>
+        </div>
+        ${score ? `
+          <p class="text-xs text-gray-500 text-center">
+            Tasks ${score.taskPoints >= 0 ? '+' : ''}${score.taskPoints}
+            · Challenges ${score.challengePoints >= 0 ? '+' : ''}${score.challengePoints}
+            · Satisfaction ${score.satisfactionPoints >= 0 ? '+' : ''}${score.satisfactionPoints}
+          </p>` : ''}
+      </div>`;
+}
+
+function renderChallengeFailBlock(report) {
+    const fails = Number(report.challengeFails) || 0;
+    const passes = Number(report.challengePasses) || 0;
+    const notes = fails > 0
+        ? '<p class="text-sm text-rose-800 mt-2">Wrong answers docked practice points — review expected answers from challenge feedback during the shift.</p>'
+        : '<p class="text-sm text-gray-600 mt-2">No incorrect perform answers this shift.</p>';
+    return `
+      <div class="rounded border border-violet-100 bg-violet-50 p-3 text-left">
+        <h4 class="font-semibold text-violet-900 mb-1">Perform challenges</h4>
+        <div class="flex gap-4 text-sm text-violet-900">
+          <span>Passed: <strong>${passes}</strong></span>
+          <span>Failed questions: <strong>${fails}</strong></span>
+          <span>Cheats used: <strong>${Number(report.cheatsUsed) || 0}</strong></span>
+        </div>
+        ${notes}
+      </div>`;
+}
+
 export function renderDebriefHtml(report) {
     const { counts, summary, notes, logLines, score, outcome, byPatient } = report;
     const outcomeBlock = outcome
         ? `<div class="rounded border border-indigo-200 bg-indigo-50 p-3 text-left" data-outcome-id="${outcome.id}">
             <div class="text-xs uppercase tracking-wide text-indigo-600 mb-1">Practice outcome</div>
-            <div class="text-lg font-bold text-indigo-900">${outcome.label}</div>
+            <div class="text-lg font-bold text-indigo-900">${outcome.label} — ${outcome.result === 'won' ? 'Won' : 'Lost'}</div>
             <p class="text-sm text-indigo-800 mt-1">Final practice score: <strong>${outcome.total}</strong></p>
             <p class="text-xs text-indigo-700 mt-2">${outcome.framing}</p>
           </div>`
@@ -166,10 +255,11 @@ export function renderDebriefHtml(report) {
         : '<p class="text-sm text-gray-500">No shift log entries.</p>';
 
     return `
-      <div class="space-y-4 text-left">
-        <p class="text-sm text-gray-600">End-of-shift practice debrief — prioritization, score, and teaching cues.</p>
+      <div class="space-y-4 text-left" data-game-over-view="debrief">
+        <p class="text-sm text-gray-600">Teaching debrief — prioritization, score, and perform-challenge results.</p>
         ${outcomeBlock}
         ${scoreBlock}
+        ${renderChallengeFailBlock(report)}
         <div class="grid grid-cols-3 gap-2 text-center">
           <div class="rounded bg-emerald-50 border border-emerald-100 p-2">
             <div class="text-lg font-bold text-emerald-700">${counts.completed}</div>
@@ -177,7 +267,7 @@ export function renderDebriefHtml(report) {
           </div>
           <div class="rounded bg-amber-50 border border-amber-100 p-2">
             <div class="text-lg font-bold text-amber-700">${counts.late}</div>
-            <div class="text-xs text-amber-800">Late / overdue</div>
+            <div class="text-xs text-amber-800">Too late</div>
           </div>
           <div class="rounded bg-rose-50 border border-rose-100 p-2">
             <div class="text-lg font-bold text-rose-700">${counts.missed}</div>
@@ -214,21 +304,69 @@ export function renderDebriefHtml(report) {
     `;
 }
 
+function shortFooterHtml() {
+    return `
+      <button type="button" class="px-4 py-2 rounded-lg font-medium bg-indigo-600 text-white hover:bg-indigo-700"
+              data-game-over-action="show-debrief">Show debrief</button>
+      <button type="button" class="px-4 py-2 rounded-lg font-medium bg-gray-500 text-white hover:bg-gray-600"
+              onclick="closeModal()">Close</button>`;
+}
+
+function debriefFooterHtml() {
+    return `
+      <button type="button" class="px-4 py-2 rounded-lg font-medium bg-gray-200 text-gray-800 hover:bg-gray-300"
+              data-game-over-action="show-short">Back</button>
+      <button type="button" class="px-4 py-2 rounded-lg font-medium bg-blue-500 text-white hover:bg-blue-600"
+              onclick="closeModal()">Close</button>`;
+}
+
+function wireGameOverActions() {
+    const modal = document.querySelector(GameConfig.selectors.modal);
+    if (!modal || modal._gameOverWired) return;
+    modal._gameOverWired = true;
+    modal.addEventListener('click', (ev) => {
+        const btn = ev.target.closest?.('[data-game-over-action]');
+        if (!btn || !lastGameOverReport) return;
+        const report = lastGameOverReport;
+        const action = btn.getAttribute('data-game-over-action');
+        if (action === 'show-debrief') {
+            ModalModule.modifyModal(
+                'Shift debrief — practice outcome',
+                renderDebriefHtml(report),
+                debriefFooterHtml()
+            );
+        } else if (action === 'show-short') {
+            const won = report.outcome?.result === 'won';
+            ModalModule.modifyModal(
+                won ? 'Game Over — Won' : 'Game Over — Lost',
+                renderShortGameOverHtml(report),
+                shortFooterHtml()
+            );
+        }
+    });
+}
+
+let lastGameOverReport = null;
+
 export function showPrioritizationDebrief() {
     const report = buildDebriefReport();
+    lastGameOverReport = report;
+    const won = report.outcome?.result === 'won';
     ModalModule.openModal({
-        title: 'Shift debrief — practice outcome',
-        content: renderDebriefHtml(report),
-        footer: `<button class="px-4 py-2 rounded-lg font-medium bg-blue-500 text-white hover:bg-blue-600" onclick="closeModal()">Close</button>`,
+        title: won ? 'Game Over — Won' : 'Game Over — Lost',
+        content: renderShortGameOverHtml(report),
+        footer: shortFooterHtml(),
         overlay: true,
         persistent: false
     });
+    wireGameOverActions();
     return report;
 }
 
 const DebriefModule = {
     buildDebriefReport,
     renderDebriefHtml,
+    renderShortGameOverHtml,
     showPrioritizationDebrief,
     init() {
         // Shown from app.handleGameOver so we do not double-open with the bare game-over modal

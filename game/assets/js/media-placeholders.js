@@ -361,8 +361,7 @@ export function showCriticalLabMedia(opts = {}) {
             host.id = 'shell-critical-lab-media';
             host.className = 'shell-critical-lab-media';
             host.setAttribute('role', 'status');
-            const chrome = document.querySelector('#shell-status-bar')
-                || document.querySelector('#shell-main')
+            const chrome = document.querySelector('#shell-main')
                 || document.body;
             chrome.appendChild(host);
         }
