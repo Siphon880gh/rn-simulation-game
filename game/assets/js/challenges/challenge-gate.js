@@ -102,6 +102,7 @@ import {
     renderChallengeLevelControl,
     readChallengeLevel,
     updateChallengeLevelProgress,
+    syncChallengeModalChrome,
     lockChallengeLevelControl,
     wireChallengeLevelControl
 } from './shared/copy-config.js';
@@ -347,7 +348,14 @@ function finishCodeBlue(passed, reason, expected, patientId, opts = {}) {
         return;
     }
 
-    settle();
+    // Cancel / dismiss: close immediately without a fail acknowledge step.
+    if (reason === 'cancelled') {
+        settle();
+        return;
+    }
+
+    ensureChallengeAnswerKey(expected);
+    showFailedAcknowledge(settle, challengeIncorrectFeedback(expected));
 }
 
 /**
@@ -448,15 +456,20 @@ export function runCodeBlueChallenge(hook) {
     });
 }
 
-function challengePauseBanner() {
-    return GameConfig.challengeCopy?.pauseBanner
-        || 'Timer is paused. Complete this game/quiz. Failure means the task doesn\'t get done and adds back to the task choices list';
-}
-
 function challengeCorrectFeedback() {
     return GameConfig.challengeCopy?.correctFeedback
         || GameConfig.challengeCopy?.passedFeedback
         || "You're correct.";
+}
+
+function challengeIncorrectFeedback(expected) {
+    const base = GameConfig.challengeCopy?.incorrectFeedback
+        || GameConfig.challengeCopy?.failureConsequence
+        || 'Incorrect — the task is not done. Select it again from the task list.';
+    if (expected) {
+        return `Incorrect — expected “${expected}”. The task is not done. Select it again from the task list.`;
+    }
+    return base;
 }
 
 function challengeContinueLabel() {
@@ -472,21 +485,23 @@ function lockChallengeControls() {
 }
 
 /**
- * Show “You're correct.” and swap the footer to a Continue control.
+ * Show outcome feedback and swap the footer to Continue.
  * Session stays open until the player clicks Continue.
  */
-function showPassedAcknowledge(onContinue) {
+function showAcknowledge(message, { ok = false, onContinue } = {}) {
     if (!activeSession) {
         onContinue?.();
         return;
     }
     activeSession.closing = true;
-    activeSession.pendingPassContinue = onContinue;
-    setChallengeFeedback(challengeCorrectFeedback(), { ok: true });
+    activeSession.pendingAcknowledgeContinue = onContinue;
+    setChallengeFeedback(message, { ok });
     lockChallengeControls();
-    // After last question (incl. multi-q challenge level) — swap before→after still
-    // while the player still has the modal open (Continue closes).
-    revealChallengeAfterMedia(activeSession.challengeMediaKey);
+    if (ok) {
+        // After last question (incl. multi-q challenge level) — swap before→after still
+        // while the player still has the modal open (Continue closes).
+        revealChallengeAfterMedia(activeSession.challengeMediaKey);
+    }
 
     const footer = document.querySelector(GameConfig.selectors.modalFooter || '#modal-footer');
     if (!footer) {
@@ -494,18 +509,29 @@ function showPassedAcknowledge(onContinue) {
         return;
     }
     const label = challengeContinueLabel();
+    const btnClass = ok
+        ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+        : 'bg-rose-700 text-white hover:bg-rose-800';
     footer.innerHTML = `
       <button type="button" id="challenge-continue-btn"
-        class="px-4 py-2 rounded-lg font-medium bg-emerald-600 text-white hover:bg-emerald-700"
+        class="px-4 py-2 rounded-lg font-medium ${btnClass}"
         onclick="window.challengeGateContinue && window.challengeGateContinue()">${label}</button>
     `;
     document.querySelector('#challenge-continue-btn')?.focus();
 }
 
-function continueAfterPassed() {
-    if (!activeSession?.pendingPassContinue) return;
-    const fn = activeSession.pendingPassContinue;
-    activeSession.pendingPassContinue = null;
+function showPassedAcknowledge(onContinue) {
+    showAcknowledge(challengeCorrectFeedback(), { ok: true, onContinue });
+}
+
+function showFailedAcknowledge(onContinue, message) {
+    showAcknowledge(message || challengeIncorrectFeedback(), { ok: false, onContinue });
+}
+
+function continueAfterAcknowledge() {
+    if (!activeSession?.pendingAcknowledgeContinue) return;
+    const fn = activeSession.pendingAcknowledgeContinue;
+    activeSession.pendingAcknowledgeContinue = null;
     fn();
 }
 
@@ -514,7 +540,6 @@ function buildSafetyContent(task) {
     return `
       <div class="challenge-gate space-y-3 text-left" data-challenge="safety-first">
         <p class="text-sm text-gray-900 font-semibold">Complete this challenge to perform the task.</p>
-        <p class="text-sm text-gray-600">${challengePauseBanner()}</p>
         <p class="text-sm text-gray-800">Before performing <strong>${name}</strong>, which action comes first?</p>
         <div class="flex flex-col gap-2">
           <button type="button" class="challenge-choice px-3 py-2 rounded border border-gray-200 text-left text-sm hover:bg-gray-50"
@@ -707,6 +732,7 @@ function mountPoolChoiceQuiz(next, task, poolSize, kind) {
             : kind === 'accucheck'
                 ? renderAccucheckMcqHtml(next.quiz, task?.name, { poolSize, levelHtml })
                 : renderSkillMcqHtml(next.quiz, task?.name, { poolSize, levelHtml });
+    syncChallengeModalChrome();
 
     // Fresh DOM: re-bind or re-lock the challenge-level control
     if (typeof cleanupChallengeLevel === 'function') {
@@ -789,17 +815,15 @@ function finishAttempt(passed, reason, expected, opts = {}) {
     }
 
     recordChallengeOutcome({ passed: false, reason, expected, ...outcomeMeta });
-    setChallengeFeedback(
-        expected
-            ? `Incorrect (expected “${expected}”) — task was not started.`
-            : 'Incorrect — task was not started.'
-    );
     ensureChallengeAnswerKey(expected, opts.expectedLabels);
     gameState.dispatch('APPEND_SHIFT_LOG', {
         message: `Challenge failed: ${activeSession?.taskName || 'task'} (no slot)`,
         timeLabel: String(gameState.getStateSlice('currentTime') ?? '—')
     });
-    endSession({ passed: false, reason, expected });
+    showFailedAcknowledge(
+        () => endSession({ passed: false, reason, expected }),
+        challengeIncorrectFeedback(expected)
+    );
 }
 
 function wireMedIdentityHandlers() {
@@ -1600,7 +1624,7 @@ const ChallengeGateModule = {
         window.challengeGateCancel = () => cancelChallengeGate();
         window.challengeGateSubmit = () => submitChallengeAnswer();
         window.challengeGateCheat = () => cheatChallenge();
-        window.challengeGateContinue = () => continueAfterPassed();
+        window.challengeGateContinue = () => continueAfterAcknowledge();
         gameState.subscribe('codeBlueHook', (hook, prev) => {
             if (!hook?.patientId || hook.resolved) return;
             if (prev?.patientId === hook.patientId && prev?.at === hook.at && !prev?.resolved) {
