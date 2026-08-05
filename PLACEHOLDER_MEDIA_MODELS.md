@@ -15,14 +15,14 @@ Related:
 
 | Kind | Model id | Params | Reference input |
 |------|----------|--------|-----------------|
-| **Image** | `gpt_image_2` | `quality: "high"`, `resolution: "2k"`, `count: 1` | Prior job id as `medias[].role: "image"` |
+| **Image** | `cinematic_studio_2_5` | `resolution: "4k"`, `aspect_ratio: "21:9"`, `count: 1` | Uploaded media_id as `medias[].role: "image"` |
 | **Video** | `seedance_2_0` | `duration: 5` (when set) | Still job id as `medias[].role: "start_image"` |
 
-**Scope of latest pass:** all catalog assets except landing department tiles (`dept-tele`, `dept-medsurg`, `dept-icu`).
+**Scope of latest pass:** Code Blue stills only (`challenge-code-blue`, `challenge-code-blue-after`, `situation-code-blue`). Other catalog assets remain on pass 3 (`gpt_image_2`).
 
 **Concurrency note:** pro plan max **4** concurrent Higgsfield jobs.
 
-**Aspect note:** `gpt_image_2` may remap unsupported ratios (e.g. `21:9` → `16:9`); UI CSS crops wide heroes.
+**Aspect note:** `cinematic_studio_2_5` supports `21:9` natively (Catalog Code Blue heroes are wide).
 
 ---
 
@@ -32,6 +32,7 @@ Append a new row after each full (or partial) regen. Newest pass first.
 
 | Pass | Date (UTC) | Image model | Image params | Video model | Video params | Notes |
 |------|------------|-------------|--------------|-------------|--------------|-------|
+| 4 — Code Blue style fix | 2026-08-05 | `cinematic_studio_2_5` | 4k / 21:9 + image ref | (unchanged) | — | Closed crash-cart drawers on BEFORE; AFTER rematched to photoreal cinematic (was 3D illustrated); jobs `b2af40eb…` / `aeb0deda…` |
 | 3 — quality pass 2 | 2026-08-01 | `gpt_image_2` | high / 2k + image ref | `seedance_2_0` | start_image from still | 38 non-dept assets; skipped `dept-*`; anti-artifact / anti-scrambled-text prompts |
 | 2 — quality pass 1 | 2026-08-01 | `nano_banana_pro` | resolution `2k` + image ref | `kling3_0` | start_image | Higher than initial fill; still showed AI artifacts / scale / text issues |
 | 1 — initial fill | ~2026-08-01 | `soul_2` | default (~1 credit) | `kling3_0_turbo` | turbo | First real media fill into `game/assets/media/` |
@@ -63,12 +64,11 @@ Latest pass also records:
 ```json
 {
   "models": {
-    "image": "gpt_image_2",
-    "imageQuality": "high",
-    "imageResolution": "2k",
+    "image": "cinematic_studio_2_5",
+    "imageResolution": "4k",
     "video": "seedance_2_0"
   }
 }
 ```
 
-Keep this file and `progress.json` → `models` in sync when the locked pair changes.
+Keep this file and `progress.json` → `models` in sync when the locked pair changes. For partial passes, stamp per-queue-row `model` / `higgsfieldJobId` even if global `models` still lists the prior full-pass pair.

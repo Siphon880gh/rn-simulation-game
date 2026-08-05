@@ -67,7 +67,7 @@ Titled image/video placeholders for the RN Simulation Game. Use this list when s
 | `challenge-admission` | image | Admission | `assets/media/challenge-admission.webp`| Clipboard / wristband still | `assets/media/challenge-admission.webp` |
 | `challenge-icp` | image | ICP | `assets/media/challenge-icp.webp`| ICP waveform / EVD still | `assets/media/challenge-icp.webp` |
 | `challenge-iv-check` | image | IV check | `assets/media/challenge-iv-check.webp`| IV site + infusion pump still (**before**) | `assets/media/challenge-iv-check.webp` |
-| `challenge-code-blue-after` | image | Code Blue — resolved | `assets/media/challenge-code-blue-after.webp`| Calm/stable bedside after successful response | `assets/media/challenge-code-blue-after.webp` |
+| `challenge-code-blue-after` | image | Code Blue — resolved | `assets/media/challenge-code-blue-after.webp`| Alive smiling male patient post-successful Code Blue; crash cart closed | `assets/media/challenge-code-blue-after.webp` |
 | `challenge-bed-prep-after` | image | Bed prep — ready | `assets/media/challenge-bed-prep-after.webp`| Made bed ready for admission | `assets/media/challenge-bed-prep-after.webp` |
 | `challenge-med-identity-after` | image | Med identity — verified | `assets/media/challenge-med-identity-after.webp`| Verified med package | `assets/media/challenge-med-identity-after.webp` |
 | `challenge-ivpb-hang-after` | image | IVPB hang — running | `assets/media/challenge-ivpb-hang-after.webp`| Secondary bag running | `assets/media/challenge-ivpb-hang-after.webp` |

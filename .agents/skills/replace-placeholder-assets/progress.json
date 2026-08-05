@@ -1,18 +1,17 @@
 {
   "status": "done",
-  "updatedAt": "2026-08-01T11:27:37.545Z",
-  "note": "Quality pass 2 complete: gpt_image_2 quality=high resolution=2k (+ref); seedance_2_0 (+start_image). Skipped dept-*.",
+  "updatedAt": "2026-08-05T15:02:00.000Z",
+  "note": "Code Blue stills regen (pass 4): cinematic_studio_2_5 4k 21:9 — closed drawers BEFORE; AFTER style-matched. Other assets remain gpt_image_2 pass 3.",
   "models": {
-    "image": "gpt_image_2",
-    "imageQuality": "high",
-    "imageResolution": "2k",
+    "image": "cinematic_studio_2_5",
+    "imageResolution": "4k",
     "video": "seedance_2_0"
   },
   "priorJobs": {
-    "challenge-code-blue-video": "2f24725e-62b2-4974-bfbd-15c22d58b676",
-    "challenge-code-blue": "9f353b43-ce8a-490e-b6d0-2152de4becf7",
-    "situation-code-blue": "69f019d7-e6ee-44aa-9df7-8800ab8a5e2b",
-    "challenge-code-blue-after": "9e327b50-1cc0-4f54-883a-f7de6ccb1f46",
+    "challenge-code-blue-video": "893f8425-8c46-48dc-a976-1c33d58f4711",
+    "challenge-code-blue": "b2af40eb-f27c-414b-8a4b-830c298cdc60",
+    "situation-code-blue": "b2af40eb-f27c-414b-8a4b-830c298cdc60",
+    "challenge-code-blue-after": "4bc28901-654a-4604-a66a-90c66f2f7068",
     "slot-perform-video": "f8e13965-52cf-4e81-a7d8-820d65f21bf7",
     "situation-critical-lab": "e2761bf6-e1d7-42b6-98be-b9aa2b63cced",
     "situation-bed-prep": "d3272b41-0c71-4f92-8a13-4d9d823b4fdf",
@@ -75,7 +74,7 @@
       "kind": "video",
       "priorFile": "assets/media/challenge-code-blue-video.mp4",
       "priorJob": "2f24725e-62b2-4974-bfbd-15c22d58b676",
-      "higgsfieldJobId": "0cd76f0c-fad6-43e9-bddc-d82d104a1675",
+      "higgsfieldJobId": "893f8425-8c46-48dc-a976-1c33d58f4711",
       "model": "seedance_2_0"
     },
     {
@@ -85,8 +84,8 @@
       "kind": "image",
       "priorFile": "assets/media/challenge-code-blue.webp",
       "priorJob": "9f353b43-ce8a-490e-b6d0-2152de4becf7",
-      "higgsfieldJobId": "7beedf4e-e303-4ebb-b452-47fc66662141",
-      "model": "gpt_image_2"
+      "higgsfieldJobId": "b2af40eb-f27c-414b-8a4b-830c298cdc60",
+      "model": "cinematic_studio_2_5"
     },
     {
       "id": "situation-code-blue",
@@ -95,8 +94,8 @@
       "kind": "image",
       "priorFile": "assets/media/situation-code-blue.webp",
       "priorJob": "69f019d7-e6ee-44aa-9df7-8800ab8a5e2b",
-      "higgsfieldJobId": "89493b5f-d88f-4d93-983b-a9030c191eaf",
-      "model": "gpt_image_2"
+      "higgsfieldJobId": "b2af40eb-f27c-414b-8a4b-830c298cdc60",
+      "model": "cinematic_studio_2_5"
     },
     {
       "id": "challenge-code-blue-after",
@@ -104,9 +103,10 @@
       "file": "assets/media/challenge-code-blue-after.webp",
       "kind": "image",
       "priorFile": "assets/media/challenge-code-blue-after.webp",
-      "priorJob": "9e327b50-1cc0-4f54-883a-f7de6ccb1f46",
-      "higgsfieldJobId": "9946230e-c350-41c1-ad51-9e3098c3f4aa",
-      "model": "gpt_image_2"
+      "priorJob": "aeb0deda-c3b9-4019-9bb2-b1b8031877e0",
+      "higgsfieldJobId": "4bc28901-654a-4604-a66a-90c66f2f7068",
+      "model": "cinematic_studio_2_5",
+      "note": "Smiling alive male patient; catalog prompt updated first"
     },
     {
       "id": "slot-perform-video",

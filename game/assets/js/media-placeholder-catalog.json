@@ -269,7 +269,7 @@
       "mount": "challenge.code-blue.video",
       "w": 720,
       "h": 320,
-      "prompt": "Subject: short silent looping video (4–8s) for Code Blue challenge hero — crash cart drawer opening / defibrillator charge lights pulse / urgent bedside motion, muted. Caption feel \"Code Blue\".",
+      "prompt": "Subject: short silent looping video (4–8s) for Code Blue challenge hero — photoreal bedside CPR team motion, defibrillator ECG pulse, crash cart drawers stay CLOSED, muted. Caption feel \"Code Blue\".",
       "replaceWith": "assets/media/challenge-code-blue-video.mp4"
     },
     {
@@ -349,7 +349,7 @@
       "mount": "challenge.code-blue.after",
       "w": 720,
       "h": 320,
-      "prompt": "Subject: after-pass still for Code Blue quiz — calmer bedside, monitor trending stable, crash cart closed/organized, relief after successful response. Caption \"Resolved\".",
+      "prompt": "Subject: after-pass still for Code Blue quiz — photoreal cinematic hospital bedside AFTER successful resuscitation. Adult male patient sitting slightly elevated in bed, CLEARLY ALIVE, eyes open, healthy skin color, warm genuine SMILE looking at the nurse. Two nurses in teal scrubs smiling with relief (no CPR). Red crash cart drawers firmly CLOSED. Monitor shows stable green ECG / good vitals. Caption \"Resolved\". Same photoreal style as Code Blue before still — not 3D illustrated.",
       "replaceWith": "assets/media/challenge-code-blue-after.webp"
     },
     {
