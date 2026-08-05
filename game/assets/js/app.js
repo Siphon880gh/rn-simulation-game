@@ -1178,6 +1178,11 @@ class GameApplication {
 
     // Handle game over (timer may already have dispatched GAME_OVER)
     handleGameOver() {
+        // Guard re-entry: dispatching GAME_OVER notifies gameStatus subscribers,
+        // which call handleGameOver again (and the timer callback may as well).
+        if (this._gameOverSettled) return;
+        this._gameOverSettled = true;
+
         if (gameState.getStateSlice('gameStatus') !== GameConfig.gameStates.GAME_OVER) {
             gameState.dispatch('GAME_OVER');
         }
