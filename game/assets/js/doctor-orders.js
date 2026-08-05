@@ -391,9 +391,18 @@ function spawnHourlyCheck(hourStart, hourEnd, hourIndex) {
 export function injectionsForHour(hourStart) {
     const pack = gameState.getStateSlice('scenarioPack');
     const map = pack?.orderInjections || {};
-    const key = String(hourStart);
-    if (Array.isArray(map[key])) return map[key];
-    if (Array.isArray(map[hourStart])) return map[hourStart];
+    const n = Number(hourStart);
+    const candidates = [
+        hourStart,
+        String(hourStart),
+        Number.isFinite(n) ? n : null,
+        Number.isFinite(n) ? String(n) : null,
+        Number.isFinite(n) ? String(n).padStart(4, '0') : null
+    ];
+    for (const key of candidates) {
+        if (key == null) continue;
+        if (Array.isArray(map[key])) return map[key];
+    }
     if (Array.isArray(map.default)) return map.default;
     return [];
 }

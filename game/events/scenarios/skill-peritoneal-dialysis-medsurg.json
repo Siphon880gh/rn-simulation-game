@@ -2,6 +2,7 @@
   "id": "skill-peritoneal-dialysis-medsurg",
   "title": "Skill practice — Peritoneal dialysis (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Build the next steps of a PD exchange from a mid-sequence anchor (BP check → prime → drain first → fill → dwell)",
     "Recognize cloudy effluent as a peritonitis warning"
   ],
-  "patients": ["noa"],
+  "patients": [
+    "noa"
+  ],
   "patientOverrides": {
     "noa": {
       "clinicalStatus": "stable",

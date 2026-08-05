@@ -2,6 +2,7 @@
   "id": "skill-pulmonary-embolism-tele",
   "title": "Skill practice — Pulmonary embolism (Tele night)",
   "version": 1,
+  "shiftKind": "night",
   "department": "tele",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Recognize acute PE signs (sudden dyspnea, tachycardia, hypoxemia, pleuritic pain)",
     "Escalate with oxygen support and provider notification after VTE risk context"
   ],
-  "patients": ["keira"],
+  "patients": [
+    "keira"
+  ],
   "patientOverrides": {
     "keira": {
       "clinicalStatus": "critical",

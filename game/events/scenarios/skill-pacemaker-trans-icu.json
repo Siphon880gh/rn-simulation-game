@@ -2,6 +2,7 @@
   "id": "skill-pacemaker-trans-icu",
   "title": "Skill practice — Pacemaker assessment / trans (ICU)",
   "version": 1,
+  "shiftKind": "night",
   "department": "icu",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Recognize failure to capture on a temporary pacemaker",
     "Verify connections, output, and sensing settings"
   ],
-  "patients": ["finn"],
+  "patients": [
+    "finn"
+  ],
   "patientOverrides": {
     "finn": {
       "clinicalStatus": "watch",

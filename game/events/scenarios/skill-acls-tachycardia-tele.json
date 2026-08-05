@@ -2,6 +2,7 @@
   "id": "skill-acls-tachycardia-tele",
   "title": "Skill practice — Adult tachycardia with pulse (Tele)",
   "version": 1,
+  "shiftKind": "night",
   "department": "tele",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Decide stable vs unstable tachycardia when a pulse is present",
     "Apply adult tachycardia-with-pulse algorithm (cardioversion, vagal/adenosine, wide-complex paths)"
   ],
-  "patients": ["sven"],
+  "patients": [
+    "sven"
+  ],
   "patientOverrides": {
     "sven": {
       "clinicalStatus": "critical",

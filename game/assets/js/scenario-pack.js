@@ -4,6 +4,11 @@
  */
 import gameState from './game-state.js';
 import { GameConfig } from './game-config.js';
+import {
+    applyRequestedShiftToPack,
+    resolvePackShiftKind,
+    resolveRequestedShiftKind
+} from './shift-kind.js';
 
 const DEFAULT_PACK_URL = GameConfig.scenario?.defaultPackUrl
     || 'events/scenarios/night-shift-default.json';
@@ -46,6 +51,8 @@ export function normalizePack(raw, sourceUrl) {
         shiftDurationHours: Number.isFinite(Number(raw.shiftDurationHours))
             ? Number(raw.shiftDurationHours)
             : null,
+        /** Authored day|night; inferred from shiftStart when omitted (default night). */
+        shiftKind: resolvePackShiftKind(raw),
         sourceUrl
     };
 }
@@ -108,6 +115,16 @@ export async function loadScenarioPack(url = DEFAULT_PACK_URL) {
         }
     }
 
+    // Landing sun/moon (or ?shift= / ?shift-starts=) may flip night↔day absolute times
+    if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const requested = resolveRequestedShiftKind(params, pack, {
+            shift: GameConfig.urlParams?.shift || 'shift',
+            shiftStarts: GameConfig.urlParams?.shiftStarts || 'shift-starts'
+        });
+        pack = applyRequestedShiftToPack(pack, requested);
+    }
+
     gameState.dispatch('SET_SCENARIO_PACK', { pack });
     return pack;
 }
@@ -160,16 +177,14 @@ function applyPackChrome(pack) {
     const titleEl = document.querySelector('#scenario-pack-title');
     if (titleEl) {
         const modeNote = resolveCensusModeSubtitle();
-        titleEl.textContent = modeNote
-            ? `${pack.title} · ${modeNote}`
+        const kind = pack.requestedShiftKind || pack.shiftKind;
+        const kindNote = kind === 'day' ? 'day shift' : kind === 'night' ? 'night shift' : null;
+        const extras = [kindNote, modeNote].filter(Boolean);
+        titleEl.textContent = extras.length
+            ? `${pack.title} · ${extras.join(' · ')}`
             : pack.title;
     }
-    // Pack disclaimer is optional pack metadata — do not replace #fiction-disclaimer
-    const packNote = document.querySelector('#scenario-pack-note');
-    if (packNote && pack.disclaimer) {
-        packNote.textContent = pack.disclaimer;
-        packNote.hidden = false;
-    }
+    // Pack disclaimer stays in JSON metadata; shell #fiction-disclaimer is the player-facing copy
     const objEl = document.querySelector('#scenario-pack-objectives');
     if (objEl && pack.learningObjectives.length) {
         objEl.innerHTML = pack.learningObjectives
@@ -208,6 +223,7 @@ function buildSkillTestBlankPack() {
         incidentPackUrl: null,
         shiftStart: null,
         shiftDurationHours: null,
+        shiftKind: 'night',
         sourceUrl: null
     };
 }

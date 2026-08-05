@@ -2,6 +2,7 @@
   "id": "skill-fluid-balance-medsurg",
   "title": "Skill practice — Fluid balance / I&O (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Track and interpret intake and output against fluid restriction",
     "Link daily weight and edema to fluid status"
   ],
-  "patients": ["hugh"],
+  "patients": [
+    "hugh"
+  ],
   "patientOverrides": {
     "hugh": {
       "clinicalStatus": "watch",

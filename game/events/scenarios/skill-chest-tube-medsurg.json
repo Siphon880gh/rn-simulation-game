@@ -2,6 +2,7 @@
   "id": "skill-chest-tube-medsurg",
   "title": "Skill practice — Chest tube care (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Assess a chest tube drainage system",
     "Respond to disconnection or sudden air-leak changes"
   ],
-  "patients": ["dante"],
+  "patients": [
+    "dante"
+  ],
   "patientOverrides": {
     "dante": {
       "clinicalStatus": "watch",

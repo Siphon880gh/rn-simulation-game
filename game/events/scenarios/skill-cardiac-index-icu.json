@@ -2,6 +2,7 @@
   "id": "skill-cardiac-index-icu",
   "title": "Skill practice — Cardiac index / thermodilution (ICU)",
   "version": 1,
+  "shiftKind": "night",
   "department": "icu",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Perform thermodilution injectate technique correctly",
     "Calculate cardiac index as CO divided by BSA"
   ],
-  "patients": ["wynn"],
+  "patients": [
+    "wynn"
+  ],
   "patientOverrides": {
     "wynn": {
       "clinicalStatus": "critical",

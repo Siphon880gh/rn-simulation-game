@@ -2,6 +2,7 @@
   "id": "tele-4",
   "title": "Telemetry — 4 patients",
   "version": 1,
+  "shiftKind": "night",
   "department": "tele",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -32,4 +33,3 @@
   },
   "events": []
 }
-

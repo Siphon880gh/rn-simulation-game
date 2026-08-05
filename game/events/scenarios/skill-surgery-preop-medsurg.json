@@ -2,6 +2,7 @@
   "id": "skill-surgery-preop-medsurg",
   "title": "Skill practice — Surgery preop checklist (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Complete typical preop checks: NPO, consents, site mark, allergies",
     "Confirm blood thinners held per order before surgery"
   ],
-  "patients": ["paige"],
+  "patients": [
+    "paige"
+  ],
   "patientOverrides": {
     "paige": {
       "clinicalStatus": "stable",

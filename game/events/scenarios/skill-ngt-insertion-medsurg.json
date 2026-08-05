@@ -2,6 +2,7 @@
   "id": "skill-ngt-insertion-medsurg",
   "title": "Skill practice — NGT insertion (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Insert an NG tube safely for decompression",
     "Confirm placement with an approved method before use"
   ],
-  "patients": ["harp"],
+  "patients": [
+    "harp"
+  ],
   "patientOverrides": {
     "harp": {
       "clinicalStatus": "watch",

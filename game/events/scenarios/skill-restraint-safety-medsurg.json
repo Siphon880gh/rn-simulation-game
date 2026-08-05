@@ -2,6 +2,7 @@
   "id": "skill-restraint-safety-medsurg",
   "title": "Skill practice — Restraint safety (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Use least-restrictive alternatives before and while restraints are in place",
     "Complete timed restraint checks for circulation, skin, and release opportunities"
   ],
-  "patients": ["otis"],
+  "patients": [
+    "otis"
+  ],
   "patientOverrides": {
     "otis": {
       "clinicalStatus": "watch",

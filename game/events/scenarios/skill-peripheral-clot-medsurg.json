@@ -2,6 +2,7 @@
   "id": "skill-peripheral-clot-medsurg",
   "title": "Skill practice — Peripheral clot / Doppler (Med-Surg night)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Differentiate arterial occlusion (6 Ps / no pulse) vs DVT (swollen warm limb with pulses)",
     "Choose arterial vs venous Doppler and escalate appropriately"
   ],
-  "patients": ["tovah"],
+  "patients": [
+    "tovah"
+  ],
   "patientOverrides": {
     "tovah": {
       "clinicalStatus": "critical",

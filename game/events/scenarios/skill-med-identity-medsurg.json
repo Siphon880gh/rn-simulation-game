@@ -2,6 +2,7 @@
   "id": "skill-med-identity-medsurg",
   "title": "Skill practice — Med identity (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Match brand and generic medication names before giving a dose",
     "Use identity checks as part of safe medication administration"
   ],
-  "patients": ["wes"],
+  "patients": [
+    "wes"
+  ],
   "patientOverrides": {
     "wes": {
       "clinicalStatus": "stable",

@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/landing.css?v=1.5">
+    <link rel="stylesheet" href="assets/css/landing.css?v=1.6">
 </head>
 <body class="landing">
     <div class="landing-atmosphere" aria-hidden="true"></div>
@@ -109,7 +109,23 @@
 
     <dialog id="census-choice-dialog" class="census-choice-dialog" aria-labelledby="census-choice-title">
         <form method="dialog" class="census-choice-card">
-            <h2 id="census-choice-title" class="census-choice-title">Unit assignment</h2>
+            <div class="census-choice-header">
+                <h2 id="census-choice-title" class="census-choice-title">Unit assignment</h2>
+                <div class="census-choice-shift" role="group" aria-label="Shift type">
+                    <button type="button" id="census-choice-shift-night"
+                            class="census-choice-shift__btn is-selected"
+                            data-shift="night" aria-pressed="true" title="Night shift">
+                        <span class="census-choice-shift__icon" aria-hidden="true">☾</span>
+                        <span class="visually-hidden">Night</span>
+                    </button>
+                    <button type="button" id="census-choice-shift-day"
+                            class="census-choice-shift__btn"
+                            data-shift="day" aria-pressed="false" title="Day shift">
+                        <span class="census-choice-shift__icon" aria-hidden="true">☀</span>
+                        <span class="visually-hidden">Day</span>
+                    </button>
+                </div>
+            </div>
             <p id="census-choice-blurb" class="census-choice-blurb"></p>
             <div class="census-choice-actions">
                 <button type="button" id="census-choice-full" class="census-choice-btn census-choice-btn--primary"

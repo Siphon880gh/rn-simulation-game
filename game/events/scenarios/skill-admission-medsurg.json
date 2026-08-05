@@ -2,6 +2,7 @@
   "id": "skill-admission-medsurg",
   "title": "Skill practice — Admission quizzes (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Complete admission safety checks (allergies, code status, belongings)",
     "Reconcile home medications on a new floor admit"
   ],
-  "patients": ["sloane"],
+  "patients": [
+    "sloane"
+  ],
   "patientOverrides": {
     "sloane": {
       "clinicalStatus": "watch",

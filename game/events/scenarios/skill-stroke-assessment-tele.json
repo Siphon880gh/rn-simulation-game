@@ -2,6 +2,7 @@
   "id": "skill-stroke-assessment-tele",
   "title": "Skill practice — Suspected stroke / BEFAST (Tele)",
   "version": 1,
+  "shiftKind": "night",
   "department": "tele",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Recognize BEFAST signs and establish last known well",
     "Apply adult suspected-stroke priorities: ABCs, glucose, stroke-team activation, imaging for hemorrhage, fibrinolytic vs aspirin path, stroke-unit admission"
   ],
-  "patients": ["nell"],
+  "patients": [
+    "nell"
+  ],
   "patientOverrides": {
     "nell": {
       "clinicalStatus": "critical",

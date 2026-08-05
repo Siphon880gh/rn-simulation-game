@@ -2,6 +2,7 @@
   "id": "skill-ekg-12-lead-tele",
   "title": "Skill practice — 12-lead EKG placement (Tele)",
   "version": 1,
+  "shiftKind": "night",
   "department": "tele",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Place precordial leads V1–V6 at correct landmarks",
     "Place limb leads with good contact for a diagnostic 12-lead"
   ],
-  "patients": ["dex"],
+  "patients": [
+    "dex"
+  ],
   "patientOverrides": {
     "dex": {
       "clinicalStatus": "watch",

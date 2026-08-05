@@ -2,6 +2,7 @@
   "id": "skill-iv-check-medsurg",
   "title": "Skill practice — IV rate check (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Verify a running IV drip rate against the order",
     "Apply protocol adjustments when titration is indicated"
   ],
-  "patients": ["reed"],
+  "patients": [
+    "reed"
+  ],
   "patientOverrides": {
     "reed": {
       "clinicalStatus": "watch",

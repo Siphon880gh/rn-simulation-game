@@ -2,6 +2,7 @@
   "id": "skill-critical-labs-medsurg",
   "title": "Skill practice — Critical lab response (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Read back critical lab values and document notification",
     "Act promptly (hold meds / notify provider) per policy"
   ],
-  "patients": ["lane"],
+  "patients": [
+    "lane"
+  ],
   "patientOverrides": {
     "lane": {
       "clinicalStatus": "watch",

@@ -2,6 +2,7 @@
   "id": "skill-pressure-injury-medsurg",
   "title": "Skill practice — Pressure injury prevention (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Prioritize scheduled repositioning and offloading for high-risk skin",
     "Perform skin checks without harmful practices (e.g. massaging reddened areas)"
   ],
-  "patients": ["ruth"],
+  "patients": [
+    "ruth"
+  ],
   "patientOverrides": {
     "ruth": {
       "clinicalStatus": "watch",

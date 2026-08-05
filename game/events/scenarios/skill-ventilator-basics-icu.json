@@ -2,6 +2,7 @@
   "id": "skill-ventilator-basics-icu",
   "title": "Skill practice — Ventilator basics (ICU)",
   "version": 1,
+  "shiftKind": "night",
   "department": "icu",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Respond to common ventilator alarms at the bedside",
     "Assess patient–ventilator interaction before silencing alarms"
   ],
-  "patients": ["samir"],
+  "patients": [
+    "samir"
+  ],
   "patientOverrides": {
     "samir": {
       "clinicalStatus": "worsening",

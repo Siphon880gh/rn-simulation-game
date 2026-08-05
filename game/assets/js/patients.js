@@ -8,6 +8,7 @@ import { registerPatientIv } from './iv-system.js';
 import { loadPastHxPack, ensurePastHxTimeline } from './past-hx-timeline.js';
 import { inferMedSlotKind } from './media-placeholders.js';
 import { decorateSepsisScreenDice } from './challenges/skills/sepsis-recognition/challenge.js';
+import { convertPatientHtmlTimes, resolvePackShiftKind, shiftOffsetMins } from './shift-kind.js';
 
 const PatientsModule = (() => {
     console.log("Patients module initialized");
@@ -2240,7 +2241,17 @@ const PatientsModule = (() => {
         try {
             // Load patient HTML template
             const response = await fetch(patientConfig.htmlFile);
-            const html = await response.text();
+            let html = await response.text();
+            const packForTimes = gameState.getStateSlice('scenarioPack');
+            let timeOffset = Number(packForTimes?.shiftOffsetMins) || 0;
+            if (!timeOffset && packForTimes?.requestedShiftKind) {
+                const authored = packForTimes.authoredShiftKind
+                    || resolvePackShiftKind(packForTimes);
+                timeOffset = shiftOffsetMins(authored, packForTimes.requestedShiftKind);
+            }
+            if (timeOffset) {
+                html = convertPatientHtmlTimes(html, timeOffset);
+            }
             
             let pastHxPack = { displayName: patientConfig.name, pastHx: [] };
             if (patientConfig.pastHxFile) {

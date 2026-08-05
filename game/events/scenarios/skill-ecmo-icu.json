@@ -2,6 +2,7 @@
   "id": "skill-ecmo-icu",
   "title": "Skill practice — ECMO (ICU)",
   "version": 1,
+  "shiftKind": "night",
   "department": "icu",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Prioritize circuit integrity, cannulation sites, and perfusion on ECMO",
     "Respond to alarms and bleeding risk with the ECMO team"
   ],
-  "patients": ["axel"],
+  "patients": [
+    "axel"
+  ],
   "patientOverrides": {
     "axel": {
       "clinicalStatus": "critical",

@@ -2,6 +2,7 @@
   "id": "skill-code-blue-response-icu",
   "title": "Skill practice — Code Blue response (ICU)",
   "version": 1,
+  "shiftKind": "night",
   "department": "icu",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Recognize pulseless arrest and start Code Blue / ACLS priorities",
     "Keep crash cart and defibrillator ready for high-risk cardiac patients"
   ],
-  "patients": ["knox"],
+  "patients": [
+    "knox"
+  ],
   "patientOverrides": {
     "knox": {
       "clinicalStatus": "critical",

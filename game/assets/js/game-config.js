@@ -20,6 +20,11 @@ export const GameConfig = {
   timer: {
     defaultSpeedFactor: 1440, // real ms between ticks = 1000 / speedFactor
     defaultShiftStart: 1900, // military HHMM
+    /** Canonical starts when landing sun/moon (or pack shiftKind) picks day|night. */
+    shiftStartsByKind: {
+      day: 700,
+      night: 1900
+    },
     defaultShiftDuration: 60 * 12, // game-minutes in the shift (also real-seconds budget before speed)
     pollInterval: 1000,
     taskPollBlockMinutes: 15,
@@ -728,6 +733,8 @@ export const GameConfig = {
   urlParams: {
     speedFactor: 'speed-factor',
     shiftStarts: 'shift-starts',
+    /** Landing census modal: day | night (remaps pack times when opposite of pack.shiftKind) */
+    shift: 'shift',
     shiftDuration: 'shift-duration',
     scenarioPack: 'scenario',
     /** E9: full (omit) | minus1 | admitStart | admitMiddle | openAdmit (legacy random) */
@@ -941,7 +948,7 @@ export const GameConfig = {
 
   /**
    * Dev / QA test mode — brand Test control opens a spawn-incident modal.
-   * On/off is loaded from `configUrl` JSON (`enabled: true|false`). No URL query.
+   * On/off is loaded from `configUrl` JSON (`testIncidents: true|false`). No URL query.
    * `testGameOver: true` in the same JSON enables secret `?game-over=<preset>`
    * instant end-of-shift seeds (game-over-test.js) and homepage preset links.
    * Paths are relative to the game page (`game/index.html`).
@@ -991,12 +998,9 @@ export const GameConfig = {
     ]
   },
 
-  // E8.M1: portfolio / demo presets (query-string shortcuts)
+  // E8.M1: portfolio packaging (unit picker via brand title; day/night on landing)
   demo: {
-    presets: {
-      quickNight: 'game/index.html?speed-factor=24&scenario=events/scenarios/night-shift-default.json',
-      quickDay: 'game/index.html?speed-factor=24&scenario=events/scenarios/day-shift-medsurg.json&shift-starts=0700'
-    }
+    presets: {}
   },
 
   /**

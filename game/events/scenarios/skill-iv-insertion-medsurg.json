@@ -2,6 +2,7 @@
   "id": "skill-iv-insertion-medsurg",
   "title": "Skill practice — IV insertion (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Select an appropriate peripheral site and use aseptic technique",
     "Confirm flashback/patency before securing and using the line"
   ],
-  "patients": ["joss"],
+  "patients": [
+    "joss"
+  ],
   "patientOverrides": {
     "joss": {
       "clinicalStatus": "watch",

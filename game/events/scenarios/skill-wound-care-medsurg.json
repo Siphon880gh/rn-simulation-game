@@ -2,6 +2,7 @@
   "id": "skill-wound-care-medsurg",
   "title": "Skill practice — Wound care / dressing (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Perform sterile dressing change with aseptic technique",
     "Assess wound bed and packing without breaking sterile field unnecessarily"
   ],
-  "patients": ["clara"],
+  "patients": [
+    "clara"
+  ],
   "patientOverrides": {
     "clara": {
       "clinicalStatus": "stable",

@@ -2,6 +2,7 @@
   "id": "night-shift-default",
   "title": "Challenge night — Med-Surg + ICU acuity",
   "version": 1,
+  "shiftKind": "night",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
   "learningObjectives": [
@@ -10,7 +11,14 @@
     "Use patient panels and chart history to support safe sequencing",
     "Recognize when work falls late or remains open at shift end"
   ],
-  "patients": ["joe", "maria", "lyle", "aisha", "robert", "lin"],
+  "patients": [
+    "joe",
+    "maria",
+    "lyle",
+    "aisha",
+    "robert",
+    "lin"
+  ],
   "patientOverrides": {
     "lyle": {
       "clinicalStatus": "watch",

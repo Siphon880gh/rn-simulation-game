@@ -2,6 +2,7 @@
   "id": "skill-medication-rights-medsurg",
   "title": "Skill practice — Medication rights (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Apply medication rights before administration",
     "Use med identity verification as the practice challenge until a dedicated rights mini-game exists"
   ],
-  "patients": ["nina"],
+  "patients": [
+    "nina"
+  ],
   "patientOverrides": {
     "nina": {
       "clinicalStatus": "stable",

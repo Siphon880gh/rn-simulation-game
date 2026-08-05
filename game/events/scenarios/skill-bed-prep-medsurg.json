@@ -2,6 +2,7 @@
   "id": "skill-bed-prep-medsurg",
   "title": "Skill practice — Bed prep for admission (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Gather the correct supplies before an admission arrives",
     "Prepare a clean, ready bed for a new patient"
   ],
-  "patients": ["piper"],
+  "patients": [
+    "piper"
+  ],
   "patientOverrides": {
     "piper": {
       "clinicalStatus": "stable",

@@ -2,6 +2,7 @@
   "id": "skill-sbar-medsurg",
   "title": "Skill practice — SBAR communication (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Structure a provider call as Situation, Background, Assessment, Recommendation",
     "Include concise vitals and what you need from the listener"
   ],
-  "patients": ["blair"],
+  "patients": [
+    "blair"
+  ],
   "patientOverrides": {
     "blair": {
       "clinicalStatus": "watch",

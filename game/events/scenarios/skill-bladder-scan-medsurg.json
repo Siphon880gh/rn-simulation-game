@@ -2,6 +2,7 @@
   "id": "skill-bladder-scan-medsurg",
   "title": "Skill practice — Bladder scan (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Perform timed bladder scans and interpret post-void residual",
     "Follow q6h (or ordered interval) scanning and catheterization thresholds"
   ],
-  "patients": ["rhea"],
+  "patients": [
+    "rhea"
+  ],
   "patientOverrides": {
     "rhea": {
       "clinicalStatus": "watch",

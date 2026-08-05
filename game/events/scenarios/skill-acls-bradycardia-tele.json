@@ -2,6 +2,7 @@
   "id": "skill-acls-bradycardia-tele",
   "title": "Skill practice — Adult bradycardia algorithm (Tele)",
   "version": 1,
+  "shiftKind": "night",
   "department": "tele",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Recognize symptomatic bradycardia with a pulse and signs of poor perfusion",
     "Apply adult bradycardia algorithm steps (atropine, TCP, dopamine/epi infusions)"
   ],
-  "patients": ["bode"],
+  "patients": [
+    "bode"
+  ],
   "patientOverrides": {
     "bode": {
       "clinicalStatus": "critical",

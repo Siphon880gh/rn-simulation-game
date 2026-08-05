@@ -2,6 +2,7 @@
   "id": "skill-insulin-drip-icu",
   "title": "Skill practice — Insulin drip / ICU (ICU)",
   "version": 1,
+  "shiftKind": "night",
   "department": "icu",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Monitor glucose frequently and titrate IV insulin per protocol",
     "Recognize and treat hypoglycemia risk on an insulin drip"
   ],
-  "patients": ["sage"],
+  "patients": [
+    "sage"
+  ],
   "patientOverrides": {
     "sage": {
       "clinicalStatus": "critical",

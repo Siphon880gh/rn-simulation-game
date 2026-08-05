@@ -2,6 +2,7 @@
   "id": "skill-pca-pump-medsurg",
   "title": "Skill practice — PCA pump (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Confirm patient-only PCA dosing (no proxy presses)",
     "Monitor sedation and respiratory rate while PCA is running"
   ],
-  "patients": ["jade"],
+  "patients": [
+    "jade"
+  ],
   "patientOverrides": {
     "jade": {
       "clinicalStatus": "watch",

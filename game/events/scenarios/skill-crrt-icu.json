@@ -2,6 +2,7 @@
   "id": "skill-crrt-icu",
   "title": "Skill practice — CRRT (ICU)",
   "version": 1,
+  "shiftKind": "night",
   "department": "icu",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Respond to CRRT filter/access alarms with assessment and team notification",
     "Protect dialysis catheter access and return lines"
   ],
-  "patients": ["cade"],
+  "patients": [
+    "cade"
+  ],
   "patientOverrides": {
     "cade": {
       "clinicalStatus": "critical",

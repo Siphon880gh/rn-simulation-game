@@ -2,6 +2,7 @@
   "id": "skill-isolation-ppe-medsurg",
   "title": "Skill practice — Isolation / PPE (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Select correct PPE for contact precautions (C. difficile)",
     "Use soap-and-water hand hygiene after C. diff care"
   ],
-  "patients": ["opal"],
+  "patients": [
+    "opal"
+  ],
   "patientOverrides": {
     "opal": {
       "clinicalStatus": "watch",

@@ -2,6 +2,7 @@
   "id": "skill-ecg-basics-tele",
   "title": "Skill practice — ECG / telemetry basics (Tele)",
   "version": 1,
+  "shiftKind": "night",
   "department": "tele",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -35,4 +36,3 @@
   },
   "events": []
 }
-

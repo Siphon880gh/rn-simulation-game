@@ -2,6 +2,7 @@
   "id": "skill-skeletal-traction-medsurg",
   "title": "Skill practice — Skeletal traction (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Keep traction weights hanging freely off the floor with ropes in pulley grooves",
     "Maintain body alignment and distal CMS while traction is continuous"
   ],
-  "patients": ["bron"],
+  "patients": [
+    "bron"
+  ],
   "patientOverrides": {
     "bron": {
       "clinicalStatus": "watch",

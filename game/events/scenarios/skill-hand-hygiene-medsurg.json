@@ -2,6 +2,7 @@
   "id": "skill-hand-hygiene-medsurg",
   "title": "Skill practice — Hand hygiene (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Choose soap-and-water when hands are visibly soiled or after C. difficile care",
     "Use alcohol-based hand rub appropriately for other moments"
   ],
-  "patients": ["ned"],
+  "patients": [
+    "ned"
+  ],
   "patientOverrides": {
     "ned": {
       "clinicalStatus": "watch",

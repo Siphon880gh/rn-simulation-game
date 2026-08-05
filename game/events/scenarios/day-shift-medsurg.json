@@ -2,6 +2,7 @@
   "id": "day-shift-medsurg",
   "title": "Day Shift — Medical-Surgical Floor",
   "version": 1,
+  "shiftKind": "day",
   "shiftStart": 700,
   "shiftDurationHours": 12,
   "fictionalOnly": true,
@@ -11,7 +12,14 @@
     "Respond to mid-shift complications without losing the census thread",
     "Close the shift with fewer open overdue tasks"
   ],
-  "patients": ["joe", "maria", "derek", "aisha", "robert", "lin"],
+  "patients": [
+    "joe",
+    "maria",
+    "derek",
+    "aisha",
+    "robert",
+    "lin"
+  ],
   "scene": {
     "theme": "medsurg",
     "unitBackground": null,

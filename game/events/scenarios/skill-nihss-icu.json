@@ -2,6 +2,7 @@
   "id": "skill-nihss-icu",
   "title": "Skill practice — NIHSS assessment (ICU)",
   "version": 1,
+  "shiftKind": "night",
   "department": "icu",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Use NIHSS to quantify stroke deficit severity",
     "Trend scores to support treatment decisions"
   ],
-  "patients": ["milo"],
+  "patients": [
+    "milo"
+  ],
   "patientOverrides": {
     "milo": {
       "clinicalStatus": "critical",

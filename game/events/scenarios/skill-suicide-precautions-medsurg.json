@@ -2,6 +2,7 @@
   "id": "skill-suicide-precautions-medsurg",
   "title": "Skill practice — Suicide precautions (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Remove environmental hazards and follow the ordered observation level",
     "Stay with the patient during high-risk moments such as bathroom use"
   ],
-  "patients": ["pearl"],
+  "patients": [
+    "pearl"
+  ],
   "patientOverrides": {
     "pearl": {
       "clinicalStatus": "watch",

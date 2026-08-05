@@ -2,6 +2,7 @@
   "id": "skill-ileostomy-bag-change-medsurg",
   "title": "Skill practice — Ileostomy bag replacement (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Measure the stoma and cut the wafer slightly larger than the diameter",
     "Replace a leaking ileostomy appliance with skin protection"
   ],
-  "patients": ["zane"],
+  "patients": [
+    "zane"
+  ],
   "patientOverrides": {
     "zane": {
       "clinicalStatus": "watch",

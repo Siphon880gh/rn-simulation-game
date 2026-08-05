@@ -2,6 +2,7 @@
   "id": "skill-heparin-drip-icu",
   "title": "Skill practice — Heparin drip (ICU)",
   "version": 1,
+  "shiftKind": "night",
   "department": "icu",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Draw aPTT at protocol intervals (often q6h) and after dose changes",
     "Titrate heparin per nomogram and monitor for bleeding"
   ],
-  "patients": ["quin"],
+  "patients": [
+    "quin"
+  ],
   "patientOverrides": {
     "quin": {
       "clinicalStatus": "watch",

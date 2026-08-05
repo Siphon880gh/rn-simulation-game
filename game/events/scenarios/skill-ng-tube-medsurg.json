@@ -2,6 +2,7 @@
   "id": "skill-ng-tube-medsurg",
   "title": "Skill practice — NG tube (Med-Surg)",
   "version": 1,
+  "shiftKind": "night",
   "department": "medsurg",
   "fictionalOnly": true,
   "disclaimer": "All patients, orders, and events in this pack are fictional and for educational practice only.",
@@ -9,7 +10,9 @@
     "Verify NG placement by radiograph or facility-approved method before use",
     "Maintain suction / patency and monitor NG output for SBO care"
   ],
-  "patients": ["theo"],
+  "patients": [
+    "theo"
+  ],
   "patientOverrides": {
     "theo": {
       "clinicalStatus": "watch",
