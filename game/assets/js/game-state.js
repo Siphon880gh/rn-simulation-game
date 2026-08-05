@@ -46,6 +46,7 @@ class GameState {
         cheatsUsed: 0,
         challengeFails: 0,
         challengePasses: 0,
+        challengeMisses: [],
         events: []
       }
     };
@@ -89,6 +90,7 @@ class GameState {
         cheatsUsed: 0,
         challengeFails: 0,
         challengePasses: 0,
+        challengeMisses: [],
         events: []
       }
     }));
@@ -418,6 +420,7 @@ class GameState {
         cheatsUsed: 0,
         challengeFails: 0,
         challengePasses: 0,
+        challengeMisses: [],
         testSeeded: false,
         events: []
       }
@@ -436,6 +439,9 @@ class GameState {
           cheatsUsed: Number(payload?.cheatsUsed ?? prev.cheatsUsed) || 0,
           challengeFails: Number(payload?.challengeFails ?? prev.challengeFails) || 0,
           challengePasses: Number(payload?.challengePasses ?? prev.challengePasses) || 0,
+          challengeMisses: Array.isArray(payload?.challengeMisses)
+            ? payload.challengeMisses.slice(-40)
+            : (Array.isArray(prev.challengeMisses) ? prev.challengeMisses : []),
           testSeeded: payload?.testSeeded === true,
           events: Array.isArray(payload?.events) ? payload.events.slice(-40) : (prev.events || [])
         }
@@ -465,6 +471,7 @@ class GameState {
         cheatsUsed: 0,
         challengeFails: 0,
         challengePasses: 0,
+        challengeMisses: [],
         events: []
       };
       return {
@@ -487,8 +494,13 @@ class GameState {
         cheatsUsed: 0,
         challengeFails: 0,
         challengePasses: 0,
+        challengeMisses: [],
         events: []
       };
+      const priorMisses = Array.isArray(prev.challengeMisses) ? prev.challengeMisses : [];
+      const nextMisses = payload.challengeMiss
+        ? [...priorMisses, payload.challengeMiss].slice(-40)
+        : priorMisses;
       const next = {
         ...prev,
         total: prev.total + delta,
@@ -497,6 +509,7 @@ class GameState {
         satisfactionPoints: prev.satisfactionPoints + (dimension === 'satisfaction' ? delta : 0),
         challengeFails: (Number(prev.challengeFails) || 0) + (payload.challengeFail ? 1 : 0),
         challengePasses: (Number(prev.challengePasses) || 0) + (payload.challengePass ? 1 : 0),
+        challengeMisses: nextMisses,
         events: [
           ...prev.events,
           {

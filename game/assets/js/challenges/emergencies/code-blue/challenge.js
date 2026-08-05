@@ -308,6 +308,8 @@ export function wireCodeBlueHandlers({
                     grade,
                     reason: 'code-blue-correct',
                     expected: grade.expectedLabels.join(' → '),
+                    given: chosen.join(' → '),
+                    prompt: question.prompt || question.stem,
                     questionId: question.id
                 });
                 return;
@@ -327,6 +329,8 @@ export function wireCodeBlueHandlers({
                 grade,
                 reason: 'code-blue-incorrect',
                 expected: grade.expectedLabels.join(' → '),
+                given: chosen.join(' → ') || '—',
+                prompt: question.prompt || question.stem,
                 questionId: question.id
             });
             return;
@@ -343,6 +347,8 @@ export function wireCodeBlueHandlers({
                 grade,
                 reason: 'code-blue-correct',
                 expected: grade.expected,
+                given: selectedChoice,
+                prompt: question.prompt || question.stem,
                 questionId: question.id
             });
             return;
@@ -357,6 +363,8 @@ export function wireCodeBlueHandlers({
             grade,
             reason: 'code-blue-incorrect',
             expected: grade.expected,
+            given: selectedChoice,
+            prompt: question.prompt || question.stem,
             questionId: question.id
         });
     };

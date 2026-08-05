@@ -747,7 +747,12 @@ export function wireSkillMcqInteractions(onGraded) {
       btn.addEventListener('click', () => {
         stopSkillMcqAudio(gate);
         const ok = btn.getAttribute('data-challenge-correct') === '1';
-        onGraded({ ok });
+        onGraded({
+          ok,
+          given: btn.textContent?.trim() || '—',
+          prompt: gate.querySelector('[data-quiz-prompt]')?.textContent?.trim()
+            || gate.querySelector('.skill-quiz-prompt')?.textContent?.trim()
+        });
       });
     });
     return;
@@ -762,15 +767,18 @@ export function wireSkillMcqInteractions(onGraded) {
         onGraded({ ok: false, expected: undefined, empty: true });
         return;
       }
+      const given = boxes.filter((b) => b.checked)
+        .map((b) => b.closest('label')?.textContent?.trim() || b.value || '—')
+        .join('; ');
       const ok = boxes.every((b) => (b.checked ? b.getAttribute('data-challenge-correct') === '1'
         : b.getAttribute('data-challenge-correct') !== '1'));
       if (!ok) {
         const expectedLabels = revealSataOutcome(gate);
-        onGraded({ ok: false, expectedLabels });
+        onGraded({ ok: false, expectedLabels, given });
         return;
       }
       clearSataOutcomePaint(gate);
-      onGraded({ ok: true });
+      onGraded({ ok: true, given });
     });
     return;
   }

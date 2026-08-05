@@ -48,7 +48,7 @@ const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
 assert(appSrc.includes('GameOverTestModule'), 'app wires game-over test');
 assert(appSrc.includes('bootImmediateGameOverTest'), 'immediate game-over boot');
 assert(appSrc.includes('gameOverTest'), 'app registers module');
-
+assert(appSrc.includes('_gameOverSettled'), 'game-over once guard');
 const gotSrc = readFileSync(join(root, 'game/assets/js/game-over-test.js'), 'utf8');
 assert(gotSrc.includes('runImmediateGameOverTest'), 'immediate runner');
 assert(!/requestAnimationFrame/.test(gotSrc), 'no paint delay before game over');
@@ -83,6 +83,56 @@ expectBand('no-late', 'steady-charge', 'won');
 expectBand('getting-by', 'getting-by', 'lost');
 expectBand('off-pace', 'off-pace', 'lost');
 
+// Seeded missed-question review for presets with challengeFails
+['lots-of-late', 'getting-by', 'off-pace'].forEach((id) => {
+  applyGameOverTestPreset(id);
+  const report = buildDebriefReport();
+  const fails = GAME_OVER_TEST_PRESETS[id].challengeFails;
+  assert(report.challengeFails === fails, `${id} challengeFails`);
+  assert(
+    Array.isArray(report.challengeMisses) && report.challengeMisses.length === fails,
+    `${id} challengeMisses length ${fails}`
+  );
+  if (fails > 0) {
+    const first = report.challengeMisses[0];
+    assert(first.given && first.given !== '', `${id} miss has given`);
+    assert(first.expected && first.expected !== '', `${id} miss has expected`);
+  }
+});
+
+applyGameOverTestPreset('perfection');
+{
+  const report = buildDebriefReport();
+  assert(
+    Array.isArray(report.challengeMisses) && report.challengeMisses.length === 0,
+    'perfection has no challengeMisses'
+  );
+}
+
+const debriefSrc = readFileSync(join(root, 'game/assets/js/debrief.js'), 'utf8');
+assert(debriefSrc.includes('Missed question review'), 'debrief miss review heading');
+assert(debriefSrc.includes('Your answer'), 'debrief your answer');
+assert(debriefSrc.includes('Correct answer'), 'debrief correct answer');
+assert(debriefSrc.includes('<details'), 'perform challenges collapsed details');
+assert(debriefSrc.includes('data-challenge-fail-block'), 'perform challenges block marker');
+assert(debriefSrc.includes('data-miss-carousel'), 'miss review carousel');
+assert(debriefSrc.includes('data-miss-carousel-action'), 'miss carousel actions');
+assert(debriefSrc.includes('fa-chevron-left'), 'miss carousel left chevron');
+assert(debriefSrc.includes('fa-chevron-right'), 'miss carousel right chevron');
+assert(debriefSrc.includes('data-miss-carousel-dot'), 'miss carousel dots');
+const gotMissSrc = readFileSync(join(root, 'game/assets/js/game-over-test.js'), 'utf8');
+assert(gotMissSrc.includes('SAMPLE_CHALLENGE_MISSES'), 'sample miss catalog');
+assert(gotMissSrc.includes('buildSeededChallengeMisses'), 'seed helper');
+assert(gotMissSrc.includes('SAMPLE_TASK_NAMES'), 'clinical task name pool');
+assert(!gotMissSrc.includes('Completed task ${'), 'no generic Completed task labels');
+
+applyGameOverTestPreset('getting-by');
+{
+  const report = buildDebriefReport();
+  const firstDone = report.summary.completed[0];
+  assert(firstDone?.name && !/^Completed task/i.test(firstDone.name), 'seeded completed name is clinical');
+  assert(firstDone?.patientId && firstDone.patientId !== 'unit', 'seeded task has patient id');
+}
 if (failures.length) {
   console.error('GAME-OVER TEST AUTO FAIL');
   failures.forEach((f) => console.error(' -', f));

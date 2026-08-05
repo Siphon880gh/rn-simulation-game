@@ -22,6 +22,7 @@ function emptyScore() {
         cheatsUsed: 0,
         challengeFails: 0,
         challengePasses: 0,
+        challengeMisses: [],
         testSeeded: false,
         events: []
     };
@@ -93,7 +94,7 @@ export function resolvePracticeOutcome(score, counts = {}) {
     return resolvePerformanceBand(score, counts);
 }
 
-export function adjustScore({ delta, reason, dimension = 'task', silent = false, challengePass, challengeFail } = {}) {
+export function adjustScore({ delta, reason, dimension = 'task', silent = false, challengePass, challengeFail, challengeMiss } = {}) {
     const amount = Number(delta) || 0;
     if (!amount && reason !== 'init' && !challengePass && !challengeFail) return getScore();
     gameState.dispatch('ADJUST_SCORE', {
@@ -101,12 +102,26 @@ export function adjustScore({ delta, reason, dimension = 'task', silent = false,
         reason: reason || 'adjust',
         dimension,
         challengePass: !!challengePass,
-        challengeFail: !!challengeFail
+        challengeFail: !!challengeFail,
+        challengeMiss: challengeMiss || undefined
     });
     return getScore();
 }
 
-export function recordChallengeOutcome({ passed, reason, expected } = {}) {
+function buildChallengeMiss({ reason, expected, given, prompt, challenge } = {}) {
+    const label = String(challenge || reason || 'Challenge').trim() || 'Challenge';
+    return {
+        challenge: label,
+        prompt: String(prompt || '').trim(),
+        given: String(given ?? '').trim() || '—',
+        expected: String(expected ?? '').trim() || '—',
+        reason: String(reason || 'incorrect').trim(),
+        at: gameState.getStateSlice('currentTime'),
+        ts: Date.now()
+    };
+}
+
+export function recordChallengeOutcome({ passed, reason, expected, given, prompt, challenge } = {}) {
     const weights = cfg().challenge || {};
     if (passed) {
         adjustScore({
@@ -118,11 +133,15 @@ export function recordChallengeOutcome({ passed, reason, expected } = {}) {
         return;
     }
     const cite = expected ? ` — expected “${expected}”` : '';
+    const skipMissLog = reason === 'cancelled' || reason === 'busy' || reason === 'disabled';
     adjustScore({
         delta: Number(weights.fail) || -8,
         reason: `challenge fail (${reason || 'incorrect'})${cite}`,
         dimension: 'challenge',
-        challengeFail: true
+        challengeFail: true,
+        challengeMiss: skipMissLog
+            ? undefined
+            : buildChallengeMiss({ reason, expected, given, prompt, challenge })
     });
 }
 

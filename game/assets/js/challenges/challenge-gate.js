@@ -301,11 +301,18 @@ function noteQuizCorrectAndMaybeContinue({ onNeedNext, onComplete }) {
     onNeedNext?.();
 }
 
-function finishCodeBlue(passed, reason, expected, patientId) {
+function finishCodeBlue(passed, reason, expected, patientId, opts = {}) {
     if (activeSession?.closing) return;
 
     const settle = () => {
-        recordChallengeOutcome({ passed, reason, expected });
+        recordChallengeOutcome({
+            passed,
+            reason,
+            expected,
+            given: opts.given,
+            prompt: opts.prompt || activeSession?.codeBlueQuestion?.prompt || activeSession?.taskName,
+            challenge: opts.challenge || 'Code Blue'
+        });
         if (passed) {
             gameState.dispatch('UPDATE_PATIENT', {
                 patientId,
@@ -416,13 +423,19 @@ export function runCodeBlueChallenge(hook) {
                     activeSession.currentQuestionId = q?.id || null;
                     if (q?.id != null) activeSession.quizSeenIds?.add(String(q.id));
                 },
-                onDone: ({ passed, reason, expected }) => {
+                onDone: ({ passed, reason, expected, given, prompt }) => {
                     if (!passed) {
-                        finishCodeBlue(false, reason, expected, patientId);
+                        finishCodeBlue(false, reason, expected, patientId, {
+                            given,
+                            prompt: prompt || activeSession?.codeBlueQuestion?.prompt || activeSession?.taskName
+                        });
                         return;
                     }
                     noteQuizCorrectAndMaybeContinue({
-                        onComplete: () => finishCodeBlue(true, reason, expected, patientId),
+                        onComplete: () => finishCodeBlue(true, reason, expected, patientId, {
+                            given,
+                            prompt: prompt || activeSession?.codeBlueQuestion?.prompt || activeSession?.taskName
+                        }),
                         onNeedNext: () => {
                             if (typeof window.codeBlueNextQuestion === 'function') {
                                 window.codeBlueNextQuestion();
@@ -570,7 +583,12 @@ function wireSafetyHandlers() {
     root.querySelectorAll('.challenge-choice').forEach((btn) => {
         btn.addEventListener('click', () => {
             const ok = btn.getAttribute('data-challenge-correct') === '1';
-            finishAttempt(ok, ok ? 'correct' : 'incorrect', undefined, { allowRetry: true });
+            finishAttempt(ok, ok ? 'correct' : 'incorrect', undefined, {
+                allowRetry: true,
+                given: btn.textContent?.trim() || '—',
+                prompt: activeSession?.taskName,
+                challenge: 'Safety check'
+            });
         });
     });
 }
@@ -591,28 +609,32 @@ function wirePoolChoiceQuiz(cfg) {
 
     initQuizChallengeLevel(poolSize);
 
-    const handleGrade = ({ ok, empty, expectedLabels }) => {
+    const handleGrade = ({ ok, empty, expectedLabels, given, prompt }) => {
         if (activeSession?.closing) return;
         const expected = activeSession?.quizExpected;
+        const meta = {
+            allowRetry: true,
+            expectedLabels: expectedLabels || activeSession?.quizExpectedLabels,
+            given,
+            prompt: prompt || activeSession?.quizPrompt || activeSession?.taskName,
+            challenge: kind === 'skill-mcq' ? 'Skill MCQ' : String(kind || 'Challenge')
+        };
         if (empty) {
             setChallengeFeedback('Select at least one option, then check your answer.');
             return;
         }
         if (!ok) {
-            finishAttempt(false, `${kind}-incorrect`, expected, {
-                allowRetry: true,
-                expectedLabels: expectedLabels || activeSession?.quizExpectedLabels
-            });
+            finishAttempt(false, `${kind}-incorrect`, expected, meta);
             return;
         }
         noteQuizCorrectAndMaybeContinue({
             onComplete: () => {
-                finishAttempt(true, `${kind}-correct`, expected, { allowRetry: true });
+                finishAttempt(true, `${kind}-correct`, expected, meta);
             },
             onNeedNext: () => {
                 const next = drawFromQuizDeck(rebuild, { excludeCurrentOnly: false });
                 if (!next?.quiz) {
-                    finishAttempt(true, `${kind}-correct`, expected, { allowRetry: true });
+                    finishAttempt(true, `${kind}-correct`, expected, meta);
                     return;
                 }
                 mountPoolChoiceQuiz(next, task, poolSize, kind);
@@ -635,7 +657,10 @@ function wirePoolChoiceQuiz(cfg) {
         gate.querySelectorAll('.challenge-choice').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const ok = btn.getAttribute('data-challenge-correct') === '1';
-                handleGrade({ ok });
+                handleGrade({
+                    ok,
+                    given: btn.textContent?.trim() || '—'
+                });
             });
         });
     };
@@ -709,8 +734,14 @@ function finishAttempt(passed, reason, expected, opts = {}) {
     const allowRetry = opts.allowRetry === true;
     if (activeSession?.closing) return;
 
+    const outcomeMeta = {
+        given: opts.given,
+        prompt: opts.prompt || activeSession?.taskName,
+        challenge: opts.challenge || activeSession?.taskName || reason
+    };
+
     if (passed) {
-        recordChallengeOutcome({ passed: true, reason, expected });
+        recordChallengeOutcome({ passed: true, reason, expected, ...outcomeMeta });
         gameState.dispatch('APPEND_SHIFT_LOG', {
             message: activeSession?.admissionQuiz || activeSession?.bedPrep
                 ? `Challenge passed: ${activeSession?.taskName || 'task'}`
@@ -737,7 +768,7 @@ function finishAttempt(passed, reason, expected, opts = {}) {
     if (allowRetry && activeSession) {
         if (!activeSession.failLogged) {
             activeSession.failLogged = true;
-            recordChallengeOutcome({ passed: false, reason, expected });
+            recordChallengeOutcome({ passed: false, reason, expected, ...outcomeMeta });
             gameState.dispatch('APPEND_SHIFT_LOG', {
                 message: `Challenge incorrect: ${activeSession?.taskName || 'task'} — retry in modal (no slot yet)`,
                 timeLabel: String(gameState.getStateSlice('currentTime') ?? '—')
@@ -757,7 +788,7 @@ function finishAttempt(passed, reason, expected, opts = {}) {
         return;
     }
 
-    recordChallengeOutcome({ passed: false, reason, expected });
+    recordChallengeOutcome({ passed: false, reason, expected, ...outcomeMeta });
     setChallengeFeedback(
         expected
             ? `Incorrect (expected “${expected}”) — task was not started.`
@@ -802,7 +833,13 @@ export function submitMedIdentity() {
             ok,
             ok ? 'med-identity-correct' : 'med-identity-incorrect',
             prompt.expected,
-            { allowRetry: true, expectedLabels }
+            {
+                allowRetry: true,
+                expectedLabels,
+                given: selected.join('; '),
+                prompt: prompt.prompt || prompt.question || activeSession?.taskName,
+                challenge: 'Med identity'
+            }
         );
         return;
     }
@@ -819,7 +856,12 @@ export function submitMedIdentity() {
         ok,
         ok ? 'med-identity-correct' : 'med-identity-incorrect',
         prompt.expected,
-        { allowRetry: true }
+        {
+            allowRetry: true,
+            given: answer,
+            prompt: prompt.prompt || prompt.question || activeSession?.taskName,
+            challenge: 'Med identity'
+        }
     );
 }
 
@@ -891,12 +933,21 @@ function wireAccucheckMcqChoices(task, poolSize, rebuild) {
                 const ok = btn.getAttribute('data-challenge-correct') === '1';
                 const expected = activeSession?.quizExpected;
                 if (!ok) {
-                    finishAttempt(false, 'accucheck-incorrect', expected, { allowRetry: true });
+                    finishAttempt(false, 'accucheck-incorrect', expected, {
+                        allowRetry: true,
+                        given: btn.textContent?.trim() || '—',
+                        prompt: activeSession?.taskName,
+                        challenge: 'Accu-Chek'
+                    });
                     return;
                 }
                 noteQuizCorrectAndMaybeContinue({
                     onComplete: () => {
-                        finishAttempt(true, 'accucheck-correct', expected, { allowRetry: true });
+                        finishAttempt(true, 'accucheck-correct', expected, {
+                            allowRetry: true,
+                            given: btn.textContent?.trim() || '—',
+                            challenge: 'Accu-Chek'
+                        });
                     },
                     onNeedNext: () => {
                         const next = drawFromQuizDeck(rebuild, { excludeCurrentOnly: false });
@@ -943,13 +994,19 @@ export function submitAccucheck() {
     }
     const expected = activeSession.accucheckPrompt.expected;
     const ok = checkAccucheckAnswer(answer, activeSession.accucheckPrompt);
+    const meta = {
+        allowRetry: true,
+        given: answer,
+        prompt: activeSession.accucheckPrompt.prompt || activeSession.taskName,
+        challenge: 'Accu-Chek'
+    };
     if (!ok) {
-        finishAttempt(false, 'accucheck-incorrect', expected, { allowRetry: true });
+        finishAttempt(false, 'accucheck-incorrect', expected, meta);
         return;
     }
     noteQuizCorrectAndMaybeContinue({
         onComplete: () => {
-            finishAttempt(true, 'accucheck-correct', expected, { allowRetry: true });
+            finishAttempt(true, 'accucheck-correct', expected, meta);
         },
         onNeedNext: () => continueAccucheckAsMcqPool()
     });
@@ -1080,7 +1137,12 @@ export function submitIvChallenge() {
         ok,
         ok ? 'iv-correct' : 'iv-incorrect',
         activeSession.ivPrompt.expected,
-        { allowRetry: true }
+        {
+            allowRetry: true,
+            given: answer,
+            prompt: activeSession.ivPrompt.prompt || activeSession.taskName,
+            challenge: 'IV rate'
+        }
     );
 }
 

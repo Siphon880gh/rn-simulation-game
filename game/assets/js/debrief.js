@@ -99,6 +99,10 @@ export function buildDebriefReport() {
     const byPatient = buildPatientNotes(summary);
     const logLines = recentLogLines();
 
+    const challengeMisses = Array.isArray(score?.challengeMisses)
+        ? score.challengeMisses
+        : [];
+
     return {
         summary,
         notes,
@@ -109,17 +113,130 @@ export function buildDebriefReport() {
         counts,
         cheatsUsed: Number(score?.cheatsUsed) || 0,
         challengeFails: Number(score?.challengeFails) || 0,
-        challengePasses: Number(score?.challengePasses) || 0
+        challengePasses: Number(score?.challengePasses) || 0,
+        challengeMisses
     };
+}
+
+function escapeDebriefText(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function renderChallengeMissSlide(miss, idx, total) {
+    const title = escapeDebriefText(miss.challenge || `Question ${idx + 1}`);
+    const prompt = escapeDebriefText(miss.prompt || 'Perform challenge');
+    const given = escapeDebriefText(miss.given || '—');
+    const expected = escapeDebriefText(miss.expected || '—');
+    const hidden = idx === 0 ? '' : ' hidden';
+    return `
+      <div class="rounded border border-rose-100 bg-white p-2.5 space-y-1.5${hidden}"
+           data-challenge-miss="${idx}"
+           data-miss-carousel-slide
+           role="group"
+           aria-roledescription="slide"
+           aria-label="Missed question ${idx + 1} of ${total}">
+        <div class="text-xs uppercase tracking-wide text-rose-700 font-semibold">${title}</div>
+        <p class="text-sm text-gray-800">${prompt}</p>
+        <div class="grid sm:grid-cols-2 gap-2 text-sm">
+          <div class="rounded bg-rose-50 border border-rose-100 px-2 py-1.5">
+            <div class="text-[0.65rem] uppercase tracking-wide text-rose-600">Your answer</div>
+            <div class="text-rose-900 font-medium">${given}</div>
+          </div>
+          <div class="rounded bg-emerald-50 border border-emerald-100 px-2 py-1.5">
+            <div class="text-[0.65rem] uppercase tracking-wide text-emerald-700">Correct answer</div>
+            <div class="text-emerald-900 font-medium">${expected}</div>
+          </div>
+        </div>
+      </div>`;
+}
+
+function renderChallengeMissReview(report) {
+    const misses = Array.isArray(report.challengeMisses) ? report.challengeMisses : [];
+    if (!misses.length) {
+        return '<p class="text-sm text-gray-600 mt-2">No missed questions to review.</p>';
+    }
+    const total = misses.length;
+    const slides = misses.map((miss, idx) => renderChallengeMissSlide(miss, idx, total)).join('');
+    const dots = misses.map((_, idx) => {
+        const active = idx === 0;
+        return `
+          <button type="button"
+                  class="h-2.5 w-2.5 rounded-full transition-colors ${active ? 'bg-violet-600' : 'bg-violet-200 hover:bg-violet-300'}"
+                  data-miss-carousel-action="goto"
+                  data-miss-carousel-index="${idx}"
+                  data-miss-carousel-dot
+                  aria-label="Go to missed question ${idx + 1}"
+                  aria-current="${active ? 'true' : 'false'}"></button>`;
+    }).join('');
+    const showNav = total > 1;
+    return `
+      <div class="mt-3" data-challenge-miss-review data-miss-carousel
+           data-miss-carousel-index="0" data-miss-carousel-count="${total}">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <h5 class="text-sm font-semibold text-violet-900">Missed question review</h5>
+          <span class="text-xs text-violet-700 tabular-nums" data-miss-carousel-counter>1 / ${total}</span>
+        </div>
+        <div class="flex items-stretch gap-1 sm:gap-2">
+          <button type="button"
+                  class="shrink-0 self-center rounded-full border border-violet-200 bg-white text-violet-800 hover:bg-violet-100 w-9 h-9 flex items-center justify-center disabled:opacity-40 disabled:pointer-events-none ${showNav ? '' : 'invisible'}"
+                  data-miss-carousel-action="prev"
+                  aria-label="Previous missed question">
+            <i class="fas fa-chevron-left text-sm" aria-hidden="true"></i>
+          </button>
+          <div class="flex-1 min-w-0" data-miss-carousel-viewport>
+            ${slides}
+          </div>
+          <button type="button"
+                  class="shrink-0 self-center rounded-full border border-violet-200 bg-white text-violet-800 hover:bg-violet-100 w-9 h-9 flex items-center justify-center disabled:opacity-40 disabled:pointer-events-none ${showNav ? '' : 'invisible'}"
+                  data-miss-carousel-action="next"
+                  aria-label="Next missed question">
+            <i class="fas fa-chevron-right text-sm" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="flex justify-center items-center gap-1.5 mt-3 ${showNav ? '' : 'hidden'}"
+             data-miss-carousel-dots role="tablist" aria-label="Missed question pages">
+          ${dots}
+        </div>
+      </div>`;
+}
+
+function setMissCarouselIndex(root, index) {
+    if (!root) return;
+    const count = Number(root.getAttribute('data-miss-carousel-count')) || 0;
+    if (count < 1) return;
+    const next = ((Number(index) % count) + count) % count;
+    root.setAttribute('data-miss-carousel-index', String(next));
+    root.querySelectorAll('[data-miss-carousel-slide]').forEach((slide, i) => {
+        slide.classList.toggle('hidden', i !== next);
+    });
+    root.querySelectorAll('[data-miss-carousel-dot]').forEach((dot, i) => {
+        const active = i === next;
+        dot.classList.toggle('bg-violet-600', active);
+        dot.classList.toggle('bg-violet-200', !active);
+        dot.classList.toggle('hover:bg-violet-300', !active);
+        dot.setAttribute('aria-current', active ? 'true' : 'false');
+    });
+    const counter = root.querySelector('[data-miss-carousel-counter]');
+    if (counter) counter.textContent = `${next + 1} / ${count}`;
 }
 
 function renderTaskList(tasks, emptyLabel) {
     if (!tasks.length) {
         return `<p class="text-sm text-gray-500">${emptyLabel}</p>`;
     }
+    const patients = gameState.getStateSlice('patients');
     const items = tasks.slice(0, 8).map((t) => {
-        const patient = t.patientId ? ` <span class="text-gray-400">(${t.patientId})</span>` : '';
-        return `<li class="text-sm text-gray-700">${t.name || t.id}${patient}</li>`;
+        const pid = t.patientId;
+        let patientLabel = '';
+        if (pid && pid !== 'unit') {
+            const p = patients?.get?.(pid);
+            patientLabel = ` <span class="text-gray-400">(${escapeDebriefText(p?.name || pid)})</span>`;
+        }
+        return `<li class="text-sm text-gray-700">${escapeDebriefText(t.name || t.id)}${patientLabel}</li>`;
     }).join('');
     const more = tasks.length > 8 ? `<li class="text-xs text-gray-400">+${tasks.length - 8} more</li>` : '';
     return `<ul class="list-disc pl-5 space-y-1 text-left">${items}${more}</ul>`;
@@ -213,19 +330,30 @@ export function renderShortGameOverHtml(report) {
 function renderChallengeFailBlock(report) {
     const fails = Number(report.challengeFails) || 0;
     const passes = Number(report.challengePasses) || 0;
-    const notes = fails > 0
-        ? '<p class="text-sm text-rose-800 mt-2">Wrong answers docked practice points — review expected answers from challenge feedback during the shift.</p>'
+    const missCount = Array.isArray(report.challengeMisses) ? report.challengeMisses.length : 0;
+    const cheats = Number(report.cheatsUsed) || 0;
+    const notes = fails > 0 || missCount > 0
+        ? '<p class="text-sm text-rose-800 mt-2">Wrong answers docked practice points — compare your answer to the correct answer below.</p>'
         : '<p class="text-sm text-gray-600 mt-2">No incorrect perform answers this shift.</p>';
     return `
-      <div class="rounded border border-violet-100 bg-violet-50 p-3 text-left">
-        <h4 class="font-semibold text-violet-900 mb-1">Perform challenges</h4>
-        <div class="flex gap-4 text-sm text-violet-900">
-          <span>Passed: <strong>${passes}</strong></span>
-          <span>Failed questions: <strong>${fails}</strong></span>
-          <span>Cheats used: <strong>${Number(report.cheatsUsed) || 0}</strong></span>
+      <details class="rounded border border-violet-100 bg-violet-50 p-3 text-left group" data-challenge-fail-block>
+        <summary class="cursor-pointer list-none flex items-start justify-between gap-2 text-violet-900">
+          <span>
+            <span class="font-semibold">Perform challenges</span>
+            <span class="block sm:inline sm:ml-2 text-sm font-normal text-violet-800">
+              Passed <strong>${passes}</strong>
+              · Failed <strong>${fails}</strong>
+              · Cheats <strong>${cheats}</strong>
+            </span>
+          </span>
+          <span class="shrink-0 text-xs uppercase tracking-wide text-violet-600 mt-0.5 group-open:hidden">Expand</span>
+          <span class="shrink-0 text-xs uppercase tracking-wide text-violet-600 mt-0.5 hidden group-open:inline">Collapse</span>
+        </summary>
+        <div class="mt-2 pt-2 border-t border-violet-100">
+          ${notes}
+          ${renderChallengeMissReview(report)}
         </div>
-        ${notes}
-      </div>`;
+      </details>`;
 }
 
 export function renderDebriefHtml(report) {
@@ -325,6 +453,23 @@ function wireGameOverActions() {
     if (!modal || modal._gameOverWired) return;
     modal._gameOverWired = true;
     modal.addEventListener('click', (ev) => {
+        const carouselBtn = ev.target.closest?.('[data-miss-carousel-action]');
+        if (carouselBtn) {
+            const root = carouselBtn.closest('[data-miss-carousel]');
+            if (!root) return;
+            ev.preventDefault();
+            const action = carouselBtn.getAttribute('data-miss-carousel-action');
+            const current = Number(root.getAttribute('data-miss-carousel-index')) || 0;
+            if (action === 'prev') {
+                setMissCarouselIndex(root, current - 1);
+            } else if (action === 'next') {
+                setMissCarouselIndex(root, current + 1);
+            } else if (action === 'goto') {
+                setMissCarouselIndex(root, Number(carouselBtn.getAttribute('data-miss-carousel-index')) || 0);
+            }
+            return;
+        }
+
         const btn = ev.target.closest?.('[data-game-over-action]');
         if (!btn || !lastGameOverReport) return;
         const report = lastGameOverReport;
