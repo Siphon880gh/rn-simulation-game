@@ -1634,11 +1634,13 @@ body.shell-bottom-resizing {
     transition: outline-color 200ms ease;
 }
 
-/* Tall content (e.g. challenge quizzes): keep panel in viewport; scroll body; pin footer.
-   Prefer svh/dvh — 100vh alone is taller than the visible area on mobile browser chrome. */
+/* Tall modals (debrief, quizzes): scroll the panel itself (not a nested body).
+   Nested #modal-content scroll + panel overflow:hidden clipped content when the
+   flex scrollport failed or the pointer was outside the content box.
+   Prefer svh/dvh — 100vh alone is taller than the visible area on mobile chrome. */
 #modal {
-    align-items: center;
-    align-items: safe center;
+    align-items: flex-start;
+    justify-content: center;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -1646,15 +1648,40 @@ body.shell-bottom-resizing {
 }
 
 #modal .modal-panel {
+    /* Block layout (not flex): flex + max-height + overflow can report a tiny
+       scrollHeight and leave most debrief content unreachable. */
     position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: auto;
+    margin-bottom: auto;
     max-height: calc(100vh - 2rem);
     max-height: calc(100dvh - 2rem);
     max-height: calc(100svh - 2rem);
-    display: flex;
-    flex-direction: column;
+    display: block;
     min-width: 0;
-    min-height: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: #9ca3af #f3f4f6;
+}
+
+#modal .modal-panel::-webkit-scrollbar {
+    width: 10px;
+}
+
+#modal .modal-panel::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 999px;
+}
+
+#modal .modal-panel::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+    border-radius: 999px;
+    border: 2px solid #f3f4f6;
 }
 
 /* Challenge modals: compact corner cue that the shift clock is paused */
@@ -1694,18 +1721,17 @@ body.shell-bottom-resizing {
     color: #1f2937;
 }
 
-#modal-title,
-#modal-footer {
-    flex-shrink: 0;
+#modal-content {
+    overflow: visible;
 }
 
-#modal-content {
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    min-height: 0;
-    flex: 1 1 auto;
+#modal-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    padding-top: 0.75rem;
+    background: #fff;
+    box-shadow: 0 -10px 16px -12px rgba(15, 23, 42, 0.35);
 }
 
 @media (max-width: 900px) {
@@ -1730,10 +1756,13 @@ body.shell-bottom-resizing {
 
     #modal-footer {
         margin-top: 0.5rem;
+        padding-top: 0.5rem;
     }
 
     #shell {
         --shell-bottom-height: 0px;
+        min-height: 100dvh;
+        max-height: 100dvh;
     }
 
     #shell-top-primary {
@@ -1971,11 +2000,18 @@ body.shell-bottom-resizing {
         min-height: 0;
     }
 
+    /* Collapse footer strip; keep overflow visible so fixed log/slots panels still paint */
     #shell-bottom {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
         gap: 0;
-        padding: 0.3rem 0.5rem;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        height: 0;
+        min-height: 0;
+        overflow: visible;
+        pointer-events: none;
     }
 
     #shell-bottom-resize {
@@ -2001,6 +2037,7 @@ body.shell-bottom-resizing {
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+        pointer-events: auto;
     }
 
     body.shell-log-visible #shift-history-log {
@@ -2070,8 +2107,12 @@ body.shell-bottom-resizing {
         justify-content: center;
         gap: 0.25rem;
         position: fixed;
-        /* Flush to visual bottom; ignore --shell-bottom-height (mobile strip is 0). */
-        bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
+        left: auto;
+        top: auto;
+        /* Visual viewport bottom (FABs live outside #shell). */
+        bottom: 0;
+        margin: 0;
+        margin-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
         z-index: 55;
         width: 2.5rem;
         height: 2.5rem;
@@ -2081,6 +2122,7 @@ body.shell-bottom-resizing {
         color: #374151;
         box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
         cursor: pointer;
+        pointer-events: auto;
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
     }

@@ -50,8 +50,8 @@ Browser chrome around the sim: locked shell regions (E1.M2), patient main mount,
 | Task queue | `#task-queue-bar` / `#slot-waiting-queue` | 3 slots + FIFO wait (slot-system.js); exclusive → `.task-slot--disabled`; busy slots show type thumbs via `slotByTaskType` (`slot-med`, …) with `slot-perform` fallback |
 | Critical lab media | `#shell-critical-lab-media` | Placeholder host for critical-lab spawn still |
 | Clock / Pause | `#clock` / `#pause` / `#shell-lean-pause` | Timer module; lean chip on mobile collapsed chrome |
-| Slots / log toggles | `#shell-slots-toggle` / `#shell-log-toggle` | Mobile FABs; body classes `shell-slots-visible` / `shell-log-visible` |
-| Modal | `#modal`… | Overlay; dims `#shell`; challenge heroes via `challengeMediaHtml`. Tall panels: `.modal-panel` max-height uses `svh`/`dvh`; `#modal-content` scrolls; title/footer pinned (`shell.css`) |
+| Slots / log toggles | `#shell-slots-toggle` / `#shell-log-toggle` | Mobile FABs **outside** `#shell` (fixed not trapped by shell overflow); body classes `shell-slots-visible` / `shell-log-visible` |
+| Modal | `#modal`… | Overlay; dims `#shell`; challenge heroes via `challengeMediaHtml`. Tall panels: `.modal-panel` is block + `overflow-y: scroll` with `svh`/`dvh` max-height; sticky `#modal-footer` (`shell.css`) — avoid flex+nested `#modal-content` scroll (tiny scrollHeight / clipped debrief) |
 | Docs FAB | `#docs-container` | Fixed bottom-right |
 | Reveal style | `#reveal-scheduled-tasks` | Empty `<style>` filled by timer |
 

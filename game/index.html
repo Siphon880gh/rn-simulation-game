@@ -314,21 +314,22 @@
                 <div id="slot-waiting-queue" class="slot-waiting-queue" aria-label="Slot waiting queue"></div>
             </div>
         </footer>
-
-        <button type="button" id="shell-log-toggle" class="shell-log-toggle"
-                aria-pressed="false" aria-controls="shift-history-log"
-                title="Shift event log">
-            <i class="fas fa-list-ul" aria-hidden="true"></i>
-            <span class="shell-log-toggle__label">Log</span>
-        </button>
-
-        <button type="button" id="shell-slots-toggle" class="shell-slots-toggle"
-                aria-pressed="false" aria-controls="slot-cluster"
-                title="Show task slots">
-            <i class="fas fa-th-large" aria-hidden="true"></i>
-            <span class="shell-slots-toggle__label">Slots</span>
-        </button>
     </div>
+
+    <!-- Outside #shell so position:fixed is not trapped by overflow/grid on mobile WebKit -->
+    <button type="button" id="shell-log-toggle" class="shell-log-toggle"
+            aria-pressed="false" aria-controls="shift-history-log"
+            title="Shift event log">
+        <i class="fas fa-list-ul" aria-hidden="true"></i>
+        <span class="shell-log-toggle__label">Log</span>
+    </button>
+
+    <button type="button" id="shell-slots-toggle" class="shell-slots-toggle"
+            aria-pressed="false" aria-controls="slot-cluster"
+            title="Show task slots">
+        <i class="fas fa-th-large" aria-hidden="true"></i>
+        <span class="shell-slots-toggle__label">Slots</span>
+    </button>
 
     <!-- Critical lab placeholder media (config: GameConfig.mediaPlaceholders) -->
     <div id="shell-critical-lab-media" class="shell-critical-lab-media" hidden role="status" aria-live="polite"></div>
@@ -345,7 +346,7 @@
     </div>
 
     <!-- Modal -->
-    <div id="modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div id="modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center hidden z-50 p-4">
         <div class="modal-panel bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
             <h2 id="modal-title" class="text-xl font-bold mb-4"></h2>
             <div id="modal-content" class="mb-4"></div>
