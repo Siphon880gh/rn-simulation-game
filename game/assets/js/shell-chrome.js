@@ -11,7 +11,6 @@ const BOTTOM_HEIGHT_STORAGE_KEY = 'rngame.shellBottomHeightPx';
 const BOTTOM_HEIGHT_MIN_PX = 120;
 const BOTTOM_HEIGHT_MAX_VH = 0.55;
 const BOTTOM_HEIGHT_DEFAULT_PX = 176;
-const BOTTOM_HEIGHT_NARROW_DEFAULT_PX = 72;
 const TOP_COLLAPSED_STORAGE_KEY = 'rngame.shellTopCollapsed';
 const CLOCK_FLOAT_POS_STORAGE_KEY = 'rngame.shellClockFloatPos';
 const NARROW_LAYOUT_MQ = '(max-width: 900px)';
@@ -620,6 +619,13 @@ function clampBottomHeight(px) {
 function applyBottomHeight(px) {
     const shell = document.querySelector(GameConfig.selectors.shell);
     if (!shell) return;
+    // Narrow: keep CSS `--shell-bottom-height: 0` so log/slots FABs sit on the
+    // viewport bottom (a non-zero strip lifts them via older calc() rules too).
+    if (isNarrowLayout()) {
+        shell.style.setProperty('--shell-bottom-height', '0px');
+        document.documentElement.style.setProperty('--shell-bottom-height', '0px');
+        return 0;
+    }
     const next = clampBottomHeight(px);
     shell.style.setProperty('--shell-bottom-height', `${next}px`);
     document.documentElement.style.setProperty('--shell-bottom-height', `${next}px`);
@@ -651,12 +657,8 @@ function initBottomResize() {
     handle.dataset.bound = '1';
 
     const stored = readStoredBottomHeight();
-    const narrow = isNarrowLayout();
-    const fallback = narrow ? BOTTOM_HEIGHT_NARROW_DEFAULT_PX : BOTTOM_HEIGHT_DEFAULT_PX;
-    // Narrow viewports: ignore a tall desktop-stored height that buries panels / Orders.
-    const initial = narrow && stored != null && stored > 150
-        ? BOTTOM_HEIGHT_NARROW_DEFAULT_PX
-        : (stored ?? fallback);
+    // Narrow: always 0 (FAB dock). Desktop: restore stored height or default.
+    const initial = isNarrowLayout() ? 0 : (stored ?? BOTTOM_HEIGHT_DEFAULT_PX);
     applyBottomHeight(initial);
 
     let dragStartY = 0;
@@ -710,11 +712,20 @@ function initBottomResize() {
     });
 
     window.addEventListener('resize', () => {
+        if (isNarrowLayout()) {
+            applyBottomHeight(0);
+            return;
+        }
+        const stored = readStoredBottomHeight();
         const shell = document.querySelector(GameConfig.selectors.shell);
         const current = shell
             ? Number.parseFloat(getComputedStyle(shell).getPropertyValue('--shell-bottom-height'))
-            : BOTTOM_HEIGHT_DEFAULT_PX;
-        if (Number.isFinite(current)) applyBottomHeight(current);
+            : NaN;
+        // Recover desktop height after a narrow session forced inline 0.
+        const basis = stored != null
+            ? stored
+            : (Number.isFinite(current) && current > 0 ? current : BOTTOM_HEIGHT_DEFAULT_PX);
+        applyBottomHeight(basis);
     });
 }
 

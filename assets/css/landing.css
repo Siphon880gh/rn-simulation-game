@@ -117,6 +117,11 @@ body.landing {
     animation: rise-in 0.85s ease-out 0.12s both;
 }
 
+/* Author display:grid beats UA [hidden]{display:none} — keep gated sections fully off */
+.landing-path[hidden] {
+    display: none !important;
+}
+
 .landing-path--skills {
     border-color: rgba(13, 110, 110, 0.4);
     background:

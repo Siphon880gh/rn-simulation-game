@@ -1990,7 +1990,7 @@ body.shell-bottom-resizing {
         position: fixed;
         left: 0.5rem;
         right: 3.25rem;
-        bottom: calc(var(--shell-bottom-height, 0px) + 3.15rem);
+        bottom: calc(var(--shell-bottom-height, 0px) + max(0.25rem, env(safe-area-inset-bottom, 0px)) + 2.9rem);
         z-index: 46;
         max-height: min(40vh, 14rem);
         height: auto;
@@ -2023,7 +2023,7 @@ body.shell-bottom-resizing {
         position: fixed;
         left: 0.5rem;
         right: 3.25rem;
-        bottom: calc(var(--shell-bottom-height, 0px) + 3.15rem);
+        bottom: calc(var(--shell-bottom-height, 0px) + max(0.25rem, env(safe-area-inset-bottom, 0px)) + 2.9rem);
         z-index: 45;
         justify-self: stretch;
         align-self: start;
@@ -2070,7 +2070,8 @@ body.shell-bottom-resizing {
         justify-content: center;
         gap: 0.25rem;
         position: fixed;
-        bottom: 0.45rem;
+        /* Flush to visual bottom; ignore --shell-bottom-height (mobile strip is 0). */
+        bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
         z-index: 55;
         width: 2.5rem;
         height: 2.5rem;

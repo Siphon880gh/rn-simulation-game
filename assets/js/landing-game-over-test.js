@@ -51,12 +51,20 @@
 
         try {
             const response = await fetch(CONFIG_URL, { cache: 'no-cache' });
-            if (!response.ok) return;
+            if (!response.ok) {
+                host.hidden = true;
+                return;
+            }
             const data = await response.json();
-            if (data?.testGameOver !== true) return;
+            if (data?.testGameOver !== true) {
+                host.hidden = true;
+                host.replaceChildren();
+                return;
+            }
             render(host);
         } catch {
             // Config missing or unreachable — keep section hidden
+            host.hidden = true;
         }
     }
 

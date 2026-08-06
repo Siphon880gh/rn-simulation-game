@@ -43,6 +43,10 @@ assert(landingHtml.includes('landing-game-over-test.js'), 'homepage script');
 const landingJs = readFileSync(join(root, 'assets/js/landing-game-over-test.js'), 'utf8');
 assert(landingJs.includes('testGameOver'), 'landing gates on testGameOver');
 assert(landingJs.includes('game-over'), 'landing builds game-over urls');
+assert(landingJs.includes('host.hidden = true'), 'landing hides host when gated off');
+
+const landingCss = readFileSync(join(root, 'assets/css/landing.css'), 'utf8');
+assert(/\.landing-path\[hidden\]/.test(landingCss), 'landing-path[hidden] display none');
 
 const appSrc = readFileSync(join(root, 'game/assets/js/app.js'), 'utf8');
 assert(appSrc.includes('GameOverTestModule'), 'app wires game-over test');
