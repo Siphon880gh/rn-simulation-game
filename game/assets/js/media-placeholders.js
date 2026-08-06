@@ -350,6 +350,29 @@ function injectLandingTiles(catalog) {
     });
 }
 
+/** Hide the corner critical-lab (or similar) media toast immediately. */
+export function hideCriticalLabMedia() {
+    clearTimeout(showCriticalLabMedia._t);
+    showCriticalLabMedia._t = null;
+    const hostSel = cfg().criticalLabHost || '#shell-critical-lab-media';
+    const host = typeof document !== 'undefined' ? document.querySelector(hostSel) : null;
+    if (host) host.hidden = true;
+}
+
+function ensureCornerMediaToastWired(host) {
+    if (!host || host.dataset.cornerMediaWired === '1') return;
+    host.dataset.cornerMediaWired = '1';
+    host.addEventListener('click', (e) => {
+        const dismiss = e.target.closest('[data-corner-media-dismiss]');
+        if (!dismiss || !host.contains(dismiss)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        hideCriticalLabMedia();
+    });
+    // Preview clicks use the same [data-media-preview] contract as queue-slot thumbs.
+    wireMediaPreviewClicks(host);
+}
+
 /** Show critical-lab still in toast / status host when a lab call spawns. */
 export function showCriticalLabMedia(opts = {}) {
     if (!isEnabled() || !cfg().mounts?.criticalLab) return;
@@ -368,15 +391,29 @@ export function showCriticalLabMedia(opts = {}) {
         const asset = getAssetById('situation-critical-lab', catalog);
         if (!asset) return;
         const label = opts.labShort ? `Critical lab — ${opts.labShort}` : asset.title;
+        const kind = asset.kind === 'video' ? 'video' : 'image';
+        const previewUrl = resolveAssetUrl({ ...asset, w: 720, h: 405, title: label });
         host.hidden = false;
         host.innerHTML =
-            buildMediaTagHtml({ ...asset, title: label }, { className: 'shell-critical-lab-media__img media-ph' })
-            + `<span class="shell-critical-lab-media__caption">${escapeHtml(label)}</span>`;
+            `<button type="button" class="shell-critical-lab-media__dismiss"`
+            + ` data-corner-media-dismiss="1"`
+            + ` aria-label="Dismiss notification">×</button>`
+            + `<button type="button" class="shell-critical-lab-media__preview-btn"`
+            + ` data-media-preview="1"`
+            + ` data-preview-src="${escapeHtml(previewUrl)}"`
+            + ` data-preview-title="${escapeHtml(label)}"`
+            + ` data-preview-kind="${kind}"`
+            + ` title="Preview ${escapeHtml(label)}"`
+            + ` aria-label="Preview ${escapeHtml(label)}">`
+            + buildMediaTagHtml({ ...asset, title: label }, { className: 'shell-critical-lab-media__img media-ph' })
+            + `<span class="shell-critical-lab-media__caption">${escapeHtml(label)}</span>`
+            + `</button>`;
+        ensureCornerMediaToastWired(host);
         if (opts.autoHideMs !== 0) {
             const ms = Number(opts.autoHideMs) || Number(cfg().criticalLabAutoHideMs) || 12000;
             clearTimeout(showCriticalLabMedia._t);
             showCriticalLabMedia._t = setTimeout(() => {
-                host.hidden = true;
+                hideCriticalLabMedia();
             }, ms);
         }
     };
@@ -796,6 +833,7 @@ const MediaPlaceholdersModule = {
     videoAudioToggleHtml,
     wireMediaAudioToggles,
     showCriticalLabMedia,
+    hideCriticalLabMedia,
     inferMedSlotKind,
     resolveSlotAssetId,
     slotMediaHtml,

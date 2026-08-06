@@ -48,7 +48,7 @@ Browser chrome around the sim: locked shell regions (E1.M2), patient main mount,
 | Bottom | `#shell-bottom` | History log + slots only (desktop); mobile uses FABs + floating panels — no live status/score strip |
 | History log | `#shift-history-log` | Append-only via `APPEND_SHIFT_LOG` |
 | Task queue | `#task-queue-bar` / `#slot-waiting-queue` | 3 slots + FIFO wait (slot-system.js); exclusive → `.task-slot--disabled`; busy slots show type thumbs via `slotByTaskType` (`slot-med`, …) with `slot-perform` fallback |
-| Critical lab media | `#shell-critical-lab-media` | Placeholder host for critical-lab spawn still |
+| Critical lab media | `#shell-critical-lab-media` | Corner still on critical-lab spawn; **×** dismiss (`hideCriticalLabMedia`); click image/caption → same `openMediaPreview` slide-up as slot thumbs (`[data-media-preview]`) |
 | Clock / Pause | `#clock` / `#pause` / `#shell-lean-pause` | Timer module; lean chip on mobile collapsed chrome |
 | Slots / log toggles | `#shell-slots-toggle` / `#shell-log-toggle` | Mobile FABs **outside** `#shell` (fixed not trapped by shell overflow); body classes `shell-slots-visible` / `shell-log-visible` |
 | Modal | `#modal`… | Overlay; dims `#shell`; challenge heroes via `challengeMediaHtml`. Tall panels: `.modal-panel` is block + `overflow-y: scroll` with `svh`/`dvh` max-height; sticky `#modal-footer` (`shell.css`) — avoid flex+nested `#modal-content` scroll (tiny scrollHeight / clipped debrief) |
@@ -114,7 +114,7 @@ Adding a doc: place under `docs/{devs,players,learning}/` **and** list it in `do
 - Config: `GameConfig.mediaPlaceholders` (`enabled`, `source: data-url|php`, `mounts.*`, `challenges` map, `slotByTaskType` / `slotFallbackId`, optional `assets` overrides).
 - Catalog: `media-placeholder-catalog.json`; inventory doc: `PLACEHOLDER_ASSETS.md`.
 - Default source is client **data-url** SVG (works on static servers); PHP under `placeholders/` when `source: 'php'`.
-- Mounts: landing departments, situation stills, critical-lab toast, busy slots (per `task.type`), in-modal challenge heroes.
+- Mounts: landing departments, situation stills, critical-lab toast (dismiss × + click-to-preview via `openMediaPreview`), busy slots (per `task.type`), in-modal challenge heroes.
 - Slot thumbs: `resolveSlotAssetId` → `slotByTaskKind` first (`shift-assessment` / `chart-assessment` / `turn-patient` / `chair-alarm` / `bed-alarm` / `call-light` / `med-pills` / `med-shot` / `med-ivpb` / `med-iv-push`), then med-form inference (`data-route` / challenge / name), then `slotByTaskType` (`med`→`slot-med`, …; **not** raw `assessment`); unmapped → `slot-perform`.
 - Challenge map: `imageId`/`videoId` = **before** (during quiz); `afterImageId` = after-pass still. `revealChallengeAfterMedia(key)` runs from `showPassedAcknowledge` in `challenge-gate.js` (after last question, before Continue closes). CSS: `.challenge-media-wrap--after` / `.challenge-media-phase-label` in `app.css`.
 - Final art: set catalog/`assets.<id>.replaceWith` (e.g. `assets/media/dept-tele.webp`); agent skills `scan-placeholder-assets` / `replace-placeholder-assets`.
