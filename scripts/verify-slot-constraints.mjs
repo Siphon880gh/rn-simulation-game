@@ -3,7 +3,8 @@
  *
  * Shift and chart assessment both exclusive-lock the whole queue (require empty
  * slots to start; other tasks blocked while either runs). Mutex + blocksWith
- * still apply between the two assessment kinds.
+ * still apply between the two assessment kinds. Call lights use the same
+ * requiresEmptySlots + exclusive occupancy.
  */
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -53,6 +54,12 @@ assert(
 assert(
   GameConfig.slotConstraints.rules.some((r) => r.type === 'blocksWith' && r.match?.kind === 'shift-assessment' && r.blocksWhen?.kind === 'chart-assessment'),
   'shift blocksWith chart-assessment'
+);
+assert(
+  GameConfig.slotConstraints.rules.some(
+    (r) => r.type === 'requiresEmptySlots' && r.exclusive === true && r.match?.kind === 'call-light'
+  ),
+  'exclusive call-light rule'
 );
 
 const slotSrc = readFileSync(join(root, 'game/assets/js/slot-system.js'), 'utf8');
@@ -185,6 +192,53 @@ const medDuringChart = canEnterSlot(med2);
 assert(medDuringChart.ok === false && medDuringChart.reason === 'exclusive-active', `med during chart ${medDuringChart.reason}`);
 assert(String(medDuringChart.message || '').toLowerCase().includes('chart'), 'med block explains chart assessment');
 assert(SlotSystem.requestSlot(med2, 1922).ok === false, 'assign med blocked during chart');
+
+SlotSystem.processSlots(1937);
+assert(!SlotSystem.findSlotForTask(chartA.id), 'chart finished');
+assert(isExclusiveOccupancyActive() === false, 'exclusive cleared after chart');
+
+const callLight = taskSystem.createTask({
+  id: 'p1-call-light',
+  type: 'assessment',
+  name: 'Call light — water',
+  scheduled: 1900,
+  expire: '+40',
+  durationMins: 4,
+  patientId: 'p1',
+  metadata: { kind: 'call-light' }
+});
+taskSystem.processTasks(1937);
+
+assert(canEnterSlot(med2).ok === true, 'med ok after chart');
+assert(SlotSystem.requestSlot(med2, 1937).ok === true, 'assign med after chart');
+
+const callDuringMed = canEnterSlot(callLight);
+assert(callDuringMed.ok === false && callDuringMed.reason === 'requires-empty-slots', `call light needs empty got ${callDuringMed.reason}`);
+assert(String(callDuringMed.message || '').toLowerCase().includes('call light'), 'call light block explains empty slots');
+assert(SlotSystem.requestSlot(callLight, 1937).ok === false, 'call light blocked while med running');
+
+SlotSystem.processSlots(1947);
+assert(!SlotSystem.findSlotForTask(med2.id), 'med 2 finished');
+
+assert(canEnterSlot(callLight).ok === true, 'call light ok when slots empty');
+assert(SlotSystem.requestSlot(callLight, 1947).ok === true, 'assign call light');
+assert(isExclusiveOccupancyActive() === true, 'exclusive during call light');
+assert(slotDisplayState({ id: 2, taskId: null }) === 'disabled', 'empty slot disabled during call light');
+
+const med3 = taskSystem.createTask({
+  id: 'p3-med',
+  type: 'med',
+  name: 'Med 3',
+  scheduled: 1900,
+  expire: '+60',
+  durationMins: 10,
+  patientId: 'p2'
+});
+taskSystem.processTasks(1947);
+const medDuringCall = canEnterSlot(med3);
+assert(medDuringCall.ok === false && medDuringCall.reason === 'exclusive-active', `med during call light ${medDuringCall.reason}`);
+assert(String(medDuringCall.message || '').toLowerCase().includes('call light'), 'med block explains call light');
+assert(SlotSystem.requestSlot(med3, 1947).ok === false, 'assign med blocked during call light');
 
 if (failures.length) {
   console.error('slot-constraints AUTO FAIL');

@@ -444,6 +444,7 @@ class GameApplication {
                     ? { ok: true }
                     : (SlotSystem.canAcceptTask?.(task) || canEnterSlot(task));
                 const canPerform = windowOk && !occupied && slotGate.ok !== false;
+                const canDelegateWhenGated = windowOk && !occupied && prereqMet;
                 const phase = taskSystem.getWindowPhase(task, now);
                 const kind = String(task.type).toLowerCase();
                 const metaKind = String(task.metadata?.kind || '').toLowerCase();
@@ -508,12 +509,13 @@ class GameApplication {
                     details: { name: 'Details', icon: 'question' }
                 };
 
-                // E13: team/solo when an available aide can perform (call lights = floor CNA only)
-                if (canPerform && task.patientId) {
+                // E13: team/solo when an available aide can perform (call lights = floor CNA only).
+                // Solo (instant) still offered when Perform is slot-gated — CNA does not occupy a player slot.
+                if (canDelegateWhenGated && task.patientId) {
                     const aide = findAvailableAideForPatient(task.patientId, now);
                     if (aide) {
                         const check = canAidePerformTask(aide, task, now);
-                        if (check.ok && check.mode === 'team') {
+                        if (check.ok && check.mode === 'team' && canPerform) {
                             const label = modeConfig('team')?.shortLabel || 'Team · ½ time';
                             items.assistTurn = {
                                 name: `${label} with ${formatAideLabel(aide)}`,

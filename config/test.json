@@ -1,4 +1,4 @@
 {
-  "testIncidents": false,
+  "testIncidents": true,
   "testGameOver": false
 }

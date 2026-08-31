@@ -55,6 +55,20 @@ assert(
   'call light templates are solo-delegable'
 );
 
+const callDurations = Object.fromEntries(
+  GameConfig.nurseAlerts.callLights.templates.map((t) => [t.id, t.durationMins])
+);
+assert(callDurations.water === 4, 'water call light 4 min');
+assert(callDurations.bathroom === 6, 'bathroom call light 6 min');
+assert(callDurations.reposition === 5, 'reposition call light 5 min');
+assert(callDurations.blanket === 4, 'blanket call light 4 min');
+assert(
+  GameConfig.slotConstraints.rules.some(
+    (r) => r.type === 'requiresEmptySlots' && r.exclusive === true && r.match?.kind === 'call-light'
+  ),
+  'call lights exclusive-lock the queue'
+);
+
 const dynSrc = readFileSync(join(root, 'game/assets/js/dynamic-tasks.js'), 'utf8');
 assert(dynSrc.includes('export function presentSpawnedTask'), 'presentSpawnedTask export');
 assert(dynSrc.includes('ACTIVATE_TASK'), 'presentSpawnedTask can force-activate');

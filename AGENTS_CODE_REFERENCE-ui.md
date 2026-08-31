@@ -87,6 +87,8 @@ API: `openModal(typeOrConfig)`, `closeModal()`, `modifyModal(title, content, foo
 
 ## Landing challenge games (`index.html`)
 
+Unit tiles, six-patient night **Start**, and skill-library **Start a shift** launch with `speed-factor=16` (~45 min wall for a 12h shift). Test skill stays `speed-factor=48`.
+
 Muted expand under Unit assignment: **I want something more challenging** → `.landing-challenge__games` grid of `.landing-challenge-game` cards (reasons always visible + **Start**). First card: six-patient night → `night-shift-default.json` (Med-Surg + Lyle ICU acuity). Single card spans full width via `:has(:only-child)`.
 
 ---

@@ -236,6 +236,14 @@ export const GameConfig = {
         match: { kind: 'shift-assessment' },
         blocksWhen: { kind: 'chart-assessment' },
         message: 'Cannot start a shift assessment while charting is in a queue slot'
+      },
+      {
+        id: 'exclusive-call-light',
+        type: 'requiresEmptySlots',
+        match: { kind: 'call-light' },
+        exclusive: true,
+        message: 'Clear all queue slots before answering a call light — it needs your full attention',
+        exclusiveMessage: 'Call light needs sole use of the queue — finish it before starting other tasks'
       }
     ]
   },
@@ -1507,6 +1515,8 @@ export const GameConfig = {
    * Nurse alerts — call lights (water, etc.) + bed near-fall alarms a few times / shift.
    * Plays sound.alarms on spawn when sound is enabled.
    * Call lights: floor CNA can solo-delegate (instant) on tele/med-surg when available.
+   * Slot duration is half a typical comfort task; exclusive occupancy (cannot start
+   * while other slots are busy; other tasks cannot start while a call light is in a slot).
    */
   nurseAlerts: {
     callLights: {
@@ -1523,7 +1533,7 @@ export const GameConfig = {
           type: 'assessment',
           kind: 'call-light',
           taskClass: 'urgent',
-          durationMins: 8,
+          durationMins: 4,
           expire: '+40',
           alarm: 'callLight',
           delegateMode: 'solo'
@@ -1535,7 +1545,7 @@ export const GameConfig = {
           type: 'assessment',
           kind: 'call-light',
           taskClass: 'urgent',
-          durationMins: 12,
+          durationMins: 6,
           expire: '+35',
           alarm: 'callLight',
           delegateMode: 'solo'
@@ -1547,7 +1557,7 @@ export const GameConfig = {
           type: 'assessment',
           kind: 'call-light',
           taskClass: 'urgent',
-          durationMins: 10,
+          durationMins: 5,
           expire: '+45',
           alarm: 'callLight',
           delegateMode: 'solo'
@@ -1559,7 +1569,7 @@ export const GameConfig = {
           type: 'assessment',
           kind: 'call-light',
           taskClass: 'routine',
-          durationMins: 8,
+          durationMins: 4,
           expire: '+50',
           alarm: 'callLight',
           delegateMode: 'solo'

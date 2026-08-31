@@ -95,7 +95,7 @@ CSS classes: `task-status-*` in `declarative-tasks.css`.
 | `requiresEmptySlots` | Start only when all 3 slots empty; `exclusive:true` blocks other starts and renders remaining slots `.task-slot--disabled` |
 | `blocksWith` | Blocked while any busy-slot task matches `blocksWhen` |
 
-Default rules: shift-assessment and chart-assessment each use mutex + `requiresEmptySlots`/`exclusive` (sole queue use; other starts blocked; empty slots `.task-slot--disabled`); bidirectional `blocksWith` between the two. Perform label and Details append the block `message` when gated. AUTO: `node scripts/verify-slot-constraints.mjs`.
+Default rules: shift-assessment and chart-assessment each use mutex + `requiresEmptySlots`/`exclusive` (sole queue use; other starts blocked; empty slots `.task-slot--disabled`); bidirectional `blocksWith` between the two. Call lights (`kind: call-light`) also `requiresEmptySlots`/`exclusive` (cannot start while other slots are busy; other tasks cannot start while a call light occupies a slot). Floor CNA solo-delegate (instant) stays available when Perform is slot-gated. Perform label and Details append the block `message` when gated. AUTO: `node scripts/verify-slot-constraints.mjs`.
 
 ---
 

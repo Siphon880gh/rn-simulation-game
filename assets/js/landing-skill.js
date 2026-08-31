@@ -12,9 +12,9 @@
         icu: 'events/scenarios/icu-2.json'
     };
     const RANDOM_UNIT_HREFS = [
-        `game/index.html?speed-factor=24&scenario=${UNIT_SCENARIO.tele}`,
-        `game/index.html?speed-factor=24&scenario=${UNIT_SCENARIO.medsurg}`,
-        `game/index.html?speed-factor=24&scenario=${UNIT_SCENARIO.icu}`
+        `game/index.html?speed-factor=16&scenario=${UNIT_SCENARIO.tele}`,
+        `game/index.html?speed-factor=16&scenario=${UNIT_SCENARIO.medsurg}`,
+        `game/index.html?speed-factor=16&scenario=${UNIT_SCENARIO.icu}`
     ];
 
     /** Fixed unit filters (unitHint and/or matching tag). Sorted alphabetically by label. */
@@ -326,11 +326,11 @@
     function hrefForSkillShift(skill) {
         const pack = pickSkillPack(skill);
         if (pack) {
-            return `game/index.html?speed-factor=24&scenario=${encodeURIComponent(pack)}`;
+            return `game/index.html?speed-factor=16&scenario=${encodeURIComponent(pack)}`;
         }
         const hint = String(skill?.unitHint || '').toLowerCase();
         if (UNIT_SCENARIO[hint]) {
-            return `game/index.html?speed-factor=24&scenario=${UNIT_SCENARIO[hint]}`;
+            return `game/index.html?speed-factor=16&scenario=${UNIT_SCENARIO[hint]}`;
         }
         return pickRandomUnitHref();
     }
