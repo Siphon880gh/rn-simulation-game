@@ -213,6 +213,14 @@ export function buildDelegationState(opts = {}) {
     const aideCount = Math.min(maxCount, Math.max(1, patientList.length >= 2 ? 2 : 1));
     const buckets = splitPatientsEvenly(patientList, aideCount);
     const windows = assignStaggeredThirds(aideCount, shiftStart, shiftMins, random);
+    if (pack?.id === 'how-to-play' && windows[0]) {
+        const thirdMins = Math.max(60, Math.floor(shiftMins / 3));
+        windows[0] = {
+            thirdIndex: 0,
+            availableFrom: shiftStart,
+            availableUntil: addMinutesToHhmm(shiftStart, thirdMins)
+        };
+    }
 
     const aides = buckets.map((bucket, index) => {
         const name = pickName(floor.names, usedNames, random);

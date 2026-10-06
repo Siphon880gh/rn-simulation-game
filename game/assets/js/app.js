@@ -45,6 +45,8 @@ import DelegationModule, {
 } from './delegation.js';
 import SkillFocusModule from './skill-focus.js';
 import BoostersModule from './boosters.js';
+import HowToPlayModule from './how-to-play.js';
+import { isTourActive, setTourActive } from './tour-mode.js';
 import { setShiftAnchor } from './availability-windows.js';
 import {
     isAccucheckTask,
@@ -144,6 +146,7 @@ class GameApplication {
             
             // Parse URL parameters and start game
             this.startGame();
+            HowToPlayModule.init();
             
             this.initialized = true;
             console.log('Game application initialized successfully');
@@ -562,6 +565,17 @@ class GameApplication {
         const actionHandlers = {
             perform: () => {
                 if (occupiedBlock()) return;
+                if (isTourActive() && task?.metadata?.fromCriticalLabCallback) {
+                    const statusEl = document.querySelector(GameConfig.selectors.statusMessage);
+                    if (statusEl) {
+                        statusEl.textContent = 'Those orders are on the chart. Press Next to continue.';
+                    }
+                    gameState.dispatch('APPEND_SHIFT_LOG', {
+                        message: 'Those orders are on the chart. Press Next to continue.',
+                        timeLabel: String(gameState.getStateSlice('currentTime') ?? '')
+                    });
+                    return;
+                }
                 const kind = String(task.type).toLowerCase();
                 if (kind === 'orders') {
                     this.performOrdersCheck(task);
@@ -842,6 +856,16 @@ class GameApplication {
                 return;
             }
             workTask = withTeamAssist(workTask, aide);
+            gameState.dispatch('UPDATE_TASK', {
+                taskId: workTask.id,
+                metadata: {
+                    assistFactor: workTask.metadata?.assistFactor,
+                    delegateMode: workTask.metadata?.delegateMode,
+                    assistedBy: workTask.metadata?.assistedBy,
+                    assistedByLabel: workTask.metadata?.assistedByLabel,
+                    delegateModeLabel: workTask.metadata?.delegateModeLabel
+                }
+            });
             const teamLabel = modeConfig('team')?.label || 'Team effort';
             gameState.dispatch('APPEND_SHIFT_LOG', {
                 message: `${teamLabel}: turn with ${formatAideLabel(aide)} (½ time)`,
@@ -1062,10 +1086,12 @@ class GameApplication {
             gameConfig.shiftStarts = pack.shiftStart;
         }
         if (!params.get(this.config.urlParams.shiftDuration) && pack?.shiftDurationHours != null) {
-            gameConfig.shiftDuration = pack.shiftDurationHours;
+            gameConfig.shiftDuration = Number(pack.shiftDurationHours) * 60;
         }
 
         console.log('Starting game with config:', gameConfig);
+
+        if (pack?.id === 'how-to-play') setTourActive(true);
 
         // Initialize game state
         gameState.dispatch('INITIALIZE_GAME', {
@@ -1180,6 +1206,7 @@ class GameApplication {
 
     // Handle game over (timer may already have dispatched GAME_OVER)
     handleGameOver() {
+        if (isTourActive()) return;
         // Guard re-entry: dispatching GAME_OVER notifies gameStatus subscribers,
         // which call handleGameOver again (and the timer callback may as well).
         if (this._gameOverSettled) return;

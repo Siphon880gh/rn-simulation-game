@@ -4,6 +4,7 @@
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
+import { isTourActive } from './tour-mode.js';
 import taskSystem from './task-system.js';
 import { isAtOrAfterInShift } from './availability-windows.js';
 import { decorateAccucheckDice } from './challenges/skills/accucheck/challenge.js';
@@ -569,6 +570,7 @@ export function spawnFromTemplate(template, currentTime, opts = {}) {
 }
 
 export function processDynamicTasksTime(currentTime, opts = {}) {
+    if (isTourActive()) return null;
     if (currentTime == null) return null;
     if (gameState.getStateSlice('isPaused')) return null;
     if (gameState.getStateSlice('gameStatus') !== GameConfig.gameStates.RUNNING) return null;

@@ -121,14 +121,16 @@ rngame/
 │   │   ├── media-placeholder-catalog.json  # asset ids / titles / prompts / replaceWith
 │   │   ├── skill-focus.js             # Test skill: blank census + challenge → landing
 │   │   ├── docs.js                    # Help FAB + in-page docs viewer (ES module)
+│   │   ├── how-to-play.js             # tour: save live shift, swap how-to-play pack, restore
+│   │   ├── tour-mode.js               # tour session flag + first real-task storage key
 │   │   ├── shell-chrome.js            # hour tabs, shift log, lean pause, mobile FABs
 │   │   ├── markdown-renderer.js       # shared markdown-it / Mermaid / KaTeX
 │   │   ├── link-popover.js            # internal-link hover Preview + Contents
 │   │   └── events.js                  # legacy Signal reveal (~23)
-│   ├── assets/css/                    # shell / scene / app / patients / declarative-tasks / markdown / link-popover
+│   ├── assets/css/                    # shell / scene / app / patients / declarative-tasks / how-to-play / markdown / link-popover
 │   ├── assets/media/                  # final stills/clips (dept-*.webp when replaced)
 │   └── events/
-│       ├── scenarios/*.json           # night + day packs (census, scene, incidentPackUrl)
+│       ├── scenarios/*.json           # night + day packs + how-to-play.json (census, scene, incidentPackUrl)
 │       ├── incidents/*.json           # E7.M2 chaos templates + events (merged into pack)
 │       └── patients/*.html            # six census packs (+ optional *-past-hx.json)
 ├── assets/js/landing-census.js        # root picker census −1 / open-to-admit + day|night shift
@@ -156,6 +158,7 @@ Line counts are approximate totals to help decide whether to load a whole file.
 6. **Tick** — timer interval (scaled by speed factor) updates `#clock`, `UPDATE_TIME`, reveals scheduled tasks at 15-min poll marks (CSS + `data-status="active"`). `event-drip` fires pack events (patient-bound injects defer while target is open-admit held; `minus1` held targets are dropped); `doctor-orders` spawns a per-hour check (5 min; complete injects pack + carryover + ≤1 sudden procedure); `admission-system` may spawn held patient + checklist; overdue work bumps `clinicalStatus` / `acuityScore` and may open Code Blue via `codeBlueHook` subscribe.
 7. **Interact** — contextMenu Perform → `challenge-gate` (pause `challenge`; med quiz / IVPB hang sequence / bed-prep gather / admission quizzes / safety; bed-prep + admission steps must win to `completeTask`) → pass → slot (most types) or complete (bed-prep / admission). Find-nurse + admitting call/callback follow critical-lab-style recall.
 8. **End** — timer seconds exhausted → `GAME_OVER` → finalize score → short **Won/Lost** performance meter (Off pace / Getting by / Steady charge / Sharp shift; average-or-below = lost) with score + too-late / cheated counts → optional **Show debrief** (by-patient notes + challenge fails + ethics framing) + dimmed shell.
+9. **How to play** — blue launch button or Documentation → How to play. `how-to-play.js` saves the live shift, swaps in `events/scenarios/how-to-play.json` (Sam Ellis / `tour-sam.html`), and steps a draggable popover (undo icon + “Reset position” after a drag). `tour-mode.js` makes scoring, drip, and shift-end no-ops while the tour is active. Skip or finish restores the saved shift. Opening that scenario directly has nothing to restore.
 
 ### Snippet — entry pipeline (near top / middle of `app.js`)
 

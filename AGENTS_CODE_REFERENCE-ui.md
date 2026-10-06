@@ -99,6 +99,8 @@ ES module. `docsStructure` near top registers `devs` / `players` / `learning` fi
 
 Adding a doc: place under `docs/{devs,players,learning}/` **and** list it in `docsStructure`.
 
+The dropdown heading is followed by **How to play** (`#docs-how-to-play`), which starts the same tour as `#how-to-play-launch`. Tour chrome lives in `how-to-play.css` / `how-to-play.js` (fixed popover, drag, reset control).
+
 ---
 
 ## Task CSS (`declarative-tasks.css`)

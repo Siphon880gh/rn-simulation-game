@@ -42,7 +42,9 @@ export const GameConfig = {
       CHALLENGE: 'challenge',
       /** Challenge-level booster: timed freeze (auto-clears). */
       BOOSTER: 'booster',
-      SYSTEM: 'system'
+      SYSTEM: 'system',
+      /** How to play popovers freeze the clock except while a tour slot is running. */
+      TOUR: 'tour'
     }
   },
 

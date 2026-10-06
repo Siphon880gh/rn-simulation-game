@@ -542,6 +542,14 @@ class TaskSystem {
     });
   }
 
+  syncRegistryFromState() {
+    this.taskRegistry.clear();
+    const tasks = gameState.getStateSlice('tasks');
+    tasks?.forEach((task, id) => {
+      this.taskRegistry.set(id, task);
+    });
+  }
+
   recordMedicationTime(task) {
     task.metadata.administeredAt = gameState.getStateSlice('currentTime');
     console.log(`Medication ${task.name} administered at ${this.formatTime(task.metadata.administeredAt)}`);

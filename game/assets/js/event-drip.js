@@ -5,6 +5,7 @@
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
+import { isTourActive } from './tour-mode.js';
 import taskSystem from './task-system.js';
 import { mountTaskDom } from './dynamic-tasks.js';
 import { isOpenAdmitMode } from './admission-system.js';
@@ -291,6 +292,7 @@ function maybeCodeBlueHook(patientId) {
 }
 
 export function processGameTime(currentTime) {
+    if (isTourActive()) return;
     if (currentTime == null) return;
     if (gameState.getStateSlice('isPaused')) return;
     if (lastProcessedTime === currentTime) return;

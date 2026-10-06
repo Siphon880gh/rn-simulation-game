@@ -4,6 +4,7 @@
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
+import { isTourActive } from './tour-mode.js';
 import taskSystem from './task-system.js';
 import { isAtOrAfterInShift, hhmmToMinutes } from './availability-windows.js';
 import { mountTaskDom } from './dynamic-tasks.js';
@@ -582,6 +583,7 @@ export function handleAdmissionCallbackComplete(task, opts = {}) {
 }
 
 function onTime(currentTime) {
+    if (isTourActive()) return;
     if (!currentTime) return;
     const hold = gameState.getStateSlice('admitHold');
     if (isOpenAdmitMode(hold?.mode) && !hold.spawned && hold.admitAt != null) {

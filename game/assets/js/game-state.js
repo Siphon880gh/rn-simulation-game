@@ -612,6 +612,8 @@ class GameState {
       delegation: payload.delegation ?? null
     }));
 
+    this.actions.set('REPLACE_STATE', (payload = {}) => payload.state || this.state);
+
     this.actions.set('SET_DELEGATE_SELECTION', (payload = {}) => {
       if (!this.state.delegation) return this.state;
       const aideId = payload.aideId == null ? null : String(payload.aideId);

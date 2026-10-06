@@ -5,6 +5,7 @@
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
+import { isTourActive } from './tour-mode.js';
 import { presentSpawnedTask, weightedPick } from './dynamic-tasks.js';
 import { playAlarm } from './sound.js';
 
@@ -139,7 +140,26 @@ function processChannel(channel, currentTime, opts = {}) {
     return spawnNurseAlert(channel, template, currentTime, opts);
 }
 
+export function captureNurseAlertsRuntime() {
+    return {
+        callLights: [...spawnedBuckets.callLights],
+        bedAlarms: [...spawnedBuckets.bedAlarms],
+        counts: { ...spawnCounts },
+        shiftStart
+    };
+}
+
+export function restoreNurseAlertsRuntime(snap) {
+    if (!snap) return;
+    spawnedBuckets.callLights = new Set(snap.callLights || []);
+    spawnedBuckets.bedAlarms = new Set(snap.bedAlarms || []);
+    spawnCounts.callLights = snap.counts?.callLights || 0;
+    spawnCounts.bedAlarms = snap.counts?.bedAlarms || 0;
+    if (snap.shiftStart != null) shiftStart = snap.shiftStart;
+}
+
 export function processNurseAlertsTime(currentTime, opts = {}) {
+    if (isTourActive()) return;
     if (currentTime == null) return;
     if (gameState.getStateSlice('isPaused')) return;
     if (gameState.getStateSlice('gameStatus') !== GameConfig.gameStates.RUNNING) return;

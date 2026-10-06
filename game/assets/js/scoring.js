@@ -4,6 +4,7 @@
  */
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
+import { isTourActive } from './tour-mode.js';
 
 const scoredTaskEvents = new Set();
 const scoredSatisfaction = new Set();
@@ -95,6 +96,7 @@ export function resolvePracticeOutcome(score, counts = {}) {
 }
 
 export function adjustScore({ delta, reason, dimension = 'task', silent = false, challengePass, challengeFail, challengeMiss } = {}) {
+    if (isTourActive()) return getScore();
     const amount = Number(delta) || 0;
     if (!amount && reason !== 'init' && !challengePass && !challengeFail) return getScore();
     gameState.dispatch('ADJUST_SCORE', {
@@ -146,6 +148,7 @@ export function recordChallengeOutcome({ passed, reason, expected, given, prompt
 }
 
 function scoreTaskTransition(taskId, prevStatus, nextStatus, task) {
+    if (isTourActive()) return;
     const key = `${taskId}:${prevStatus}->${nextStatus}`;
     if (scoredTaskEvents.has(key)) return;
     scoredTaskEvents.add(key);
@@ -195,6 +198,7 @@ function scoreMissedOpenTasks() {
 }
 
 function scoreSatisfactionFromPatients() {
+    if (isTourActive()) return;
     const w = cfg().satisfaction || {};
     const patients = gameState.getStateSlice('patients');
     if (!patients) return;
@@ -221,6 +225,7 @@ function scoreSatisfactionFromPatients() {
 }
 
 function onTasksChanged(tasks) {
+    if (isTourActive()) return;
     if (!tasks) return;
     const nextSnap = new Map();
     tasks.forEach((task, id) => {
@@ -234,6 +239,7 @@ function onTasksChanged(tasks) {
 }
 
 export function finalizeShiftScore() {
+    if (isTourActive()) return getScore();
     // Preset seeds lock the snapshot so miss/satisfaction hooks do not rewrite QA totals
     if (getScore()?.testSeeded) return getScore();
     scoreMissedOpenTasks();

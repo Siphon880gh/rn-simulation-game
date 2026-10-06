@@ -15,6 +15,17 @@ const PatientsModule = (() => {
 
     // Patient data structure
     const patientConfigs = {
+        'tour-sam': {
+            id: 'tour-sam',
+            name: 'Sam Ellis',
+            room: 'Room 212-A',
+            age: 64,
+            sex: 'Male',
+            diagnosis: 'Cellulitis, left lower leg',
+            careSchedules: ['turnQ2h'],
+            careReason: 'Limited mobility — needs help turning',
+            htmlFile: 'events/patients/tour-sam.html'
+        },
         joe: {
             id: 'joe',
             name: 'Joe Johnson',
@@ -2282,7 +2293,10 @@ const PatientsModule = (() => {
                 ? []
                 : careKeys.flatMap((key) => buildCareScheduleTasks(patientConfig.id, key, careReason));
             const patientIndex = gameState.getStateSlice('patients')?.size || 0;
-            const soloTasks = skipPackTasks
+            const skipSolo = skipPackTasks
+                || Boolean(options.skipSoloTasks)
+                || gameState.getStateSlice('scenarioPack')?.id === 'how-to-play';
+            const soloTasks = skipSolo
                 ? []
                 : buildSoloRequestTasks(patientConfig.id, patientIndex);
             const shiftTasks = buildShiftAssessmentTasks(patientConfig.id);
@@ -2946,6 +2960,10 @@ const PatientsModule = (() => {
         showGlobalPanel,
         
         // Getters
+        getPanelMode: () => panelMode,
+        setPanelMode: (mode) => {
+            panelMode = mode === 'global' ? 'global' : 'patient';
+        },
         getPatientConfigs: () => ({ ...patientConfigs }),
         getPatient: (id) => gameState.getStateSlice('patients').get(id),
         applyPanelVisibility,

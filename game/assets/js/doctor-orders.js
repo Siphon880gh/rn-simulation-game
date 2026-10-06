@@ -6,6 +6,7 @@
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
+import { isTourActive } from './tour-mode.js';
 import { mountTaskDom } from './dynamic-tasks.js';
 import { minutesFromShiftAnchor } from './availability-windows.js';
 import { showShellToast } from './critical-labs.js';
@@ -762,18 +763,22 @@ export function handleOrdersCheckComplete(task, opts = {}) {
         injected += 1;
     });
 
-    const trivial = maybeInjectTrivialOrder({
-        now,
-        hourStart,
-        random: opts.random,
-        force: opts.forceTrivial,
-        patientId: opts.trivialPatientId,
-        template: opts.trivialTemplate,
-        showToast: opts.showToast
-    });
+    const trivial = isTourActive()
+        ? null
+        : maybeInjectTrivialOrder({
+            now,
+            hourStart,
+            random: opts.random,
+            force: opts.forceTrivial,
+            patientId: opts.trivialPatientId,
+            template: opts.trivialTemplate,
+            showToast: opts.showToast
+        });
     if (trivial) injected += 1;
 
-    const proc = maybeInjectSuddenProcedure({
+    const proc = isTourActive()
+        ? null
+        : maybeInjectSuddenProcedure({
         now,
         hourStart,
         random: opts.random,
@@ -796,7 +801,54 @@ export function handleOrdersCheckComplete(task, opts = {}) {
     renderOrdersTask(gameState.getStateSlice('tasks').get(task.id) || task);
 }
 
+export function forceSpawnOrdersCheck(currentTime) {
+    const now = currentTime ?? gameState.getStateSlice('currentTime') ?? shiftStart;
+    const { hourIndex, hourStart, hourEnd } = getHourWindow(now);
+    const existingId = `orders-check-${hourStart}`;
+    const existing = gameState.getStateSlice('tasks')?.get(existingId);
+    if (existing) return existing;
+    return spawnHourlyCheck(hourStart, hourEnd, hourIndex);
+}
+
+export function setDoctorOrdersShift(start, durationMinutes) {
+    const nextStart = Number(start);
+    const nextDuration = Number(durationMinutes);
+    if (Number.isFinite(nextStart)) shiftStart = nextStart;
+    if (Number.isFinite(nextDuration) && nextDuration > 0) shiftDuration = nextDuration;
+}
+
+export function captureDoctorOrdersRuntime() {
+    return {
+        spawnedHourStarts: [...spawnedHourStarts],
+        injectionHandled: [...injectionHandled],
+        carryover: [...carryoverById.entries()],
+        overdueCarryNoted: [...overdueCarryNoted],
+        missedCheckQueuedHours: [...missedCheckQueuedHours],
+        procedureInjected,
+        shiftStart,
+        shiftDuration
+    };
+}
+
+export function restoreDoctorOrdersRuntime(snap) {
+    if (!snap) return;
+    spawnedHourStarts.clear();
+    (snap.spawnedHourStarts || []).forEach((hour) => spawnedHourStarts.add(hour));
+    injectionHandled.clear();
+    (snap.injectionHandled || []).forEach((id) => injectionHandled.add(id));
+    carryoverById.clear();
+    (snap.carryover || []).forEach(([id, spec]) => carryoverById.set(id, spec));
+    overdueCarryNoted.clear();
+    (snap.overdueCarryNoted || []).forEach((id) => overdueCarryNoted.add(id));
+    missedCheckQueuedHours.clear();
+    (snap.missedCheckQueuedHours || []).forEach((hour) => missedCheckQueuedHours.add(hour));
+    procedureInjected = !!snap.procedureInjected;
+    if (snap.shiftStart != null) shiftStart = snap.shiftStart;
+    if (snap.shiftDuration != null) shiftDuration = snap.shiftDuration;
+}
+
 export function processDoctorOrdersTime(currentTime) {
+    if (isTourActive()) return;
     if (currentTime == null) return;
     if (gameState.getStateSlice('isPaused')) return;
     if (gameState.getStateSlice('gameStatus') === GameConfig.gameStates.GAME_OVER) return;

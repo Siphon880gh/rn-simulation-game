@@ -7,6 +7,7 @@
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import taskSystem from './task-system.js';
+import { isTourActive } from './tour-mode.js';
 import { isAtOrAfterInShift, hhmmToMinutes, minutesFromShiftAnchor } from './availability-windows.js';
 import { mountTaskDom, presentSpawnedTask } from './dynamic-tasks.js';
 import { showCriticalLabMedia } from './media-placeholders.js';
@@ -529,7 +530,11 @@ export function handleCriticalLabCallComplete(task, opts = {}) {
         ?? addMinutesToHhmm(task.scheduled, cfg().callWindowMins || 60);
     const lab = resolveLab(task.metadata);
 
-    const callbackAt = pickCallbackAt(now, windowEnd, opts.random || Math.random);
+    const callbackAt = pickCallbackAt(
+        now,
+        windowEnd,
+        isTourActive() ? (() => 0) : (opts.random || Math.random)
+    );
     const pending = {
         callbackAt,
         windowEnd,
@@ -616,7 +621,7 @@ function applyCallbackEffects(task, lab, now) {
                 fromCriticalLabCallback: true,
                 labId: lab.id,
                 labShort: lab.shortName,
-                incident: true
+                incident: !isTourActive()
             }
         });
 
@@ -666,7 +671,7 @@ function onTime(currentTime) {
     if (currentTime == null) return;
     if (gameState.getStateSlice('isPaused')) return;
     if (gameState.getStateSlice('gameStatus') === GameConfig.gameStates.GAME_OVER) return;
-    spawnScheduledLabs(currentTime);
+    if (!isTourActive()) spawnScheduledLabs(currentTime);
     processPendingRecalls(currentTime);
     processPendingCallbacks(currentTime);
 }
@@ -682,6 +687,33 @@ export function listPendingCriticalLabCallbacks() {
         windowEnd: p.windowEnd,
         recallCount: p.recallCount || 0
     }));
+}
+
+export function captureCriticalLabsRuntime() {
+    return {
+        spawnedLabKeys: [...spawnedLabKeys],
+        pending: [...pendingCallbacks.entries()].map(([key, pending]) => [key, {
+            ...pending,
+            lab: pending.lab ? { ...pending.lab } : pending.lab
+        }]),
+        spawnedCallbackKeys: [...spawnedCallbackKeys],
+        spawnedRecallKeys: [...spawnedRecallKeys],
+        callbackCompleteHandled: [...callbackCompleteHandled]
+    };
+}
+
+export function restoreCriticalLabsRuntime(snap) {
+    if (!snap) return;
+    spawnedLabKeys.clear();
+    (snap.spawnedLabKeys || []).forEach((key) => spawnedLabKeys.add(key));
+    pendingCallbacks.clear();
+    (snap.pending || []).forEach(([key, pending]) => pendingCallbacks.set(key, pending));
+    spawnedCallbackKeys.clear();
+    (snap.spawnedCallbackKeys || []).forEach((key) => spawnedCallbackKeys.add(key));
+    spawnedRecallKeys.clear();
+    (snap.spawnedRecallKeys || []).forEach((key) => spawnedRecallKeys.add(key));
+    callbackCompleteHandled.clear();
+    (snap.callbackCompleteHandled || []).forEach((key) => callbackCompleteHandled.add(key));
 }
 
 export function resetCriticalLabs() {

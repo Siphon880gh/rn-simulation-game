@@ -1,0 +1,206 @@
+body.tour-modal-clear #modal {
+    align-items: flex-start;
+    padding-top: var(--tour-modal-popover, 10.5rem);
+}
+
+body.tour-modal-clear #modal .modal-panel {
+    margin-top: 0;
+    margin-bottom: 0;
+    max-height: calc(100vh - var(--tour-modal-popover, 10.5rem) - 1rem);
+    max-height: calc(100dvh - var(--tour-modal-popover, 10.5rem) - 1rem);
+    max-height: calc(100svh - var(--tour-modal-popover, 10.5rem) - 1rem);
+}
+
+.how-to-play-launch {
+    position: fixed;
+    top: 0.45rem;
+    right: 0.55rem;
+    z-index: 70;
+    border: 1px solid #1d4ed8;
+    background: #2563eb;
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.2;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
+    cursor: pointer;
+}
+
+.how-to-play-launch:hover {
+    background: #1d4ed8;
+}
+
+.how-to-play-launch[hidden] {
+    display: none !important;
+}
+
+.tour-target {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+    border-radius: 0.5rem;
+}
+
+#how-to-play-popover {
+    position: fixed;
+    z-index: 90;
+    width: min(22rem, calc(100vw - 1.25rem));
+    background: #fff;
+    color: #111827;
+    border: 1px solid #dbeafe;
+    border-radius: 0.85rem;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
+    padding: 0.85rem 0.95rem 0.75rem;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+
+#how-to-play-popover.is-dragging {
+    cursor: grabbing;
+}
+
+#how-to-play-popover.is-dragged .how-to-play-popover__kicker {
+    padding-right: 1.5rem;
+}
+
+.how-to-play-popover__reset {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    width: 1.55rem;
+    height: 1.55rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dbeafe;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    cursor: pointer;
+    padding: 0;
+}
+
+.how-to-play-popover__reset[hidden] {
+    display: none !important;
+}
+
+.how-to-play-popover__reset-tip {
+    position: absolute;
+    top: 50%;
+    right: calc(100% + 0.35rem);
+    width: max-content;
+    padding: 0.28rem 0.5rem;
+    border-radius: 0.45rem;
+    background: #111827;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: none;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.22);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.how-to-play-popover__reset:hover .how-to-play-popover__reset-tip,
+.how-to-play-popover__reset:focus-visible .how-to-play-popover__reset-tip {
+    opacity: 1;
+}
+
+#how-to-play-popover[hidden] {
+    display: none !important;
+}
+
+.context-menu-list,
+.context-menu-root {
+    z-index: 100 !important;
+}
+
+#how-to-play-popover.is-center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(28rem, calc(100vw - 1.25rem));
+}
+
+.how-to-play-popover__kicker {
+    margin: 0 0 0.25rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #2563eb;
+}
+
+.how-to-play-popover__body {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.4;
+}
+
+.how-to-play-popover__list {
+    margin: 0.15rem 0 0;
+    padding-left: 1.15rem;
+    font-size: 0.95rem;
+    line-height: 1.35;
+}
+
+.how-to-play-popover__list li + li {
+    margin-top: 0.55rem;
+}
+
+.how-to-play-popover__close {
+    margin: 0.7rem 0 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.how-to-play-popover__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+}
+
+.how-to-play-popover__actions button {
+    border-radius: 0.5rem;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.how-to-play-popover__next {
+    margin-left: auto;
+    background: #2563eb;
+    color: #fff;
+    border: 1px solid #1d4ed8;
+}
+
+.how-to-play-popover__next:disabled {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+    color: #6b7280;
+    cursor: default;
+}
+
+.how-to-play-popover__prev,
+.how-to-play-popover__skip {
+    background: #fff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+@media (max-width: 900px) {
+    .how-to-play-launch {
+        top: 0.3rem;
+        right: 0.35rem;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+}

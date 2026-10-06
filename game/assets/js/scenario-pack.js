@@ -47,6 +47,7 @@ export function normalizePack(raw, sourceUrl) {
         spawnPlan: raw.spawnPlan && typeof raw.spawnPlan === 'object' ? raw.spawnPlan : null,
         scene: raw.scene && typeof raw.scene === 'object' ? raw.scene : null,
         incidentPackUrl: typeof raw.incidentPackUrl === 'string' ? raw.incidentPackUrl : null,
+        skipIncidentPack: raw.skipIncidentPack === true || raw.id === 'how-to-play',
         shiftStart: Number.isFinite(Number(raw.shiftStart)) ? Number(raw.shiftStart) : null,
         shiftDurationHours: Number.isFinite(Number(raw.shiftDurationHours))
             ? Number(raw.shiftDurationHours)
@@ -103,9 +104,11 @@ export async function loadScenarioPack(url = DEFAULT_PACK_URL) {
     }
     let pack = normalizePack(await response.json(), url);
 
-    const incidentUrl = pack.incidentPackUrl
-        || GameConfig.scenario?.defaultIncidentPackUrl
-        || null;
+    const incidentUrl = pack.skipIncidentPack
+        ? null
+        : (pack.incidentPackUrl
+            || GameConfig.scenario?.defaultIncidentPackUrl
+            || null);
     if (incidentUrl) {
         try {
             const incident = await loadIncidentPack(incidentUrl);

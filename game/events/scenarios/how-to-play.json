@@ -1,0 +1,36 @@
+{
+  "id": "how-to-play",
+  "title": "How to play",
+  "version": 1,
+  "shiftKind": "night",
+  "shiftStart": 1900,
+  "shiftDurationHours": 12,
+  "department": "medsurg",
+  "fictionalOnly": true,
+  "skipIncidentPack": true,
+  "disclaimer": "Walkthrough only. This patient is not part of a normal assignment.",
+  "learningObjectives": [
+    "Practice the shift clock, badges, assessment, medications, CNA help, alerts, and hourly orders"
+  ],
+  "patients": ["tour-sam"],
+  "scene": {
+    "theme": "medsurg",
+    "unitBackground": null,
+    "situationStills": {}
+  },
+  "events": [],
+  "dynamicTemplates": [],
+  "orderInjections": {
+    "default": [
+      {
+        "id": "tour-order-encourage-fluids",
+        "type": "assessment",
+        "name": "Encourage fluids",
+        "patientId": "tour-sam",
+        "expire": "+60",
+        "durationMins": 5,
+        "taskClass": "routine"
+      }
+    ]
+  }
+}

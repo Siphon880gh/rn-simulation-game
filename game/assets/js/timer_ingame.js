@@ -2,6 +2,7 @@ import { roundDownTo15, timemarkPlusMinutes, divideBy15Mins, list15MinTimemarksF
 import { GameConfig } from './game-config.js';
 import gameState from './game-state.js';
 import BoostersModule from './boosters.js';
+import { isTourActive } from './tour-mode.js';
 
 const GameTimerModule = (() => {
   const FLASH_MS = {
@@ -227,7 +228,15 @@ const GameTimerModule = (() => {
     }
 
     timerState.currentShiftTime = currentTime.hours;
-    clockElement.textContent = formatMilitaryTime(currentTime.hours, currentTime.seconds);
+    const label = formatMilitaryTime(currentTime.hours, currentTime.seconds);
+    clockElement.textContent = label;
+    const lean = document.querySelector(GameConfig.selectors.clockLean || '#clock-lean');
+    if (lean) lean.textContent = label;
+  }
+
+  function paintClock() {
+    if (timerState.shiftStart === -1) return;
+    updateClockDisplay(calculateCurrentTime());
   }
 
   // Format time for display
@@ -375,6 +384,10 @@ ${selectors.join(',\n')} {
 
   // Handle game over
   function handleGameOver() {
+    if (isTourActive()) {
+      timerState.secondsLeft = Math.max(1, timerState.secondsLeft);
+      return;
+    }
     timerActions.stop();
     gameState.dispatch('GAME_OVER');
     timerState.gameOverCallback();
@@ -395,6 +408,7 @@ ${selectors.join(',\n')} {
     timerActions.initialize(config);
     timerState.lastElapsedGameMins = -1;
     syncIcedClockUi();
+    paintClock();
     timerActions.start();
   };
 
@@ -410,6 +424,91 @@ ${selectors.join(',\n')} {
   const pause = (source) => timerActions.pause(source);
   const resume = (source) => timerActions.resume(source);
   const stop = () => timerActions.stop();
+
+  function restartInterval() {
+    if (timerState.intervalId) clearInterval(timerState.intervalId);
+    timerState.intervalId = setInterval(() => {
+      if (!timerState.isPaused) tickTimer();
+    }, 1000 / timerState.speedFactor);
+  }
+
+  const setSpeedFactor = (factor) => {
+    const next = Number(factor);
+    if (!Number.isFinite(next) || next <= 0) return;
+    if (next === timerState.speedFactor && timerState.intervalId) return;
+    timerState.speedFactor = next;
+    if (timerState.intervalId) restartInterval();
+  };
+
+  const seekToHhmm = (hhmm) => {
+    const target = Number(hhmm);
+    if (!Number.isFinite(target) || timerState.shiftStart === -1) return;
+    const startM = Math.floor(timerState.shiftStart / 100) * 60 + (timerState.shiftStart % 100);
+    let targetM = Math.floor(target / 100) * 60 + (target % 100);
+    if (targetM < startM) targetM += 24 * 60;
+    const elapsedMins = Math.max(0, targetM - startM);
+    const perSecond = timerState.gameMinutesPerRealSecond || 1;
+    const elapsedSeconds = elapsedMins * 60 / perSecond;
+    timerState.secondsLeft = Math.max(1, timerState.timePerDay - elapsedSeconds);
+    const current = calculateCurrentTime();
+    updateClockDisplay(current);
+    while (timerState.pollTaskTimes.length && Number(timerState.pollTaskTimes[0]) <= Number(current.hours)) {
+      timerState.pollTaskTimes.shift();
+    }
+    gameState.dispatch('UPDATE_TIME', { time: current.hours });
+  };
+
+  const beginWindow = ({ shiftStart, gameMinutesPerShift, speedFactor }) => {
+    timerActions.initialize({
+      clockSelector: timerState.clockSelector,
+      pauseSelector: timerState.pauseSelector,
+      speedFactor: speedFactor || timerState.speedFactor || 1,
+      gameMinutesPerShift,
+      shiftStart,
+      gameOverCallback: timerState.gameOverCallback
+    });
+    timerState.lastElapsedGameMins = -1;
+    timerActions.start();
+    const current = calculateCurrentTime();
+    updateClockDisplay(current);
+    gameState.dispatch('UPDATE_TIME', { time: current.hours });
+  };
+
+  const capture = () => ({
+    totalDays: timerState.totalDays,
+    gameMinutesPerShift: timerState.gameMinutesPerShift,
+    timePerDay: timerState.timePerDay,
+    shiftStart: timerState.shiftStart,
+    gameMinutesPerRealSecond: timerState.gameMinutesPerRealSecond,
+    secondsLeft: timerState.secondsLeft,
+    currentShiftTime: timerState.currentShiftTime,
+    isPaused: timerState.isPaused,
+    time: timerState.time,
+    pollTaskTimes: [...timerState.pollTaskTimes],
+    clockSelector: timerState.clockSelector,
+    pauseSelector: timerState.pauseSelector,
+    speedFactor: timerState.speedFactor,
+    lastElapsedGameMins: timerState.lastElapsedGameMins,
+    gameOverCallback: timerState.gameOverCallback
+  });
+
+  const restore = (snap) => {
+    if (!snap) return;
+    if (timerState.intervalId) clearInterval(timerState.intervalId);
+    timerState = {
+      ...timerState,
+      ...snap,
+      pollTaskTimes: [...(snap.pollTaskTimes || [])],
+      intervalId: null,
+      flashClearTimers: timerState.flashClearTimers
+    };
+    restartInterval();
+    timerState.isPaused = !!gameState.getStateSlice('isPaused');
+    const current = calculateCurrentTime();
+    updateClockDisplay(current);
+    syncPauseButtonLabel();
+    syncIcedClockUi();
+  };
 
   // Clock follows declarative pauseSources / isPaused (user, modal, challenge, system)
   gameState.subscribe('isPaused', (isPaused) => {
@@ -428,7 +527,12 @@ ${selectors.join(',\n')} {
     pause,
     resume,
     stop,
-    getState: () => ({ ...timerState })
+    setSpeedFactor,
+    seekToHhmm,
+    beginWindow,
+    capture,
+    restore,
+    getState: () => ({ ...timerState, pollTaskTimes: [...timerState.pollTaskTimes] })
   };
 })();
 
