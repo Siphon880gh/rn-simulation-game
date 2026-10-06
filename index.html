@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/landing.css?v=1.7">
+    <link rel="stylesheet" href="assets/css/landing.css?v=1.8">
 </head>
 <body class="landing">
     <div class="landing-atmosphere" aria-hidden="true"></div>
@@ -111,18 +111,23 @@
         <form method="dialog" class="census-choice-card">
             <div class="census-choice-header">
                 <h2 id="census-choice-title" class="census-choice-title">Unit assignment</h2>
-                <div class="census-choice-shift" role="group" aria-label="Shift type">
+                <div class="census-choice-shift" role="group" aria-labelledby="census-choice-shift-label">
+                    <span class="census-choice-shift__label" id="census-choice-shift-label">Shift Type</span>
                     <button type="button" id="census-choice-shift-night"
                             class="census-choice-shift__btn is-selected"
-                            data-shift="night" aria-pressed="true" title="Night shift">
+                            data-shift="night" aria-pressed="true"
+                            title="Night shift, 1900-0730"
+                            aria-label="Night shift, 1900 to 0730">
                         <span class="census-choice-shift__icon" aria-hidden="true">☾</span>
-                        <span class="visually-hidden">Night</span>
+                        <span class="census-choice-shift__hours" aria-hidden="true">1900-0730</span>
                     </button>
                     <button type="button" id="census-choice-shift-day"
                             class="census-choice-shift__btn"
-                            data-shift="day" aria-pressed="false" title="Day shift">
+                            data-shift="day" aria-pressed="false"
+                            title="Day shift, 0700-1930"
+                            aria-label="Day shift, 0700 to 1930">
                         <span class="census-choice-shift__icon" aria-hidden="true">☀</span>
-                        <span class="visually-hidden">Day</span>
+                        <span class="census-choice-shift__hours" aria-hidden="true">0700-1930</span>
                     </button>
                 </div>
             </div>
